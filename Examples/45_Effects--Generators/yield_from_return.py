@@ -13,7 +13,7 @@ def emit(items: list[str]) -> Generator[str, None, Size]:
 
 def report(items: list[str]) -> Iterator[str]:
     size: Size = yield from emit(items)
-    yield f"({size} characters)"
+    yield f"{size} characters"
 
 print(list(report(["red", "green", "blue"])))
-#: ['red', 'green', 'blue', '(12 characters)']
+#: ['red', 'green', 'blue', '12 characters']

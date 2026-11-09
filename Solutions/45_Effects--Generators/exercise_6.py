@@ -13,7 +13,7 @@ def emit(items: list[str]) -> Generator[str, None, Size]:
 
 def report(items: list[str]) -> Generator[str, None, Size]:
     size: Size = yield from emit(items)
-    yield f"({size} characters)"
+    yield f"{size} characters"
     return size
 
 def summarize(items: list[str]) -> Generator[str]:
@@ -21,4 +21,4 @@ def summarize(items: list[str]) -> Generator[str]:
     yield f"total: {counted}"
 
 print(list(summarize(["red", "green", "blue"])))
-#: ['red', 'green', 'blue', '(12 characters)', 'total: 12']
+#: ['red', 'green', 'blue', '12 characters', 'total: 12']

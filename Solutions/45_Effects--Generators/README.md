@@ -788,7 +788,7 @@ def emit(items: list[str]) -> Generator[str, None, Size]:
 
 def report(items: list[str]) -> Generator[str, None, Size]:
     size: Size = yield from emit(items)
-    yield f"({size} characters)"
+    yield f"{size} characters"
     return size
 
 def summarize(items: list[str]) -> Generator[str]:
@@ -796,7 +796,7 @@ def summarize(items: list[str]) -> Generator[str]:
     yield f"total: {counted}"
 
 print(list(summarize(["red", "green", "blue"])))
-#: ['red', 'green', 'blue', '(12 characters)', 'total: 12']
+#: ['red', 'green', 'blue', '12 characters', 'total: 12']
 ```
 
 **Declare the return channel.**
@@ -825,7 +825,7 @@ since `list()` drives the chain with `next()`,
 the runtime equivalent of `send(None)`.
 
 The count `12` therefore reaches `summarize()` through two returns.
-`'(12 characters)'` takes the other route: `report()` yields it,
+`'12 characters'` takes the other route: `report()` yields it,
 the `yield from` in `summarize()` relays it, and the driver receives it.
 The count ends up in `size` and then in `counted`;
 the string ends up in the list that `list()` builds.
