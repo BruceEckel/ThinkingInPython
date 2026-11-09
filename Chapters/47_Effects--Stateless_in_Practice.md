@@ -231,7 +231,7 @@ print(4_000 < heads < 6_000)
 #: True
 ```
 
-`Ask` and `Tell` each carry a payload the request delivers,
+`Ask` and `Tell` in `ask_tell_stateless.py` each carry a payload the request delivers,
 whereas `Flip`'s whole content is its type and the `bool` it produces.
 
 The parentheses in `if (yield from flip()):` are mandatory.
@@ -535,7 +535,7 @@ def draw(source: Source, hour: int) -> None:
 ```
 
 An `Outlet` request carries the hour so the handler can check which sources are available at that hour.
-`Ask` carries a prompt for the same reason.
+`Ask` in `ask_tell_stateless.py` carries a prompt for the same reason.
 
 `Source` carries no `@runtime_checkable`,
 because the listings name `Source` in annotations and in `Outlet`'s base,
@@ -625,7 +625,7 @@ In this program the `with` block has closed by then,
 because `plug()` sits outside it.
 If a handler raises an exception while a `with` block is open,
 that block's exit waits until Python reclaims the abandoned generator.
-The reclaiming can come after the `except` clause that handled the exception has finished.
+The reclaiming can come after an `except` clause around `run()` has handled the exception and finished.
 
 ```python
 # microgrid_demo.py
@@ -1008,7 +1008,7 @@ Every line above it comes from a supplied implementation,
 because the pipeline leaves every `print()` to the implementations you supply.
 Those lines therefore record where each run stopped.
 The run at `[2]` stops after `feed: fetching`.
-`topic_of()` yields a `NotInteresting`,
+`topic_of()` in `research.py` yields a `NotInteresting`,
 and `research()` stops at that `yield from`.
 The stop comes before the `need(Encyclopedia)` on the next line,
 and so before any call to `Library.article()`.
@@ -1145,7 +1145,7 @@ print(type(edge(Wire(""))).__name__)
 
 `fetch_nonempty()` can fail either way.
 `Unavailable` originates in ordinary code.
-`latest()` raises it, and the `@throws` on `fetch()` lifts it.
+`latest()` on a `Feed` raises it, and the `@throws` on `fetch()` lifts it.
 `Empty` originates here, in the generator,
 where the headline is available to inspect.
 The generator yields that failure as a value rather than raising it,

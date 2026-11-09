@@ -676,7 +676,8 @@ a different design, a detail, or an equivalent alternative.
 
 ## Shared code: the research pipeline
 
-The chapter's `research.py` and the doubles from `newswire.py` appear here,
+The chapter's `research.py` appears here unchanged.
+Its `newswire.py` doubles follow as `feeds.py`,
 with exercise 6's `StaleWire` added,
 so the listings that follow can import them:
 
@@ -912,7 +913,7 @@ def research() -> Effect[
 **Add and declare the failure.**
 The Effect version takes four edits, one of which the type checker names.
 `research_long.py` makes them in a copy of `research()` and imports the rest from `research.py`.
-`report()` needs three more.
+`report()` in `report.py` needs three more.
 
 1. A new exception class, `TooLong`.
 2. A new `@throws(TooLong)` function, `within_limit()`,
