@@ -2773,7 +2773,23 @@ the causer as a phrase reads better, and keep when it does not).
 survey rule, since the parse cannot tell a demoted actor from an
 incidental object.
 
-**Sightings.** 1, promoted at Bruce's call (2026-11-09).
+**Sightings.** 2 flags, promoted at Bruce's call (2026-11-09), then a
+book sweep the same day over the `[CAUS]` list: 308 sites, 112
+rewritten (four Opus agents by chapter band, chapter 45 by hand), 196
+kept. The keeps, by the agents' labels: a stative complement ("makes
+instances unhashable", "depend on the schedule"), a causer that is the
+claim with the type checker or Python as the object ("`@final` makes
+the type checker report a subclass", a gerund edit that makes `ty`
+report), an imperative or a step label ("Let the type checker infer
+the rest"), a title, "need" or "want" with a purpose infinitive, an
+exercise statement, and "make" as a light verb ("makes the same
+calls"). Rewrites that worked: a condition or phrase for the causer
+("Under `slots=True`, `dataclass()` builds a new class"; "With a
+closure, a function carries state"), a modal for the actor ("Callers
+must pass the fields after `KW_ONLY` by keyword"), the event as the
+verb ("`throw(exc)` raises `exc` at the `yield`"), and a split where
+the causative joined two claims ("gives each cast a narrator. Each
+cast chooses its actors.").
 - `45_Effects--Generators` 2026-11-09, heading, was Claude-written:
   "`close()` Requires the Generator to Finish" -> "`close()`: The
   Generator Must Finish"
