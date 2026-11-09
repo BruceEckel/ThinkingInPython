@@ -1219,7 +1219,7 @@ and the `finally` block runs at collection time.
 Calling `close()` yourself runs the `finally` block at a point you choose.
 
 A second `close()` is safe.
-On a generator that is already `GEN_CLOSED`,
+On a `GEN_CLOSED` generator,
 `close()` returns `None` and leaves the generator as it is.
 The garbage collector closes a generator that is still paused,
 so a generator the driver closed has run its `finally` block once when the collector reclaims it.
