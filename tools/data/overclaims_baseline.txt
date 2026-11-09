@@ -797,7 +797,6 @@ Chapters/47_Effects--Stateless_in_Practice.md	[BOUND] An EMS adds one thing
 Chapters/47_Effects--Stateless_in_Practice.md	[BOUND] An Effect that asks for ten separate things is usually two Effects
 Chapters/47_Effects--Stateless_in_Practice.md	[BOUND] CODE also decorates a generator function, so one function can make the request and declare the failure
 Chapters/47_Effects--Stateless_in_Practice.md	[BOUND] CODE and CODE in one function
-Chapters/47_Effects--Stateless_in_Practice.md	[BOUND] CODE and CODE match the CODE and CODE Protocols by structure, and the engine works with the three Protocols alone
 Chapters/47_Effects--Stateless_in_Practice.md	[BOUND] CODE asks for two things, and both are leaves
 Chapters/47_Effects--Stateless_in_Practice.md	[BOUND] CODE comes from the only two schedule combinators the library has
 Chapters/47_Effects--Stateless_in_Practice.md	[BOUND] CODE handles the two channels differently

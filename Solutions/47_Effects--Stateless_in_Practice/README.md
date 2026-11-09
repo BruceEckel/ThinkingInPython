@@ -874,8 +874,7 @@ and your edit list says which tool named each line.
 <summary>Solution</summary>
 
 The solution decorates `within_limit()` with `@throws(TooLong)`,
-which moves the raised exception into the error channel,
-where `catch()` handles it:
+which moves the raised exception into the error channel:
 
 ```python
 # research_long.py

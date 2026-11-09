@@ -1460,8 +1460,9 @@ That is the ambiguity of [When Two Implementations Match](46_Effects--Stateless.
 Each was a class with a method per product.
 Each is now a function that hands `play()` a matched set.
 No parallel hierarchy remains.
-`Kitty` and `Puzzle` match the `Hero` and `Obstacle` Protocols by structure,
-and the engine works with the three Protocols alone:
+`Kitty` and `Puzzle` match the `Hero` and `Obstacle` Protocols by structure.
+Here, `Loud` and `Script` each supply the `say()` the third Protocol requires,
+so the engine works with either:
 
 ```python
 # two_games.py

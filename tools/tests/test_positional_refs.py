@@ -287,3 +287,58 @@ def test_self_name_is_a_survey_rule(
     out = capsys.readouterr().out
     assert "[survey self-name] '`items.py`'" in out
     assert out.strip().endswith("0 new, 0 accepted, 1 survey")
+
+
+def absent_hits(text: str) -> list[str]:
+    doc = Document.from_text(text, Path("fixture.md"))
+    return [h.phrase for h in find(doc) if h.kind == "survey absent-name"]
+
+
+def test_absent_name_function() -> None:
+    text = ("`proxy()` works, and `survey()` can delegate:\n\n"
+            "```python\n# a.py\ndef proxy(): ...\n```\n")
+    assert absent_hits(text) == ["`survey()`"]
+
+
+def test_absent_name_once_per_sentence() -> None:
+    text = ("Both `survey()` and `survey()` run:\n\n"
+            "```python\n# a.py\nprint(1)\n```\n")
+    assert absent_hits(text) == ["`survey()`"]
+
+
+def test_absent_name_quiet_cases() -> None:
+    imported = ("`survey()` runs:\n\n"
+                "```python\n# a.py\nfrom b import survey\n```\n")
+    assert absent_hits(imported) == []
+    defined = ("`Shape` is a base:\n\n"
+               "```python\n# a.py\nclass Shape: ...\n```\n")
+    assert absent_hits(defined) == []
+    builtin = ("`print()` shows it:\n\n"
+               "```python\n# a.py\nx = 1\n```\n")
+    assert absent_hits(builtin) == []
+    variable = ("The `inner` name is bound:\n\n"
+                "```python\n# a.py\nx = 1\n```\n")
+    assert absent_hits(variable) == []
+    earlier = ("`survey()` is defined elsewhere. Here it runs:\n\n"
+               "```python\n# a.py\nx = 1\n```\n")
+    assert absent_hits(earlier) == []
+
+
+def test_absent_name_checks_the_whole_file() -> None:
+    text = ("```python\n# a.py\ndef survey(): ...\n```\n\n"
+            "`survey()` continues:\n\n"
+            "```python\n# a.py (continued)\nx = 1\n```\n")
+    assert absent_hits(text) == []
+
+
+def test_absent_name_is_a_survey_rule(
+    book: Path, capsys: pytest.CaptureFixture[str],
+) -> None:
+    book.write_text("`survey()` runs:\n\n"
+                    "```python\n# a.py\nx = 1\n```\n",
+                    encoding="utf-8")
+    assert main(["--fail"]) == 0
+    assert "absent-name" not in capsys.readouterr().out
+    assert main(["--survey"]) == 0
+    out = capsys.readouterr().out
+    assert "[survey absent-name] '`survey()`'" in out

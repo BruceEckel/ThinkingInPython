@@ -110,6 +110,40 @@ statement-like word (line, call, loop, print, return, ...):
    keeps, so it is a survey rule, printed under `--survey`, never
    baselined.
 
+10. `survey absent-name` (2026-11-09): a lead-in whose colon sentence
+   names a function or class in a code span that the listing under it
+   never mentions. Chapter 45's lead-in to `answering_proxy.py` said
+   "`proxy()` has the same annotation as `interview()`, so `drive()`
+   accepts either, and `survey()` can delegate to either with `yield
+   from`:" while `survey()` is defined two listings earlier and
+   `answering_proxy.py` never uses it. Bruce: "I don't see survey()
+   in answering_proxy.py". A lead-in's claim belongs to the listing
+   under it, so the clause is cut or moved to prose beside the
+   listing that holds the name (commit 8b4f61eb). Only the sentence
+   of the paragraph that ends in a colon is read. A span counts when
+   it is a call (`name()`, `obj.method()`, compared by its final
+   name) or one CapWords word (`Need`, `Generator`). Bare lowercase
+   spans, spans with spaces or brackets, and filenames are variables,
+   syntax, or files, and too noisy. The Python builtins and
+   exception names (`COMMON_NAMES`, from `dir(builtins)`) are quiet,
+   since a lead-in uses them as general terms. The listing's code
+   includes its imports, so an imported name is present, and a
+   method call counts (`named_in_code()`: a lead-in's `pop()` is
+   answered by `d.pop(...)`, where `in_code()`, written for the
+   construct rules, would not look after a dot). A
+   `(continued)` part is compared with the code of every part of its
+   file in the chapter, since its lead-in speaks of the whole file.
+   One hit per absent name per sentence. A survey rule, printed under
+   `--survey`, never baselined; the reader judges each hit. The first
+   book run had 68 hits and 3 rewrites (chapter 45's, chapter 47's
+   `two_games.py` lead-in, Solutions 47's "where `catch()` handles
+   it"). The keeps: a contrast with the previous listing ("`announce()`
+   in place of `notify()`"), a name defined in a module the listing
+   imports (`wrapper()` inside `tracer`), a generated dunder, a type
+   or placeholder (`Need`, `SomeClass`, `blocking_call()`), a
+   cross-reference, an absence that is the claim ("with no `Meter`"),
+   and a lead-in that introduces two listings at once.
+
 Deliberately not matched, so a human never reads them as hits: "the
 first argument" or "the first parameter" (a position in a call or
 signature), "the first version", "the second form", "the first half"
@@ -141,7 +175,7 @@ every other file's entries.
 
     uv run python -m tools.positional_refs          # new hits
     uv run python -m tools.positional_refs --all    # every hit
-    uv run python -m tools.positional_refs --survey # + call, time, alternative, self-name
+    uv run python -m tools.positional_refs --survey # + call, time, alternative, self-name, absent-name
     uv run python -m tools.positional_refs --accept # judged keeps
     uv run python -m tools.positional_refs Chapters/30_*.md
     uv run tip positional CH=30
@@ -149,6 +183,7 @@ every other file's entries.
 """
 
 import argparse
+import builtins
 import re
 from collections.abc import Iterator
 from dataclasses import dataclass
@@ -243,6 +278,10 @@ SURVEY_UNIT: Final = count_unit(SURVEY_SING, SURVEY_PLUR)
 SURVEY_KIND: Final = "survey count+unit"
 ALT_KIND: Final = "survey alternative"
 SELF_KIND: Final = "survey self-name"
+ABSENT_KIND: Final = "survey absent-name"
+COMMON_NAMES: Final = frozenset(dir(builtins))
+CALL_SPAN: Final = re.compile(r"[A-Za-z_][\w.]*\(\)")
+CAP_SPAN: Final = re.compile(r"[A-Z]\w*")
 GENERIC_NAMES: Final = frozenset(("__init__.py", "conftest.py"))
 ALT_MARKERS: Final = re.compile(
     r"\b(?:if|would|could|might|were|had|unless|instead|otherwise|"
@@ -439,6 +478,13 @@ def in_code(name: str, code: str) -> bool:
     return re.search(rf"(?<![\w.]){re.escape(name)}\b", code) is not None
 
 
+def named_in_code(name: str, code: str) -> bool:
+    """Does `name` occur in `code` as a whole word, a method call
+    (`d.pop(`) included? The absent-name rule's test: a lead-in that
+    says `pop()` is answered by `d.pop(...)` in the listing."""
+    return re.search(rf"(?<!\w){re.escape(name)}\b", code) is not None
+
+
 def names_a_listing_span(sentence: str, code: str) -> bool:
     """Does a code span in the sentence name something the code holds?"""
     return any(
@@ -522,9 +568,40 @@ def self_name_hits(doc: Document) -> Iterator[Hit]:
                               m.group(), " ".join(sentence.split()))
 
 
+def absent_name_hits(doc: Document) -> Iterator[Hit]:
+    """A hit per function or class a lead-in names that its listing lacks."""
+    for block in doc.blocks:
+        slug = block.slug
+        if slug is None:
+            continue
+        paragraph = lead_in(doc, block)
+        if not paragraph:
+            continue
+        code = "\n".join(block_code(b) for b in doc.blocks
+                         if b.slug == slug)
+        text, lines = joined(paragraph)
+        for start, sentence in sentences(text):
+            if not sentence.rstrip().endswith(":"):
+                continue
+            seen: set[str] = set()
+            for m in CODE_SPAN.finditer(sentence):
+                body = m.group().strip("`").strip()
+                if not (CALL_SPAN.fullmatch(body)
+                        or CAP_SPAN.fullmatch(body)):
+                    continue
+                name = identifier(body)
+                if (name in seen or name in COMMON_NAMES
+                        or named_in_code(name, code)):
+                    continue
+                seen.add(name)
+                yield Hit(lines[start + m.start()], ABSENT_KIND,
+                          m.group(), " ".join(sentence.split()))
+
+
 def find(doc: Document) -> Iterator[Hit]:
     """A hit per positional reference in one document."""
     yield from self_name_hits(doc)
+    yield from absent_name_hits(doc)
     for block, paragraph in region_paragraphs(doc):
         text, lines = joined(paragraph)
         counts = keyword_counts(block)
@@ -575,7 +652,9 @@ def main(argv: list[str] | None = None) -> int:
                     help="also print the survey hits (a count on "
                          "`call` or `time`; an unmarked alternative in "
                          "a walkthrough; a lead-in that names its own "
-                         "listing), which are never baselined")
+                         "listing; a lead-in naming a function or "
+                         "class the listing lacks), which are never "
+                         "baselined")
     args = ap.parse_args(argv)
     paths = md_files(args.paths or [ROOT / "Chapters", ROOT / "Solutions"])
     shown_paths = {display(p) for p in paths}

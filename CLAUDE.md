@@ -353,7 +353,18 @@ the thing's name; the filename is on the listing's first line. A
 `conftest.py` are quiet. The first run (7177b735) rewrote six and
 kept eight, a file the reader already has: a module a test needs
 before it is supplied, a chapter file a solution revises. R31 in
-`bruce_edit_db.md` holds the rule.
+`bruce_edit_db.md` holds the rule. Its sibling the same day is
+`survey absent-name`: a lead-in's colon sentence names a function or
+class, in a code span, that the listing under it never mentions
+("and `survey()` can delegate to either with `yield from`:" above
+`answering_proxy.py`, which never calls `survey()`; Bruce: "I don't
+see survey() in answering_proxy.py"). A lead-in's claim belongs to
+the listing under it, so the clause is cut. Method calls count as
+present (`d.pop(` answers `pop()`), builtins and a bare lowercase
+span are skipped. The first run had 68 hits and 3 rewrites; the
+keeps are a contrast with the previous listing, a name inside an
+imported module, a generated dunder, a type or placeholder, a
+cross-reference, and an absence that is the claim.
 `tip trailing` (`tools/trailing_tags.py`, 2026-10-18) lists two shapes
 Bruce marked in chapter 31, rules R32 and R35 in `bruce_edit_db.md`: a
 clause that ends on a comma, a participle, and a measure or place
