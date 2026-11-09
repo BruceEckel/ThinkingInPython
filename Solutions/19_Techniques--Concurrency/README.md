@@ -171,7 +171,7 @@ The comprehension awaits one coroutine at a time.
 `await` waits for that coroutine to finish, so `b` starts once `a` finishes.
 The later coroutines stay unscheduled while the current one waits.
 
-`gather()` finishes in about the longest delay, 0.03 seconds,
+The `gather()` version finishes in about the longest delay, 0.03 seconds,
 because all three waits overlap.
 This version takes their sum, about 0.06 seconds,
 because the waits run one after another.
@@ -395,7 +395,7 @@ so each task runs start to finish before the next begins.
 Waiting does not create overlap.
 Suspending does.
 These five tasks spend almost all their time waiting and still run one at a time.
-`cpu_price()` spends its time computing and runs one at a time for the same reason:
+`cpu_price()` in `peak_concurrency.py` spends its time computing and runs one at a time for the same reason:
 it has no `await` to reach.
 
 The total run time shows the blocking tasks running in turn.
