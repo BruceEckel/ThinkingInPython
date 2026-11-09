@@ -589,7 +589,8 @@ The augmented assignments `|=`, `&=`, `-=`, and `^=` modify a set in place.
 They match the `update()`, `intersection_update()`, `difference_update()`,
 and `symmetric_difference_update()` methods.
 
-`add()` inserts a single element, and `remove()` and `discard()` delete one.
+A set's `add()` inserts a single element,
+and `remove()` and `discard()` delete one.
 `remove()` raises a `KeyError` on a missing element,
 where a `list`'s `remove()` raises a `ValueError`.
 `discard()` ignores a missing element.
