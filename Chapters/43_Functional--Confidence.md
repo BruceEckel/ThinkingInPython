@@ -231,7 +231,7 @@ That rules out two shapes these chapters use often.
 By contrast, a `functools.partial` pickles as its wrapped function plus its bound arguments,
 so a `partial` of a top-level function carries to a worker the argument a closure captures.
 
-The `if __name__ == "__main__"` guard follows from the same import.
+The `if __name__ == "__main__"` guard follows from the import a pickled function needs.
 Each worker imports this module to find `count_primes()`.
 Without the guard, each worker re-runs the pool-building code,
 which fails in the worker with a `RuntimeError` and in the parent with `BrokenProcessPool`.
@@ -484,7 +484,7 @@ and test as statements about what is true.
 That gain, more than the presence of functions,
 is the "functionality" the introduction sets out to find.
 
-Part V extends the same discipline and asks the type checker to enforce it.
+Part V extends these chapters' discipline and asks the type checker to enforce it.
 [Effect Management](44_Effects--Effect_Management.md)
 puts a function's effects in its signature,
 and the chapters after it build a checked system on that idea.

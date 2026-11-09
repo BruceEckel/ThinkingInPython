@@ -299,9 +299,12 @@ is confusing" on chapter 45's "A `yield` inside a `finally` clause
 draws the same `RuntimeError`"), for one shape: draw, draws, drew, or
 drawn with a code span or a diagnostic noun as its object. The repair
 names the actor with the verb the book taught ("`close()` raises",
-"the type checker reports"). About 30 sites stay NEW for the chapter
-passes, with four literal hits ("draws `n` random pairs") to accept as
-they are read.
+"the type checker reports"). The sweep that day rewrote the book's
+30 or so sites, and the baseline holds six literal hits ("draws `n`
+random pairs"). The same sweep read all 1,370 "same" sites for rule
+R63 ("the same X" has a second term the reader can name, Bruce: "same
+as what") and rewrote about 30; no tool lists that shape, so the
+`ambiguity` pass reads every "same" in its scope.
 Since 2026-10-28 `tip watch-words` also lists a verb cancelled by its
 object, `no X`, `none`, or `none of` ("runs none of the body", "raises
 no exception", "has no `__slots__`"), Bruce's "reversal of

@@ -108,7 +108,9 @@ Then pass a tuple of classes at the call site and watch for the extra pair of pa
 your edited `demo_exceptions.py` prints `before`,
 then a line starting `[TypeError]`, then `survived`,
 and `uv run ty check` passes on it.
-A block that still divides by zero under the same `expected(...)` call prints `[ZeroDivisionError] division by zero`,
+A block that still divides by zero under the edited call,
+`expected((ZeroDivisionError, TypeError))`,
+prints `[ZeroDivisionError] division by zero`,
 so the original type stays covered.
 
 <details>
@@ -176,7 +178,7 @@ shows several managers on one `with` statement, entered left to right.
 Add another `tag("li")` with its own `as` name to the managers on the `with` line,
 grouping them in parentheses once they outgrow one line.
 Predict the closing tags before you run `multiple.py`,
-using the same last-in-first-out rule.
+using the rule that the last manager to enter is the first to exit.
 
 <details>
 <summary>The shape</summary>

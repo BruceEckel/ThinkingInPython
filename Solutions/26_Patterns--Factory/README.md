@@ -1231,7 +1231,7 @@ and can load any module through `__import__()`.
 
 **Look up the name as a key.**
 `create_shape()` is the chapter's version,
-which looks `kind` up in a dictionary keyed on the same names.
+which looks `kind` up in a dictionary keyed on shape names such as `"Circle"`.
 The string stays data,
 so `create_shape(ATTACK)` raises a `KeyError` for an unknown key.
 
@@ -1724,7 +1724,7 @@ The chapter's `registry.py` relies on the same timing.
 The name is an argument because the type checker rejects `__name__` on a `Builder`.
 `Builder` is a `Callable`.
 A `Callable` declares how you call it, not that it carries a `__name__`.
-Writing `PROTOTYPES[build.__name__] = build()` draws:
+If you write `PROTOTYPES[build.__name__] = build()`, the type checker reports:
 
 ```text
 error[unresolved-attribute]: Object of type `Builder` has no attribute `__name__`

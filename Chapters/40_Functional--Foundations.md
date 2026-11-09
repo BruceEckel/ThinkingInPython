@@ -622,7 +622,7 @@ At runtime `percent()` clamps each argument, as the `#:` line shows.
 
 The declaration on its own line states the type of `percent`.
 `ty` takes the type of `percent` from that declaration and checks the three calls against it.
-A call to `percent()` with no argument draws a `missing-argument` report,
+A call to `percent()` with no argument is a `missing-argument` error,
 so `ty` catches the `TypeError` case before the program runs.
 
 ## Composing Functions

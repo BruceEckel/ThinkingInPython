@@ -363,7 +363,7 @@ says the cache stores results in a dictionary keyed on the arguments.
 A dictionary key must be hashable,
 so ask which argument type in the signature fails that test.
 The fix changes the `Nested` alias.
-The same section's note on pure functions covers a separate requirement.
+The `cache` section's note on pure functions covers a separate requirement.
 
 <details>
 <summary>The shape</summary>
@@ -424,7 +424,7 @@ The call raises `TypeError` before `deep_sum()`'s body runs.
 **Silence the checker so the listing runs.**
 `ty` reports the same problem before the program runs.
 The standard library's type declarations give a cached function's parameters the type `Hashable`,
-so both calls draw `invalid-argument-type`.
+so the type checker reports `invalid-argument-type` on both calls.
 On the recursive call it reads "Expected `Hashable`, found `list[Nested]`".
 On the list passed through `expect()`,
 the same diagnostic names the literal's inferred type.

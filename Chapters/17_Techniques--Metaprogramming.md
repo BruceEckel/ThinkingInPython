@@ -390,7 +390,8 @@ the supported way for a debugger to change a function's variables.
 The type checker skips the code inside the string,
 so `namespace` carries the annotation `dict[str, object]`,
 and `namespace[class_name]` is an `object`.
-Returning an `object` where `make_class()` declares `Callable[[], Command]` draws an `invalid-return-type`.
+If `make_class()` returns that `object` where it declares `Callable[[], Command]`,
+the type checker reports an `invalid-return-type`.
 `cast(Callable[[], Command], ...)` states the actual no-argument signature at the one place that creates the class.
 
 `EventMakers` in `greenhouse.py` stores each class it builds.

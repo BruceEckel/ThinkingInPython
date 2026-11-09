@@ -2836,11 +2836,26 @@ distinction", "draws a conclusion", and "draws the line", which the
 literal pass judges by its own test and which carry no hidden actor.
 None seen yet for the flagged sense.
 
-**Sightings.** 1 flag, made a rule at Bruce's call (2026-11-09). No
-book sweep yet: `tip watch-words` lists the remaining sites as NEW
-Tier 2 hits, about 30, nearly all a type-checker diagnostic (chapters
-08, 09, 12, 17, 40, 41, 46, 47, appendix B, and eleven Solutions
-files).
+**Sightings.** 1 flag, made a rule at Bruce's call (2026-11-09), then
+a book sweep the same day (six Opus agents by chapter band, brief in
+`build/same-draws-2026-11-09/`, chapter 45 by hand): about 30 sites
+rewritten in 22 files, nearly all a type-checker diagnostic, and no
+figurative site kept. Six literal hits the scan matches ("draws `n`
+random pairs", "To draw the `Room`", "draws from `SHAPES`") are in the
+watch-words baseline. The forms that worked: "the type checker reports
+X" with the code as an "If you" condition or a "when" clause, "is an X
+error" where the call is the natural subject, and `ty` kept where the
+sentence or the one before names it. A "Done when" criterion takes the
+"If you" form.
+- `08_Foundations--Static_Types`: "A call that leaves out `width`
+  draws `missing-argument`." -> "A call that leaves out `width` is a
+  `missing-argument` error."
+- `Solutions/30_Patterns--Observer`: "Making that change in the first
+  version draws `invalid-argument-type` at `t.attach()`." -> "If you
+  make that change in the first version, the type checker reports
+  `invalid-argument-type` at `t.attach()`."
+- `B_An_Effect_Checker`: "so `fetch()` draws a finding." -> "so the
+  checker reports a finding for `fetch()`."
 - `45_Effects--Generators` 2026-11-09, was Claude-written: "A `yield`
   inside a `finally` clause draws the same `RuntimeError`, `generator
   ignored GeneratorExit`." -> "If a generator yields inside a
@@ -2849,6 +2864,67 @@ files).
 
 **Home.** CLAUDE.md watch list (Tier 2, "draws") | literal (Accrued
 patterns) | `tools/watch_words.py` | this file.
+
+### R63. "The same X" has a second term the reader can name
+
+**Test.** At each "the same X", ask "same as what?" and answer as a
+reader who has this sentence, the sentence before it, and the adjacent
+listing. "Same" is a comparison, and the reader goes looking for its
+second term. The sentence fails when the search has more than one
+result or none: (1) two candidates fit, since the page holds two
+errors, two listings, two calls, or two classes; (2) the second term is
+more than a sentence or an adjacent listing away; (3) a phrase after
+the noun, an appositive, a quoted message, or a code span, reads as the
+second term and is not; (4) the sentence opens a paragraph or follows a
+listing that has several X; (5) nothing is compared, C55's shape, where
+"same" is a pointer. Bruce (2026-11-09, chapter 45, on "raises the
+same `RuntimeError`, `generator ignored GeneratorExit`"): "same as
+what". Repair: name the second term with words the passage has ("the
+message shown for `stubborn()`", "the `TypeError` that `parse()`
+raised", "as in `registry.py`", "as `bump()` does"), or, where identity
+is not the claim, write the pointer ("that", "its", "the").
+
+**Keep when.** The second term is in the sentence ("the same X as Y",
+"both use the same X", "the same X in both"). It is the one candidate
+in the previous sentence or the adjacent listing. The idioms ("the same
+way" after the way is described, "at the same time", "stays the same").
+Identity against a possible copy ("returns the same `cls` it
+received"), and an unchanged input against a changed output ("the same
+command now reports:"). Exercise statements and quoted diagnostics.
+
+**Sightings.** 1 flag, made a rule at Bruce's call (2026-11-09), with
+C55's sightings as shape 5. The book sweep the same day (six Opus
+agents by chapter band, brief in `build/same-draws-2026-11-09/`) read
+all 1,370 "same" sites and rewrote about 30, one in 45. By shape: a
+second term in another section or several sentences back (the most
+common), two candidates on the page, an appositive posing as the term,
+and nothing compared. The keeps: a term in the sentence, one adjacent
+candidate, the idioms, and an appositive that names the thing where
+"each" or "every" carries the comparison ("makes the same call,
+`element.accept(visitor)`, on each element").
+- `24_Patterns--Template_Method`, three `TypeError`s in the listing:
+  "raises the same `TypeError`." -> "raises a `TypeError` with the
+  message shown for `Hijack`, `overrides a @final method`."
+- `Solutions/47_Effects--Stateless_in_Practice`, two traces: "prints
+  the same trace" -> "prints the `short` trace"
+- `Solutions/44_Effects--Effect_Management`, nothing compared: "The
+  same value always passes `validate()`" -> "A value of 1 or more
+  always passes `validate()`"
+- `Solutions/18_Techniques--Performance`, two readings (equal times,
+  or the work counted again): "Every caller on the path accumulates
+  the same time." -> "Every caller on the path counts that work
+  again."
+- `41_Functional--Toolkits`, a section opener: "The same dispatch,
+  written as a method" -> "The same dispatch as `singledispatch()`,
+  written as a method"
+- `45_Effects--Generators` 2026-11-09, was Claude-written: "`close()`
+  raises the same `RuntimeError`, `generator ignored GeneratorExit`."
+  -> "`close()` raises a `RuntimeError` with the message shown for
+  `stubborn()`, `generator ignored GeneratorExit`."
+
+**Home.** CLAUDE.md (the "same" bullet) | ambiguity (the comparison
+entry and Accrued shapes) | `[SAME]` in `tools/sentence_shapes.py`
+(shape 5 only) | this file.
 
 ## Candidates
 

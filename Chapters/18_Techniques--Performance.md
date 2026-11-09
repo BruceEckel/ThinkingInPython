@@ -1677,7 +1677,7 @@ Use a vectorized NumPy expression wherever the shape of the computation allows i
 and write a `@njit` loop for the steps that need one,
 keeping the array as the shared data structure throughout.
 
-The same machine measured the compiled `collatz_lengths()` at about 38x faster than the loop,
+The machine that timed `count_primes()` measured the compiled `collatz_lengths()` at about 38x faster than the loop,
 so the 3x threshold leaves a wide margin here too.
 
 ## Converting a Slow Function to Rust

@@ -752,7 +752,7 @@ Solutions/20_Patterns--Rethinking_Objects/README.md	only: Write CODE to hold a C
 Solutions/20_Patterns--Rethinking_Objects/README.md	only: so the caller changes only the copy
 Solutions/20_Patterns--Rethinking_Objects/README.md	price: so the type checker now rejects a weight where CODE declares a price
 Solutions/21_Patterns--Design_Patterns/README.md	names none of: and the remainder fits in one sentence that states the pattern's intent and names none of its classes
-Solutions/21_Patterns--Design_Patterns/README.md	shipping: The design is the same shipping calculation
+Solutions/21_Patterns--Design_Patterns/README.md	shipping: The design is the shipping calculation from CODE
 Solutions/22_Patterns--Iterators/README.md	defines no: because a generator defines no CODE
 Solutions/22_Patterns--Iterators/README.md	has no: Python's iterator protocol has no CODE
 Solutions/22_Patterns--Iterators/README.md	has no: The recursion has no base case
@@ -935,3 +935,9 @@ Solutions/47_Effects--Stateless_in_Practice/README.md	price: Dropping the last p
 Solutions/47_Effects--Stateless_in_Practice/README.md	price: so the assertions together say that CODE tries every price and writes only the affordable ones
 Solutions/47_Effects--Stateless_in_Practice/README.md	price: the script runs out at the fourth price
 Solutions/47_Effects--Stateless_in_Practice/README.md	prices: The test proves from both sides that CODE attempts all four prices
+Chapters/32_Patterns--Multiple_Dispatching.md	draws code: which draws CODE random pairs from CODE and yields each as a CODE tuple
+Chapters/38_Patterns--Simulation.md	draw the code: To draw the CODE
+Chapters/41_Functional--Toolkits.md	draw code: Four tools draw CODE elements from an iterable
+Solutions/26_Patterns--Factory/README.md	draws from code: CODE draws from CODE
+Solutions/32_Patterns--Multiple_Dispatching/README.md	draws with code: a wet CODE draws with CODE whether CODE or CODE calls CODE
+Solutions/36_Patterns--Memento/README.md	draws after code: Then write a test that draws after CODE and compares the memento's contents as a list

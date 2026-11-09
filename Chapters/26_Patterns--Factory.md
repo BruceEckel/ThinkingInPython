@@ -881,7 +881,8 @@ Suppose you write a factory subclass and forget `make_obstacle()`.
 Python defines the class and raises a `TypeError` when you create an instance,
 before `GameEnvironment.__init__()` calls anything.
 The type checker reports that construction before the program runs.
-At runtime, `make()` in `registry.py` raises the same `TypeError` on a `Shape` subclass that forgets `draw()`,
+Python raises that `TypeError` for any class that leaves an abstract method unimplemented.
+At runtime, `make()` in `registry.py` raises it on a `Shape` subclass that forgets `draw()`,
 and so does `Partial()` in [*Surrogate*](25_Patterns--Surrogate.md#proxy).
 
 A Protocol simplifies the *Abstract Factory*.

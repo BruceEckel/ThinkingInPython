@@ -348,7 +348,7 @@ if something broke, you can name the requirement that piece expresses.
 <details>
 <summary>Solution</summary>
 
-The design is the same shipping calculation,
+The design is the shipping calculation from `exercise_2.py`,
 written the way it looks before anyone questions it:
 an abstract base and two subclasses.
 

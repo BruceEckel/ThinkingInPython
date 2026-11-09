@@ -532,7 +532,7 @@ so the exception unwinds the driver's stack frames in the ordinary Python way.
 The driver never throws it into the suspended Effect.
 
 If you wrap `run_load()` in `catch(Blackout)` to turn the blackout into a value,
-the program type-checks and the run prints the same trace through `Turbine offline`.
+the program type-checks and the run prints the `short` trace through `Turbine offline`.
 Then the `Blackout` escapes `run()`,
 and the traceback ends with `grid.Blackout: 20`.
 The run is the same with or without the wrapper,

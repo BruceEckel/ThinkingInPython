@@ -464,7 +464,7 @@ finalize(WeakSlot("y"), print, "y", "closed")
 the `__weakref__` slot along with it,
 so a `Slot` instance has nowhere to list its weak references.
 `weakref.ref()`, `weakref.proxy()`,
-and `WeakValueDictionary` raise the same `TypeError` on a `Slot`,
+and `WeakValueDictionary` raise the same `TypeError` as `finalize()` on a `Slot`,
 since a slotted class keeps the list of an instance's weak references in its `__weakref__` slot.
 
 `WeakSlot` lists `__weakref__` among its slots,

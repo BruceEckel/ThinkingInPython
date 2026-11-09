@@ -189,3 +189,10 @@ Shapes Bruce flags that the catalog above did not name, dated, with the sentence
 - 2026-11-08, chapter 45: a concessive "however" read as the contrastive adverb.
   "each `yield from` stays with its target until that generator finishes, however many `next()` calls that takes" (Bruce: "unclear usage of 'however'").
   Added to the connective entry above, as R58, and as a Tier 2 watch word; the book sweep that day rewrote all 39 concessive sites.
+- 2026-11-09, chapter 45: "the same X" with its second term unnamed.
+  "`close()` raises the same `RuntimeError`, `generator ignored GeneratorExit`" (Bruce: "same as what").
+  The second term was the run of `stubborn()` in the listing above, and the message after the noun read as the term.
+  At every "the same X", ask "same as what?" with the sentence, the one before it, and the adjacent listing in view.
+  Rewrite when two candidates fit, when the term is further away than that, when a phrase after the noun poses as the term, or when nothing is compared:
+  "`close()` raises a `RuntimeError` with the message shown for `stubborn()`".
+  Keep a term in the sentence, a single adjacent candidate, and the idioms. Rule R63 in `bruce_edit_db.md`; the `[SAME]` survey lists only the nothing-compared shape, so read every "same" in the scope.

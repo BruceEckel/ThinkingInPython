@@ -76,7 +76,6 @@ Solutions/36_Patterns--Memento/README.md	[cc,conj,relcl] Class .. shows: A Class
 Solutions/42_Functional--Error_Handling/README.md	[appos,cc,conj] prints .. is: for the input that CODE rejects, your run prints the CODE from CODE and the later step's trace line is missing, while every input that passes CODE still prints that line.
 Solutions/43_Functional--Confidence/README.md	[prep] answer .. is: By that rule, the answer for a roster of two and a size of five is one group of two.
 Solutions/45_Effects--Generators/README.md	[cc,conj,prep] definitions .. is: ** Three CODE definitions over CODE, CODE, and CODE keep the two integer channels apart, so transposing the CODE and the CODE is a type checker error.
-Solutions/46_Effects--Stateless/README.md	[acl,relcl] caller .. draws: A caller that hands CODE to CODE with no CODE supplied draws an CODE.
 Solutions/46_Effects--Stateless/README.md	[cc,conj,prep] split .. applied: That split between the table and the body is the chapter's split between an Effect and its environment, applied to a test.
 Solutions/47_Effects--Stateless_in_Practice/README.md	[appos,prep] all .. timing: The code around CODE did change, all of it outside the Effect: the executor class, the timing the chapter's version prints, and the CODE guard.
 Solutions/47_Effects--Stateless_in_Practice/README.md	[appos] prints .. makes: your process-pool version prints CODE with CODE unchanged character for character, and removing the CODE guard makes CODE fail with a CODE.

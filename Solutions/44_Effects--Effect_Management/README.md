@@ -392,7 +392,8 @@ For `withdraw()`, that means taking the balance as a parameter and returning the
 The same inputs then give the same answer.
 The caller holds the state.
 
-`Thermometer` has the same pair inside a design pattern.
+`Thermometer` has a side cause and a side effect, as `withdraw()` does,
+inside a design pattern.
 The `celsius` setter writes `_celsius`,
 an instance attribute rather than a global.
 Then the setter calls `announce()`,
@@ -519,8 +520,8 @@ and also not negative" is the same idea described as two exclusions.
 Both checks disappear from `slope()`, and so does the code each one needed.
 A `PositiveInt` holds a value of 1 or more.
 Dividing by it always succeeds, so the `try`/`except ZeroDivisionError` goes.
-The same value always passes `validate()`, so the call to `validate()` goes,
-and `validate()` along with it.
+A value of 1 or more always passes `validate()`,
+so the call to `validate()` goes, and `validate()` along with it.
 
 **Fail at the construction site.**
 The failure now comes from the constructor rather than from `slope()`.

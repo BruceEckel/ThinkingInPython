@@ -420,7 +420,7 @@ while `type(shape)` finds the `Circle` that `kind()` built.
 A `type[...]` parameter accepts a class.
 It rejects a *type expression* such as `int | None`,
 which can appear in an annotation but is a union rather than a class,
-so passing it draws `invalid-argument-type`.
+so the type checker reports `invalid-argument-type` when you pass one.
 A function that validates or converts data against an arbitrary annotation takes a type expression as its argument.
 Python 3.15 (PEP 747) adds `TypeForm[T]` to annotate that parameter.
 Given `def convert[T](form: TypeForm[T], raw: object) -> T`,
@@ -778,15 +778,15 @@ so `label()` reads it with `.get()` and a default.
 `ReadOnly`, added in Python 3.13 (PEP 705), is another per-key qualifier.
 The type checker accepts a read of a `ReadOnly` key and rejects an assignment to it.
 If `Style` declares `width: ReadOnly[int]`,
-`style['width'] = 8` inside `label()` draws `invalid-assignment`,
+`style['width'] = 8` inside `label()` is an `invalid-assignment` error,
 with the message that the key "is marked read-only."
 At runtime the assignment succeeds, since every `TypedDict` value is a `dict`.
 
 The type checker verifies the keywords at each call.
-A call that passes `width="6"` draws `invalid-argument-type` from `ty`,
-the same diagnostic a wrongly typed ordinary parameter draws.
+For a call that passes `width="6"`, `ty` reports `invalid-argument-type`,
+the same diagnostic it reports for a wrongly typed ordinary parameter.
 The diagnostic's message reads "Expected `int`, found `Literal["6"]`".
-A call that leaves out `width` draws `missing-argument`.
+A call that leaves out `width` is a `missing-argument` error.
 
 The checkers disagree about a misspelled keyword.
 Pyright rejects `fill` misspelled as `fil="*"` with `No parameter named "fil"`,

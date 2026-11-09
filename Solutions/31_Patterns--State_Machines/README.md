@@ -230,7 +230,7 @@ class Mood(State[Input], Enum):
 
 your trace interleaves greetings with transition lines in the form of `trap_states_demo.py`'s `Waiting mouse appears -> Luring`,
 the input printed as a word, and `uv run ty check` passes.
-A transition function that can finish without returning a `Mood` draws `invalid-return-type`.
+The type checker reports `invalid-return-type` for a transition function that can finish without returning a `Mood`.
 You can name one gain and one loss of a member over a class.
 
 <details>

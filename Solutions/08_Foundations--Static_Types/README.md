@@ -602,7 +602,7 @@ Every `Circle` is a `Shape`, so a `list[Circle]` meets that requirement.
 A `list[Shape]` parameter refuses the same argument because `list` is invariant.
 
 **Give up the write operations.**
-`shapes.append(...)` draws a diagnostic for the reason the widening works.
+The type checker reports an error on `shapes.append(...)` for the reason the widening works.
 `Sequence` is a read-only container type, so it has no `append()`.
 The diagnostic is therefore `unresolved-attribute` rather than an argument-type error.
 The type checker does not say "you may not append a `Square` here."
@@ -829,7 +829,8 @@ so consider when a tuple receives its contents.
 with `HISTORY` empty,
 `ty check` reports `unresolved-attribute` for the `append()` call,
 and your final `final_constants.py` passes the check and prints `3 hello ('first',)`.
-Adding `"first"` later with `HISTORY = HISTORY + ("first",)` draws `invalid-assignment`.
+If you add `"first"` later with `HISTORY = HISTORY + ("first",)`,
+`ty check` reports `invalid-assignment`.
 
 <details>
 <summary>Solution</summary>

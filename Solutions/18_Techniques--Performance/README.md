@@ -604,7 +604,7 @@ A program this small has no other candidates.
 The listing still calls `print()` after detaching,
 because a harness that captures stdout through Python code adds that code's functions to the global count.
 
-The two local attachments above produce the same `Counter`.
+The two local attachments above print the same `Counter` as the `set_events()` run.
 That agreement is an artifact of the example's size.
 In a real program `set_events()` reports every Python function the process runs,
 so library code fills the `Counter` beside your own functions,
@@ -687,7 +687,7 @@ The two columns pick different functions because they measure different things.
 `cumtime` is the time from entering a function to leaving it,
 including everything it called,
 so a caller's `cumtime` always covers the work beneath it.
-Every caller on the path accumulates the same time.
+Every caller on the path counts that work again.
 `tottime` excludes the callees,
 so it attributes time to the stack frame that is executing.
 

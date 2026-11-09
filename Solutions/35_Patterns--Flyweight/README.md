@@ -1032,7 +1032,8 @@ The member tuples are the spec table, and `Tile(s)` is the pool lookup.
 `to_symbol()` makes the same check in its own body.
 
 The type checker still catches each `Literal`-version mistake that the enum leaves possible.
-A `match` over `Tile` that leaves out a member draws the same `invalid-return-type` as a `match` over `Symbol` that leaves out a symbol.
+It reports `invalid-return-type` when a `match` over `Tile` leaves out a member,
+as it does when a `match` over `Symbol` leaves out a symbol.
 The `Literal` version's `SPECS` annotation guards against a key outside `Symbol`.
 The enum makes that mismatch impossible,
 because it declares the set once instead of twice.

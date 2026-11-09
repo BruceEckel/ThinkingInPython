@@ -1182,7 +1182,7 @@ for line in lines(check({"app": APP, "requests": STUB})):
 ```
 
 With `APP` alone, the table reads `requests.get` as `Unknown`,
-so `fetch()` draws a finding.
+so the checker reports a finding for `fetch()`.
 With the stub, `requests.get` is a declared function like any other,
 and the second run prints its row, `['Network']`.
 `fetch()`'s body row takes the stub's declared `Network`.

@@ -871,7 +871,7 @@ A third operation is one more function,
 and neither `Template` nor the two existing functions change.
 
 `to_query()` recurses into the nested `inner`,
-so `inner`'s pieces flatten into the same `sql` string and `values` list.
+so `inner`'s pieces join `outer`'s pieces in one `sql2` string and one `values2` list.
 Every entry in `values2` is then a value a database driver accepts.
 Composing `t`-strings this way builds a nested composite.
 Iterating over any one `Template` stays flat.
@@ -880,8 +880,7 @@ Iterating over any one `Template` stays flat.
 `name` holds an injection attempt.
 `to_query()` receives the literal pieces and the values separately,
 so `name` comes out as a value in the parameter list rather than as text in the query.
-Written as an f-string,
-the same line is one finished `str` with the attack inside it.
+Written as an f-string, `query` is one finished `str` with the attack inside it.
 Any defense must then inspect that string and guess where the user's text begins.
 
 That separation is the general argument for handing a consumer the structure instead of the answer.

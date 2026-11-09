@@ -207,8 +207,9 @@ so `partial(pad, 5)` calls `pad(5, instance)` and fails with `AttributeError: 'i
 Use `partialmethod` inside a class body and `partial` everywhere else.
 
 The type checker rejects `partial(pad, 5)` before the run.
-`pad()`'s first parameter is `self`, so the call draws `invalid-argument-type`:
-expected `Text`, found `Literal[5]`.
+`pad()`'s first parameter is `self`,
+so the call is an `invalid-argument-type` error: expected `Text`,
+found `Literal[5]`.
 
 ### `cached_property`
 
@@ -420,7 +421,8 @@ a rule that depends on two types needs [*Multiple Dispatching*](32_Patterns--Mul
 
 ### `singledispatchmethod`
 
-The same dispatch, written as a method so it reads as `self.op(x)` instead of a bare function call.
+The same dispatch as `singledispatch()`,
+written as a method so it reads as `self.op(x)` instead of a bare function call.
 Here, the registered method again takes the [placeholder name `_`](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch).
 
 ```python
@@ -667,7 +669,7 @@ print(list(filterfalse(small, data)))
 #: [3, 4]
 ```
 
-The same trailing `1` shows how `dropwhile()` differs from `filterfalse()`.
+The trailing `1` in `data` shows how `dropwhile()` differs from `filterfalse()`.
 `dropwhile()` stops testing once the predicate fails,
 so it yields the final `1`.
 `filterfalse()` tests every element, drops that `1`, and returns `[3, 4]`.

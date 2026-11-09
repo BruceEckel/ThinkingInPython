@@ -1298,7 +1298,7 @@ the same number a perfectly settled plate reports,
 so the summary statistic cannot tell "finished" from "never started."
 
 **Probe a point on the diagonal.**
-The main diagonal in every figure follows from the same two terms.
+The main diagonal in every figure follows from `amplitude()`'s two terms.
 Swapping `x` and `y` turns the first term into the second and the second into the first,
 so the swap reverses the subtraction inside `amplitude()`'s `abs()`.
 On the line `x == y` the swap leaves the point where it was,

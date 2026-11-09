@@ -11,7 +11,7 @@ Chapters/03_Foundations--Containers.md	[PASSIVE] is read: CODE, from the CODE mo
 Chapters/03_Foundations--Containers.md	[PASSIVE] is set: CODE is also set-like, and so is CODE when every value is hashable.
 Chapters/04_Foundations--Control_Flow.md	[PASSIVE+BY] is followed: In Python, a handler is CODE followed by the exception type it handles.
 Chapters/07_Foundations--Classes.md	[PASSIVE] is initialized: CODE is *lazily initialized*, created on first use, so the method runs at the first read rather than when the constructor runs.
-Chapters/08_Foundations--Static_Types.md	[PASSIVE] is marked: If CODE declares CODE, CODE inside CODE draws CODE, with the message that the key "is marked read-only."
+Chapters/08_Foundations--Static_Types.md	[PASSIVE] is marked: If CODE declares CODE, CODE inside CODE is an CODE error, with the message that the key "is marked read-only."
 Chapters/12_Techniques--Data_Classes_as_Types.md	[PASSIVE] is decorated: CODE is CODE decorated with CODE:
 Chapters/17_Techniques--Metaprogramming.md	[PASSIVE] are called: Such methods are sometimes called *metamethods*.
 Chapters/17_Techniques--Metaprogramming.md	[PASSIVE] gets built: Decide whether an instance gets built: a metaclass CODE.

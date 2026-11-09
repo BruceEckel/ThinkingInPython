@@ -163,7 +163,7 @@ def greet_all(names: list[str]) -> Depend[
 
 `uv run ty check` passes on your file with the `# type: ignore` gone and only the annotation of `greet_all()` changed,
 and running it with a `Console` supplied prints `Hello, Alice!` and `Hello, Bob!`.
-A caller that hands `greet_all()` to `run()` with no `Console` supplied draws an `invalid-argument-type`.
+The type checker reports an `invalid-argument-type` for a call that hands `greet_all()` to `run()` with no `Console` supplied.
 
 <details>
 <summary>Solution</summary>
@@ -838,7 +838,8 @@ since a declaration says what the function may request, not what it must.
 The chapter warns about this deletion.
 A bare `greet(name)` passes every check and discards the greeting.
 
-Removing the `yield from` in front of `need(Console)` in `greet()` draws two diagnostics:
+If you remove the `yield from` in front of `need(Console)` in `greet()`,
+the type checker reports two diagnostics:
 
 ```python
 def greet(name: str) -> Depend[Need[Console], None]:
@@ -1390,7 +1391,7 @@ def to_log(name: str) -> Depend[Need[Recorder], None]:
 your six predictions for `ambiguous_supply.py` with a third implementation match your six runs.
 `supply()` hands the request to the first argument that satisfies it.
 With separate `Protocol`s,
-handing `Terminal` to the recording Effect draws an `invalid-argument-type` that names the missing method,
+the type checker reports an `invalid-argument-type` that names the missing method when you hand `Terminal` to the recording Effect,
 and you can name the case that two `Protocol`s still leave to argument order.
 
 <details>

@@ -194,7 +194,8 @@ def prefix(msg: str) -> str:
 `Err("boom").map_error(prefix)` prints an `Err` holding the prefixed message,
 `Ok(5).map_error(prefix)` prints `Ok(answer=5)` unchanged,
 and `uv run ty check` passes on a `map_error()` call on a parameter annotated `Result[int, str]`.
-If `Ok` lacks the method, that call draws `unresolved-attribute`.
+If `Ok` lacks the method,
+the type checker reports `unresolved-attribute` on that call.
 
 <details>
 <summary>Solution</summary>

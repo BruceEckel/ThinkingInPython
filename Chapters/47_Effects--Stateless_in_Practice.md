@@ -1849,7 +1849,7 @@ listing the overloads it failed to match.
 Supply first, then fork.
 
 That restriction is the only one the checker enforces.
-Two of those same four overloads accept an Effect that declares an error,
+Two of `fork()`'s four overloads accept an Effect that declares an error,
 and both return a `Task` with [no error type on it](#fork-drops-the-error-channel).
 
 The `with` block that manages the pool's lifetime sits outside `run()`,
@@ -2171,7 +2171,7 @@ error[invalid-argument-type]: Argument to function `run` is incorrect
 The `# type: ignore` silences that diagnostic,
 since the listing provokes the matching runtime failure on purpose.
 The `MissingAbilityError` the listing prints names the `Log` nobody supplied.
-Nesting the `supply()` inside the `run()` call draws the same diagnostic,
+A `run()` call with the `supply()` nested inside it is the same `invalid-argument-type` error,
 so the checker catches the missing `Log` in either form.
 
 `catch()` handles part of a channel the way `supply()` does.

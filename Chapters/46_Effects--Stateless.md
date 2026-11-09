@@ -781,7 +781,8 @@ The type records which Abilities each layer leaves open.
 The repeated union is the shape a `type` alias normally shortens.
 Elsewhere the book writes one.
 Under `ty` 0.0.95 the alias checks the same as the written-out signature.
-An undeclared Ability behind `type Greeting = Depend[...]` draws the same `invalid-yield`.
+`ty` reports an `invalid-yield` for an undeclared Ability behind `type Greeting = Depend[...]`,
+as it does for the written-out signature of `greet_all()` above.
 This book still writes out Effect signatures in full,
 because the union is the information.
 Every channel a function uses stays visible at the point of use.
@@ -1427,8 +1428,9 @@ An asynchronous program such as a web service or a bot awaits `run_async()` at t
 Calling `run()` inside a coroutine is a runtime error rather than a type error,
 because whether an event loop is running is a fact about the moment of the call,
 not about any type.
-The opposite mistake, calling `run_async()` without `await` in synchronous code,
-draws `ty`'s `unused-awaitable` warning.
+For the opposite mistake,
+calling `run_async()` without `await` in synchronous code,
+`ty` reports an `unused-awaitable` warning.
 
 ## The Error Channel
 

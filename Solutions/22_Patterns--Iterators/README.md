@@ -902,14 +902,15 @@ def flatten_str(
 the original `flatten()` raises a `RecursionError` on `[1, "ab", 2]`,
 your fixed version prints `[1, 'ab', 2]`,
 and `uv run ty check` passes on your file.
-A return type left as `Iterator[int]` draws `invalid-yield`.
+If you leave the return type as `Iterator[int]`,
+the type checker reports `invalid-yield`.
 You can say which lines of `flatten_loop()` change.
 
 <details>
 <summary>Solution</summary>
 
 If you add `str` to the `isinstance()` test but leave the return type as `Iterator[int]`,
-the program prints the same lists,
+the program prints `[1, 'ab', 2]` and `[1, 'ab', 2, 3]`, as the solution does,
 and `ty` reports an `invalid-yield` at `yield item`,
 whose type is now `int | str`.
 The solution widens the return type with the test,
@@ -1043,7 +1044,8 @@ over `[1, "two", 3, None, 4]` with `int`,
 `typed()` raises a `TypeError` naming `str`,
 while `typed_skipping()` and your class version both give `[1, 3, 4]`.
 `uv run ty check` passes;
-a class version that can fall off the end of `__next__()` draws `invalid-return-type`.
+if your class version can fall off the end of `__next__()`,
+`ty` reports `invalid-return-type`.
 
 <details>
 <summary>Solution</summary>

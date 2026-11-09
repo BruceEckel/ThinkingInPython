@@ -1055,7 +1055,7 @@ The type checker rejects `5.5` and `"five"` as arguments before the program runs
 The `# type: ignore` silences that report so the listing can show what the constructor does with each value at runtime.
 
 The type checker accepts `Stars(True)`,
-because a `bool` is an `int` to the checker for the same subclass reason.
+because `bool` is a subclass of `int` to the checker as well as to `isinstance()`.
 In the loop the three values reach the checker as one union,
 so its report names `True` beside the two values it rejects;
 a direct `Stars(True)` passes.

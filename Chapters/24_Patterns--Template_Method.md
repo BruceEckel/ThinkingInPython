@@ -213,7 +213,8 @@ and `@final` stops that replacement only when the type checker runs.
 The `__final__` check reads a flag rather than a method name.
 If `ApplicationFramework` gains a second `@final` instance method,
 the check protects that method too.
-In that version, the `class` statement of a subclass that replaces that method raises the same `TypeError`.
+In that version, the `class` statement of a subclass that replaces that method raises a `TypeError` with the message shown for `Hijack`,
+`overrides a @final method`.
 
 The `__final__` check misses a `@final` on a `@property`,
 and a `@final` written above `@classmethod` or `@staticmethod`.
@@ -251,8 +252,8 @@ inherit from `ABC` and declare that step with [`@abstractmethod`](20_Patterns--R
 Instantiating a subclass that leaves the step abstract then raises a `TypeError`,
 and the type checker reports the attempt.
 The older convention gives the step a body that raises `NotImplementedError`.
-Under that convention,
-Python instantiates the same subclass and the type checker accepts it.
+Under that convention, Python instantiates a subclass that leaves out the step,
+and the type checker accepts it.
 The step raises `NotImplementedError` when `run()` calls it,
 after any earlier steps have run.
 

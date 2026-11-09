@@ -880,7 +880,7 @@ so its parameter type is the generator's `SendType`.
 For `interview()` that is `Answer`, and `None` is not an `Answer`,
 so the priming call is a type error.
 `send_none_is_next.py` carries a `# type: ignore` to suppress it.
-Removing that comment draws:
+If you remove that comment, the type checker reports:
 
 ```text
 error[invalid-argument-type]: Argument to bound method

@@ -1174,7 +1174,8 @@ Checkers differ here.
 Pyright infers `set[Unknown]` for this factory and rejects it against `dict[str, str]`.
 
 Subscripting makes the factory's return type concrete.
-Changing `Checked`'s factory to `dict[int, int]` then draws a type error.
+If you change `Checked`'s factory to `dict[int, int]`,
+the type checker reports the mismatch with `dict[str, str]`.
 Use the bare form when the factory and the annotation agree,
 which is most of the time.
 Subscript the factory when you want that agreement checked.

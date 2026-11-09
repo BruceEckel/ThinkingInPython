@@ -1072,7 +1072,8 @@ the first child exception propagates out of the `await` immediately.
 `gather()` reports that one exception rather than a list of six outcomes,
 and loses the four results it was collecting, including `a` and `b`,
 which had succeeded.
-`d` fails in the same tick, but the `gather()` future has resolved by then.
+`d` fails in the same tick as `c`,
+but the `gather()` future has resolved by then.
 `gather()` therefore retrieves `d`'s failure and discards it instead of raising it.
 
 **Leave the other tasks running.**

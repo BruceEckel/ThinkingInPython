@@ -740,7 +740,7 @@ Chapters/45_Effects--Generators.md	[BOUND] That CODE comes before the card step'
 Chapters/45_Effects--Generators.md	[BOUND] That event loop is the single driver at the edge of the program
 Chapters/45_Effects--Generators.md	[BOUND] The Moore shape and the Mealy shape both fit one function with no CODE field
 Chapters/45_Effects--Generators.md	[BOUND] The annotation describes the three channels
-Chapters/45_Effects--Generators.md	[BOUND] The asynchronous generator CODE writes the same loop as its body, with a CODE, and leaves the two methods to Python
+Chapters/45_Effects--Generators.md	[BOUND] The asynchronous generator CODE in CODE computes CODE's sequence in a CODE loop with a CODE, and leaves the two methods to Python
 Chapters/45_Effects--Generators.md	[BOUND] The callback needs a variable that survives from one call to the next, to hold the running CODE
 Chapters/45_Effects--Generators.md	[BOUND] The one assignment CODE replaces the CODE and the CODE
 Chapters/45_Effects--Generators.md	[BOUND] TypeScript types the three channels as CODE
@@ -876,7 +876,7 @@ Chapters/B_An_Effect_Checker.md	[BOUND] The last two functions turn findings and
 Chapters/B_An_Effect_Checker.md	[BOUND] The one CODE is CODE, which calls the function it receives
 Chapters/B_An_Effect_Checker.md	[BOUND] Two functions that call each other make the recursion circular
 Chapters/B_An_Effect_Checker.md	[BOUND] Whole modules take one line each, which keeps the table short
-Chapters/B_An_Effect_Checker.md	[BOUND] With CODE alone, the table reads CODE as CODE, so CODE draws a finding
+Chapters/B_An_Effect_Checker.md	[BOUND] With CODE alone, the table reads CODE as CODE, so the checker reports a finding for CODE
 Chapters/B_An_Effect_Checker.md	[BOUND] With the walrus operator, the CODE condition computes the next rows and compares them in one expression
 Chapters/B_An_Effect_Checker.md	[BOUND] a CODE over syntax-tree nodes, records for the data, a CODE for the one operation in the core that can fail, and a pure core with its Effects at the edge
 Solutions/02_Foundations--Tour/README.md	[BOUND] CODE evaluates to the single string CODE

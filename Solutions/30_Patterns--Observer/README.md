@@ -194,7 +194,8 @@ class Display:
 both versions print `display: 25C`,
 `uv run ty check` passes on each with `t.attach(Display())` in place,
 and only the second declares `subject: Thermometer` in `Display.update()`.
-Making that change in the first version draws `invalid-argument-type` at `t.attach()`.
+If you make that change in the first version,
+the type checker reports `invalid-argument-type` at `t.attach()`.
 You can say what each version adds.
 
 <details>
