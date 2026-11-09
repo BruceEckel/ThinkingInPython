@@ -125,6 +125,13 @@ def rules(source: str) -> list[str]:
     ("The `Result` that `ask()` returns stops one level up.", []),
     ("`check()` rejects negatives but lets zero through.", []),
     ("The `finally` clause runs on every ending and turns the sensor off.", ["PRT"]),
+    ("`close()` requires the generator to finish.", ["CAUS"]),
+    ("The decorator lets the caller skip the check.", ["CAUS"]),
+    ("`slots=True` makes `dataclass()` build a new class.", ["CAUS"]),
+    ("The generator must finish.", []),
+    ("It makes the check safe.", []),
+    ("The pool needs a lock.", []),
+    ("The class is required to define it.", []),
 ])
 def test_rules(source: str, expected: list[str]) -> None:
     assert rules(source) == expected
@@ -161,7 +168,7 @@ def test_calibration_examples_name_known_rules() -> None:
     assert {rule for rule, _, _ in CALIBRATION_EXAMPLES} <= set(ALL_RULES)
     assert set(RULES) == {"IMP", "COLON+AND", "PAIR", "AND+REL", "PRT"}
     assert set(SURVEY_RULES) == {
-        "AND", "COLON", "ADD", "TWO", "CAN", "SAME"}
+        "AND", "COLON", "ADD", "TWO", "CAN", "SAME", "CAUS"}
 
 
 def test_main_reports_without_failing_and_accepts(

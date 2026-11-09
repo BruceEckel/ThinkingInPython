@@ -110,6 +110,13 @@ SOURCES: Final[tuple[str, ...]] = (
     "The `Result` that `ask()` returns stops one level up.",
     "`check()` rejects negatives but lets zero through.",
     "The `finally` clause runs on every ending and turns the sensor off.",
+    "`close()` requires the generator to finish.",
+    "The decorator lets the caller skip the check.",
+    "`slots=True` makes `dataclass()` build a new class.",
+    "The generator must finish.",
+    "It makes the check safe.",
+    "The pool needs a lock.",
+    "The class is required to define it.",
 )
 """Markdown paragraphs; each is cleaned the way the checks clean it."""
 

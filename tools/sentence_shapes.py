@@ -159,6 +159,38 @@ delegate to either") from an event hedged with "can"; the reader
 of the list asks whether the sentence describes what the thing on
 the page does, and writes the present if so.
 
+`[CAUS]` (2026-11-09, from a heading the author marked in chapter 45)
+is a causative verb whose object is the real actor and whose
+infinitive is the real event: "`close()` Requires the Generator to
+Finish", Bruce: "see how passive that is? Maybe something like:
+'`close()`: the generator must finish.'" The sentence is grammatically
+active, but the generator, which must act, is the object of
+"requires", and finishing hangs off it as an infinitive, so the
+actor is demoted. The same shape: "`close()` requires the generator
+to finish", "the decorator lets the caller skip the check", "the
+registry allows a subclass to register itself", "`slots=True` makes
+`dataclass()` build a new class". The repair puts the actor in
+subject position with its own verb or modal ("the generator must
+finish", "the caller can skip the check", "`dataclass()` builds a
+new class under `slots=True`"). The rule (`causative()`) fires on a
+`CAUSATIVES` verb (a `VERB`, not passive) with a noun object, the
+`dobj` of the verb or the `nsubj` of the complement, followed by a
+verb complement (`xcomp` or `ccomp`). The parser sometimes reads
+"requires the generator to finish" as a preposition "to" with the
+verb as its `pobj`, so that reading counts too. The message leads
+with the three words: `[CAUS] requires CODE finish: ...`. Quiet by
+design: a passive causative ("is required to define it", which is
+`tip passive`'s), an adjective complement ("makes the check safe"),
+a pronoun object ("lets us", "let's"), and a noun object with no verb
+complement ("needs a lock"). It is a survey rule because "need" and "want" often take a
+purpose infinitive that is not the actor's event ("a lock to hold"),
+"let" and "make" fire on imperatives ("Let the type checker infer
+the rest") and titles ("Making Classes Work"), and the reader of the
+list asks whether the object is the one that acts; "get", "have",
+"expect", and "help" were dropped from the list the day it was
+written, since their hits were purpose infinitives and perfects. The
+first book-wide run had 308 hits.
+
 `[SAME]` (2026-11-01, from a sentence the author marked in chapter 45)
 is a "same" with nothing to compare against: "At CODE, the same CODE
 raises CODE", said of a generator with one `yield`. "Same" has one
@@ -210,8 +242,8 @@ takes one verb instead ("Distinguishing the Wrappers"), but headings
 are outside the paragraph reader, so the rule never sees one.
 
 Five rules run by default, `RULES`: `[IMP]`, `[COLON+AND]`, `[PAIR]`,
-`[AND+REL]`, and `[PRT]`, judged against a baseline. Six are survey rules, `SURVEY_RULES`: `[AND]`,
-plain `[COLON]`, `[ADD]`, `[TWO]`, `[CAN]`, and `[SAME]`. The calibration shows why. `[AND]` fired on 7 before
+`[AND+REL]`, and `[PRT]`, judged against a baseline. Seven are survey rules, `SURVEY_RULES`: `[AND]`,
+plain `[COLON]`, `[ADD]`, `[TWO]`, `[CAN]`, `[SAME]`, and `[CAUS]`. The calibration shows why. `[AND]` fired on 7 before
 only, 1 both, and 6 after only of the 72 rewritten pairs, so the
 author's own rewrites carry the shape: it is a judgment made per
 sentence in an editing pass, not a fault, and the whole book yields
@@ -281,7 +313,7 @@ or introduces a list whose items hold relative clauses.
     uv run python -m tools.sentence_shapes           # new hits
     uv run python -m tools.sentence_shapes --all     # every hit
     uv run python -m tools.sentence_shapes --accept  # judged keeps
-    uv run python -m tools.sentence_shapes --survey  # + AND, COLON, ADD, TWO, CAN, SAME
+    uv run python -m tools.sentence_shapes --survey  # + AND, COLON, ADD, TWO, CAN, SAME, CAUS
     uv run python -m tools.sentence_shapes --calibrate
     uv run python -m tools.sentence_shapes Chapters/31_*.md
     uv run tip sentence-shapes CH=31
@@ -354,6 +386,7 @@ SURVEY_RULES: Final = {
     "TWO": "two modified terms held across one comparison",
     "CAN": "a modal can where the sentence reports what happens",
     "SAME": "a same with nothing to compare against",
+    "CAUS": "a causative verb that demotes the actor to its object",
 }
 """Printed only under `--survey`; never baselined."""
 ALL_RULES: Final = tuple(RULES) + tuple(SURVEY_RULES)
@@ -398,6 +431,12 @@ LIGHT_POS: Final = frozenset({"DET", "PUNCT", "PART", "CCONJ", "SPACE"})
 NESTING_POS: Final = frozenset({"VERB"})
 """A side with a verb of its own (a participle, a relative clause, a
 clause) is a picture the reader builds rather than a name."""
+CAUSATIVES: Final = frozenset({
+    "require", "let", "allow", "make", "force", "enable", "cause", "permit", "need", "want"})
+"""Verbs that put the actor in object position before its infinitive."""
+CAUS_OBJECTS: Final = frozenset({"NOUN", "PROPN"})
+"""Parts of speech for the object; a pronoun (\"lets us\") is quiet."""
+COMPLEMENT_DEPS: Final = frozenset({"xcomp", "ccomp"})
 SAME_DETERMINERS: Final = frozenset(
     "the this that its their his her your our".split())
 """Words before \"same\" that make it a pointer candidate."""
@@ -502,6 +541,13 @@ CALIBRATION_EXAMPLES: Final[tuple[tuple[str, str, bool], ...]] = (
     ("CAN", "You can skim for topics new to you.", False),
     ("CAN", "A `set` can hold any hashable object.", False),
     ("CAN", "The type checker cannot see the string.", False),
+    ("CAUS", "`close()` requires the generator to finish.", True),
+    ("CAUS", "The decorator lets the caller skip the check.", True),
+    ("CAUS", "`slots=True` makes `dataclass()` build a new class.", True),
+    ("CAUS", "The generator must finish.", False),
+    ("CAUS", "It makes the check safe.", False),
+    ("CAUS", "The pool needs a lock.", False),
+    ("CAUS", "The class is required to define it.", False),
     ("SAME", "At `[2]`, the same `yield` raises `GeneratorExit`.", True),
     ("SAME", "At `[2]`, its `yield` raises `GeneratorExit`.", False),
     ("SAME", "The same directory reaches pytest through `pythonpath` in `pyproject.toml`.", True),
@@ -989,6 +1035,46 @@ def can_event(sentence: Sentence) -> bool:
     return False
 
 
+def causative(sentence: Sentence) -> tuple[Token, Token, Token] | None:
+    """(verb, object, infinitive) for a causative that demotes its actor.
+
+    A `CAUSATIVES` lemma on a non-passive `VERB` with a noun object
+    (`CAUS_OBJECTS`) and a verb complement. The object is the verb's
+    `dobj` before an `xcomp` or `ccomp` verb, or the `nsubj` of that
+    complement. The parser also reads \"requires the generator to
+    finish\" as a `prep` \"to\" with the verb as its `pobj`, so that
+    counts as the complement.
+    """
+    toks = sentence.tokens
+    for verb in toks:
+        if verb.lemma.lower() not in CAUSATIVES or verb.pos != "VERB":
+            continue
+        kids = children(verb, sentence)
+        if any(k.dep == "auxpass" for k in kids):
+            continue
+        for obj in kids:
+            if (obj.dep != "dobj" or obj.pos not in CAUS_OBJECTS
+                    or obj.i < verb.i):
+                continue
+            for k in kids:
+                if (k.dep in COMPLEMENT_DEPS and k.pos == "VERB"
+                        and k.i > obj.i):
+                    return verb, obj, k
+                if k.dep == "prep" and k.text.lower() == "to" and (
+                        k.i > obj.i):
+                    for inf in children(k, sentence):
+                        if inf.dep == "pobj" and inf.tag == "VB":
+                            return verb, obj, inf
+        for comp in kids:
+            if comp.dep not in COMPLEMENT_DEPS or comp.pos != "VERB":
+                continue
+            for obj in children(comp, sentence):
+                if (obj.dep == "nsubj" and obj.pos in CAUS_OBJECTS
+                        and verb.i < obj.i < comp.i):
+                    return verb, obj, comp
+    return None
+
+
 def same_idiom(toks: list[Token], k: int) -> bool:
     """Is the \"same\" at index k an idiom or a predicate?"""
     after = toks[k + 1] if k + 1 < len(toks) else None
@@ -1095,6 +1181,8 @@ def shapes(paragraph: Paragraph) -> Iterator[tuple[str, Sentence]]:
             yield "CAN", sentence
         if same_pointer(sentence):
             yield "SAME", sentence
+        if causative(sentence) is not None:
+            yield "CAUS", sentence
     for sentence in colon_units(paragraph):
         label = colon_clause(sentence)
         if label:
@@ -1108,7 +1196,11 @@ def find(docs: list[Document], parser: Parser = parse) -> Iterator[Finding]:
             lines = paragraph.lines
             for rule, sentence in shapes(paragraph):
                 line = lines[min(sentence.start, len(lines) - 1)]
-                yield Finding(doc.path, line, f"[{rule}] "
+                detail = ""
+                found = causative(sentence) if rule == "CAUS" else None
+                if found is not None:
+                    detail = " ".join(t.text for t in found) + ": "
+                yield Finding(doc.path, line, f"[{rule}] " + detail
                               + sentence_text(paragraph, sentence))
 
 

@@ -476,6 +476,17 @@ the repair is "its `yield`" or "that directory". The parse cannot
 tell an implied second term ("for the same reason `bump()` does")
 from none, so it is a survey rule: the book-wide read had 194
 candidates and 6 rewrites.
+The seventh survey rule is `[CAUS]` (2026-11-09), a causative verb
+(requires, lets, allows, makes, forces, enables, causes, permits,
+needs, wants) whose object is a noun or code span and whose
+complement is a verb ("`close()` requires the generator to finish",
+Bruce on the chapter 45 heading: "see how passive that is?"): the
+actor sits in object position and its event hangs off it as an
+infinitive, so the repair puts the actor in the subject with its own
+verb or modal ("`close()`: the generator must finish"); rule R61 in
+`bruce_edit_db.md`. The parse cannot tell a demoted actor from an
+incidental object ("makes the type checker report"), and the first
+run had 308 hits, so it is a survey rule the activate pass reads.
 The fifth default rule is `[PRT]` (2026-11-04), a phrasal verb split
 around a noun-phrase object ("the driver carries the request out",
 Bruce: "general style: carries out the request"); the particle holds
