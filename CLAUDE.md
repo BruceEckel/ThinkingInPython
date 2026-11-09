@@ -343,6 +343,17 @@ an alternative, a framed opener and a bare continuation
 skill reads for by hand; since the same day the `alternative` pass
 (`.claude/skills/alternative/SKILL.md`, the tenth of `super-prose`
 and a default `tip rewrite` pass) owns that read.
+Since 2026-11-09 `--survey` also lists `survey self-name`: a lead-in
+paragraph, the prose directly above a listing, that names that
+listing's own file in a code span ("In `yield_from_nested.py`, a
+`yield from` in `survey()` receives that `Result`:"; Bruce: "it sounds
+like it's referring to some other listing"). The repair is "Here," or
+the thing's name; the filename is on the listing's first line. A
+`(continued)` part and the generic names `__init__.py` and
+`conftest.py` are quiet. The first run (7177b735) rewrote six and
+kept eight, a file the reader already has: a module a test needs
+before it is supplied, a chapter file a solution revises. R31 in
+`bruce_edit_db.md` holds the rule.
 `tip trailing` (`tools/trailing_tags.py`, 2026-10-18) lists two shapes
 Bruce marked in chapter 31, rules R32 and R35 in `bruce_edit_db.md`: a
 clause that ends on a comma, a participle, and a measure or place

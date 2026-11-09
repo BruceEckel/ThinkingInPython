@@ -238,3 +238,52 @@ def test_alternative_is_a_survey_rule(
     out = capsys.readouterr().out
     assert "[survey alternative] 'A `for`'" in out
     assert out.strip().endswith("0 new, 0 accepted, 1 survey")
+
+
+def self_hits(text: str) -> list[tuple[int, str, str]]:
+    doc = Document.from_text(text, Path("fixture.md"))
+    return [(h.line, h.kind, h.phrase) for h in find(doc)
+            if h.kind == "survey self-name"]
+
+
+def test_self_name_lead_in() -> None:
+    text = ("In `items.py`, the loop runs:\n\n"
+            "```python\n# items.py\nprint(1)\n```\n")
+    assert self_hits(text) == [(1, "survey self-name", "`items.py`")]
+
+
+def test_self_name_ignores_directory_prefix() -> None:
+    text = ("See `items.py`:\n\n"
+            "```python\n# utils/items.py\nprint(1)\n```\n")
+    assert [p for _, _, p in self_hits(text)] == ["`items.py`"]
+
+
+def test_self_name_quiet_cases() -> None:
+    here = "Here, the loop runs:\n\n```python\n# items.py\nprint(1)\n```\n"
+    assert self_hits(here) == []
+    part = ("```python\n# items.py\nprint(1)\n```\n\n"
+            "Complete `items.py`:\n\n"
+            "```python\n# items.py (continued)\nprint(2)\n```\n")
+    assert self_hits(part) == []
+    init = ("In `__init__.py`, the package loads:\n\n"
+            "```python\n# a_package/__init__.py\nprint(1)\n```\n")
+    assert self_hits(init) == []
+    other = ("Compare `other.py`:\n\n"
+             "```python\n# items.py\nprint(1)\n```\n")
+    assert self_hits(other) == []
+    heading = "## `items.py`\n\n```python\n# items.py\nprint(1)\n```\n"
+    assert self_hits(heading) == []
+
+
+def test_self_name_is_a_survey_rule(
+    book: Path, capsys: pytest.CaptureFixture[str],
+) -> None:
+    book.write_text("In `items.py`, it runs:\n\n"
+                    "```python\n# items.py\nprint(1)\n```\n",
+                    encoding="utf-8")
+    assert main(["--fail"]) == 0
+    assert "self-name" not in capsys.readouterr().out
+    assert main(["--survey"]) == 0
+    out = capsys.readouterr().out
+    assert "[survey self-name] '`items.py`'" in out
+    assert out.strip().endswith("0 new, 0 accepted, 1 survey")

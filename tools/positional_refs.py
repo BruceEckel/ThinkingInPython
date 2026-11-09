@@ -88,6 +88,28 @@ statement-like word (line, call, loop, print, return, ...):
    sentence that cites a tag is still read for this rule, since the
    chapter 04 find cited `[5]`.
 
+9. `survey self-name` (2026-11-09): a lead-in, the prose paragraph
+   directly above a fenced listing, that names that listing's own
+   file in a code span. Bruce read chapter 45's "In
+   `yield_from_nested.py`, a `yield from` in `survey()` receives that
+   `Result`:" above the block whose first line is `# yield_from_nested.py`
+   and found it confusing: "it sounds like it's referring to some
+   other listing, but it's actually the listing the sentence is
+   introducing." The repair is "Here, ..." or the thing itself, since
+   the listing's first line already carries the filename. The
+   paragraph is found by walking back from the opening fence over
+   blank lines; a heading, fence, table row, block quote, list item,
+   or HTML comment there means no lead-in. The directory in the path
+   comment is dropped before the comparison. Quiet cases: a
+   `(continued)` part (its lead-in names the file naturally), the
+   `GENERIC_NAMES` (`__init__.py`, `conftest.py`), and a block with no
+   path comment or a shape block. The keeps are a file the reader
+   already has (chapter 11's missing `palindrome.py` before it is
+   supplied, Solutions 26's chapter demo before its revised version).
+   Commit 7177b735's run over the book had six rewrites and eight
+   keeps, so it is a survey rule, printed under `--survey`, never
+   baselined.
+
 Deliberately not matched, so a human never reads them as hits: "the
 first argument" or "the first parameter" (a position in a call or
 signature), "the first version", "the second form", "the first half"
@@ -119,7 +141,7 @@ every other file's entries.
 
     uv run python -m tools.positional_refs          # new hits
     uv run python -m tools.positional_refs --all    # every hit
-    uv run python -m tools.positional_refs --survey # + call, time, alternative
+    uv run python -m tools.positional_refs --survey # + call, time, alternative, self-name
     uv run python -m tools.positional_refs --accept # judged keeps
     uv run python -m tools.positional_refs Chapters/30_*.md
     uv run tip positional CH=30
@@ -220,6 +242,8 @@ COUNT_UNIT: Final = count_unit(UNIT_SING, UNIT_PLUR)
 SURVEY_UNIT: Final = count_unit(SURVEY_SING, SURVEY_PLUR)
 SURVEY_KIND: Final = "survey count+unit"
 ALT_KIND: Final = "survey alternative"
+SELF_KIND: Final = "survey self-name"
+GENERIC_NAMES: Final = frozenset(("__init__.py", "conftest.py"))
 ALT_MARKERS: Final = re.compile(
     r"\b(?:if|would|could|might|were|had|unless|instead|otherwise|"
     r"rather|contrast|compared?|comparison|alternative|another|"
@@ -449,8 +473,58 @@ def alternative_hit(
     return None
 
 
+def lead_in(doc: Document, block: Block) -> list[tuple[int, str]]:
+    """The paragraph directly above a block's opening fence, if any.
+
+    Walks back over blank lines to the previous non-blank line. A
+    heading, fence, table row, block quote, list item, or HTML comment
+    there means no lead-in; otherwise the contiguous non-blank lines
+    upward form the paragraph, as (1-based line, text) pairs.
+    """
+    fenced = doc.in_fence()
+    index = block.open_at - 1
+    while index >= 0 and not doc.lines[index].strip():
+        index -= 1
+    paragraph: list[tuple[int, str]] = []
+    first = True
+    while index >= 0:
+        line = doc.lines[index]
+        if (not line.strip() or fenced[index] or HEADING.match(line)):
+            break
+        if (BLOCKQUOTE.match(line) or TABLE.match(line)
+                or HTML.match(line) or HTML_COMMENT_OPEN.match(line)
+                or HTML_COMMENT_CLOSE.search(line)
+                or (first and LIST_ITEM.match(line))):
+            return [] if first else paragraph
+        first = False
+        paragraph.insert(0, (index + 1, line.strip()))
+        index -= 1
+    return paragraph
+
+
+def self_name_hits(doc: Document) -> Iterator[Hit]:
+    """A hit per lead-in that names the listing it introduces."""
+    for block in doc.blocks:
+        slug = block.slug
+        if slug is None or block.continued:
+            continue
+        name = slug.rsplit("/", 1)[-1]
+        if name in GENERIC_NAMES:
+            continue
+        paragraph = lead_in(doc, block)
+        if not paragraph:
+            continue
+        text, lines = joined(paragraph)
+        for start, sentence in sentences(text):
+            for m in CODE_SPAN.finditer(sentence):
+                if m.group().strip("`").strip() == name:
+                    yield Hit(lines[start + m.start()], SELF_KIND,
+                              m.group(), " ".join(sentence.split()))
+
+
 def find(doc: Document) -> Iterator[Hit]:
     """A hit per positional reference in one document."""
+    yield from self_name_hits(doc)
     for block, paragraph in region_paragraphs(doc):
         text, lines = joined(paragraph)
         counts = keyword_counts(block)
@@ -500,7 +574,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--survey", action="store_true",
                     help="also print the survey hits (a count on "
                          "`call` or `time`; an unmarked alternative in "
-                         "a walkthrough), which are never baselined")
+                         "a walkthrough; a lead-in that names its own "
+                         "listing), which are never baselined")
     args = ap.parse_args(argv)
     paths = md_files(args.paths or [ROOT / "Chapters", ROOT / "Solutions"])
     shown_paths = {display(p) for p in paths}
