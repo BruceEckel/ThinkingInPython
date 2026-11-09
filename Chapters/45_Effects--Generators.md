@@ -1439,11 +1439,12 @@ so the machine stays in that state.
 The entry action sits above the loop, so it runs once, on entry.
 `trap_states.py`'s `waiting()` returns `TrapState.WAITING` from its `case _`,
 and `state_machine.py` re-enters the state and prints its message again.
-`HOLDING`'s `chime` is a third field in its row;
+`TrapState.HOLDING`'s `chime` is a third field in its row;
 here `holding()`'s entry code prints it after the message.
 
 `return luring()` creates `luring()`'s generator object and hands it out as `waiting()`'s result.
-`luring()`'s body runs when a driver delegates to it:
+`luring()`'s body runs when a driver delegates to it.
+Here, `trampoline()` is that driver:
 
 ```python
 # trap_generators_demo.py
@@ -2030,8 +2031,8 @@ with `values.append(a)` in place of `yield a`.
 Because the list holds all the values,
 the sequence must be finite and fit in memory.
 
-The third way is an iterator class like `Squasher`,
-whose `__next__()` returns one value per call:
+The third way is an iterator class whose `__next__()` returns one value per call,
+the shape of `Squasher` in `squasher_switch.py`:
 
 ```python
 # fibonacci_class.py
