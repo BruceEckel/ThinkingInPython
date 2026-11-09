@@ -2705,13 +2705,81 @@ the method is incidental. The sentence narrates a run on the page
 ("the test caught it by asserting on stdout") rather than a standing
 method.
 
-**Sightings.** 1, promoted at Bruce's call (2026-11-09).
+**Sightings.** 1, promoted at Bruce's call (2026-11-09), then a book
+sweep the same day: 190 "by <gerund>" sites in `Chapters/` and
+`Solutions/`, 64 rewritten (three Opus agents by chapter band, chapter
+45 by hand), 126 kept. The keeps, by the agents' labels: a mechanism's
+manner ("CPython frees most objects by counting references",
+"`supply()` resolves at runtime by scanning its arguments"), an
+instrument or criterion ("check by reading", "sorts by key"), the
+outcome as the news the next sentence builds on, a narrated run,
+exercise statements, and the sequence idioms ("opens by", "ends by",
+"starts by").
 - `45_Effects--Generators` 2026-11-09, Bruce's hand on a Claude
   rewrite: "A driver ends a generator early by calling `close()`."
   -> "To end a generator early, a driver calls `close()`."
+- `11_Techniques--Testing`: "Run the test suite by typing `pytest` in
+  the project directory." -> "To run the test suite, type `pytest`
+  in the project directory."
+- `19_Techniques--Concurrency`: "The programmer minimizes context
+  switches by choosing where the code yields control." -> "To
+  minimize context switches, the programmer chooses where the code
+  yields control."
+- `38_Patterns--Simulation`: "`landing()` decides whether a door is
+  passable by testing the occupant's type with `isinstance()`." ->
+  "To decide whether a door is passable, `landing()` tests the
+  occupant's type with `isinstance()`."
+- `29_Patterns--Changing_the_Interface`: "An adapter implements `f()`
+  by calling `g()` and `h()`." -> "To implement `f()`, an adapter
+  calls `g()` and `h()`."
+- `12_Techniques--Data_Classes_as_Types`, a hazard keeps a gerund
+  subject: "A caller can skip the check by calling the type instead
+  of the factory:" -> "Calling the type instead of the factory skips
+  the check:"
+- `20_Patterns--Rethinking_Objects`, the purpose reads better last:
+  "Java encouraged reusing code by inheriting implementation." ->
+  "Java encouraged inheriting implementation to reuse code."
 
 **Home.** CLAUDE.md (dedicated bullet after "X is how Y") | activate
 (Accrued patterns) | this file.
+
+### R61. A causative demotes the actor; put the actor in the subject
+
+**Test.** A causative verb (requires, lets, allows, makes, forces,
+enables, causes, permits, needs, gets) whose object is the thing that
+acts and whose infinitive is the real event: "`close()` requires the
+generator to finish", "the decorator lets the caller skip the check",
+"`slots=True` makes `dataclass()` build a new class". The sentence is
+active in form, but the actor sits in object position and its action
+hangs off it as an infinitive, so the reader builds the causer's
+clause first and meets the event second. Bruce (2026-11-09, on
+chapter 45's heading "`close()` Requires the Generator to Finish"):
+"see how passive that is? Maybe something like: '`close()`: the
+generator must finish'." Repair: make the actor the subject with its
+own verb or modal, and attach the causer as a condition, a phrase, or
+a colon lead-in: "`close()`: the generator must finish"; "the caller
+can skip the check"; "under `slots=True`, `dataclass()` builds a new
+class"; "when the exception arrives, the driver stops".
+
+**Keep when.** The causer is the claim and the actor is incidental
+("`@record` makes every field read-only" has an adjective complement
+and no demoted actor). A passive causative ("is required to") is the
+passive rule's. "need" with a noun object and no event ("needs a
+lock"). A causative whose object is not an agent and whose infinitive
+is the point ("lets the type checker see the mismatch" names what the
+checker does; test whether "the type checker sees the mismatch" with
+the causer as a phrase reads better, and keep when it does not).
+`tip sentence-shapes ARGS=--survey` lists the shape as `[CAUS]`, a
+survey rule, since the parse cannot tell a demoted actor from an
+incidental object.
+
+**Sightings.** 1, promoted at Bruce's call (2026-11-09).
+- `45_Effects--Generators` 2026-11-09, heading, was Claude-written:
+  "`close()` Requires the Generator to Finish" -> "`close()`: The
+  Generator Must Finish"
+
+**Home.** activate (Accrued patterns) | `tools/sentence_shapes.py`
+(`[CAUS]`) | this file.
 
 ## Candidates
 

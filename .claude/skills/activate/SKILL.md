@@ -467,3 +467,15 @@ and it becomes part of every future pass.
   result, so a repeated call returns at once"). Keep a "by" phrase
   that names an instrument, a criterion, or an agent ("sorts by key",
   "is built by the decorator"). R60 in `bruce_edit_db.md`.
+- "`close()` Requires the Generator to Finish" becomes "`close()`:
+  The Generator Must Finish" (Bruce, 2026-11-09: "see how passive that
+  is?"). A causative verb (requires, lets, allows, makes, forces,
+  enables, needs) whose object is the thing that acts and whose
+  infinitive is the real event is active in form and demotes the actor
+  all the same. Put the actor in the subject with its own verb or
+  modal, and attach the causer as a condition, a phrase, or a colon
+  lead-in: "the caller can skip the check", "under `slots=True`,
+  `dataclass()` builds a new class". Keep an adjective complement
+  ("makes every field read-only") and a causer that is the claim.
+  `tip sentence-shapes CH=NN ARGS=--survey` lists the shape as
+  `[CAUS]`. R61 in `bruce_edit_db.md`.
