@@ -1068,7 +1068,7 @@ def test_walls_block_and_food_is_eaten() -> None:
 
 The same model drives a graphical view.
 The view is the one module that imports `tkinter`.
-The imports point one way, from `maze_view.py` into the model's modules.
+The imports point one way, from the view into the model's modules.
 
 ```python
 # robot_explorer/maze_view.py

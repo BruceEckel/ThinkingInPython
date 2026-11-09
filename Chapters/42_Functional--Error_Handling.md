@@ -282,8 +282,8 @@ You can catch an exception from existing code and turn it into an `Err`,
 so the failure becomes data rather than control flow.
 `func_c()` does that with a `ZeroDivisionError`.
 
-`steps.py` gathers the three steps the rest of the chapter chains,
-so a listing imports all three from one module.
+One module gathers the three steps the rest of the chapter chains,
+so a listing imports all three from one place.
 The module imports `func_a()` and names it in [`__all__`](06_Foundations--Modules_and_Packages.md#what-a-module-exports)
 beside its own two functions.
 Listing an imported name in `__all__` declares it part of the module's public interface:

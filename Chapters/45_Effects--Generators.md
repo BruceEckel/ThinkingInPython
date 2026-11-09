@@ -796,7 +796,7 @@ A single loop at the edge of the program interprets requests yielded at any dept
 `drive()` and `yield from` both run a generator's body one `yield` at a time and both finish at `StopIteration`,
 so they are easy to confuse.
 In `yield_from_delegates.py`, `drive()` receives `interview()`'s `Result`.
-In `yield_from_nested.py`, a `yield from` in `survey()` receives that `Result`:
+Here, a `yield from` in `survey()` receives that `Result`:
 
 ```python
 # yield_from_nested.py
@@ -819,7 +819,7 @@ print(drive(survey(),
 #: Alice of Wonderland, friend Rabbit, color blue
 ```
 
-Here `interview()`'s `Result` arrives as the value of `yield from interview()` instead of as `stop.value` in the driver.
+`interview()`'s `Result` arrives as the value of `yield from interview()` instead of as `stop.value` in the driver.
 `interview()`'s questions reach `drive()` through three generators rather than two.
 
 ![Requests reach the one driver; results stop one level up.](_images/yield_from_relay)
@@ -1861,8 +1861,7 @@ the exponentiation operator of FORTRAN and COBOL,
 with a single up-arrow character.
 Asterisks pair off from the left,
 so three in a row become an arrow and an asterisk.
-`squasher_switch.py` is that subroutine as an iterator class,
-with `^` standing for the arrow:
+Here is that subroutine as an iterator class, with `^` standing for the arrow:
 
 ```python
 # squasher_switch.py

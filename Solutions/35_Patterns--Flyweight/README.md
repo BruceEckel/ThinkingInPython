@@ -396,7 +396,7 @@ so the test passes on code with one tile per cell.
 The test asserts on a different grass cell, `field[1][1]`,
 whose `walkable` turns `False` only when the cells share one `MutableTile`.
 
-A solution runs in its own folder, so `exercise_3.py` defines `MutableTile`,
+A solution runs in its own folder, so this solution defines `MutableTile`,
 a `@dataclass` version of the chapter's `Tile`,
 rather than editing a copy of `tile_map.py`.
 Its factory, `mutable_tile()`, takes the place of `tile()`.

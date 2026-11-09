@@ -605,7 +605,7 @@ Chapters/38_Patterns--Simulation.md	[BOUND] One move is one chain
 Chapters/38_Patterns--Simulation.md	[BOUND] Random kicks alone carry them there
 Chapters/38_Patterns--Simulation.md	[BOUND] The cycle exists for the checker alone
 Chapters/38_Patterns--Simulation.md	[BOUND] The design adds an event loop, a component whose one job here is to resume each waiting rat in turn
-Chapters/38_Patterns--Simulation.md	[BOUND] The imports point one way, from CODE into the model's modules
+Chapters/38_Patterns--Simulation.md	[BOUND] The imports point one way, from the view into the model's modules
 Chapters/38_Patterns--Simulation.md	[BOUND] The rest is the maze
 Chapters/38_Patterns--Simulation.md	[BOUND] The robot is the one item that moves, so its room gets an CODE occupant and behaves like any other empty room once the robot moves away
 Chapters/38_Patterns--Simulation.md	[BOUND] The teleports are not shortcuts but the only way through
@@ -655,7 +655,6 @@ Chapters/42_Functional--Error_Handling.md	[BOUND] A flat sequence of CODE calls 
 Chapters/42_Functional--Error_Handling.md	[BOUND] Apart from CODE, the only way to the answer is narrowing to one of the two classes, with CODE as in CODE below, or with CODE as in CODE
 Chapters/42_Functional--Error_Handling.md	[BOUND] CODE adds the note before it returns the exception as a value, in the one stack frame that has both the exception and the field name
 Chapters/42_Functional--Error_Handling.md	[BOUND] CODE and the CODE field exist on CODE alone, so the type checker rejects CODE, as it rejects using the CODE as if it were a number
-Chapters/42_Functional--Error_Handling.md	[BOUND] CODE gathers the three steps the rest of the chapter chains, so a listing imports all three from one module
 Chapters/42_Functional--Error_Handling.md	[BOUND] CODE in CODE catches CODE alone, and a CODE that catches CODE the same way can return CODE
 Chapters/42_Functional--Error_Handling.md	[BOUND] CODE runs the three steps in order and checks each CODE with CODE
 Chapters/42_Functional--Error_Handling.md	[BOUND] CODE states the success type alone, where CODE states the failure type as well
@@ -664,6 +663,7 @@ Chapters/42_Functional--Error_Handling.md	[BOUND] Exceptions are Python's defaul
 Chapters/42_Functional--Error_Handling.md	[BOUND] Functional programmers call a type a *monad* when it has two operations
 Chapters/42_Functional--Error_Handling.md	[BOUND] If one step's CODE carries a type different from an earlier step's CODE, the chain returns a union of both types, and that union is wider than the annotation you wrote
 Chapters/42_Functional--Error_Handling.md	[BOUND] In CODE, the three steps take their inputs from CODE and CODE rather than from an earlier step's answer, so stopping at the first CODE discards whatever the later steps would have found
+Chapters/42_Functional--Error_Handling.md	[BOUND] One module gathers the three steps the rest of the chapter chains, so a listing imports all three from one place
 Chapters/42_Functional--Error_Handling.md	[BOUND] The module imports CODE and names it in CODE beside its own two functions
 Chapters/42_Functional--Error_Handling.md	[BOUND] The result reports CODE alone (see exercise 3)
 Chapters/42_Functional--Error_Handling.md	[BOUND] The returns library provides a CODE type whose two cases are CODE and CODE, a CODE decorator like the one in CODE, and do-notation, which combines multiple results in one flat expression instead of nested binds

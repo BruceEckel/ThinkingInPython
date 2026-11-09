@@ -564,8 +564,7 @@ No built-in type implements either method, so `2 @ 3` raises a `TypeError`.
 The in-place forms, `__iadd__()` and its siblings, are a separate family.
 They serve `+=`, not `a + b`.
 
-In `radd_dispatch.py`,
-a `Meters` record implements `__add__()` and `__radd__()`.
+Here, a `Meters` record implements `__add__()` and `__radd__()`.
 Each method prints a line when it runs, so the output traces each dispatch:
 
 ```python
