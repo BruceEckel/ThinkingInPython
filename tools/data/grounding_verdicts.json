@@ -1,7 +1,7 @@
 {
  "6476eb4778e6007d": {
   "file": "02_Foundations--Tour.md",
-  "line": 351,
+  "line": 353,
   "target": "07_Foundations--Classes.md",
   "terms": [
    "Bucket"
@@ -12,7 +12,7 @@
  },
  "40269c5a2d110ef4": {
   "file": "04_Foundations--Control_Flow.md",
-  "line": 766,
+  "line": 768,
   "target": "03_Foundations--Containers.md",
   "terms": [
    "scores"
@@ -23,7 +23,7 @@
  },
  "a800f43efa7e5b09": {
   "file": "07_Foundations--Classes.md",
-  "line": 678,
+  "line": 680,
   "target": "08_Foundations--Static_Types.md",
   "terms": [
    "Derived"
@@ -34,7 +34,7 @@
  },
  "6105b531c2441ebb": {
   "file": "11_Techniques--Testing.md",
-  "line": 106,
+  "line": 107,
   "target": "12_Techniques--Data_Classes_as_Types.md",
   "terms": [
    "Account"
@@ -56,7 +56,7 @@
  },
  "92d572806e136770": {
   "file": "12_Techniques--Data_Classes_as_Types.md",
-  "line": 690,
+  "line": 691,
   "target": "08_Foundations--Static_Types.md",
   "terms": [
    "Stars"
@@ -67,7 +67,7 @@
  },
  "ceda21ecec78c6c4": {
   "file": "12_Techniques--Data_Classes_as_Types.md",
-  "line": 1110,
+  "line": 1112,
   "target": "05_Foundations--Functions.md",
   "terms": [
    "Months"
@@ -78,7 +78,7 @@
  },
  "7c9a753f95d1c66a": {
   "file": "14_Techniques--Decorators.md",
-  "line": 1252,
+  "line": 1258,
   "target": "07_Foundations--Classes.md",
   "terms": [
    "trace_class"
@@ -89,7 +89,7 @@
  },
  "9d74798f33eb179b": {
   "file": "15_Techniques--Context_Managers.md",
-  "line": 485,
+  "line": 496,
   "target": "08_Foundations--Static_Types.md",
   "terms": [
    "exc_type"
@@ -100,7 +100,7 @@
  },
  "a6f80d7775b0cbcd": {
   "file": "16_Techniques--Comprehensions.md",
-  "line": 298,
+  "line": 300,
   "target": "03_Foundations--Containers.md",
   "terms": [
    "SIZE"
@@ -111,7 +111,7 @@
  },
  "0c738529ede5867a": {
   "file": "19_Techniques--Concurrency.md",
-  "line": 255,
+  "line": 256,
   "target": "15_Techniques--Context_Managers.md",
   "terms": [
    "Meter"
@@ -122,7 +122,7 @@
  },
  "6203333350c5fed9": {
   "file": "19_Techniques--Concurrency.md",
-  "line": 1467,
+  "line": 1470,
   "target": "28_Patterns--Data_Transfer_Objects.md",
   "terms": [
    "Times"
@@ -131,9 +131,20 @@
   "p_terms": 0.03,
   "asked": "2026-10-16"
  },
+ "e767a82a7d57ae4f": {
+  "file": "21_Patterns--Design_Patterns.md",
+  "line": 201,
+  "target": "20_Patterns--Rethinking_Objects.md",
+  "terms": [
+   "Callable"
+  ],
+  "sentence": "A function with a `Callable` parameter can replace a pattern's interface and classes, so the chapters ahead keep asking a question from [Rethinking Objects](20_Patterns--Rethinking_Objects.md#guidelines):",
+  "p_terms": 0.01,
+  "asked": "2026-11-09"
+ },
  "04acbadd1165eaba": {
   "file": "22_Patterns--Iterators.md",
-  "line": 786,
+  "line": 795,
   "target": "21_Patterns--Design_Patterns.md",
   "terms": [
    "__iter__",
@@ -145,7 +156,7 @@
  },
  "1121029ae76447a0": {
   "file": "22_Patterns--Iterators.md",
-  "line": 856,
+  "line": 865,
   "target": "20_Patterns--Rethinking_Objects.md",
   "terms": [
    "GoFIterator"
@@ -154,16 +165,16 @@
   "p_terms": 0.0,
   "asked": "2026-10-13"
  },
- "674efb071da3872a": {
+ "fcd9c2238c5938fa": {
   "file": "22_Patterns--Iterators.md",
-  "line": 913,
+  "line": 922,
   "target": "05_Foundations--Functions.md",
   "terms": [
    "DONE"
   ],
-  "sentence": "`DONE` is a [sentinel](05_Foundations--Functions.md#sentinel-values), because the default must differ from every value the source could yield.",
-  "p_terms": 0.01,
-  "asked": "2026-10-13"
+  "sentence": "`DONE` is a [sentinel](05_Foundations--Functions.md#sentinel-values), because the default must differ from every value the source can yield.",
+  "p_terms": 0.02,
+  "asked": "2026-11-09"
  },
  "f149830ef146ed79": {
   "file": "23_Patterns--Singleton.md",
@@ -178,7 +189,7 @@
  },
  "7af500ad34e92834": {
   "file": "23_Patterns--Singleton.md",
-  "line": 706,
+  "line": 705,
   "target": "25_Patterns--Surrogate.md",
   "terms": [
    "__call__"
@@ -189,7 +200,7 @@
  },
  "c358c8813c054976": {
   "file": "24_Patterns--Template_Method.md",
-  "line": 205,
+  "line": 206,
   "target": "07_Foundations--Classes.md",
   "terms": [
    "getattr"
@@ -200,7 +211,7 @@
  },
  "7ba2e510106b2109": {
   "file": "25_Patterns--Surrogate.md",
-  "line": 204,
+  "line": 205,
   "target": "11_Techniques--Testing.md",
   "terms": [
    "_Proxy__implementation"
@@ -211,7 +222,7 @@
  },
  "7d6ca0d9bffc09a1": {
   "file": "25_Patterns--Surrogate.md",
-  "line": 766,
+  "line": 770,
   "target": "31_Patterns--State_Machines.md",
   "terms": [
    "change_to"
@@ -222,7 +233,7 @@
  },
  "17a44941abf94c5d": {
   "file": "26_Patterns--Factory.md",
-  "line": 168,
+  "line": 169,
   "target": "22_Patterns--Iterators.md",
   "terms": [
    "shape_name"
@@ -244,7 +255,7 @@
  },
  "19283748bd6927e4": {
   "file": "28_Patterns--Data_Transfer_Objects.md",
-  "line": 472,
+  "line": 474,
   "target": "09_Foundations--Class_Attributes.md",
   "terms": [
    "messenger_idiom.py",
@@ -291,7 +302,7 @@
  },
  "a4f132fd61a9bf31": {
   "file": "30_Patterns--Observer.md",
-  "line": 1089,
+  "line": 1090,
   "target": "05_Foundations--Functions.md",
   "terms": [
    "gather",
@@ -303,7 +314,7 @@
  },
  "e8e91f728192b79c": {
   "file": "30_Patterns--Observer.md",
-  "line": 1887,
+  "line": 1891,
   "target": "17_Techniques--Metaprogramming.md",
   "terms": [
    "Notifying",
@@ -315,7 +326,7 @@
  },
  "174f9c2a8b0e1a24": {
   "file": "31_Patterns--State_Machines.md",
-  "line": 786,
+  "line": 791,
   "target": "25_Patterns--Surrogate.md",
   "terms": [
    "UnpredictablePerson",
@@ -328,7 +339,7 @@
  },
  "919cfd41be150204": {
   "file": "31_Patterns--State_Machines.md",
-  "line": 801,
+  "line": 806,
   "target": "22_Patterns--Iterators.md",
   "terms": [
    "mouse_move_generator",
@@ -340,7 +351,7 @@
  },
  "6e7bf0b5ce335367": {
   "file": "34_Patterns--Composite_and_Interpreter.md",
-  "line": 167,
+  "line": 168,
   "target": "08_Foundations--Static_Types.md",
   "terms": [
    "Directory",
@@ -396,7 +407,7 @@
  },
  "ac09f5e8941b7dcd": {
   "file": "37_Patterns--Pattern_Refactoring.md",
-  "line": 636,
+  "line": 638,
   "target": "07_Foundations--Classes.md",
   "terms": [
    "singledispatch",
@@ -409,7 +420,7 @@
  },
  "d2b75b2af9d16cb3": {
   "file": "41_Functional--Toolkits.md",
-  "line": 713,
+  "line": 717,
   "target": "05_Foundations--Functions.md",
   "terms": [
    "fillvalue"
@@ -431,7 +442,7 @@
  },
  "cfbc0527ad9d260c": {
   "file": "44_Effects--Effect_Management.md",
-  "line": 1005,
+  "line": 1011,
   "target": "19_Techniques--Concurrency.md",
   "terms": [
    "greet"
@@ -442,7 +453,7 @@
  },
  "66259d22eeb4fc05": {
   "file": "47_Effects--Stateless_in_Practice.md",
-  "line": 447,
+  "line": 446,
   "target": "44_Effects--Effect_Management.md",
   "terms": [
    "Flip"
@@ -453,7 +464,7 @@
  },
  "757f33f7028c918e": {
   "file": "47_Effects--Stateless_in_Practice.md",
-  "line": 1337,
+  "line": 1338,
   "target": "46_Effects--Stateless.md",
   "terms": [
    "Oven",
