@@ -542,10 +542,8 @@ The `Size` that `emit()` returns stops one level up, in `report()`,
 as the value of the `yield from` expression.
 A `yield from` therefore works like a function call:
 `report()` calls `emit()` and gets its result back,
-while the values `emit()` yields still go to the driver.
+while the values `emit()` yields go to the driver.
 
-`drive_by_hand.py` and `drive()` read a generator's result by catching `StopIteration` and taking its `value`.
-In `report()`, `yield from` takes both steps.
 When `emit()` finishes,
 `yield from` catches the `StopIteration` and evaluates to the exception's `value`.
 The one assignment `size: Size = yield from emit(items)` replaces the `try` and the `except`.
@@ -664,7 +662,7 @@ Each `visit()` returns its subtree's [`Counter`](03_Foundations--Containers.md#c
 to the `visit()` that called it.
 `Counter` objects support `+`,
 so `counts += yield from visit(...)` merges a subtree's counts into the parent's counts.
-The outermost `visit()` returns the `Counter` for the whole garden to `census()`.
+The outermost `visit()` returns the `Counter` for the whole garden.
 
 `yield from` delegates to any iterable, not just a generator.
 Here, it takes a list:
