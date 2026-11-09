@@ -1127,7 +1127,7 @@ Use `default_factory` for any mutable default.
 `field()` types its parameter as `default_factory: Callable[[], _T]`,
 so it accepts any callable that takes no arguments.
 A named function like `make_months()` is one.
-A type is another, which is why `field(default_factory=list)` appears throughout this book.
+A type is another, so `field(default_factory=list)` appears throughout this book.
 Calling `list` builds an empty list.
 A subscripted generic is callable too,
 so `field(default_factory=dict[str, str])` is legal and produces an empty dict.

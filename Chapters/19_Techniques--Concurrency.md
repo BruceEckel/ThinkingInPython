@@ -629,7 +629,7 @@ You can also stop a `TaskGroup` deliberately.
 `tg.cancel()` (3.15) cancels every task in the group,
 for the case where the answer arrives before the batch finishes and the remaining work has lost its value.
 
-`TaskGroup` is where most programs meet an exception group,
+Most programs meet an exception group in a `TaskGroup`,
 but `ExceptionGroup` and `except*` (both added in 3.11) work in any code.
 You build a group from a message and a list of exceptions,
 and raise it like any other exception.
@@ -1424,8 +1424,8 @@ so one thread at a time runs Python bytecode, no matter how many cores sit idle.
 
 ### Threads Overlap Waits, Not Computing
 
-A thread waiting on I/O releases the GIL.
-That release is why a thread pool helps with I/O-bound work.
+A thread waiting on I/O releases the GIL,
+so a thread pool helps with I/O-bound work.
 
 The next two examples, one for waiting and one for computing, share a harness.
 `compare()` runs a price function sequentially and threaded and confirms the two agree.
@@ -2251,7 +2251,8 @@ Awaiting that `Future` raises `TypeError: 'Future' object can't be awaited`.
 so both are awaitable and neither blocks anything.
 `loop.run_in_executor()` connects the two kinds of `Future`.
 It submits to the executor and returns an `asyncio.Future` that resolves when the executor's own future does.
-That conversion is why `process_price()` calls `loop.run_in_executor()` instead of `pool.submit()`.
+`process_price()` awaits its result,
+so it calls `loop.run_in_executor()` instead of `pool.submit()`.
 
 `main(pool: ProcessPoolExecutor)` receives its pool as a parameter,
 and `with ProcessPoolExecutor() as pool:` creates the pool outside `main`.

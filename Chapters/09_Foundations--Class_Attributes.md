@@ -389,8 +389,8 @@ print(a.total, b.total, Tally.total)
 `self.total += 1` expands to `self.total = self.total + 1`.
 The read falls back to the class and finds `0`.
 The write creates a fresh `total` on the instance.
-The write through `self` is why `class_var.py` increments through the class name,
-`Tally.total += 1`.
+`class_var.py` increments through the class name, `Tally.total += 1`,
+so the write updates the class attribute.
 
 With `ClassVar`, the type checker reports this mistake before the program runs.
 The checker rejects the augmented form as it rejects a direct `self.total = 5`.

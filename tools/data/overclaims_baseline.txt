@@ -1008,7 +1008,7 @@ Solutions/18_Techniques--Performance/README.md	[BOUND] Declaring CODE removes th
 Solutions/18_Techniques--Performance/README.md	[BOUND] It is one line instead of three, it says what the result is rather than how the parts accumulate, and it stays fast when the 100 parts turn into 100,000
 Solutions/18_Techniques--Performance/README.md	[BOUND] It is the only addition, because the interpreter reports CODE when a Python code object starts running, and the module's own stack frame starts before the tool attaches
 Solutions/18_Techniques--Performance/README.md	[BOUND] Measuring One Function with CODE attaches CODE to chosen code objects with CODE
-Solutions/18_Techniques--Performance/README.md	[BOUND] NumPy's CODE adds the same raw doubles in a C loop, which is why vectorizing is faster and CODE alone is not
+Solutions/18_Techniques--Performance/README.md	[BOUND] NumPy's CODE adds the same raw doubles in a C loop, so vectorizing is faster and CODE alone is not
 Solutions/18_Techniques--Performance/README.md	[BOUND] On a CODE build, the comparison is two runs of the same file that differ in CODE alone
 Solutions/18_Techniques--Performance/README.md	[BOUND] Removing the front element shifts the rest of the list one place left, and the shifted list breaks the heap ordering
 Solutions/18_Techniques--Performance/README.md	[BOUND] The two flags identify the state

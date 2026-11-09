@@ -1080,12 +1080,12 @@ Unlike a `TaskGroup`,
 `gather()` leaves the other tasks running when the exception propagates,
 so `e` and `f` are still sleeping when `main()` returns.
 `asyncio.run()` then cancels the tasks that remain as it shuts down the loop,
-which is why the trace ends at the `gather raised` line.
+so the trace ends at the `gather raised` line.
 If `main()` goes on to other work,
 they run to completion in the background with no code awaiting their results.
 
-That combination, results discarded and siblings left running,
-is why `return_exceptions=True` and `TaskGroup` exist.
+`return_exceptions=True` and `TaskGroup` exist to address those two faults:
+the discarded results and the siblings left running.
 `return_exceptions=True` keeps every outcome, so partial success stays visible.
 A `TaskGroup` guarantees that every task has ended when the block exits.
 Bare `gather()` gives you neither.

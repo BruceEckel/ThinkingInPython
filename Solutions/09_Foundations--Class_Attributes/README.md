@@ -382,8 +382,7 @@ print(vars(A)["x"])
 ```
 
 **Remove the shadow.**
-`del a.x` (`[1]`) removes the entry from the instance dictionary,
-which is where assignment writes.
+`del a.x` (`[1]`) removes the entry that `a.x = 1` wrote into the instance dictionary.
 `a.x` reads `100` again,
 because the lookup falls back to the class the way it did before any assignment.
 

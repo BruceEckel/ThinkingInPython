@@ -520,7 +520,7 @@ a different design, a detail, or an equivalent alternative.
 [Stubs and Mocks](../../Chapters/11_Techniques--Testing.md#stubs-and-mocks)
 checks a call with a `Mock`, and `assert_not_called()` checks the opposite case.
 Test a balance of zero as well as a positive one,
-since zero is where the boundary lies.
+since the boundary lies at zero.
 Use `parametrize` to cover both.
 A hand-written stub needs somewhere to keep what it receives,
 so the test has something to inspect afterward.

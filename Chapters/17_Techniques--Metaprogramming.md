@@ -509,7 +509,7 @@ print(sorted(c.__name__ for c in Shape.registry))
 ```
 
 Each new subclass removes its base classes from the registry,
-which is why `Blue` is absent from the `Color` print at `[1]` and `Round` is absent from the `Shape` registry.
+so `Blue` is absent from the `Color` print at `[1]` and `Round` is absent from the `Shape` registry.
 None of this needs a metaclass.
 
 `__init_subclass__()` is implicitly a class method.
@@ -989,7 +989,7 @@ so both `__get__` lines appear ahead of `3 4`.
 The final access, `Point.x`, goes through the class rather than an instance,
 so `__get__()` receives `obj=None` and reports `via class`.
 That branch returns `self`, the descriptor object,
-which is why `isinstance(Point.x, Field)` is `True`.
+so `isinstance(Point.x, Field)` is `True`.
 
 Each `Field` stores values under `_x` or `_y` in the instance's `__dict__`.
 The underscore prefix keeps each storage key apart from the attribute's name.
@@ -1304,7 +1304,7 @@ A misspelled attribute access on the result then passes the check.
 Under mypy `ASingleton()` has the type `ASingleton` with or without the `[T]`,
 because mypy ignores a metaclass `__call__()` return type.
 
-That same `[T]` is why the body calls `type.__call__(cls, ...)` instead of the more usual `super().__call__(...)`.
+The `[T]` also forces the body to call `type.__call__(cls, ...)` instead of the more usual `super().__call__(...)`.
 Annotating the first parameter as `type[T]` drops `Singleton` from the type of `cls`.
 `ty` and mypy accept a zero-argument `super()` only when they can confirm that `cls` is a `Singleton`.
 Pyright accepts it without the check.

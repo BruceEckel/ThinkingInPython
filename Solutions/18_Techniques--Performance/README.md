@@ -787,7 +787,7 @@ The per-element allocation previews the chapter's NumPy lesson.
 A compact layout saves time when the loop over it reads raw values instead of Python objects.
 `sum()` over an `array` works on Python objects and boxes every element.
 NumPy's `sum()` adds the same raw doubles in a C loop,
-which is why vectorizing is faster and `array` alone is not.
+so vectorizing is faster and `array` alone is not.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -963,8 +963,8 @@ so `xs[left]` is the target when the target is present.
 A membership test needs that, and `search_comparison.py` relies on it.
 
 **Find the end of the run.**
-`right` is where a new duplicate goes, after the existing ones,
-and it is the wrong index to read.
+A new duplicate goes at `right`, after the existing ones,
+but `right` is the wrong index to read.
 `xs[right]` is the next larger value,
 or an `IndexError` when the target is the largest element in the list.
 
@@ -1071,7 +1071,8 @@ at its full `limit`, timed with `min(timeit.repeat(...))`.
 On a python.org 3.15 build,
 one machine measured `count_primes()` about 20% faster with the JIT on,
 against run-to-run noise of a few percent.
-Run-to-run noise is why `pyperformance` reports a geometric mean over dozens of benchmarks instead of one number from one program.
+Because a single timing carries run-to-run noise,
+`pyperformance` reports a geometric mean over dozens of benchmarks instead of one number from one program.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.

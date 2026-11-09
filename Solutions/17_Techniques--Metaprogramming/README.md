@@ -814,7 +814,7 @@ The `added_in_init` line shows the same limit for the namespace.
 `__new__()` must make every decision that goes through the arguments: the name,
 the bases, and the namespace from which `type` builds the class.
 `__init__()` receives the completed class object and can change it in place,
-which is why `setattr(cls, ...)` still works there.
+so `setattr(cls, ...)` still works there.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
