@@ -139,7 +139,9 @@ and every other tool ignores it.
 A type checker is one of those other tools, so it sees the annotation as `T`.
 At runtime, your code reads the metadata back with `get_type_hints()`.
 Those two facts make `Annotated` a candidate for the first role,
-a place to write the row:
+a place to write the row.
+`performs()` builds the metadata that holds a row,
+and `row()` reads the row back:
 
 ```python
 # utils/effect_rows.py
