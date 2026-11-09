@@ -949,7 +949,8 @@ and a `StopIteration` that propagates out of a generator's body becomes a `Runti
 `next(inner)` runs `inner`'s body up to its first `yield`.
 How much code runs before that point depends on the generator.
 A generator that opens with a `yield from` continues into its delegate and stops at the delegate's first `yield`.
-A generator that returns before its first `yield` makes `next(inner)` raise `StopIteration`.
+When a generator returns before its first `yield`,
+`next(inner)` raises `StopIteration`.
 `sequence()` in `yield_from_arguments.py` does that when its `steps` tuple is empty.
 
 In the second run, `drive()` sees two requests instead of three.
@@ -967,7 +968,7 @@ A driver controls a generator through the methods of the generator object:
 Two more methods resume the body at a `yield`.
 With these, the `yield` expression raises an exception instead of returning a value:
 
-- `throw(exc)` makes the `yield` raise `exc`.
+- `throw(exc)` raises `exc` at the `yield`.
 - `close()` is `throw(GeneratorExit)` followed by a runtime test,
   inside `close()`, of how the body responded.
   A body that lets the exception propagate finishes on its own,
@@ -1659,7 +1660,7 @@ so the two jobs alternate.
 A finished job raises `StopIteration` at its `next()`,
 and the `continue` at `[2]` skips `[3]`, so the finished job leaves the queue.
 
-We can modify `task_runner()` to allow jobs to make requests:
+We can modify `task_runner()` so that jobs can make requests:
 
 ```python
 # task_runner_send.py
@@ -1998,7 +1999,7 @@ to hold the running `total`.
 `summing()` returns the `consume` function,
 which captures `total` as a [closure](40_Functional--Foundations.md#closures)
 variable, so `total` outlives `summing()`'s call.
-The `nonlocal` statement lets `consume()` assign to the captured `total`.
+Under the `nonlocal` statement, `consume()` assigns to the captured `total`.
 
 `fibonacci()` controls how many times `consume()` runs and when the sequence ends.
 `consume()` receives one value per call and cannot ask for the next value or stop the loop early.
@@ -2088,7 +2089,7 @@ Each approach gives up one side's loop or the alternation between the two loops:
 All three approaches work around the same missing ability:
 pausing `fibonacci()` in the middle of its loop, handing out a value,
 and resuming where it stopped.
-A generator lets the producer and the consumer each keep their own loop.
+With a generator, the producer and the consumer each keep their own loop.
 
 A pair of loops passing values in both directions resembles the queues in [Coordinating Threads with Queues](19_Techniques--Concurrency.md#coordinating-threads-with-queues),
 with three differences:

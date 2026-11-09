@@ -163,7 +163,7 @@ def drive_in_order(
 `interview()` runs the same under both drivers,
 and each driver returns `Alice of Wonderland, friend Rabbit` from the chapter's three answers.
 Given one answer for three questions,
-your iterator driver lets the answers' `StopIteration` reach the caller instead of returning `None`.
+your iterator driver passes the answers' `StopIteration` on to the caller instead of returning `None`.
 
 <details>
 <summary>Solution</summary>
@@ -533,8 +533,8 @@ a different design, a detail, or an equivalent alternative.
 
 [A Generator in the Middle](../../Chapters/45_Effects--Generators.md#a-generator-in-the-middle)
 shows `sequence()` collecting each step's return value into a `list[str]` and joining the list.
-A type parameter in the `ReturnType` position lets each step return a type of its own,
-and `yield from` evaluates to that type.
+With a type parameter in the `ReturnType` position,
+each step returns a type of its own, and `yield from` evaluates to that type.
 Compare what `drive()` declares for its `conversation` parameter with the type of the generic call.
 
 <details>
@@ -763,7 +763,8 @@ def summarize(items: list[str]) -> Generator[str]:
 
 `uv run ty check` passes,
 and your caller's output for the chapter's `["red", "green", "blue"]` ends with a line carrying `12`.
-Changing `report()`'s annotation back to `Iterator[str]` makes `ty` report `invalid-return-type`,
+With `report()`'s annotation changed back to `Iterator[str]`,
+`ty` reports `invalid-return-type`,
 and you can name the type parameter through which each of your two values travels.
 
 <details>
