@@ -846,7 +846,7 @@ That stored item restores the `current_item()` that GoF had and Python dropped.
 so the constructor computes the first item, slow or fast,
 whether or not anything uses it.
 A source that blocks on its first read blocks at construction.
-`OverStream` pulls early the same way.
+The chapter's `OverStream` pulls early the same way.
 Its `is_done()` reads the next item before `current_item()` asks for it.
 Answering a question about the next item means fetching that item.
 
