@@ -184,7 +184,8 @@ def test_calibration_examples_name_known_rules() -> None:
     assert set(RULES) == {"IMP", "COLON+AND", "PAIR", "AND+REL", "PRT"}
     assert set(SURVEY_RULES) == {
         "AND", "COLON", "ADD", "TWO", "CAN", "SAME", "SAME+NEW", "CAUS"}
-    assert JUDGED_SURVEY_RULES == {"ADD", "SAME", "SAME+NEW", "TWO"}
+    assert JUDGED_SURVEY_RULES == {
+        "ADD", "CAN", "CAUS", "SAME", "SAME+NEW", "TWO"}
     assert JUDGED_SURVEY_RULES <= set(SURVEY_RULES)
 
 
@@ -340,8 +341,11 @@ def test_same_hits_are_judged_in_the_shared_baseline(
     ("`drive()`, imported unchanged, answers a request yielded two "
      "generators deep the same way it answers one from "
      "`interview()`'s own body.\n", "TWO"),
+    ("A call between the check and the use can reset that "
+     "attribute.\n", "CAN"),
+    ("`close()` requires the generator to finish.\n", "CAUS"),
 ])
-def test_add_and_two_hits_are_judged_in_the_shared_baseline(
+def test_judged_survey_rules_share_one_baseline(
     source: str, label: str, tmp_path: Path,
     capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch,
 ) -> None:

@@ -2830,9 +2830,26 @@ cast chooses its actors.").
   "A generator written for others to drive therefore lets
   `GeneratorExit` end it." -> "A generator for a driver must therefore
   finish when `GeneratorExit` arrives: it cleans up and returns."
+- A second read the same day, before the 197 hits then standing were
+  recorded as judged in the survey baseline (two Opus agents by
+  chapter band, the session sampling their keeps and deciding their
+  close calls), rewrote one more and kept 196.
+  `26_Patterns--Factory`, a section title as the causer, where "the
+  causer is the claim" cannot hold: "[Explicit Registration with a
+  Protocol] makes the checker report a class that lacks `draw()` at
+  the line that registers it." -> "In [Explicit Registration with a
+  Protocol], the checker reports a class that lacks `draw()` at the
+  line that registers it." Kept after a close look: a body that
+  chooses to step aside ("It can handle the exception and yield
+  again, clean up, or let the exception end the generator:", chapter
+  45), a run of settings each stated first ("`random.seed(42)` makes
+  the hand-written loop draw the same strings"), and the type
+  checker's enforcement as the claim ("The type checker makes a
+  caller tell the two apart").
 
 **Home.** activate (Accrued patterns) | `tools/sentence_shapes.py`
-(`[CAUS]`) | this file.
+(`[CAUS]`, with its read keeps in
+`tools/data/sentence_shapes_survey_baseline.txt`) | this file.
 
 ### R62. Code does not "draw" an exception or a diagnostic; its actor raises or reports it
 
@@ -3816,8 +3833,23 @@ from a hedged event.
   listing as its evidence, is a keep, as is a "can" paired with a
   "cannot" or set against a sibling option. Yield 7%, so the shape
   is rare in this book; the rule stays a survey for new drafts.
+- Reread 2026-11-09, before the hits were recorded as judged in the
+  survey baseline: two Opus agents read the 278 hits then standing
+  (259 of them sentences the first sweep had read, 19 written since)
+  and rewrote none; the session read the 19 new ones and a
+  one-in-eight sample of the rest. A lead-in keeps its "can" when its
+  subject is generic ("A generator can wrap an iterator and check
+  each item, in fewer lines:", where the plain present would say that
+  every generator does) or when it sets one design beside a sibling
+  ("`slope()` can catch `ZeroDivisionError` ... instead of
+  introducing a new type:"). The first sweep's rewrites had a
+  specific subject and no sibling ("`yield from` can take over that
+  job:").
 
-**Home.** CLAUDE.md (global, the "can"/"could" bullet); this file.
+**Home.** CLAUDE.md (global, the "can"/"could" bullet);
+`tools/sentence_shapes.py` (`[CAN]`, with its read keeps in
+`tools/data/sentence_shapes_survey_baseline.txt` since 2026-11-09);
+the `activate` skill's Accrued patterns; this file.
 
 ### C50. A part noun names its owner when a second owner is on the page
 

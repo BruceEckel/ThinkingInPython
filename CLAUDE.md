@@ -493,7 +493,13 @@ broken contract", Bruce: "this could be 'catches'"); the repair is
 the plain present when the sentence reports what the thing on the
 page does, and the keep is a real capability ("a `set` can hold
 any hashable object"), which the parse cannot tell apart, so it
-is a survey rule.
+is a survey rule. The 2026-10-30 sweep read its 298 hits and rewrote
+21, and Bruce kept every close call. Since 2026-11-09 its hits are
+judged against the survey baseline described under `[SAME+NEW]`
+below: a second read of the 278 then standing (two Opus agents by
+chapter band with `[CAUS]`, brief in
+`build/can-caus-reread-2026-11-09/`) rewrote none. Only 19 of the 278
+were sentences written since the first sweep.
 The sixth survey rule is `[SAME]` (2026-11-01), a "same" after a
 determiner or possessive in a sentence with no comparison or count
 word and no idiom ("At `[2]`, the same `yield` raises
@@ -525,6 +531,12 @@ verb or modal ("`close()`: the generator must finish"); rule R61 in
 `bruce_edit_db.md`. The parse cannot tell a demoted actor from an
 incidental object ("makes the type checker report"), and the first
 run had 308 hits, so it is a survey rule the activate pass reads.
+The sweep that day rewrote 112 of the 308. A second read of the 197
+left standing rewrote one more (a section title as the causer:
+"[Explicit Registration with a Protocol] makes the checker report"
+is "In [Explicit Registration with a Protocol], the checker
+reports"), and the 196 keeps are judged against the survey baseline
+described under `[SAME+NEW]` below.
 The eighth survey rule is `[SAME+NEW]` (2026-11-09), a "same" on a
 noun the passage has not used ("`safe()` uses the same separation",
 where nothing above says "separation" or "separate"; rule R63's
@@ -540,17 +552,18 @@ or counted subject, and a "same" spread over repeats ("every time",
 uses the noun the passage used ("this design" before, so "the same
 design", not "the same model"). The first book-wide run had 117 hits
 and 20 rewrites; the keeps are a summary noun for the sentence before
-("faced the same problem"). Since the same day four survey rules,
-`[ADD]`, `[SAME]`, `[SAME+NEW]`, and `[TWO]` (`JUDGED_SURVEY_RULES`),
-share a baseline of their own,
+("faced the same problem"). Since the same day six survey rules,
+`[ADD]`, `[CAN]`, `[CAUS]`, `[SAME]`, `[SAME+NEW]`, and `[TWO]`
+(`JUDGED_SURVEY_RULES`), share a baseline of their own,
 `tools/data/sentence_shapes_survey_baseline.txt`,
 as `[LEAD]` has one in `tip overclaims`: `--survey` prints the hits
 of those rules not yet judged and ends on `K survey, J judged`,
 and `tip sentence-shapes CH=NN ARGS=--survey-accept` adds them after
 a read and drops stale entries, scoped by `CH=` like the other
-accepts. It holds 469 keeps, each read in context that day (96
-`[SAME+NEW]`, 140 `[SAME]`, 149 `[ADD]`, 84 `[TWO]`), so a chapter
-pass reads only a sentence written or edited since. A rule joins the
+accepts. It holds 943 keeps, each read in context that day (96
+`[SAME+NEW]`, 140 `[SAME]`, 149 `[ADD]`, 84 `[TWO]`, 278 `[CAN]`,
+196 `[CAUS]`), so a chapter pass reads only a sentence written or
+edited since. A rule joins the
 set after a reread of its standing hits under the rule's tests as
 they are that day, never on the strength of an older sweep. The
 accept takes in
@@ -560,9 +573,10 @@ entry is keyed by its sentence, and an `[ADD]` entry by its sentence
 and the one before it. For the other rules an edit to the passage
 above a kept sentence leaves the entry in place, and
 `ARGS="--survey --all"` lists the judged ones, marked `judged`, for a
-reread after a passage is restructured. The other four survey rules (`[AND]`, `[COLON]`,
-`[CAN]`, `[CAUS]`) print every hit on every run, 1,678 over the book
-that day.
+reread after a passage is restructured. The other two survey rules,
+`[AND]` and `[COLON]`, print every hit on every run, 1,203 over the
+book that day; they are judgments made per sentence in a chapter
+pass, so a judged list would record style choices, not keeps.
 The fifth default rule is `[PRT]` (2026-11-04), a phrasal verb split
 around a noun-phrase object ("the driver carries the request out",
 Bruce: "general style: carries out the request"); the particle holds

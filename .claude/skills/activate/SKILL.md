@@ -479,3 +479,10 @@ and it becomes part of every future pass.
   ("makes every field read-only") and a causer that is the claim.
   `tip sentence-shapes CH=NN ARGS=--survey` lists the shape as
   `[CAUS]`. R61 in `bruce_edit_db.md`.
+  Since 2026-11-09 the survey prints only the `[CAUS]` hits nobody
+  has judged, and the same holds for `[CAN]`, a "can" where the
+  sentence reports what the page shows ("A test can catch the broken
+  contract" is "catches"; C49 in `bruce_edit_db.md`).
+  After reading a chapter's hits, record the keeps with
+  `tip sentence-shapes CH=NN ARGS=--survey-accept`, which takes in
+  every unjudged hit in the chapter and its Solutions file.

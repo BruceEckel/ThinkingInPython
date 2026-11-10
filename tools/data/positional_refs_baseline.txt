@@ -81,7 +81,7 @@ Chapters/25_Patterns--Surrogate.md	the second call	With the guard, the second ca
 Chapters/26_Patterns--Factory.md	the first `build()`	Every `.topping()` call after the first `build()` adds to that same list, so a second `build()` on the same builder returns a pizza carrying the first pizza's toppings too.
 Chapters/26_Patterns--Factory.md	the first `draw()`	A base class whose `draw()` raises a `NotImplementedError` reports the omission later, at the first `draw()` call.
 Chapters/26_Patterns--Factory.md	the line that	With the abstract base classes in `abstract_factory_abc.py`, the checker reports the line that constructs the incomplete factory.
-Chapters/26_Patterns--Factory.md	the line that	[Explicit Registration with a Protocol](#explicit-registration-with-a-protocol) makes the checker report a class that lacks `draw()` at the line that registers it.
+Chapters/26_Patterns--Factory.md	the line that	In [Explicit Registration with a Protocol](#explicit-registration-with-a-protocol), the checker reports a class that lacks `draw()` at the line that registers it.
 Chapters/29_Patterns--Changing_the_Interface.md	The first line	The first line of each trace names that place: `ProxyAdapter.f()` for the object adapter, `WhatIUse2.op() wraps it` for Approach 2, and `WhatIHave2.f()` for Approach 3.
 Chapters/29_Patterns--Changing_the_Interface.md	each trace	The first line of each trace names that place: `ProxyAdapter.f()` for the object adapter, `WhatIUse2.op() wraps it` for Approach 2, and `WhatIHave2.f()` for Approach 3.
 Chapters/31_Patterns--State_Machines.md	the first call	A function body runs at the call, and Python evaluates an annotation lazily, so by the first call the whole module has loaded and `TrapState` exists.

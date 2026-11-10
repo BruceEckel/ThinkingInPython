@@ -171,7 +171,12 @@ survey rule because the parse cannot tell a capability stated as
 a fact ("a `set` can hold any hashable object", "`survey()` can
 delegate to either") from an event hedged with "can"; the reader
 of the list asks whether the sentence describes what the thing on
-the page does, and writes the present if so.
+the page does, and writes the present if so. Since 2026-11-09 its
+read hits are kept in the judged baseline described under
+`[SAME+NEW]` below. The reread that day covered the 278 standing hits
+and rewrote none: 259 were sentences the 2026-10-30 sweep had read
+(298 hits, 21 rewritten), and the 19 written since are capabilities,
+hazards, and options.
 
 `[CAUS]` (2026-11-09, from a heading the author marked in chapter 45)
 is a causative verb whose object is the real actor and whose
@@ -203,7 +208,12 @@ the rest") and titles ("Making Classes Work"), and the reader of the
 list asks whether the object is the one that acts; "get", "have",
 "expect", and "help" were dropped from the list the day it was
 written, since their hits were purpose infinitives and perfects. The
-first book-wide run had 308 hits.
+first book-wide run had 308 hits, and the sweep that day rewrote 112
+of them. Since 2026-11-09 its read hits are kept in the judged
+baseline described under `[SAME+NEW]` below: a second read of the 197
+then standing rewrote 1 (a section title as the causer, "[Explicit
+Registration with a Protocol] makes the checker report") and kept
+196.
 
 `[SAME]` (2026-11-01, from a sentence the author marked in chapter 45)
 is a "same" with nothing to compare against: "At CODE, the same CODE
@@ -278,8 +288,8 @@ question" for a request), a "same" that was untrue ("the same limit"
 ahead of "both limits"), and a term stated only afterward. The other
 96 were keeps. Reprinted on every run, they would make a chapter pass
 reread all of them to find one written since, so the rules in
-`JUDGED_SURVEY_RULES` (`[ADD]`, `[SAME]`, `[SAME+NEW]`, and `[TWO]`)
-share a baseline of their own,
+`JUDGED_SURVEY_RULES` (`[ADD]`, `[CAN]`, `[CAUS]`, `[SAME]`,
+`[SAME+NEW]`, and `[TWO]`) share a baseline of their own,
 `tools/data/sentence_shapes_survey_baseline.txt` (`SURVEY_BASELINE`).
 `--survey` prints the hits of those rules not in it and ends on `K
 survey, J judged`; `--survey --all` prints the judged ones too, marked
@@ -396,7 +406,7 @@ or introduces a list whose items hold relative clauses.
     uv run python -m tools.sentence_shapes --all     # every hit
     uv run python -m tools.sentence_shapes --accept  # judged keeps
     uv run python -m tools.sentence_shapes --survey  # + AND, COLON, ADD, TWO, CAN, SAME, SAME+NEW, CAUS
-    uv run python -m tools.sentence_shapes --survey-accept  # judged ADD, SAME, SAME+NEW, TWO keeps
+    uv run python -m tools.sentence_shapes --survey-accept  # keeps of the judged survey rules
     uv run python -m tools.sentence_shapes --calibrate
     uv run python -m tools.sentence_shapes Chapters/31_*.md
     uv run tip sentence-shapes CH=31
@@ -457,17 +467,18 @@ SURVEY_BASELINE: Final = DATA_DIR / "sentence_shapes_survey_baseline.txt"
 """The judged survey keeps, apart from the default rules' baseline."""
 SURVEY_HEADER: Final = (
     "# Survey hits a human read and judged keeps, for the survey rules\n"
-    "# in JUDGED_SURVEY_RULES ([ADD], [SAME], [SAME+NEW], [TWO]): the\n"
-    "# sentence has one reading, and a reader gets it on the first\n"
-    "# pass. An entry is not an exemption from the rule.\n"
+    "# in JUDGED_SURVEY_RULES ([ADD], [CAN], [CAUS], [SAME], [SAME+NEW],\n"
+    "# [TWO]): the sentence passes its rule's test as it stands. An\n"
+    "# entry is not an exemption from the rule.\n"
     "# path<TAB>[RULE] sentence, with whitespace normalized and no\n"
     "# line number, so a reflow leaves an entry alone and an edit to\n"
     "# the sentence retires it. [SAME+NEW] puts the noun and a colon\n"
-    "# before the sentence. [ADD] puts \" | after: \" and the sentence\n"
-    "# before it after its own sentence, because the reading depends\n"
-    "# on both, so an edit to either one retires the entry. For the\n"
-    "# other rules an edit to the passage above leaves the entry in\n"
-    "# place, so reread a kept sentence when the text above it changes.\n"
+    "# before the sentence, and [CAUS] the verb, object, and\n"
+    "# complement. [ADD] puts \" | after: \" and the sentence before it\n"
+    "# after its own sentence, because the reading depends on both, so\n"
+    "# an edit to either one retires the entry. For the other rules an\n"
+    "# edit to the passage above leaves the entry in place, so reread\n"
+    "# a kept sentence when the text above it changes.\n"
     "# Rewritten by `tip sentence-shapes ARGS=--survey-accept`; read\n"
     "# the delta with `tip sentence-shapes ARGS=--survey` before\n"
     "# accepting.\n"
@@ -498,7 +509,7 @@ SURVEY_RULES: Final = {
 }
 """Printed only under `--survey`; never in the default baseline."""
 JUDGED_SURVEY_RULES: Final = frozenset(
-    {"ADD", "SAME", "SAME+NEW", "TWO"})
+    {"ADD", "CAN", "CAUS", "SAME", "SAME+NEW", "TWO"})
 """The survey rules whose read hits are kept in `SURVEY_BASELINE`."""
 ALL_RULES: Final = tuple(RULES) + tuple(SURVEY_RULES)
 COUNT_WORDS: Final = frozenset(
@@ -1601,11 +1612,11 @@ def main(argv: list[str] | None = None, parser: Parser = parse) -> int:
     ap = build_arg_parser(
         __doc__, fail_help="exit 1 when any NEW sentence is found",
         survey_help="also print the survey rules, never counted as "
-                    "new; a judged [ADD], [SAME], [SAME+NEW], or [TWO] "
-                    "hit prints only with --all",
-        survey_accept_help="add the unjudged [ADD], [SAME], [SAME+NEW], "
-                           "and [TWO] hits to their own baseline and "
-                           "drop stale entries",
+                    "new; a judged hit of [ADD], [CAN], [CAUS], [SAME], "
+                    "[SAME+NEW], or [TWO] prints only with --all",
+        survey_accept_help="add the unjudged hits of [ADD], [CAN], "
+                           "[CAUS], [SAME], [SAME+NEW], and [TWO] to "
+                           "their own baseline and drop stale entries",
         calibrate_help="run the rules over tools/data/edit_pairs.json "
                        "and the built-in examples")
     args = parse_args(ap, argv)

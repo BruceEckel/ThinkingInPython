@@ -72,9 +72,12 @@ scope's line range:
   and `[SAME+NEW]`, a "same" on a noun the 30 lines above never use,
   "`safe()` uses the same separation" -> "`safe()` checks each value
   while it is still separate from the literal text", R63; the survey
-  prints only the `[ADD]`, `[SAME]`, `[SAME+NEW]`, and `[TWO]` hits
-  not yet judged, and a read keep goes into their own baseline with
-  `tip sentence-shapes CH=NN ARGS=--survey-accept`)
+  prints only the `[ADD]`, `[CAN]`, `[SAME]`, `[SAME+NEW]`, and `[TWO]`
+  hits not yet judged, with `[AND]` and `[COLON]` in full, and a read
+  keep goes into the survey baseline with
+  `tip sentence-shapes CH=NN ARGS=--survey-accept`; `activate` reads
+  `[CAUS]`, a causative with the actor in object position, R61, judged
+  the same way)
 - `tip watch-words CH=NN` (for `ambiguity`: `however`, Tier 2 since
   2026-11-08, the concessive "however many" that reads first as a
   contrast and is a universal over a count or a manner, R58; the
@@ -125,8 +128,8 @@ Bruce's "we" and his em-dashes stay.
    keep to accept; a `stale` entry paired with a `NEW` whose flagged
    word is unchanged is a re-keyed keep, accepted with the scoped
    `tip <check>-accept CH=NN`.
-3. The survey rules with a judged list, `[ADD]`, `[SAME]`,
-   `[SAME+NEW]`, `[TWO]`, and `[LEAD]`: run
+3. The survey rules with a judged list, `[ADD]`, `[CAN]`, `[CAUS]`,
+   `[SAME]`, `[SAME+NEW]`, `[TWO]`, and `[LEAD]`: run
    `tip sentence-shapes CH=NN ARGS=--survey` and
    `tip overclaims CH=NN ARGS=--survey` again. A kept sentence the
    pass edited prints as `survey` beside its `stale` entry, so reread

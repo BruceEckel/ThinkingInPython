@@ -359,7 +359,7 @@ Chapters/25_Patterns--Surrogate.md	only: Python calls it only after normal looku
 Chapters/26_Patterns--Factory.md	carries no: Add a CODE to CODE that satisfies CODE but carries no CODE
 Chapters/26_Patterns--Factory.md	even: A lazy import produces the same failure even when the import statement is in the file
 Chapters/26_Patterns--Factory.md	even: even momentarily
-Chapters/26_Patterns--Factory.md	explicit: Explicit Registration with a Protocol makes the checker report a class that lacks CODE at the line that registers it
+Chapters/26_Patterns--Factory.md	explicit: In Explicit Registration with a Protocol
 Chapters/26_Patterns--Factory.md	explicit: Explicit registration fails the opposite way
 Chapters/26_Patterns--Factory.md	explicit: If registration is explicit
 Chapters/26_Patterns--Factory.md	explicit: as Explicit Registration with a Protocol does for a class that lacks CODE

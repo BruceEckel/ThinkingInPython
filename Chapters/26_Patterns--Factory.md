@@ -351,8 +351,8 @@ The type checker reports a line that constructs such a class by name,
 but `make()` constructs the class it looks up in the registry.
 `Shape.registry[name]()` calls a `type[Shape]`.
 Any `type[Shape]` may be a concrete subclass, so the checker accepts the call.
-[Explicit Registration with a Protocol](#explicit-registration-with-a-protocol)
-makes the checker report a class that lacks `draw()` at the line that registers it.
+In [Explicit Registration with a Protocol](#explicit-registration-with-a-protocol),
+the checker reports a class that lacks `draw()` at the line that registers it.
 
 Adding a `Triangle` takes a single class definition,
 and `make()` builds it with no change to the factory.
