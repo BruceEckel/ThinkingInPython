@@ -1234,7 +1234,7 @@ and a `try`/`finally` between them.
 Write a class with `__enter__()` and `__exit__()` when the manager needs state beyond one setup and teardown,
 methods beyond the two protocol ones, or reuse across several `with` statements.
 A generator manager handles one setup, one teardown, and one entry.
-Add `ContextDecorator` only when the same bracket should also wrap whole functions.
+Add `ContextDecorator` only when the same setup and teardown should also wrap whole functions.
 
 In all four forms, the borrower's side contains two lines.
 Every change you make later goes inside the manager.

@@ -1652,7 +1652,7 @@ Exercise 10 collects the same 36 answers in one place.
 
 The weapon ranking is a cycle.
 Every weapon loses to two others, so no group can count on winning.
-The same cycle appears at the group level.
+A second cycle appears at the group level.
 An `Elf` beats a `Dwarf` on three of their four weapon pairings,
 a `Troll` beats an `Elf` on three of four,
 and a `Dwarf` beats a `Troll` on three of four,

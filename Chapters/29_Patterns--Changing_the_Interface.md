@@ -207,7 +207,7 @@ A type checker still rejects an argument that is not a `WhatIWant`,
 so specify the requirement with a [`Protocol`](08_Foundations--Static_Types.md#structural-typing-with-protocols)
 that lists `f()`, not with a base class to inherit.
 [*Surrogate*](25_Patterns--Surrogate.md#what-the-implementation-supplies)
-makes the same substitution for a proxy's implementation.
+does the same for a proxy's implementation.
 Here, `WhatIWant` is a `Protocol` that the adapter matches by structure:
 
 ```python

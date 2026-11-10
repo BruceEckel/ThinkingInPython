@@ -14,6 +14,7 @@ from tools.parsed_prose import Paragraph, RawSentence, parsed
 from tools.sentence_shapes import (
     CALIBRATION_EXAMPLES,
     ALL_RULES,
+    JUDGED_SURVEY_RULES,
     RULES,
     SURVEY_RULES,
     colon_clause,
@@ -181,6 +182,8 @@ def test_calibration_examples_name_known_rules() -> None:
     assert set(RULES) == {"IMP", "COLON+AND", "PAIR", "AND+REL", "PRT"}
     assert set(SURVEY_RULES) == {
         "AND", "COLON", "ADD", "TWO", "CAN", "SAME", "SAME+NEW", "CAUS"}
+    assert JUDGED_SURVEY_RULES == {"SAME", "SAME+NEW"}
+    assert JUDGED_SURVEY_RULES <= set(SURVEY_RULES)
 
 
 def test_main_reports_without_failing_and_accepts(
@@ -303,6 +306,54 @@ def test_a_rewritten_same_new_sentence_retires_its_entry(
         sentence_shapes.SURVEY_BASELINE)
     assert len(entries) == 1
     assert "machinery:" in next(iter(entries))
+
+
+def test_same_hits_are_judged_in_the_shared_baseline(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(sentence_shapes, "BASELINE", tmp_path / "base.txt")
+    path = tmp_path / "a.md"
+    path.write_text("At `[2]`, the same `yield` raises `GeneratorExit`.\n",
+                    encoding="utf-8")
+    assert main([str(path), "--survey"], recorded_parser) == 0
+    out = capsys.readouterr().out
+    assert any(line.startswith("survey   ") and "[SAME] At CODE" in line
+               for line in out.splitlines())
+    assert "1 survey, 0 judged" in out
+    assert main([str(path), "--survey-accept"], recorded_parser) == 0
+    assert "added 1, dropped 0" in capsys.readouterr().out
+    assert main([str(path), "--survey"], recorded_parser) == 0
+    out = capsys.readouterr().out
+    assert "[SAME]" not in out and "0 survey, 1 judged" in out
+    assert main([str(path), "--survey", "--all"], recorded_parser) == 0
+    lines = capsys.readouterr().out.splitlines()
+    assert any(line.startswith("judged   ") and "[SAME] " in line
+               for line in lines)
+
+
+def test_a_sentence_with_both_same_rules_has_two_entries(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(sentence_shapes, "BASELINE", tmp_path / "base.txt")
+    path = tmp_path / "a.md"
+    path.write_text("The same directory reaches pytest through "
+                    "`pythonpath` in `pyproject.toml`.\n",
+                    encoding="utf-8")
+    assert main([str(path), "--survey"], recorded_parser) == 0
+    assert "2 survey, 0 judged" in capsys.readouterr().out
+    assert main([str(path), "--survey-accept"], recorded_parser) == 0
+    assert "added 2, dropped 0" in capsys.readouterr().out
+    messages = [entry.split("\t", 1)[1] for entry in
+                sentence_shapes.load_baseline(
+                    sentence_shapes.SURVEY_BASELINE)]
+    assert len(messages) == 2
+    assert sum(m.startswith("[SAME] ") for m in messages) == 1
+    assert sum(m.startswith("[SAME+NEW] directory: ")
+               for m in messages) == 1
+    assert main([str(path), "--survey"], recorded_parser) == 0
+    assert "0 survey, 2 judged" in capsys.readouterr().out
 
 
 def test_other_survey_rules_stay_unjudged(

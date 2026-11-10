@@ -526,7 +526,7 @@ The rest are here for your own designs.
     [Rethinking Objects](20_Patterns--Rethinking_Objects.md#protocols-generalize-composition-adapts)
     builds on this.
     [Stateless](46_Effects--Stateless.md#declaring-a-dependency)
-    moves the same declaration into a function's signature,
+    moves that description into a function's signature,
     where `Need` specifies what the function requires of its surroundings.
     Designing the communication gives *Managed Coupling* its target:
     not the least coupling, but coupling you can read.

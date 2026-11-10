@@ -150,7 +150,7 @@ Chapters/15_Techniques--Context_Managers.md	could: The manager closed any resour
 Chapters/15_Techniques--Context_Managers.md	never: CODE never propagates to the CODE
 Chapters/15_Techniques--Context_Managers.md	never: never runs
 Chapters/15_Techniques--Context_Managers.md	only: A class manager that stores per-CODE state stays reusable only if CODE resets that state
-Chapters/15_Techniques--Context_Managers.md	only: Add CODE only when the same bracket should also wrap whole functions
+Chapters/15_Techniques--Context_Managers.md	only: Add CODE only when the same setup and teardown should also wrap whole functions
 Chapters/15_Techniques--Context_Managers.md	only: The CODE makes CODE and CODE positional-only
 Chapters/15_Techniques--Context_Managers.md	only: it wrapped only the call that creates the generator object
 Chapters/15_Techniques--Context_Managers.md	registers nothing: so it registers nothing for CODE

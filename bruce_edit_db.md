@@ -2929,7 +2929,12 @@ afterward. The 96 keeps are a summary noun for the sentence before
 and "same" set against a stated difference ("the same answer by a
 different algorithm"). They are the first entries of the rule's own
 baseline, `tools/data/sentence_shapes_survey_baseline.txt`, so the
-survey prints only a hit not yet judged.
+survey prints only a hit not yet judged. `[SAME]` joined that
+baseline the same day, after the session reread its 143 standing hits
+with their passages: 139 kept, 4 rewritten (the four sightings marked
+"reread" below). Three were test 6 where `[SAME+NEW]` is quiet by
+design, a command and a cognate in another sense inside its 30 lines,
+so the read still applies test 6 by hand. One was test 7.
 - `44_Effects--Effect_Management`, one sentence after "this design":
   "Flix expresses the same model with different notation." -> "the
   same design"
@@ -2987,10 +2992,27 @@ survey prints only a hit not yet judged.
   raises the same `RuntimeError`, `generator ignored GeneratorExit`."
   -> "`close()` raises a `RuntimeError` with the message shown for
   `stubborn()`, `generator ignored GeneratorExit`."
+- `15_Techniques--Context_Managers` (reread), a noun the chapter had
+  used once, as a verb, 650 lines up, one sentence after "one setup,
+  one teardown": "Add `ContextDecorator` only when the same bracket
+  should also wrap whole functions." -> "the same setup and teardown"
+- `21_Patterns--Design_Patterns` (reread), a noun for what the passage
+  said with a verb ("It describes what a caller needs"), under an
+  unrelated "Declaring that a design": "[Stateless] moves the same
+  declaration into a function's signature" -> "moves that description
+  into a function's signature"
+- `29_Patterns--Changing_the_Interface` (reread), a nominalization
+  under a quoted "Liskov Substitution Principle": "[*Surrogate*] makes
+  the same substitution for a proxy's implementation." -> "does the
+  same for a proxy's implementation."
+- `Solutions/32_Patterns--Multiple_Dispatching` (reread), not the
+  same thing: "The weapon ranking is a cycle. ... The same cycle
+  appears at the group level." -> "A second cycle appears at the
+  group level."
 
 **Home.** CLAUDE.md (the "same" bullet) | ambiguity (the comparison
 entry and Accrued shapes) | `[SAME]` (shape 5) and `[SAME+NEW]`
-(shape 6, with a baseline of judged keeps) in
+(shape 6), with a shared baseline of judged keeps, in
 `tools/sentence_shapes.py` | this file.
 
 ## Candidates

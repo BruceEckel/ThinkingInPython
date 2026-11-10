@@ -62,7 +62,7 @@ most of the book's hits read one way.
 - `tip sentence-shapes CH=NN ARGS=--survey`: `[SAME]`, `[SAME+NEW]`, `[PAIR]`, `[TWO]`, and `[AND+REL]`.
   `[SAME+NEW]` (2026-11-09) is a "same" on a noun that no line in the 30 above uses, and it prints the noun (`[SAME+NEW] separation: ...`);
   ask "same as what?" and check that the passage called the thing by that noun.
-  The survey prints only the `[SAME+NEW]` hits not yet judged and ends on `K survey, J judged`.
+  The survey prints only the `[SAME]` and `[SAME+NEW]` hits not yet judged and ends on `K survey, J judged`.
   After the read, `tip sentence-shapes CH=NN ARGS=--survey-accept` records the keeps in `tools/data/sentence_shapes_survey_baseline.txt`.
   The accept takes in every unjudged hit in the chapter and its Solutions file, so a pass over one section reads the rest of that list first.
 - `tip possessives CH=NN` and `tip stranded CH=NN`: an elided head noun, which the reader supplies from two candidates.
@@ -209,3 +209,10 @@ Shapes Bruce flags that the catalog above did not name, dated, with the sentence
   "the same generic caretaker" for `History`, "the same question" for a request, "the same model" one sentence after "this design", "the same guarantee" one sentence after "the rule".
   Use the passage's noun. The keeps are a summary noun for the sentence before ("Gradual typing faced the same problem").
   The 96 keeps of that run are in the rule's baseline, so a pass reads only a sentence written or edited since.
+  `[SAME]` joined that baseline the same day, after a reread of its 143 hits in context: 139 kept, 4 rewritten.
+  Three of the 4 were the first test again, in places `[SAME+NEW]` is quiet by design, so the read still applies it by hand.
+  A command is quiet: "Add `ContextDecorator` only when the same bracket should also wrap whole functions", one sentence after "one setup, one teardown", is now "the same setup and teardown".
+  A cognate in another sense inside the 30 lines is quiet too: "moves the same declaration" under "Declaring that a design should have low coupling" is now "moves that description", after "It describes what a caller needs";
+  "makes the same substitution" under a quoted "Liskov Substitution Principle" is now "does the same".
+  So is "the same shape", a quiet noun: check that the sentence before or after says what the shape is.
+  The fourth was the second test: "The weapon ranking is a cycle. ... The same cycle appears at the group level" named a second, different cycle, and is now "A second cycle appears at the group level".
