@@ -2134,7 +2134,9 @@ of its keeps and decided its close calls): 4 rewritten, 149 kept.
 **Home.** CLAUDE.md (project, the `tip sentence-shapes` paragraph:
 `[ADD]` is a survey rule there, since 161 of the 178 hits were keeps,
 with its read keeps in `tools/data/sentence_shapes_survey_baseline.txt`
-since 2026-11-09); the `cohesion` skill's Accrued patterns; this file.
+since 2026-11-09, each entry holding the sentence and the one before
+it, so an edit to either brings the hit back); the `cohesion` skill's
+Accrued patterns; this file.
 Promoted on Bruce's ruling, the way R46 to R48 were.
 
 ### R50. A verb cancelled by its object says what happens instead

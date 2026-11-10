@@ -237,6 +237,7 @@ and it becomes part of every future pass.
   after reading them, record the keeps with `ARGS=--survey-accept`,
   which takes in every unjudged hit in the chapter and its Solutions file.
   A kept sentence depends on the sentence before it,
-  so reread the kept `[ADD]` sentences of a paragraph you reorder
-  (`ARGS="--survey --all"` lists them, marked `judged`).
+  so a hit prints both (`[ADD] sentence | after: previous sentence`)
+  and its baseline entry holds both:
+  when you edit or move either sentence, the hit prints again for a read.
   `bruce_edit_db.md` R49 has the sightings.

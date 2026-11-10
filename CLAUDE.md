@@ -467,8 +467,10 @@ described under `[SAME+NEW]` below. The reread that day (one Opus
 agent, brief in `build/shapes-reread-2026-11-09/`, the session
 checking a sample of its keeps and deciding its close calls) covered
 the 153 standing hits: 4 rewritten, 149 kept. A kept `[ADD]` sentence
-depends on the sentence before it, so reread a paragraph's kept hits
-after reordering it.
+depends on the sentence before it, so the hit prints both
+(`[ADD] sentence | after: previous sentence`) and the baseline entry
+holds both: an edit to either sentence retires the entry and the hit
+prints again for a read.
 The fourth survey rule is `[TWO]` (2026-10-28), a comparison whose
 two terms each carry a verb of their own ("answers a request
 yielded two generators deep the same way it answers one from
@@ -554,10 +556,11 @@ they are that day, never on the strength of an older sweep. The
 accept takes in
 every unjudged hit in the chapter and its Solutions file, so a pass
 over one section reads the rest of that list before accepting. An
-entry is keyed by its sentence: an edit to the passage above a kept
-sentence leaves the entry in place, and `ARGS="--survey --all"` lists
-the judged ones, marked `judged`, for a reread after a passage is
-restructured. The other four survey rules (`[AND]`, `[COLON]`,
+entry is keyed by its sentence, and an `[ADD]` entry by its sentence
+and the one before it. For the other rules an edit to the passage
+above a kept sentence leaves the entry in place, and
+`ARGS="--survey --all"` lists the judged ones, marked `judged`, for a
+reread after a passage is restructured. The other four survey rules (`[AND]`, `[COLON]`,
 `[CAN]`, `[CAUS]`) print every hit on every run, 1,678 over the book
 that day.
 The fifth default rule is `[PRT]` (2026-11-04), a phrasal verb split

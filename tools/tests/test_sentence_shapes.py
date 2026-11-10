@@ -13,6 +13,7 @@ from tools.markdown import Document
 from tools.parsed_prose import Paragraph, RawSentence, parsed
 from tools.sentence_shapes import (
     CALIBRATION_EXAMPLES,
+    ADD_AFTER,
     ALL_RULES,
     JUDGED_SURVEY_RULES,
     RULES,
@@ -109,6 +110,7 @@ def rules(source: str) -> list[str]:
     ("A closure keeps its captured variables between calls, but each call runs its body from the top. The generator keeps its place as well, so a loop in progress survives.", ["ADD"]),
     ("A closure keeps its captured variables between calls, but each call runs its body from the top. The generator keeps its locals and its place in the body, so a loop in progress survives.", []),
     ("It checks the declaration's type and ignores which code runs first. Pyright accepts the read too.", ["ADD"]),
+    ("The type checker reads the annotation and ignores which code runs first. Pyright accepts the read too.", ["ADD"]),
     ("Programmers have been bad at keeping objects inside that set. Constructing an object in an illegal state is too easy.", []),
     ("The copy shares the inner objects. It duplicates the outer list as well.", []),
     ("`drive()`, imported unchanged, answers a request yielded two generators deep the same way it answers one from `interview()`'s own body.", ["TWO"]),
@@ -409,3 +411,50 @@ def test_default_run_prints_nothing_about_the_survey(
     out = capsys.readouterr().out
     assert "survey" not in out and "judged" not in out
     assert out.endswith("0 new, 0 accepted\n")
+
+
+ADD_P1 = ("It checks the declaration's type and ignores which code "
+          "runs first. Pyright accepts the read too.\n")
+ADD_P2 = ("The type checker reads the annotation and ignores which "
+          "code runs first. Pyright accepts the read too.\n")
+
+
+def test_an_add_message_carries_the_sentence_before_it() -> None:
+    doc = Document.from_text(ADD_P1, Path("fixture.md"))
+    [found] = list(find([doc], recorded_parser))
+    assert found.message == (
+        "[ADD] Pyright accepts the read too." + ADD_AFTER
+        + "It checks the declaration's type and ignores which code "
+        "runs first.")
+    doc = Document.from_text(
+        "`drive()`, imported unchanged, answers a request yielded two "
+        "generators deep the same way it answers one from "
+        "`interview()`'s own body.\n", Path("fixture.md"))
+    [two] = list(find([doc], recorded_parser))
+    assert two.message.startswith("[TWO] ")
+    assert ADD_AFTER not in two.message
+
+
+def test_an_edit_to_the_sentence_before_retires_an_add_entry(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(sentence_shapes, "BASELINE", tmp_path / "base.txt")
+    path = tmp_path / "a.md"
+    path.write_text(ADD_P1, encoding="utf-8")
+    assert main([str(path), "--survey-accept"],
+                recorded_parser) == 0
+    assert "added 1" in capsys.readouterr().out
+    path.write_text(ADD_P2, encoding="utf-8")
+    assert main([str(path), "--survey"], recorded_parser) == 0
+    out = capsys.readouterr().out
+    lines = out.splitlines()
+    assert any(line.startswith("survey   ")
+               and "| after: The type checker reads" in line
+               for line in lines)
+    assert any(line.startswith("stale    ")
+               and "| after: It checks" in line for line in lines)
+    assert "1 survey, 0 judged, 1 stale" in out
+    assert main([str(path), "--survey-accept"],
+                recorded_parser) == 0
+    assert "added 1, dropped 1 stale" in capsys.readouterr().out

@@ -117,8 +117,9 @@ kept in the judged baseline described under `[SAME+NEW]` below. The
 reread that day covered the 153 standing hits: 4 rewritten (three
 named the thing added, "accept `bpackage` as well as `bPackage`";
 one dropped an "also" with nothing to add to) and 149 kept. A kept
-hit depends on the sentence before it, so reread a paragraph's kept
-hits after reordering it.
+hit's reading depends on the sentence before, so an `[ADD]` hit prints
+both, `[ADD] sentence | after: previous sentence`, and its baseline
+entry holds both: an edit to either sentence retires the entry.
 
 `[TWO]` (2026-10-28, from a sentence the author marked in chapter 45
 as "hard to follow") is a comparison whose two terms each carry a
@@ -284,7 +285,8 @@ share a baseline of their own,
 survey, J judged`; `--survey --all` prints the judged ones too, marked
 `judged`; and `--survey-accept` adds the unjudged hits after a human
 read and drops stale entries, for the given files alone like
-`--accept`. An entry is keyed by its sentence, so an edit to the
+`--accept`. An entry is keyed by its sentence (an `[ADD]` entry by its
+sentence and the one before it), so for the other rules an edit to the
 passage above a kept sentence leaves the entry in place: reread a kept
 sentence when the text above it changes.
 
@@ -348,7 +350,10 @@ of `--calibrate` are `tools/parse_check.py`'s, shared with the other
 parse-based checks.
 
 A hit prints as `path:line: [RULE] sentence`, the line holding the
-sentence's first character. Every hit is read once by a human, and the
+sentence's first character. A `[SAME+NEW]` hit puts the noun and a
+colon before the sentence, a `[CAUS]` hit the verb, object, and
+complement, and an `[ADD]` hit the previous sentence after ` | after: `.
+Every hit is read once by a human, and the
 ones judged keeps live in `tools/data/sentence_shapes_baseline.txt`, so
 a run prints only what is new. An entry is `path<TAB>[RULE] sentence`
 with whitespace normalized and no line number, so a reflow or an edit
@@ -456,13 +461,16 @@ SURVEY_HEADER: Final = (
     "# sentence has one reading, and a reader gets it on the first\n"
     "# pass. An entry is not an exemption from the rule.\n"
     "# path<TAB>[RULE] sentence, with whitespace normalized and no\n"
-    "# line number ([SAME+NEW] puts the noun and a colon before the\n"
-    "# sentence), so a reflow leaves an entry alone and an edit to the\n"
-    "# sentence retires it. An edit to the passage above the sentence\n"
-    "# leaves the entry in place, so reread a kept sentence when the\n"
-    "# text above it changes. Rewritten by\n"
-    "# `tip sentence-shapes ARGS=--survey-accept`; read the delta with\n"
-    "# `tip sentence-shapes ARGS=--survey` before accepting.\n"
+    "# line number, so a reflow leaves an entry alone and an edit to\n"
+    "# the sentence retires it. [SAME+NEW] puts the noun and a colon\n"
+    "# before the sentence. [ADD] puts \" | after: \" and the sentence\n"
+    "# before it after its own sentence, because the reading depends\n"
+    "# on both, so an edit to either one retires the entry. For the\n"
+    "# other rules an edit to the passage above leaves the entry in\n"
+    "# place, so reread a kept sentence when the text above it changes.\n"
+    "# Rewritten by `tip sentence-shapes ARGS=--survey-accept`; read\n"
+    "# the delta with `tip sentence-shapes ARGS=--survey` before\n"
+    "# accepting.\n"
     "# See tools/sentence_shapes.py.\n"
 )
 """The comment header of the survey baseline file."""
@@ -509,6 +517,8 @@ PAIR_BREAKS: Final = frozenset(",;:.()?!")
 PAIR_NOUN_START: Final = frozenset(
     {"DET", "NOUN", "PROPN", "PRON", "ADJ", "NUM"})
 """Parts of speech that open a noun phrase after the stray conjunction."""
+ADD_AFTER: Final = " | after: "
+"""Joins an `[ADD]` hit's sentence to the sentence before it."""
 ADDITIVE_WORDS: Final = frozenset({"also", "too", "likewise"})
 """Adverbs that add a member to a set the previous sentence set up."""
 PERSON_SUBJECTS: Final = frozenset(
@@ -1541,8 +1551,14 @@ def find(docs: list[Document], parser: Parser = parse) -> Iterator[Finding]:
                         if rule == "SAME+NEW" else None)
                 if noun is not None:
                     detail = noun.text + ": "
+                tail = ""
+                if rule == "ADD":
+                    index = next(i for i, s in enumerate(paragraph.sentences)
+                                 if s is sentence)
+                    tail = ADD_AFTER + sentence_text(
+                        paragraph, paragraph.sentences[index - 1])
                 yield Finding(doc.path, line, f"[{rule}] " + detail
-                              + sentence_text(paragraph, sentence))
+                              + sentence_text(paragraph, sentence) + tail)
 
 
 def rule_of(message: str) -> str:
