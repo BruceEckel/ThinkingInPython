@@ -367,3 +367,27 @@ before/after pair, and it becomes part of every future pass.
   `tip sentence-shapes` lists the shape as `[PRT]`, a default rule
   with a baseline of judged keeps; R56 in `bruce_edit_db.md` has the
   sightings, and a heading with the shape takes one verb instead.
+- **Two pictures across one comparison** (2026-10-28, Bruce on chapter
+  45: "asking the reader to hold two things at once").
+  "`drive()`, imported unchanged, answers a request yielded two
+  generators deep the same way it answers one from `interview()`'s own
+  body" makes the reader build one picture, hold it, build a second,
+  and then compare the two, all inside one clause.
+  A comparator ("the same way", "the same X as", "as X as", "like",
+  "unlike", "rather than", "instead of") with a verb-bearing term on
+  each side is the shape.
+  Drop a modifier the context already supplies, or make the second
+  term a name the reader has, or give each picture its own sentence:
+  the new thing, then the mechanism, then the relation.
+  "`drive()` is imported unchanged. The requests now come from
+  `ask()`, one generator below `interview()`, and `yield from` passes
+  each one up to the driver, so `drive()` sees the same `Question`s it
+  saw in `interview_generator.py`."
+  Keep two bare verb phrases around "rather than" or "instead of",
+  terms short enough to read as names, a comparison of two things the
+  section just showed, and the idioms ("as soon as", "like any other").
+  `tip sentence-shapes CH=NN ARGS=--survey` lists the shape as `[TWO]`.
+  Since 2026-11-09 it prints only the hits nobody has judged; after
+  reading them, record the keeps with `ARGS=--survey-accept`, which
+  takes in every unjudged hit in the chapter and its Solutions file.
+  R51 in `bruce_edit_db.md` has the sightings.

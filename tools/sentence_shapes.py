@@ -112,7 +112,14 @@ out") or lets another word carry it ("removes that last change").
 The book-wide read that day had 178 hits and 17 real ones, so the
 rule is a survey rule: most additive adverbs with a new subject do
 mean the subject ("Pyright accepts the read too"), and the reader
-cannot tell which from the parse.
+cannot tell which from the parse. Since 2026-11-09 its read hits are
+kept in the judged baseline described under `[SAME+NEW]` below. The
+reread that day covered the 153 standing hits: 4 rewritten (three
+named the thing added, "accept `bpackage` as well as `bPackage`";
+one dropped an "also" with nothing to add to) and 149 kept. A kept
+hit depends on the sentence before it, so reread a paragraph's kept
+hits after reordering it.
+
 `[TWO]` (2026-10-28, from a sentence the author marked in chapter 45
 as "hard to follow") is a comparison whose two terms each carry a
 modifier of their own, so the reader holds two unfinished pictures
@@ -135,6 +142,12 @@ to the driver, so `drive()` sees the same `Question`s it saw in
 supplies. "Use a `set` rather than a `list`" is quiet, because both
 terms are light. It is a survey rule because weight is a judgment:
 two heavy terms the reader already knows can ride in one clause.
+Since 2026-11-09 its read hits are kept in the judged baseline
+described under `[SAME+NEW]` below. The reread that day covered the
+84 standing hits and rewrote none: 62 are comparisons that read once
+(two bare verb phrases around "rather than", terms already on the
+page, exercise statements) and 22 are not the shape (an idiom such
+as "as soon as", or "like" meaning "such as").
 
 `[CAN]` (2026-10-30, from a sentence the author marked in chapter 20)
 is a modal "can" standing where the sentence reports what happens:
@@ -263,11 +276,11 @@ another name ("the same generic caretaker" for `History`, "the same
 question" for a request), a "same" that was untrue ("the same limit"
 ahead of "both limits"), and a term stated only afterward. The other
 96 were keeps. Reprinted on every run, they would make a chapter pass
-reread all of them to find one written since, so `[SAME+NEW]` and
-`[SAME]` share a baseline of their own,
-`tools/data/sentence_shapes_survey_baseline.txt` (`SURVEY_BASELINE`,
-for the rules in `JUDGED_SURVEY_RULES`).
-`--survey` prints the hits of those two rules not in it and ends on `K
+reread all of them to find one written since, so the rules in
+`JUDGED_SURVEY_RULES` (`[ADD]`, `[SAME]`, `[SAME+NEW]`, and `[TWO]`)
+share a baseline of their own,
+`tools/data/sentence_shapes_survey_baseline.txt` (`SURVEY_BASELINE`).
+`--survey` prints the hits of those rules not in it and ends on `K
 survey, J judged`; `--survey --all` prints the judged ones too, marked
 `judged`; and `--survey-accept` adds the unjudged hits after a human
 read and drops stale entries, for the given files alone like
@@ -314,9 +327,9 @@ other words. `[IMP]` fired on 2 before only, 0 both, and 1 after only,
 and the after-only one was an exercise sentence the parser misread.
 Survey rules print only under `--survey`, each line marked `survey`
 instead of NEW or accepted, after the default rules' lines. They never
-enter the default rules' baseline and never count toward `N new`;
-`[SAME]` and `[SAME+NEW]` share a judged list of their own, described
-in the `[SAME+NEW]` section above. The intended use is
+enter the default rules' baseline and never count toward `N new`.
+The rules in `JUDGED_SURVEY_RULES` share a judged list of their own,
+described in the `[SAME+NEW]` section above. The intended use is
 `tip sentence-shapes CH=31 ARGS=--survey` at the start of a chapter
 pass.
 
@@ -378,7 +391,7 @@ or introduces a list whose items hold relative clauses.
     uv run python -m tools.sentence_shapes --all     # every hit
     uv run python -m tools.sentence_shapes --accept  # judged keeps
     uv run python -m tools.sentence_shapes --survey  # + AND, COLON, ADD, TWO, CAN, SAME, SAME+NEW, CAUS
-    uv run python -m tools.sentence_shapes --survey-accept  # judged SAME, SAME+NEW keeps
+    uv run python -m tools.sentence_shapes --survey-accept  # judged ADD, SAME, SAME+NEW, TWO keeps
     uv run python -m tools.sentence_shapes --calibrate
     uv run python -m tools.sentence_shapes Chapters/31_*.md
     uv run tip sentence-shapes CH=31
@@ -439,9 +452,9 @@ SURVEY_BASELINE: Final = DATA_DIR / "sentence_shapes_survey_baseline.txt"
 """The judged survey keeps, apart from the default rules' baseline."""
 SURVEY_HEADER: Final = (
     "# Survey hits a human read and judged keeps, for the survey rules\n"
-    "# in JUDGED_SURVEY_RULES ([SAME] and [SAME+NEW]): the reader can\n"
-    "# name what the \"same\" compares with. An entry is not an\n"
-    "# exemption from the rule.\n"
+    "# in JUDGED_SURVEY_RULES ([ADD], [SAME], [SAME+NEW], [TWO]): the\n"
+    "# sentence has one reading, and a reader gets it on the first\n"
+    "# pass. An entry is not an exemption from the rule.\n"
     "# path<TAB>[RULE] sentence, with whitespace normalized and no\n"
     "# line number ([SAME+NEW] puts the noun and a colon before the\n"
     "# sentence), so a reflow leaves an entry alone and an edit to the\n"
@@ -476,7 +489,8 @@ SURVEY_RULES: Final = {
     "CAUS": "a causative verb that demotes the actor to its object",
 }
 """Printed only under `--survey`; never in the default baseline."""
-JUDGED_SURVEY_RULES: Final = frozenset({"SAME", "SAME+NEW"})
+JUDGED_SURVEY_RULES: Final = frozenset(
+    {"ADD", "SAME", "SAME+NEW", "TWO"})
 """The survey rules whose read hits are kept in `SURVEY_BASELINE`."""
 ALL_RULES: Final = tuple(RULES) + tuple(SURVEY_RULES)
 COUNT_WORDS: Final = frozenset(
@@ -1571,11 +1585,11 @@ def main(argv: list[str] | None = None, parser: Parser = parse) -> int:
     ap = build_arg_parser(
         __doc__, fail_help="exit 1 when any NEW sentence is found",
         survey_help="also print the survey rules, never counted as "
-                    "new; a judged [SAME] or [SAME+NEW] hit prints "
-                    "only with --all",
-        survey_accept_help="add the unjudged [SAME] and [SAME+NEW] "
-                           "hits to their own baseline and drop stale "
-                           "entries",
+                    "new; a judged [ADD], [SAME], [SAME+NEW], or [TWO] "
+                    "hit prints only with --all",
+        survey_accept_help="add the unjudged [ADD], [SAME], [SAME+NEW], "
+                           "and [TWO] hits to their own baseline and "
+                           "drop stale entries",
         calibrate_help="run the rules over tools/data/edit_pairs.json "
                        "and the built-in examples")
     args = parse_args(ap, argv)

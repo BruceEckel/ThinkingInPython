@@ -261,7 +261,7 @@ print(EmailAddress("grace@example.com"))
 **Require a single `@`.**
 The original check, `"@" in self.text`,
 confirms that an `@` appears somewhere and accepts any number of them.
-`count("@") == 1` also rejects two-`@` strings like `"b@@x.com"`.
+`count("@") == 1` rejects both a string with no `@` and a two-`@` string like `"b@@x.com"`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.

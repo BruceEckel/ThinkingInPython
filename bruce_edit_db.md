@@ -2111,9 +2111,31 @@ rule `[ADD]`):
 - the rest in chapters 06, 12 (two), 15, 18, 22, 26, 47 and Solutions
   04, 17, 21, each the same shape and repair.
 
+A reread on 2026-11-09 covered the 153 hits then standing, before
+they were recorded as judged in the survey baseline (one Opus agent,
+brief in `build/shapes-reread-2026-11-09/`; the session read a sample
+of its keeps and decided its close calls): 4 rewritten, 149 kept.
+- `Solutions/06_Foundations--Modules_and_Packages`: "the shell and the
+  editor accept `bpackage` as well, but Python's import check compares
+  case and rejects `bpackage`" -> "accept `bpackage` as well as
+  `bPackage`," (the subject reading put the shell and the editor
+  beside Python, which the same sentence says rejects the name)
+- `Solutions/12_Techniques--Data_Classes_as_Types`: "`count("@") == 1`
+  also rejects two-`@` strings like `"b@@x.com"`." -> "rejects both a
+  string with no `@` and a two-`@` string like `"b@@x.com"`." (the
+  sentence before says the original check accepts any number of them)
+- `Solutions/38_Patterns--Simulation`: "Too small a kick keeps the step
+  small in a loud region too," -> "in a loud region as well as near a
+  nodal line,"
+- `Solutions/34_Patterns--Composite_and_Interpreter`, an adverb with
+  nothing on the page to add to: "`(2 * x + 1).right` also resolves
+  for a caller." -> "resolves for a caller."
+
 **Home.** CLAUDE.md (project, the `tip sentence-shapes` paragraph:
-`[ADD]` is a survey rule there, since 161 of the 178 hits were keeps);
-this file. Promoted on Bruce's ruling, the way R46 to R48 were.
+`[ADD]` is a survey rule there, since 161 of the 178 hits were keeps,
+with its read keeps in `tools/data/sentence_shapes_survey_baseline.txt`
+since 2026-11-09); the `cohesion` skill's Accrued patterns; this file.
+Promoted on Bruce's ruling, the way R46 to R48 were.
 
 ### R50. A verb cancelled by its object says what happens instead
 
@@ -2235,11 +2257,19 @@ rewrites, 84 keeps, 17 commits):
 - the sweep's keeps were the majority, because most comparators in the
   book join two short terms or two bare verb phrases, and the scan
   weighs words, not familiarity.
+- a reread on 2026-11-09 covered the 84 hits then standing, before
+  they were recorded as judged in the survey baseline
+  (`tools/data/sentence_shapes_survey_baseline.txt`), and rewrote
+  none: 62 comparisons that read once and 22 not the shape (an idiom,
+  or "like" meaning "such as"). Fifteen of the 237 `[TWO]` and `[ADD]`
+  lines had changed since the 2026-10-28 reads, and none of those
+  failed.
 
 **Home.** CLAUDE.md (global, "One picture per clause"); `tip
 sentence-shapes` (`[TWO]`, `SURVEY_RULES` in `tools/sentence_shapes.py`,
-`comparator()`, `heavy_side()`, `two_terms()`); the deep-review skill's
-prose pass; this file. Promoted on Bruce's ruling, the way R46 to R50
+`comparator()`, `heavy_side()`, `two_terms()`, with its read keeps in
+the survey baseline since 2026-11-09); the deep-review skill's prose
+pass; the `straighten` skill's Accrued patterns; this file. Promoted on Bruce's ruling, the way R46 to R50
 were. It is a cousin of the `straighten` skill's "subject held open":
 there the reader holds a subject across a long modifier, here two
 modified terms across a comparator.

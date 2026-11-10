@@ -1152,7 +1152,7 @@ although it can also return `NotImplemented`.
 [*Multiple Dispatching*](../../Chapters/32_Patterns--Multiple_Dispatching.md#operators-dispatch-twice)
 explains the convention: typeshed gives the sentinel a type inheriting `Any`,
 so returning it satisfies any declared return type.
-With the declaration, `(2 * x + 1).right` also resolves for a caller.
+With the declaration, `(2 * x + 1).right` resolves for a caller.
 
 `NotImplemented` adds a check at runtime, not at type-checking time.
 The type checker rejects `"a" + x` and `x + "a"` in the source it checks,

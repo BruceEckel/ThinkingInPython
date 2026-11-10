@@ -184,7 +184,7 @@ so the rename breaks a convention, not a rule.
 calls for short, all-lowercase package names,
 so `bPackage` stands out as something other than a package to anyone scanning an import line.
 Its capital letter also makes the name easy to mistype.
-On a case-insensitive filesystem the shell and the editor accept `bpackage` as well,
+On a case-insensitive filesystem the shell and the editor accept `bpackage` as well as `bPackage`,
 but Python's import check compares case and rejects `bpackage`.
 Exercise 4 examines that check.
 

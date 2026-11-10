@@ -218,3 +218,25 @@ and it becomes part of every future pass.
   and a sentence that tangles the two concepts at the seam is split with them.
   `bruce_edit_db.md` R29 has the record, the chapter 45 before/after,
   and the 2026-10-05 and 2026-10-30 sweeps.
+- **An additive adverb after a change of subject.**
+  Bruce, 2026-10-28, on a chapter 45 sentence:
+  "'as well' could read as 'the same way a closure does'."
+  "Also", "too", "as well", and "likewise" say that something joins a set
+  the previous sentence set up, and a new subject is the reader's first candidate.
+  "A closure keeps its captured variables between calls.
+  The generator keeps its place as well" says the closure keeps its place.
+  Read the sentence both ways, with the adverb on the subject and on the predicate.
+  If the subject reading is false or beside the point, name the thing added
+  ("The generator keeps its locals and its place in the body",
+  "copies on the way in as well as on the way out")
+  or let another word carry the addition ("removes that last change").
+  A subject reading that is the claim stays ("Pyright accepts the read too"),
+  and so does a sentence where both readings are true.
+  `tip sentence-shapes CH=NN ARGS=--survey` lists the shape as `[ADD]`.
+  Since 2026-11-09 it prints only the hits nobody has judged;
+  after reading them, record the keeps with `ARGS=--survey-accept`,
+  which takes in every unjudged hit in the chapter and its Solutions file.
+  A kept sentence depends on the sentence before it,
+  so reread the kept `[ADD]` sentences of a paragraph you reorder
+  (`ARGS="--survey --all"` lists them, marked `judged`).
+  `bruce_edit_db.md` R49 has the sightings.

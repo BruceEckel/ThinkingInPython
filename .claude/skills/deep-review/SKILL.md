@@ -183,9 +183,9 @@ flourishes, nothing that obscures the point.
   "copies on the way in as well as on the way out") or let another
   word carry it ("removes that last change"). A subject reading that
   is the claim stays ("Pyright accepts the read too"). `tip
-  sentence-shapes CH=NN ARGS=--survey` lists the candidates as
-  `[ADD]`; rule R49 in `bruce_edit_db.md` has the pairs (Bruce,
-  2026-10-28).
+  sentence-shapes CH=NN ARGS=--survey` lists the candidates nobody
+  has judged as `[ADD]`; rule R49 in `bruce_edit_db.md` has the
+  pairs (Bruce, 2026-10-28).
 - **One picture per clause:** a comparison ("the same way", "as X
   as", "like", "rather than", "instead of") whose two terms each
   carry a participle, a relative clause, or a clause, so the reader
@@ -196,8 +196,10 @@ flourishes, nothing that obscures the point.
   the relation, or make the second term a name the reader already
   has. Keep two bare verb phrases around "rather than", terms
   short enough to read as names, and idioms ("as soon as").
-  `tip sentence-shapes CH=NN ARGS=--survey` lists them as `[TWO]`;
-  rule R51 in `bruce_edit_db.md` (Bruce, 2026-10-28).
+  `tip sentence-shapes CH=NN ARGS=--survey` lists the ones nobody
+  has judged as `[TWO]`; rule R51 in `bruce_edit_db.md` (Bruce,
+  2026-10-28). A read keep of either rule goes into the survey
+  baseline with `ARGS=--survey-accept`.
 - **Reversal of expectation:** a verb that promises an action or a
   possession, then an object that cancels it: "runs none of the
   body", "raises no exception", "has no `__slots__`", "prints

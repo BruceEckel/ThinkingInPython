@@ -1501,7 +1501,7 @@ The loop works within a range of step sizes and fails outside it.
 A grain in a loud region gets a large kick and moves fast.
 As it nears a nodal line the amplitude shrinks and so does its step,
 so the grain slows down and settles on the line.
-Too small a kick keeps the step small in a loud region too,
+Too small a kick keeps the step small in a loud region as well as near a nodal line,
 so the grain barely travels.
 Too large a kick keeps the step large near a nodal line,
 since a small amplitude still leaves the step large enough to carry the grain out of the neighborhood in which it was settling.

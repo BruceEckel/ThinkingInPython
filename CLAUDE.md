@@ -462,6 +462,13 @@ closure keeps its place; the repair names the thing added ("keeps
 its locals and its place"). The book-wide read that day had 178
 hits and 17 rewrites, since most such adverbs do mean the subject
 ("Pyright accepts the read too"), which is why it is a survey rule.
+Since 2026-11-09 its hits are judged against the survey baseline
+described under `[SAME+NEW]` below. The reread that day (one Opus
+agent, brief in `build/shapes-reread-2026-11-09/`, the session
+checking a sample of its keeps and deciding its close calls) covered
+the 153 standing hits: 4 rewritten, 149 kept. A kept `[ADD]` sentence
+depends on the sentence before it, so reread a paragraph's kept hits
+after reordering it.
 The fourth survey rule is `[TWO]` (2026-10-28), a comparison whose
 two terms each carry a verb of their own ("answers a request
 yielded two generators deep the same way it answers one from
@@ -473,7 +480,10 @@ picture its own sentence and then states the relation. The
 book-wide read that day had 102 hits, 18 rewrites, and 84
 keeps (idioms the scan cannot tell from comparisons, "as soon
 as" and "like any other"; two bare verb phrases around "rather
-than"; exercise statements), so it stays a survey rule.
+than"; exercise statements), so it stays a survey rule. Since
+2026-11-09 its hits are judged against the same survey baseline: the
+reread that day covered the 84 standing hits and rewrote none (62
+comparisons that read once, 22 not the shape).
 The fifth survey rule is `[CAN]` (2026-10-30), a modal "can" on a
 main-clause verb with a thing as its subject, no negation, and no
 condition or option word in the sentence ("A test can catch the
@@ -528,23 +538,28 @@ or counted subject, and a "same" spread over repeats ("every time",
 uses the noun the passage used ("this design" before, so "the same
 design", not "the same model"). The first book-wide run had 117 hits
 and 20 rewrites; the keeps are a summary noun for the sentence before
-("faced the same problem"). Since the same day `[SAME+NEW]` and
-`[SAME]` share a baseline of their own,
+("faced the same problem"). Since the same day four survey rules,
+`[ADD]`, `[SAME]`, `[SAME+NEW]`, and `[TWO]` (`JUDGED_SURVEY_RULES`),
+share a baseline of their own,
 `tools/data/sentence_shapes_survey_baseline.txt`,
 as `[LEAD]` has one in `tip overclaims`: `--survey` prints the hits
-of those two rules not yet judged and ends on `K survey, J judged`,
+of those rules not yet judged and ends on `K survey, J judged`,
 and `tip sentence-shapes CH=NN ARGS=--survey-accept` adds them after
 a read and drops stale entries, scoped by `CH=` like the other
-accepts. The first run's 96 keeps and the 139 `[SAME]` keeps are in
-it, so the `ambiguity` pass reads only a sentence written or edited
-since. The accept takes in
+accepts. It holds 469 keeps, each read in context that day (96
+`[SAME+NEW]`, 140 `[SAME]`, 149 `[ADD]`, 84 `[TWO]`), so a chapter
+pass reads only a sentence written or edited since. A rule joins the
+set after a reread of its standing hits under the rule's tests as
+they are that day, never on the strength of an older sweep. The
+accept takes in
 every unjudged hit in the chapter and its Solutions file, so a pass
 over one section reads the rest of that list before accepting. An
 entry is keyed by its sentence: an edit to the passage above a kept
 sentence leaves the entry in place, and `ARGS="--survey --all"` lists
 the judged ones, marked `judged`, for a reread after a passage is
-restructured. The other six survey rules print every hit on every
-run.
+restructured. The other four survey rules (`[AND]`, `[COLON]`,
+`[CAN]`, `[CAUS]`) print every hit on every run, 1,678 over the book
+that day.
 The fifth default rule is `[PRT]` (2026-11-04), a phrasal verb split
 around a noun-phrase object ("the driver carries the request out",
 Bruce: "general style: carries out the request"); the particle holds

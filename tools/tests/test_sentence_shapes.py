@@ -182,7 +182,7 @@ def test_calibration_examples_name_known_rules() -> None:
     assert set(RULES) == {"IMP", "COLON+AND", "PAIR", "AND+REL", "PRT"}
     assert set(SURVEY_RULES) == {
         "AND", "COLON", "ADD", "TWO", "CAN", "SAME", "SAME+NEW", "CAUS"}
-    assert JUDGED_SURVEY_RULES == {"SAME", "SAME+NEW"}
+    assert JUDGED_SURVEY_RULES == {"ADD", "SAME", "SAME+NEW", "TWO"}
     assert JUDGED_SURVEY_RULES <= set(SURVEY_RULES)
 
 
@@ -329,6 +329,37 @@ def test_same_hits_are_judged_in_the_shared_baseline(
     assert main([str(path), "--survey", "--all"], recorded_parser) == 0
     lines = capsys.readouterr().out.splitlines()
     assert any(line.startswith("judged   ") and "[SAME] " in line
+               for line in lines)
+
+
+@pytest.mark.parametrize("source, label", [
+    ("It checks the declaration's type and ignores which code runs "
+     "first. Pyright accepts the read too.\n", "ADD"),
+    ("`drive()`, imported unchanged, answers a request yielded two "
+     "generators deep the same way it answers one from "
+     "`interview()`'s own body.\n", "TWO"),
+])
+def test_add_and_two_hits_are_judged_in_the_shared_baseline(
+    source: str, label: str, tmp_path: Path,
+    capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(sentence_shapes, "BASELINE", tmp_path / "base.txt")
+    path = tmp_path / "a.md"
+    path.write_text(source, encoding="utf-8")
+    tag = f"[{label}] "
+    assert main([str(path), "--survey"], recorded_parser) == 0
+    out = capsys.readouterr().out
+    assert any(line.startswith("survey   ") and tag in line
+               for line in out.splitlines())
+    assert "1 survey, 0 judged" in out
+    assert main([str(path), "--survey-accept"], recorded_parser) == 0
+    assert "added 1, dropped 0" in capsys.readouterr().out
+    assert main([str(path), "--survey"], recorded_parser) == 0
+    out = capsys.readouterr().out
+    assert f"[{label}]" not in out and "0 survey, 1 judged" in out
+    assert main([str(path), "--survey", "--all"], recorded_parser) == 0
+    lines = capsys.readouterr().out.splitlines()
+    assert any(line.startswith("judged   ") and tag in line
                for line in lines)
 
 

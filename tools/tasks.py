@@ -572,11 +572,12 @@ def sentence_shapes(v: Vars) -> None:
     event the sentence reports, and [SAME] a "same" with nothing to
     compare against ("the same `yield`" where the listing has one
     `yield`, which "its `yield`" says). [SAME+NEW] is a "same" on a
-    noun the 30 lines above never use. [SAME] and [SAME+NEW] share a
+    noun the 30 lines above never use. [ADD], [SAME], [SAME+NEW], and
+    [TWO] (a comparison whose two terms each carry a verb) share a
     baseline of their own,
     tools/data/sentence_shapes_survey_baseline.txt, written by
     ARGS=--survey-accept after a read, so the survey prints only the
-    sentences of those two rules not yet judged.
+    sentences of those four rules not yet judged.
     Run `tip sentence-shapes CH=31 ARGS=--survey` at the start of a
     chapter pass. It reports and never gates; `tip prose` runs it after
     the subject-gap scan. CH= picks one chapter and its Solutions file.

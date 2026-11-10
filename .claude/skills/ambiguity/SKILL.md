@@ -62,7 +62,7 @@ most of the book's hits read one way.
 - `tip sentence-shapes CH=NN ARGS=--survey`: `[SAME]`, `[SAME+NEW]`, `[PAIR]`, `[TWO]`, and `[AND+REL]`.
   `[SAME+NEW]` (2026-11-09) is a "same" on a noun that no line in the 30 above uses, and it prints the noun (`[SAME+NEW] separation: ...`);
   ask "same as what?" and check that the passage called the thing by that noun.
-  The survey prints only the `[SAME]` and `[SAME+NEW]` hits not yet judged and ends on `K survey, J judged`.
+  The survey prints only the `[SAME]`, `[SAME+NEW]`, and `[TWO]` hits not yet judged and ends on `K survey, J judged` (`[ADD]` is judged the same way; `[PAIR]` and `[AND+REL]` are default rules with the ordinary baseline).
   After the read, `tip sentence-shapes CH=NN ARGS=--survey-accept` records the keeps in `tools/data/sentence_shapes_survey_baseline.txt`.
   The accept takes in every unjudged hit in the chapter and its Solutions file, so a pass over one section reads the rest of that list first.
 - `tip possessives CH=NN` and `tip stranded CH=NN`: an elided head noun, which the reader supplies from two candidates.
