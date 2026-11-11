@@ -232,6 +232,66 @@ Moved from `CLAUDE.md`, which keeps the rule that you never start an upgrade you
   values the checker rejects; a sentence now says so. That pass is
   the shape to repeat when a `ty` release adds a rule or a narrowing
   change, since the gate cannot see a "cannot see" sentence turn false.
+  The 0.0.95 to 0.0.101 upgrade (2026-11-11, with ruff 0.17.3 to
+  0.17.4 and hypothesis 6.170.14 to 6.170.15; Python, uv, pyright,
+  and the other libraries unchanged) was the first to rename rules,
+  and it had two gate failures and one prose casualty. The renames,
+  found by diffing the `# name` headings of `ty explain rule` under
+  both versions (`uv tool run --from ty==OLD ty explain rule`):
+  `unresolved-attribute` is `missing-attribute`, or
+  `missing-union-attribute` when some members of a union have the
+  attribute and others lack it (`X | None`, `int | str`,
+  `Result[A, E]`); `invalid-method-override` is
+  `incompatible-method-override`, or
+  `lost-keyword-for-regular-parameter` (new headline, "Override of
+  method `op` disallows keyword arguments allowed by the method on
+  the base class") when the override renames a keyword-capable
+  parameter or makes it positional-only; `invalid-attribute-override`
+  and `invalid-mutable-override` are `incompatible-...`;
+  `unresolved-import` is `import-not-found`; and instantiating an
+  abstract class is `abstract-class-instantiation`, no longer
+  `call-non-callable`. An old name in a `# ty: ignore[...]` still
+  works and draws `renamed-rule-in-ignore-comment`; `tools/` had
+  four. About 50 prose sentences name one of these rules, nearly all
+  in `Solutions/`, and no gate reads them. A mechanical replace is
+  not enough: of the 41 sentences two Opus agents probed afterward,
+  five were the union case and needed `missing-union-attribute`
+  (Solutions 08 twice, 16 twice by hand, 23, 42 twice), and the
+  replace left "an `missing-attribute`" at eight sites and missed a
+  `# ty: unresolved attribute` comment in chapter 11's
+  `name_mangling.py`. The gate failures: chapter 32's
+  `singledispatch_trap.py` had two `# type: ignore` comments that
+  went unused, because 0.0.101 follows the `singledispatchmethod`
+  descriptor (`Paper.compete` reveals
+  `_SingleDispatchMethodCallable[str]`, where 0.0.95 read
+  `(...) -> str` and reported `.register`); and chapter 12's
+  `factory_checking.py` failed with `no-matching-overload`, the
+  casualty. 0.0.101 checks a bare `field(default_factory=set)`
+  against the field's annotation, where 0.0.95 inferred `Unknown`
+  and accepted any bare factory (a standalone
+  `reveal_type(field(default_factory=set))` is `Unknown` in both;
+  the annotation is what supplies the type). That ended the
+  section's point, that subscripting the factory buys a check; the
+  listing became one `Mismatched` class with a `# type: ignore`, and
+  exercise 7 and its solution swap `dict` for `list` in place of the
+  subscripted form. `tip quoted-diagnostics-probe` found 5 of 43
+  STALE, all rule names or the one new headline; 43 of 43 after the
+  requote. The pyright delta was two NEW in `singledispatch_trap.py`
+  (pyright rejects `.register` there, which the removed ignores had
+  hidden) and one GONE in `factory_checking.py`, accepted. All 13
+  pinned probes HOLD, byte-identical under both versions apart from
+  the rule names, with `record(cls)` still mistyped (one Opus agent,
+  about 110k tokens, two minutes), and four Opus agents (107k to
+  166k tokens, two to nine minutes) probed the 120 "cannot, misses,
+  accepts" sentences and 44 neighbors and found every one still
+  true. The shared brief is `build/upgrade-2026-11-11/BRIEF.md`
+  while that directory lasts. Two traps: the first verify after the
+  upgrade reran every chapter's markers at once, and under that load
+  Solutions 18's `exercise_9.py` timing claim missed all three tries
+  (it printed `True` four times standalone and passed on the second
+  verify); and probe agents work in the build trees, so the session
+  runs no verify, sync, or `pyright-review` until the last one
+  reports.
   **Sweep `Solutions/` for quoted diagnostics too, not just `Chapters/`.**
   The 2026-09-02 exercise pass found ten stale `ty` quotes, every one of
   them in `Solutions/` and not one in `Chapters/`: wrong line numbers,
@@ -415,10 +475,11 @@ chapter 09 said it missed.
 
   Chapter 09's "A Base Class Declares, a Subclass Supplies" pins to a
   `ty` version what the checker enforces of `sides: ClassVar[int]` in a
-  base. On 0.0.87: a subclass `sides = "four"` draws `invalid-assignment`
+  base. On 0.0.101: a subclass `sides = "four"` draws `invalid-assignment`
   against the declared type; `sides: ClassVar[str] = "four"` draws
-  `invalid-attribute-override`; `sides: ClassVar[bool] = True` draws
-  `invalid-mutable-override` (new in 0.0.87; on 0.0.86 it passed, and
+  `incompatible-attribute-override`; `sides: ClassVar[bool] = True` draws
+  `incompatible-mutable-override` (both named `invalid-...` before
+  0.0.101; the second was new in 0.0.87; on 0.0.86 it passed, and
   the chapter named Pyright's `reportIncompatibleVariableOverride` and
   `ty` issue 2158 as the contrast); and a subclass with no `sides`
   draws nothing. Probe all four in a scratch copy of

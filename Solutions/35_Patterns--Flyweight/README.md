@@ -1040,7 +1040,7 @@ because it declares the set once instead of twice.
 
 The enum adds one check.
 A misspelled or missing member, such as `Tile.DOOR`,
-is an `missing-attribute` error.
+is a `missing-attribute` error.
 In the `Literal` version,
 the wrapper that `@cache` returns takes any hashable argument in place of `tile()`'s `Symbol`,
 so the matching mistake, `tile("+")`,

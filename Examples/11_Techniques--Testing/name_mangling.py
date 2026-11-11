@@ -7,6 +7,6 @@ class Vault:
 v = Vault()
 print(vars(v))
 #: {'_balance': 0, '_Vault__pin': '1234'}
-# ty: unresolved attribute "_Vault__pin":
+# ty: "Vault" has no attribute "_Vault__pin":
 print(v._Vault__pin)  # type: ignore
 #: 1234

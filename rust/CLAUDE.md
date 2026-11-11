@@ -12,7 +12,7 @@ both first-line comments in a fenced block:
   caller for that crate, and one marked `# rust/<crate>/<crate>.pyi` is
   the crate's type stub (since 2026-11-11). Maturin installs a stub
   named for the module from the crate root as `__init__.pyi` and adds an
-  empty `py.typed`; without it `ty` reports `unresolved-attribute` on
+  empty `py.typed`; without it `ty` reports `missing-attribute` on
   each function `demo.py` uses. The `rust/` prefix is what makes
   `tools/extract_examples.py` skip it entirely (never written to
   `Examples/`/`build/examples/`, never run by `pytest`/`ty`/`ruff`/

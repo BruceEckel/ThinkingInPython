@@ -1624,7 +1624,7 @@ If you leave `compete()` out of `Weapon`, the program prints the same two lines,
 since every weapon class defines its own.
 The type checker rejects the change.
 `ty` reports an `invalid-explicit-override` at each of the six `@override` decorators,
-and an `missing-attribute` at `battle()`'s call,
+and a `missing-attribute` at `battle()`'s call,
 because `get_weapon()` returns a `Weapon`.
 The solution declares `compete()` on the base,
 which gives that call and every `@override` a method to name.
@@ -1896,7 +1896,7 @@ If you delete the `isinstance()` tests in `paper_vs_rock()` and `rock_vs_paper()
 the demo prints the same five lines,
 because the lookup reaches each cell with a `Paper` in the position it reads.
 The type checker rejects the access.
-`ty` reports an `missing-attribute` in each cell,
+`ty` reports a `missing-attribute` in each cell,
 since a cell's parameters are `Item`s and `Paper` alone defines `wet`.
 The solution keeps the tests so that the type checker narrows the operand to `Paper` before the attribute access.
 

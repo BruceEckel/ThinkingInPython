@@ -1762,7 +1762,7 @@ def collatz_lengths(values: list[int]) -> list[int]: ...
 
 Maturin installs the stub with the compiled module,
 and adds the marker file [`py.typed`](06_Foundations--Modules_and_Packages.md#pythonpath).
-With no stub, the type checker reports an `missing-attribute` error for `fastcount.count_primes` and for `fastcount.collatz_lengths` in the listing below.
+With no stub, the type checker reports a `missing-attribute` error for `fastcount.count_primes` and for `fastcount.collatz_lengths` in the listing below.
 You write and maintain the stub yourself,
 so a signature you change in `lib.rs` needs the matching change in `fastcount.pyi`.
 

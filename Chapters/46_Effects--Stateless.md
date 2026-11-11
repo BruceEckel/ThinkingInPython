@@ -780,7 +780,7 @@ The type records which Abilities each layer leaves open.
 
 The repeated union is the shape a `type` alias normally shortens.
 Elsewhere the book writes one.
-Under `ty` 0.0.95 the alias checks the same as the written-out signature.
+Under `ty` 0.0.101 the alias checks the same as the written-out signature.
 `ty` reports an `invalid-yield` for an undeclared Ability behind `type Greeting = Depend[...]`,
 as it does for the written-out signature of `greet_all()` above.
 This book still writes out Effect signatures in full,

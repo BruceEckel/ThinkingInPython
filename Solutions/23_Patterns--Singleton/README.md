@@ -58,7 +58,7 @@ You can also name what the change gives up and the failure that no longer occurs
 
 If you remove the guard but keep the annotation `ClassVar[__OnlyOne | None]`,
 the script still runs and prints the same line.
-`ty`, though, reports an `missing-attribute` error on `OnlyOne.instance.val.append(arg)`,
+`ty`, though, reports a `missing-union-attribute` error on `OnlyOne.instance.val.append(arg)`,
 because `None` has no `val` attribute.
 In the chapter's version, the guard narrows `instance` to the inner class,
 so the type checker accepts the `append()` call after it.

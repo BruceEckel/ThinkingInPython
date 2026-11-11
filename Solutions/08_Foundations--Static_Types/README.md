@@ -751,14 +751,14 @@ def show(b: Box) -> str:
 for `box = Box("hi")`, `print(show(box))` prints `HI`,
 `print(box.val)` prints `None`,
 and `uv run ty check` passes on `narrowing_attribute.py`.
-Calling `upper()` on `b.val` inside the `if` instead makes the check report `missing-attribute`.
+Calling `upper()` on `b.val` inside the `if` instead makes the check report `missing-union-attribute`.
 
 <details>
 <summary>Solution</summary>
 
 If you copy `b.val` into `val` and test `val` but still call `b.val.upper()`,
 the test narrows the local and leaves the attribute at `str | None`.
-`ty check` then reports an `missing-attribute` on `b.val.upper()`.
+`ty check` then reports `missing-union-attribute` on `b.val.upper()`.
 The call also fails at run time with an `AttributeError`,
 because `reset()` has set the attribute to `None`.
 The solution calls `upper()` on the local, the name the test narrowed.

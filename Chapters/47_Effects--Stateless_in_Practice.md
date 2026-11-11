@@ -1211,7 +1211,7 @@ Where `report()` turns those failures into messages,
 Both the runtime and the type checker accept either order.
 A handler passes error values to its caller unchanged,
 so `supply()`'s driver relays the failures to the catch either way.
-Under `ty` 0.0.95 both orders infer the same result type.
+Under `ty` 0.0.101 both orders infer the same result type.
 The orders differ in the Ability channel.
 `supply(feed, book)(catch_all(research))` comes back with `Never` there,
 and `catch_all(supply(feed, book)(research))` with `Unknown`:
@@ -2085,7 +2085,7 @@ if __name__ == "__main__":
     reveal_type(full)
 ```
 
-Under `ty` 0.0.95, `ty check nested_handle.py` reads the two forms the same way:
+Under `ty` 0.0.101, `ty check nested_handle.py` reads the two forms the same way:
 
 ```text
 info[revealed-type]: Revealed type
@@ -2308,7 +2308,7 @@ so a raised failure crosses the thread boundary as an ordinary exception.
 `wait()` raises the failure again when it awaits the `Task`'s future,
 past any `catch()` the caller wraps around the result.
 The type agrees with the runtime.
-`reveal_type(bad)` under `ty` 0.0.95 reports `(n: int) -> Generator[Need[Executor], Any, Task[int]]`,
+`reveal_type(bad)` under `ty` 0.0.101 reports `(n: int) -> Generator[Need[Executor], Any, Task[int]]`,
 with `Boom` nowhere in it.
 
 The fix is the discipline `catch()` and `catch_all()` teach:

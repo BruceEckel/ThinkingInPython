@@ -152,7 +152,7 @@ One annotation in `flower_visitors.py` looks like a shortcut,
 but the empty base class requires it.
 `accept()` types its visitor as `Any` because the `Visitor` base class declares no `visit()` method.
 If you declare that parameter as `Visitor`,
-the type checker reports `visitor.visit` as an unresolved attribute.
+the type checker reports `visitor.visit` as a missing attribute.
 The classic pattern declares `visit()` abstract on the visitor base,
 so `visitor.visit` resolves.
 A [`Protocol`](08_Foundations--Static_Types.md#structural-typing-with-protocols)

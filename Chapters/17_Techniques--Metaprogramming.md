@@ -662,7 +662,7 @@ so `dispatch()` passes `self` to the function it finds.
 
 The listing writes `func.__dict__["event"]` rather than `func.event` to satisfy the type checker.
 A function's type declares a closed set of attributes,
-so the type checker reports `Button.press.event` as an unresolved attribute,
+so the type checker reports `Button.press.event` as a missing attribute,
 and it reports the assignment `func.event = event` the same way.
 Every object's type declares `__dict__` as a `dict[str, Any]`,
 so indexing it type-checks.
