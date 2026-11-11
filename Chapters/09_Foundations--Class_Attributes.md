@@ -347,9 +347,9 @@ since it describes what a class must have and leaves the value to the class.
 `ty` 0.0.95 enforces what the declaration states about the value.
 It reports `invalid-assignment` when a subclass writes `sides = "four"`,
 since the checker compares the value with the declared `ClassVar[int]`.
-A subclass that redeclares the attribute as `sides: ClassVar[str] = "four"` is an `invalid-attribute-override` error.
+A subclass that redeclares the attribute as `sides: ClassVar[str] = "four"` is an `incompatible-attribute-override` error.
 If a subclass narrows the type, as `sides: ClassVar[bool] = True` does,
-`ty` reports `invalid-mutable-override`.
+`ty` reports `incompatible-mutable-override`.
 A mutable attribute's type is [invariant](08_Foundations--Static_Types.md#variance),
 so a subclass must keep the type it inherits.
 

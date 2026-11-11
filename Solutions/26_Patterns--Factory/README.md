@@ -1652,7 +1652,7 @@ def spawn(name: str) -> Monster:
 
 your decorated `prototype_registry.py` fills `PROTOTYPES` with `'goblin'` and `'troll'`,
 and `spawn_demo.py` prints its two chapter lines unchanged.
-Keying the table on the decorated function's `__name__` makes `uv run ty check` report `unresolved-attribute`.
+Keying the table on the decorated function's `__name__` makes `uv run ty check` report `missing-attribute`.
 You can name one gain and one loss against the table literal.
 
 <details>
@@ -1727,7 +1727,7 @@ A `Callable` declares how you call it, not that it carries a `__name__`.
 If you write `PROTOTYPES[build.__name__] = build()`, the type checker reports:
 
 ```text
-error[unresolved-attribute]: Object of type `Builder` has no attribute `__name__`
+error[missing-attribute]: Object of type `Builder` has no attribute `__name__`
 ```
 
 The chapter's `ShapeFactory.register()` in `shape_registry.py` reads `__name__` safely because it receives a class,

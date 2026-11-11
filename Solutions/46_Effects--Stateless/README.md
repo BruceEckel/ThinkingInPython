@@ -792,7 +792,7 @@ and whether the next line uses the dropped value.
 <summary>Done when</summary>
 
 for the first deletion your record shows `ty check` and `ruff check` silent and the script printing `['greeted Alice', 'greeted Bob']` with no greetings,
-and for the second it shows `invalid-return-type` and `unresolved-attribute`.
+and for the second it shows `invalid-return-type` and `missing-attribute`.
 You can say which line makes the second break visible to the type checker.
 
 <details>
@@ -856,7 +856,7 @@ which is not assignable to return type
 8 | def greet(name: str) -> Depend[Need[Console], None]:
   |                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-error[unresolved-attribute]: Object of type
+error[missing-attribute]: Object of type
 `Generator[Need[Console], Any, Console]` has no attribute `print`
   --> greeter.py:10:5
    |
@@ -867,7 +867,7 @@ error[unresolved-attribute]: Object of type
 The `invalid-return-type` error says `greet()` has become an ordinary function.
 Removing the body's one `yield from` removes its last `yield`,
 so `greet()` returns `None` where its annotation declares a `Generator`.
-The `unresolved-attribute` error says the value in `console` has the wrong type,
+The `missing-attribute` error says the value in `console` has the wrong type,
 a `Generator` rather than a `Console`.
 
 The difference between the two cases is whether anything later uses the dropped value.

@@ -393,11 +393,11 @@ class Paper(Item):
 class Rock(Item):
     pass
 
-@Paper.compete.register  # type: ignore  # [1]
+@Paper.compete.register  # [1]
 def _(self: Item, opponent: Rock) -> str:
     return "paper wins"
 
-@Rock.compete.register  # type: ignore  # [2]
+@Rock.compete.register  # [2]
 def _(self: Item, opponent: Rock) -> str:
     return "rock draws"
 

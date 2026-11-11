@@ -180,10 +180,10 @@ If you use that signature in place of the union,
 the type checker rejects the override.
 In that version, a `WhatIUse2` refuses the `WhatIWant` that every `WhatIUse` accepts.
 That refusal breaks [substitutability](20_Patterns--Rethinking_Objects.md#liskov-substitution).
-`ty` reports the rejection as `invalid-method-override`:
+`ty` reports the rejection as `incompatible-method-override`:
 
 ```text
-error[invalid-method-override]: Invalid override of
+error[incompatible-method-override]: Invalid override of
 method `op`
 info: parameter `what_i_want` has an incompatible type:
 `WhatIWant` is not assignable to `WhatIHave`

@@ -195,7 +195,7 @@ def prefix(msg: str) -> str:
 `Ok(5).map_error(prefix)` prints `Ok(answer=5)` unchanged,
 and `uv run ty check` passes on a `map_error()` call on a parameter annotated `Result[int, str]`.
 If `Ok` lacks the method,
-the type checker reports `unresolved-attribute` on that call.
+the type checker reports `missing-attribute` on that call.
 
 <details>
 <summary>Solution</summary>
@@ -204,7 +204,7 @@ If you give `map_error()` to `Err` alone,
 `Ok(5).map_error(prefix)` raises an `AttributeError`:
 `'Ok' object has no attribute 'map_error'`.
 On a parameter annotated `Result[int, str]`,
-`ty` reports `unresolved-attribute` for every `map_error()` call,
+`ty` reports `missing-attribute` for every `map_error()` call,
 an `Err` argument included,
 because the `Ok` member of the union has no such method.
 The solution gives `Ok` a `map_error()` that returns `self`,

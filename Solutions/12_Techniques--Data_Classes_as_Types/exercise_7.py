@@ -20,15 +20,14 @@ with expected(ValueError):
 #: index is not allowed: use default_factory
 
 @dataclass(frozen=True)
-class Bare:
+class Fixed:
     months: list[Month] = field(default_factory=make_months)
     index: dict[str, Month] = field(default_factory=dict)
 
 @dataclass(frozen=True)
-class Subscripted:
+class WrongFactory:
     months: list[Month] = field(default_factory=make_months)
-    index: dict[str, Month] = field(
-        default_factory=dict[str, Month])
+    index: dict[str, Month] = field(default_factory=list)  # type: ignore
 
-print(Bare().index, Subscripted().index)
-#: {} {}
+print(Fixed().index, WrongFactory().index)
+#: {} []

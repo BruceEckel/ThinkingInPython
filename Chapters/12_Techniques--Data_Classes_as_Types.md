@@ -1129,11 +1129,7 @@ so it accepts any callable that takes no arguments.
 A named function like `make_months()` is one.
 A type is another, so `field(default_factory=list)` appears throughout this book.
 Calling `list` builds an empty list.
-A subscripted generic is callable too,
-so `field(default_factory=dict[str, str])` is legal and produces an empty dict.
-That form seems redundant, because the annotation on the left names the type,
-and the subscript vanishes at runtime.
-It gains one thing, a check that the factory builds the type the annotation names:
+The type checker compares the type the factory builds with the field's annotation:
 
 ```python
 # factory_checking.py
@@ -1141,44 +1137,33 @@ from dataclasses import dataclass, field
 from exceptions import expected
 
 @dataclass
-class Unchecked:
+class Mismatched:
     # A set
-    data: dict[str, str] = field(default_factory=set)
+    data: dict[str, str] = field(default_factory=set)  # type: ignore
 
-@dataclass
-class Checked:
-    data: dict[str, str] = field(
-        default_factory=dict[str, str])
-
-print(type(Unchecked().data).__name__)
+print(type(Mismatched().data).__name__)
 #: set
 with expected(TypeError):
-    Unchecked().data["theme"] = "dark"
+    Mismatched().data["theme"] = "dark"
 #: [TypeError] 'set' object does not support item assignment
-print(Checked().data)
-#: {}
 ```
 
-`Unchecked` passes every check.
-`ty` accepts it, the linter (`ruff`) accepts it,
-and the declaration says `dict[str, str]`, so every reader expects a dict.
-What arrives is a `set`.
-Python reports the mistake at the first item assignment,
+The declaration says `dict[str, str]`, and the factory builds a `set`.
+Python accepts the class definition and builds the instance.
+It reports the mistake at the first item assignment,
 which can be far from the declaration that caused it.
 
-For a bare `list`, `dict`, or `set` factory,
-`ty` infers `Unknown` for the `field()` call.
-`Unknown` satisfies any annotation,
-so `ty` accepts any bare factory for the field.
-Checkers differ here.
-Pyright infers `set[Unknown]` for this factory and rejects it against `dict[str, str]`.
+The type checker reports the mistake at the declaration.
+The annotation tells the checker which type the `field()` call must produce.
+No overload of `field()` produces a `dict[str, str]` from a factory that builds a `set`,
+so `ty` reports `no-matching-overload` on the call.
+Pyright rejects the factory too.
+The `# type: ignore` suppresses the report so the listing can show the runtime failure.
 
-Subscripting makes the factory's return type concrete.
-If you change `Checked`'s factory to `dict[int, int]`,
-the type checker reports the mismatch with `dict[str, str]`.
-Use the bare form when the factory and the annotation agree,
-which is most of the time.
-Subscript the factory when you want that agreement checked.
+A subscripted generic is callable too,
+so `field(default_factory=dict[str, str])` is legal and produces an empty dict.
+The subscript repeats the annotation on the left and vanishes at runtime.
+The checker verifies the bare factory, so write the bare form.
 
 ## A `NamedTuple` Cannot Validate Itself {#namedtuple-cannot-validate}
 
@@ -1732,9 +1717,9 @@ Try each exercise before opening its [solution](../Solutions/12_Techniques--Data
 7.  Give `Months` a second field,
     a `dict[str, Month]` index written with a `= {}` default,
     and read the error `@dataclass` reports.
-    Then fix it two ways,
-    with `default_factory=dict` and with `default_factory=dict[str, Month]`,
-    and say which one the type checker can verify.
+    Fix it with `default_factory=dict`.
+    Then change the factory to `list`,
+    and compare what the type checker reports with what the program does.
 8.  `stars_float.py` builds a `Stars` holding `5.5`.
     Add a type test to the check in `__post_init__()` so that `Stars(5.5)` raises `TypeFailure`.
     `Stars(True)` also passes the range check.

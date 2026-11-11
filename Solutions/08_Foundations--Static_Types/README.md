@@ -196,7 +196,7 @@ def last[T](items: list[T]) -> T:
 <summary>Done when</summary>
 
 your `generics.py` prints the final element of each list and `uv run ty check` passes.
-Adding `.upper()` to the `last()` call on the `list[int]` makes the check report `unresolved-attribute`,
+Adding `.upper()` to the `last()` call on the `list[int]` makes the check report `missing-attribute`,
 as `n.upper()` does for `first()`.
 
 <details>
@@ -280,7 +280,7 @@ class LoudTally(NamedTally):
 
 with `t = LoudTally("clicks")`,
 `print(t.bump().bump().report())` prints `CLICKS: 2` and `uv run ty check` passes.
-Changing `bump()`'s return annotation from `Self` to `Tally` makes `ty` flag `unresolved-attribute` on the chained `report()` call.
+Changing `bump()`'s return annotation from `Self` to `Tally` makes `ty` flag `missing-attribute` on the chained `report()` call.
 
 <details>
 <summary>Solution</summary>
@@ -408,7 +408,7 @@ The checker accepts any operation on an `Unknown` value,
 so every expression built on that value passes.
 `words.top().upper()` passes either way.
 With the default removed, so does `words.top().no_such_method()`.
-With `= str` in place, `ty` reports `unresolved-attribute` on that call:
+With `= str` in place, `ty` reports `missing-attribute` on that call:
 ``Object of type `str` has no attribute `no_such_method` ``.
 
 A default turns a bare annotation that accepts every operation into one that checks each operation against `str`.
@@ -560,7 +560,7 @@ def add_square(shapes: Sequence[Shape]) -> None:
 <summary>Done when</summary>
 
 `uv run ty check` passes on `variance.py` with `add_square(circles)` uncommented,
-and a body that still calls `shapes.append(Square())` makes it report `unresolved-attribute` on `Sequence[Shape]`.
+and a body that still calls `shapes.append(Square())` makes it report `missing-attribute` on `Sequence[Shape]`.
 Your explanation names the variance of `Sequence` and of `list`.
 
 <details>
@@ -604,7 +604,7 @@ A `list[Shape]` parameter refuses the same argument because `list` is invariant.
 **Give up the write operations.**
 The type checker reports an error on `shapes.append(...)` for the reason the widening works.
 `Sequence` is a read-only container type, so it has no `append()`.
-The diagnostic is therefore `unresolved-attribute` rather than an argument-type error.
+The diagnostic is therefore `missing-attribute` rather than an argument-type error.
 The type checker does not say "you may not append a `Square` here."
 It says the type you declared has no such operation.
 
@@ -751,14 +751,14 @@ def show(b: Box) -> str:
 for `box = Box("hi")`, `print(show(box))` prints `HI`,
 `print(box.val)` prints `None`,
 and `uv run ty check` passes on `narrowing_attribute.py`.
-Calling `upper()` on `b.val` inside the `if` instead makes the check report `unresolved-attribute`.
+Calling `upper()` on `b.val` inside the `if` instead makes the check report `missing-attribute`.
 
 <details>
 <summary>Solution</summary>
 
 If you copy `b.val` into `val` and test `val` but still call `b.val.upper()`,
 the test narrows the local and leaves the attribute at `str | None`.
-`ty check` then reports an `unresolved-attribute` on `b.val.upper()`.
+`ty check` then reports an `missing-attribute` on `b.val.upper()`.
 The call also fails at run time with an `AttributeError`,
 because `reset()` has set the attribute to `None`.
 The solution calls `upper()` on the local, the name the test narrowed.
@@ -827,7 +827,7 @@ so consider when a tuple receives its contents.
 <summary>Done when</summary>
 
 with `HISTORY` empty,
-`ty check` reports `unresolved-attribute` for the `append()` call,
+`ty check` reports `missing-attribute` for the `append()` call,
 and your final `final_constants.py` passes the check and prints `3 hello ('first',)`.
 If you add `"first"` later with `HISTORY = HISTORY + ("first",)`,
 `ty check` reports `invalid-assignment`.
@@ -835,7 +835,7 @@ If you add `"first"` later with `HISTORY = HISTORY + ("first",)`,
 <details>
 <summary>Solution</summary>
 
-If you keep the `append()` call, `ty check` reports `unresolved-attribute`,
+If you keep the `append()` call, `ty check` reports `missing-attribute`,
 since a tuple has no `append()`.
 The call also fails at run time with an `AttributeError`.
 Rebuilding the tuple with `HISTORY = HISTORY + ("first",)` runs,

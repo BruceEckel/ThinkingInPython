@@ -812,9 +812,9 @@ a different design, a detail, or an equivalent alternative.
 > Give `Months` a second field,
 > a `dict[str, Month]` index written with a `= {}` default,
 > and read the error `@dataclass` reports.
-> Then fix it two ways,
-> with `default_factory=dict` and with `default_factory=dict[str, Month]`,
-> and say which one the type checker can verify.
+> Fix it with `default_factory=dict`.
+> Then change the factory to `list`,
+> and compare what the type checker reports with what the program does.
 
 <details>
 <summary>Where to look</summary>
@@ -822,8 +822,8 @@ a different design, a detail, or an equivalent alternative.
 [Defaults Built Fresh, Not Shared](../../Chapters/12_Techniques--Data_Classes_as_Types.md#defaults-built-not-shared)
 shows `@dataclass` rejecting a mutable default and `field(default_factory=...)` as the fix.
 Wrap the class definition that has the `= {}` default in `expected(ValueError)` to capture the message.
-Then write the two fixed classes,
-and ask what return type the type checker can read from `dict` and from `dict[str, Month]`.
+Then write the fixed class and a third class whose factory is `list`,
+and compare the type each factory builds with the field's annotation.
 
 <details>
 <summary>The shape</summary>
@@ -842,31 +842,32 @@ def make_months() -> list[Month]:
     ...
 
 @dataclass(frozen=True)
-class Bare:
+class Fixed:
     months: list[Month] = field(default_factory=make_months)
     index: dict[str, Month] = field(default_factory=dict)
 
 @dataclass(frozen=True)
-class Subscripted:
+class WrongFactory:
     months: list[Month] = field(default_factory=make_months)
-    index: dict[str, Month] = field(
-        default_factory=dict[str, Month])
+    index: dict[str, Month] = field(default_factory=list)  # type: ignore
 ```
 
 <details>
 <summary>Done when</summary>
 
 the `= {}` version fails at the class definition with `mutable default <class 'dict'> for field index is not allowed: use default_factory`,
-and both fixed versions build an empty index.
-Changing the subscripted factory to `dict[int, int]` makes `uv run ty check` report `invalid-assignment`;
-swapping the bare `dict` for `list` passes the check.
+the fixed version builds an empty index,
+and the `list` version builds an empty list.
+With the `# type: ignore` removed,
+`uv run ty check` reports `no-matching-overload` on the `field()` call that takes `list`.
 
 <details>
 <summary>Solution</summary>
 
 The listing cuts `Month` down to `name` and `n`,
 builds two months in place of twelve, and puts the new field on three variants
-(`Broken`, `Bare`, and `Subscripted`) that stand in for the chapter's `Months`.
+(`Broken`, `Fixed`, and `WrongFactory`)
+that stand in for the chapter's `Months`.
 
 ```python
 # exercise_7.py
@@ -891,18 +892,17 @@ with expected(ValueError):
 #: index is not allowed: use default_factory
 
 @dataclass(frozen=True)
-class Bare:
+class Fixed:
     months: list[Month] = field(default_factory=make_months)
     index: dict[str, Month] = field(default_factory=dict)
 
 @dataclass(frozen=True)
-class Subscripted:
+class WrongFactory:
     months: list[Month] = field(default_factory=make_months)
-    index: dict[str, Month] = field(
-        default_factory=dict[str, Month])
+    index: dict[str, Month] = field(default_factory=list)  # type: ignore
 
-print(Bare().index, Subscripted().index)
-#: {} {}
+print(Fixed().index, WrongFactory().index)
+#: {} []
 ```
 
 **Provoke the decorator's error.**
@@ -910,21 +910,18 @@ print(Bare().index, Subscripted().index)
 `@dataclass` inspects the default as the decorator runs,
 finds an unhashable object, and raises a `ValueError` naming the fix.
 
-**Fix it with a bare factory.**
-`Bare` and `Subscripted` differ in what `ty` verifies.
-`ty` infers `Unknown` for `field(default_factory=dict)`.
-`Unknown` satisfies any annotation,
-so `ty` accepts the bare factory whatever the field's annotation says.
-Pyright, by contrast,
-checks the bare factory against the annotation and rejects a mismatched one.
+**Fix it with a factory.**
+`Fixed` passes `dict` as the factory.
+Each `Fixed()` calls `dict()` and gets an empty index of its own.
 
-**Give the checker a return type.**
-`dict[str, Month]` is callable too, and its return type is concrete.
-If you change `Subscripted`'s factory to `dict[int, int]`,
-the type checker therefore reports the `field()` call as an error before the program runs.
-
-The bare form is fine where a reader can see that the factory and the annotation agree.
-Subscript the factory when you want the checker to confirm the agreement.
+**Give the field the wrong factory.**
+`WrongFactory` declares a `dict[str, Month]` and builds a `list`.
+`@dataclass` accepts the class, and `WrongFactory().index` is `[]`.
+The program fails later, at the first statement that uses the index as a dict.
+The type checker compares the type the factory builds with the annotation.
+It reports `no-matching-overload` on the `field()` call,
+before the program runs.
+The `# type: ignore` suppresses that report so the listing can print the list.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.

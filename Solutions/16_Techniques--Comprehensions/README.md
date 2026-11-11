@@ -24,7 +24,7 @@ so the second test runs only on the elements the first one accepted.
 your comprehension prints a one-element list holding `16`,
 and `uv run ty check` passes on your file.
 If you swap the two tests in the filter,
-`ty` reports `unresolved-attribute` on `isdigit`,
+`ty` reports `missing-union-attribute` on `isdigit`,
 which confirms that the order of the tests matters.
 
 <details>
@@ -34,7 +34,8 @@ If you test `e.isdigit()` alone, or before the type test,
 the comprehension raises an `AttributeError` at the first element,
 since the integer `1` has no `isdigit()` method.
 The type checker flags the call before the program runs.
-`ty` reports `unresolved-attribute`, because `e` is `int | str` at that point.
+`ty` reports `missing-union-attribute`,
+because `e` is `int | str` at that point.
 The solution tests `isinstance(e, str)` first,
 so `and` calls `isdigit()` only on strings.
 

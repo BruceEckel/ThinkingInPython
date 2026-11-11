@@ -855,7 +855,7 @@ A single `__setattr__()` gives up three things that `Thermometer`'s per-attribut
     The type checker accepts `station.celcius = 25.0`,
     a misspelling of `celsius`,
     and the assignment quietly creates a new attribute.
-    The same misspelling on a `Thermometer` produces an `unresolved-attribute` error.
+    The same misspelling on a `Thermometer` produces an `missing-attribute` error.
     `Thermometer` inherits `object`'s `__setattr__()`,
     so the type checker verifies each assignment against the attributes the class declares.
 

@@ -388,7 +388,7 @@ Running it raises an `AttributeError`:
 <summary>Solution</summary>
 
 If you annotate the `accept()` parameter as `Visitor` instead of `Visits`,
-`ty` reports an `unresolved-attribute` on `visitor.visit`,
+`ty` reports an `missing-attribute` on `visitor.visit`,
 because the empty `Visitor` base declares no `visit()`.
 The `Beetle` call then passes the checker, since `Beetle` is a `Visitor`.
 At runtime the call raises the same `AttributeError` as it does under `Any`.

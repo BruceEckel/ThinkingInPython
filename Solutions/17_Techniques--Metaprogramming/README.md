@@ -303,7 +303,7 @@ The type checker then catches a misspelled attribute on the result.
 
 The `cls: type[T]` annotation also decides how the body reaches the cache.
 `ty` sees `cls` as some class `T`,
-so it would report `unresolved-attribute` for `cls._instances`.
+so it would report `missing-attribute` for `cls._instances`.
 The body reads the cache through the class name, `Singleton._instances`.
 
 **Keep one instance per class.**

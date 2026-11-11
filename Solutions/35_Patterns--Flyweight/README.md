@@ -981,7 +981,7 @@ def parse_map(text: str) -> list[list[Tile]]:
 
 `tile_map_demo.py`'s map prints `24 3`,
 `parse_map("?")` raises `ValueError: '?' is not a valid Tile`,
-and `uv run ty check` reports `unresolved-attribute` on a member missing from the enum,
+and `uv run ty check` reports `missing-attribute` on a member missing from the enum,
 such as `Tile.DOOR`.
 You can then say which wrong-symbol mistakes the type checker catches in each version and which stay runtime failures in both.
 
@@ -1040,7 +1040,7 @@ because it declares the set once instead of twice.
 
 The enum adds one check.
 A misspelled or missing member, such as `Tile.DOOR`,
-is an `unresolved-attribute` error.
+is an `missing-attribute` error.
 In the `Literal` version,
 the wrapper that `@cache` returns takes any hashable argument in place of `tile()`'s `Symbol`,
 so the matching mistake, `tile("+")`,

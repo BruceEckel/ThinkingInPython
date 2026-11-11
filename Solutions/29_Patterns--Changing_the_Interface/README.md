@@ -497,7 +497,7 @@ def run(user: WhatIUse) -> None:
 <details>
 <summary>Done when</summary>
 
-before your fix, `uv run ty check` reports `invalid-method-override` on `WhatIUse2.op()`
+before your fix, `uv run ty check` reports `lost-keyword-for-regular-parameter` on `WhatIUse2.op()`
 (the parameter `item` does not match `what_i_want`),
 and the keyword call raises a `TypeError` for `what_i_want`.
 After it, `ty` passes,
@@ -508,7 +508,7 @@ and `WhatIUse2().op(what_i_want=WhatIHave())` prints `WhatIUse2.op() wraps it` t
 
 If you add a `/` to `WhatIUse2.op()` and keep the name `item`,
 the override rejects the keyword that every `WhatIUse` caller may pass.
-In that version, `ty` reports `invalid-method-override` because the parameter is positional-only,
+In that version, `ty` reports `lost-keyword-for-regular-parameter` because the parameter is positional-only,
 and `run(WhatIUse2())` raises a `TypeError` for the unexpected keyword `what_i_want`.
 The solution gives the parameter the base class's name,
 so the override accepts every call the base accepts.
@@ -594,8 +594,9 @@ With the `/` removed, `what_i_want` becomes a name callers can pass by keyword.
 `ty` rejects the override:
 
 ```text
-error[invalid-method-override]: Invalid override of
-method `op`
+error[lost-keyword-for-regular-parameter]: Override of
+method `op` disallows keyword arguments allowed by the
+method on the base class
 info: the parameter named `item` does not match
 `what_i_want` (and can be used as a keyword parameter)
 info: This violates the Liskov Substitution Principle

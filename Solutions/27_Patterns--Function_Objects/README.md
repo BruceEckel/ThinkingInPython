@@ -126,7 +126,7 @@ Undo needs more, because a command now answers two requests,
 
 If you keep `command.py`'s `Command` alias as the type of the macro's list,
 the script still prints `15` and `0`,
-but `ty` reports `unresolved-attribute` on `c.undo()`,
+but `ty` reports `missing-attribute` on `c.undo()`,
 because an object of type `Command` has no attribute `undo`.
 `Command` describes one call,
 so the solution gives the list a `Protocol` that declares both operations.
@@ -356,7 +356,7 @@ Because the report reads `finder.__name__`,
 `chain` needs a `Protocol` here instead of an alias like the chapter's `RootFinder`.
 If you annotate `chain` with a `Callable` type, as `RootFinder` is,
 the script runs and prints the same output,
-but `ty` reports `unresolved-attribute` on both reads of `finder.__name__`.
+but `ty` reports `missing-attribute` on both reads of `finder.__name__`.
 A `Callable` describes a call and declares no `__name__`.
 Pyright allows the reads, inferring the attributes of a function object.
 `Finder` declares `__name__` alongside `__call__()`,

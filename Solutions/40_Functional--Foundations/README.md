@@ -439,7 +439,7 @@ the checker narrows the name to the list's own type, so the append still passes.
 
 `ty` reports `invalid-assignment` on `MAX_SIZE = 200` and accepts `CONFIG.append(3)`,
 and you can say why.
-After your annotation change, `ty` reports `unresolved-attribute` on the append.
+After your annotation change, `ty` reports `missing-attribute` on the append.
 If the type checker still passes the append,
 your annotation leaves the value's type mutable.
 
@@ -495,7 +495,7 @@ print(CONFIG)
 If you add `CONFIG.append(3)` to that version, `ty` reports:
 
 ```
-error[unresolved-attribute]: Object of type `tuple[Literal[1], Literal[2]]` has no attribute `append`
+error[missing-attribute]: Object of type `tuple[Literal[1], Literal[2]]` has no attribute `append`
 ```
 
 The error comes from the tuple type rather than from `Final`.

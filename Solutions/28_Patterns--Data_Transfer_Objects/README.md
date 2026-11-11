@@ -308,7 +308,7 @@ def summarize(data: list[float]) -> tuple[float, int]:
 <summary>Done when</summary>
 
 `uv run ty check` passes on your repaired file,
-and restoring the broken line makes it report `unresolved-attribute` for `mean`.
+and restoring the broken line makes it report `missing-attribute` for `mean`.
 The swapped `count, mean = summarize(...)` still type-checks and prints `mean=2 count=3.0`,
 and you can name two mistakes the checker still reports.
 
@@ -595,7 +595,7 @@ class Point(tuple[float, float]):
 
 `Point(1.0, 2.0) + Point(3.0, 4.0)` prints `Point(4.0, 6.0)` and its `type()` is `Point`,
 slicing it with `[:1]` prints the tuple `(4.0,)`,
-and `uv run ty check` passes on your file with no `invalid-method-override` on `__add__()`.
+and `uv run ty check` passes on your file with no `incompatible-method-override` on `__add__()`.
 
 <details>
 <summary>Solution</summary>
@@ -642,7 +642,7 @@ Using `type(self)` rather than `Point` means a subclass of `Point` gets an insta
 **Annotate `other` as any tuple.**
 The parameter carries `tuple[float, ...]` rather than `tuple[float, float]` because an override must accept everything the base method accepts.
 `tuple.__add__()` takes a tuple of any length,
-so `ty` reports `invalid-method-override` for the two-element annotation,
+so `ty` reports `incompatible-method-override` for the two-element annotation,
 citing the Liskov Substitution Principle.
 The wider annotation also lets `p + (1.0,)` type-check,
 so a tuple of the wrong length gets past the type checker.

@@ -975,7 +975,7 @@ You can also name the guarantee you gave up and decide whether `BoundedStack` sh
 <summary>Solution</summary>
 
 If you have `push()` return `False` when the stack is full,
-`ty` reports an `invalid-method-override` error.
+`ty` reports an `incompatible-method-override` error.
 The override's `bool` is not assignable to the `None` that `Stack.push()` returns.
 `fill()` discards each returned `bool`, three of them `False`, and returns 2.
 A refusal by return value is still a refusal,

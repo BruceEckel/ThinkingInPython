@@ -1905,7 +1905,7 @@ The fields are the parameters of the question.
 If you declare `Random` as an empty class, the way the chapter declares `Flip`,
 the request has no field to carry the range.
 `roll()` fails at `Random(low, high)` with a `TypeError`,
-and `ty` reports `too-many-positional-arguments` there and `unresolved-attribute` where the handler reads `request.low`.
+and `ty` reports `too-many-positional-arguments` there and `missing-attribute` where the handler reads `request.low`.
 
 **Run one game under two handlers.**
 You write `game()` once, and it runs under both handlers unchanged.

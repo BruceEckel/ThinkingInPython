@@ -3,19 +3,12 @@ from dataclasses import dataclass, field
 from exceptions import expected
 
 @dataclass
-class Unchecked:
+class Mismatched:
     # A set
-    data: dict[str, str] = field(default_factory=set)
+    data: dict[str, str] = field(default_factory=set)  # type: ignore
 
-@dataclass
-class Checked:
-    data: dict[str, str] = field(
-        default_factory=dict[str, str])
-
-print(type(Unchecked().data).__name__)
+print(type(Mismatched().data).__name__)
 #: set
 with expected(TypeError):
-    Unchecked().data["theme"] = "dark"
+    Mismatched().data["theme"] = "dark"
 #: [TypeError] 'set' object does not support item assignment
-print(Checked().data)
-#: {}
