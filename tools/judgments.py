@@ -119,7 +119,7 @@ def ask(
     """
     api_key()
     # Not in .venv; the tip tasks add it (see the docstring).
-    from typesafe_sdk import (  # ty: ignore[unresolved-import]
+    from typesafe_sdk import (  # ty: ignore[import-not-found]
         AsyncTypeSafeClient, Choice, Noul, Score, TypeSafeAPIConnectionError,
         TypeSafeAPITimeoutError, TypeSafeInternalServerError)
 

@@ -89,8 +89,8 @@ import html
 import re
 import tomllib
 import unicodedata
-import re._constants as sre  # ty: ignore[unresolved-import]
-import re._parser as sre_parse  # ty: ignore[unresolved-import]
+import re._constants as sre  # ty: ignore[import-not-found]
+import re._parser as sre_parse  # ty: ignore[import-not-found]
 from bisect import bisect_right
 from collections import defaultdict
 from collections.abc import Callable, Iterable, Iterator

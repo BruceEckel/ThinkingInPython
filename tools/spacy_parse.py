@@ -23,7 +23,7 @@ new rule never needs a new parse.
 import json
 import sys
 
-import spacy  # ty: ignore[unresolved-import]
+import spacy  # ty: ignore[import-not-found]
 
 
 def main() -> None:
