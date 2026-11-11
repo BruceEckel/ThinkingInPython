@@ -1129,41 +1129,9 @@ so it accepts any callable that takes no arguments.
 A named function like `make_months()` is one.
 A type is another, so `field(default_factory=list)` appears throughout this book.
 Calling `list` builds an empty list.
-The type checker compares the type the factory builds with the field's annotation:
-
-```python
-# factory_checking.py
-from dataclasses import dataclass, field
-from exceptions import expected
-
-@dataclass
-class Mismatched:
-    # A set
-    data: dict[str, str] = field(default_factory=set)  # type: ignore
-
-print(type(Mismatched().data).__name__)
-#: set
-with expected(TypeError):
-    Mismatched().data["theme"] = "dark"
-#: [TypeError] 'set' object does not support item assignment
-```
-
-The declaration says `dict[str, str]`, and the factory builds a `set`.
-Python accepts the class definition and builds the instance.
-It reports the mistake at the first item assignment,
-which can be far from the declaration that caused it.
-
-The type checker reports the mistake at the declaration.
-The annotation tells the checker which type the `field()` call must produce.
-No overload of `field()` produces a `dict[str, str]` from a factory that builds a `set`,
-so `ty` reports `no-matching-overload` on the call.
-Pyright rejects the factory too.
-The `# type: ignore` suppresses the report so the listing can show the runtime failure.
-
-A subscripted generic is callable too,
-so `field(default_factory=dict[str, str])` is legal and produces an empty dict.
-The subscript repeats the annotation on the left and vanishes at runtime.
-The checker verifies the bare factory, so write the bare form.
+The type checker compares the type the factory builds with the field's annotation,
+so it reports `field(default_factory=set)` on a field annotated `dict[str, str]`
+(see exercise 7).
 
 ## A `NamedTuple` Cannot Validate Itself {#namedtuple-cannot-validate}
 

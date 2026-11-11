@@ -13,6 +13,7 @@ Chapters/Composite_and_Interpreter	Composite_and_Interpreter	6	Declining with `N
 Chapters/Composite_and_Interpreter	Composite_and_Interpreter	8	An iterative walk over a deep tree
 Chapters/Comprehensions	Comprehensions	9	Counting the calls the walrus saves
 Chapters/Confidence	Confidence	1	Which process ran each call
+Chapters/Data_Classes_as_Types	Data_Classes_as_Types	7	A `dict` field default, three ways
 Chapters/Effect_Management	Effect_Management	2	Threading a `Log` Effect through every signature
 Chapters/Error_Handling	Error_Handling	2	`Err.map_error()`
 Chapters/Error_Handling	Error_Handling	3	`combined()` that collects every failure
