@@ -1224,10 +1224,12 @@ On a `GEN_CLOSED` generator,
 A generator the driver closed is `GEN_CLOSED` at collection time,
 so its `finally` block runs once.
 
-A generator still at `GEN_CREATED`, before its first `next()`,
-is outside every `try` statement.
-`close()` on it marks it `GEN_CLOSED` and skips the body,
-so closing `readings()` before its first `next()` leaves the sensor as it was.
+A generator at `GEN_CREATED` has run none of its body,
+because the body starts at the first `next()`.
+`close()` marks that generator `GEN_CLOSED` and the body never starts.
+Closing `readings()` before its first `next()` prints nothing:
+the sensor never turns on,
+and execution never enters the `try` statement whose `finally` clause turns it off.
 
 ### `close()`: The Generator Must Finish {#close-requires-the-generator-to-finish}
 
