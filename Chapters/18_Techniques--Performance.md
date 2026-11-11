@@ -1748,6 +1748,24 @@ fn fastcount(m: &Bound<'_, PyModule>) -> PyResult<()> {
 The `--release` flag selects Cargo's optimized profile.
 `maturin develop` alone builds the unoptimized debug profile,
 the wrong build to time.
+
+The compiled module holds machine code, which the type checker cannot read.
+A *stub file* supplies the types.
+`fastcount.pyi`, in the crate's root directory beside `Cargo.toml`,
+declares each function's signature with `...` as its body:
+
+```python
+# rust/fastcount/fastcount.pyi
+def count_primes(limit: int) -> int: ...
+def collatz_lengths(values: list[int]) -> list[int]: ...
+```
+
+Maturin installs the stub with the compiled module,
+and adds the marker file [`py.typed`](06_Foundations--Modules_and_Packages.md#pythonpath).
+With no stub, the type checker reports an `unresolved-attribute` error for `fastcount.count_primes` and for `fastcount.collatz_lengths` in the listing below.
+You write the stub by hand,
+so a signature you change in `lib.rs` needs the matching change in `fastcount.pyi`.
+
 Python imports `fastcount` as a normal module with both functions attached:
 
 ```python

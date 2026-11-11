@@ -1112,7 +1112,7 @@ def sync(v: Vars) -> None:
 @task("Verify the committed Examples/, Solutions/, rust/, and effects/ "
       "code matches the Markdown")
 def check(v: Vars) -> None:
-    """extract_rust runs in its default check mode: it reads the two
+    """extract_rust runs in its default check mode: it reads the
     rust/ files chapter 18's blocks name and compares them with the
     book, needing no Rust toolchain. Before 2026-10-16 nothing in the
     gate compared them, and rust/fastcount/demo.py sat two sample-run
@@ -2202,7 +2202,7 @@ def rust_all(v: Vars) -> None:
     """
 
 
-@task("Regenerate each crate's src/lib.rs and demo.py from Chapters/")
+@task("Regenerate each crate's src/lib.rs, stub, and demo.py from Chapters/")
 def rust_sync(v: Vars) -> None:
     """Never touches the rest of a crate (Cargo.toml, pyproject.toml,
     .gitignore, .python-version): those are real, hand-maintained

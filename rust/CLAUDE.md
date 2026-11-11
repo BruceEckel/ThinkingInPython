@@ -9,7 +9,11 @@ both first-line comments in a fenced block:
 - A ` ```rust ` block marked `// <crate>/src/<file>.rs` extracts to
   `rust/<crate>/src/<file>.rs`.
 - A ` ```python ` block marked `# rust/<crate>/<name>.py` is the Python
-  caller for that crate. The `rust/` prefix is what makes
+  caller for that crate, and one marked `# rust/<crate>/<crate>.pyi` is
+  the crate's type stub (since 2026-11-11). Maturin installs a stub
+  named for the module from the crate root as `__init__.pyi` and adds an
+  empty `py.typed`; without it `ty` reports `unresolved-attribute` on
+  each function `demo.py` uses. The `rust/` prefix is what makes
   `tools/extract_examples.py` skip it entirely (never written to
   `Examples/`/`build/examples/`, never run by `pytest`/`ty`/`ruff`/
   `run_examples.py`), since the compiled module it imports does not exist
@@ -19,12 +23,19 @@ This is deliberate: only the `rust-*` tasks in `tools/tasks.py` build or
 run anything in `rust/` or require a Rust toolchain, so `verify`/`gate`/`ci`
 all work with no Rust installed. The one read the gate makes is
 `extract_rust.py`'s check mode, in `tip check` since 2026-10-16: it compares
-the two files the book's blocks name with the committed copies and fails on
+the files the book's blocks name with the committed copies and fails on
 drift, which `tip rust-sync` fixes. `tip rust-all` syncs, builds, and runs the
 crates for real, and `verify-targets` never runs the `rust-*` tasks;
 see `rust/README.md`. A crate
 directory also holds real, hand-maintained project files
 (`Cargo.toml`, `pyproject.toml`, `.python-version`, `.gitignore`,
 scaffolded once by `maturin new --bindings pyo3 <name>`) that
-`extract_rust.py` never touches, only `src/lib.rs` and the paired demo
+`extract_rust.py` never touches, only `src/lib.rs`, the stub, and the paired demo
 file are book-generated.
+
+`uv sync` rebuilds a crate only when a file in its `pyproject.toml`'s
+`cache-keys` changes (`Cargo.toml`, `src/**/*.rs`, `fastcount.pyi`, since
+2026-11-11). Before that list existed, adding the stub left the
+installed package unchanged until `uv sync --reinstall-package
+fastcount`. Name the stub in `cache-keys`: the glob `*.pyi` made
+every `uv sync` reinstall the package.

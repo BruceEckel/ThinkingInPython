@@ -9,7 +9,8 @@ It is deliberately separate from the rest of the book's tooling.
 Only the `rust-*` tasks build anything here or need a Rust
 toolchain: `tip verify`, `tip gate`, and `tip ci`
 all work with no Rust installed. The one thing the gate does here is
-compare `fastcount/src/lib.rs` and `fastcount/demo.py` with the chapter
+compare `fastcount/src/lib.rs`, `fastcount/fastcount.pyi`, and
+`fastcount/demo.py` with the chapter
 (`tools/extract_rust.py` in check mode, inside `tip check`), which needs
 no compiler, so a chapter 18 edit without `tip rust-sync` fails the
 build. Building and running the code
@@ -39,7 +40,7 @@ tip rust-all      # sync from the book, build every crate, run its demo
 available separately:
 
 ```
-tip rust-sync    # regenerate each crate's src/lib.rs and demo.py from Chapters/
+tip rust-sync    # regenerate each crate's src/lib.rs, stub, and demo.py from Chapters/
 tip rust-build   # build and install every crate (release mode), without running anything
 tip rust-test    # build every crate and run its demo.py against the real extension
 tip rust-clean   # remove every crate's target/ and .venv/ (never touches the book)
@@ -79,7 +80,12 @@ fenced block from `Chapters/*.md`:
   `pytest`/`ty`/`ruff`/`run_examples.py` never see it, since the compiled
   `fastcount` module they would need to `import` does not exist there.
 
-Only `src/lib.rs` and `demo.py` are generated this way. Everything else
+A ` ```python ` block marked `# rust/fastcount/fastcount.pyi` is extracted
+the same way. It is the crate's type stub: maturin installs it with the
+compiled module and adds the `py.typed` marker, so a type checker sees
+the two functions' signatures.
+
+Only `src/lib.rs`, `fastcount.pyi`, and `demo.py` are generated this way. Everything else
 in a crate directory (`Cargo.toml`, `pyproject.toml`, `.python-version`,
 `.gitignore`) is a real, hand-maintained project file, exactly like any
 other Rust project, scaffolded once by `maturin new --bindings pyo3

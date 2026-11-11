@@ -589,6 +589,16 @@ or `uv pip install -e .` for an editable install.
 The package resolves by name from anywhere,
 and edits to its source take effect the next time you run a program that imports it.
 
+An installed package whose code carries annotations says so with a marker:
+an empty file named `py.typed` in the package's directory.
+The marker tells the type checker of a program that imports the package to use those annotations,
+and it covers every subpackage beneath that directory.
+The typing specification also applies a stricter export rule to a marked package.
+A name that `__init__.py` imports from a submodule is private unless `__all__` lists it or the import repeats it,
+as in `from ._engine import total as total`.
+Pyright reports an import of such a private name.
+The type checker (`ty`) accepts the import.
+
 ## Lazy Imports
 
 Every `import` so far runs the target module's top-level code immediately,

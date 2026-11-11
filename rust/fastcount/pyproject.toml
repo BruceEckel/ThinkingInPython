@@ -11,3 +11,14 @@ classifiers = [
     "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dynamic = ["version"]
+
+# What `uv sync` watches to decide the crate needs a rebuild. uv's
+# default is pyproject.toml alone, so an edit to the Rust source or to
+# the type stub left the installed package as it was.
+[tool.uv]
+cache-keys = [
+    { file = "pyproject.toml" },
+    { file = "Cargo.toml" },
+    { file = "src/**/*.rs" },
+    { file = "fastcount.pyi" },
+]
