@@ -30,3 +30,5 @@ print(inspect.getgeneratorstate(sensor))
 sensor.close()  # [2]
 #: stopped with 2 unread
 #: sensor off
+print(inspect.getgeneratorstate(sensor))
+#: GEN_CLOSED

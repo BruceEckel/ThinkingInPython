@@ -1194,6 +1194,8 @@ print(inspect.getgeneratorstate(sensor))
 sensor.close()  # [2]
 #: stopped with 2 unread
 #: sensor off
+print(inspect.getgeneratorstate(sensor))
+#: GEN_CLOSED
 ```
 
 `first_above()` returns at `[1]` with the first reading over the limit.
@@ -1205,6 +1207,7 @@ which `inspect.getgeneratorstate()` reports as `GEN_SUSPENDED`.
 The `except GeneratorExit` clause runs when the driver stops early,
 and reports what the stop left unread.
 The `finally` clause runs on every ending and turns off the sensor.
+After `close()` returns, `inspect.getgeneratorstate()` reports `GEN_CLOSED`.
 
 A generator may catch `GeneratorExit` as long as it then finishes,
 as `readings()` does by reaching the end of its body.
