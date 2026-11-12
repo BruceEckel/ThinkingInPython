@@ -32,8 +32,18 @@ each pass hands the next one less to do.
    puts the negation back: it tells the reader an alternative is
    excluded and leaves them to find it. Cut the limiter when the
    passage has not yet named the alternative, or names it in the
-   next sentence (C62). `tip negatives CH=NN` shows each paragraph's
-   `only` count, and `tip overclaims CH=NN` lists "X alone".
+   next sentence (C62). The test for each "only" and "alone" is
+   deletion: read the sentence without the word. If the passage
+   still says what it needs, or the next sentence supplies the
+   contrast, the word goes ("an `undo` body starts only at `[1]`",
+   followed by "The successful run finishes without reaching `[1]`",
+   is "starts at `[1]`"). It stays when the reader would otherwise
+   assume the excluded case ("the first `send()` accepts only
+   `None`"). `tip watch-words CH=NN ARGS="--tier 1"` lists every
+   `only`, `tip negatives CH=NN` counts them per paragraph, and
+   `tip overclaims CH=NN` lists "X alone". Read the list for the
+   scope, since both words are also what Claude reaches for when it
+   turns a negative sentence positive.
 3. `straighten`: a buried actor, a subject held open, an overloaded
    sentence, a colon or "and" carrying a second claim.
 4. `cohesion`: old before new, one topic string per paragraph, R29's

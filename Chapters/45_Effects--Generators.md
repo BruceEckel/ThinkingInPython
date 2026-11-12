@@ -1454,7 +1454,7 @@ whose `undo` yields `void ticket` and `release seat`.
 `Failed` reaches the driver at `[3]`, after the last undo command.
 
 `book()` creates every `undo` generator,
-and an `undo` body starts only at `[1]`.
+and an `undo` body starts at `[1]`.
 The successful run finishes without reaching `[1]`,
 and Python discards the three unstarted generators.
 
