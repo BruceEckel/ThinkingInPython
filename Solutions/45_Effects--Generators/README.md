@@ -1626,7 +1626,7 @@ def commands(*names: str) -> Commands:
     ...
 
 def step(
-    do: Commands, undo: Commands,
+    *, do: Commands, undo: Commands,
     rest: Commands | None = None,
 ) -> Commands:
     ...
@@ -1670,7 +1670,7 @@ def commands(*names: str) -> Commands:
     yield from names
 
 def step(
-    do: Commands, undo: Commands,
+    *, do: Commands, undo: Commands,
     rest: Commands | None = None,
 ) -> Commands:
     try:
@@ -1683,14 +1683,20 @@ def step(
 
 def book() -> Commands:
     return step(
-        commands("reserve seat", "issue ticket"),
-        commands("void ticket", "release seat"),
-        step(commands("hold room"),
-             commands("release room"),
-             step(commands("book taxi"),
-                  commands("cancel taxi"),
-                  step(commands("charge card"),
-                       commands("refund card")))),
+        do=commands("reserve seat", "issue ticket"),
+        undo=commands("void ticket", "release seat"),
+        rest=step(
+            do=commands("hold room"),
+            undo=commands("release room"),
+            rest=step(
+                do=commands("book taxi"),
+                undo=commands("cancel taxi"),
+                rest=step(
+                    do=commands("charge card"),
+                    undo=commands("refund card"),
+                ),
+            ),
+        ),
     )
 
 def unwind(saga: Commands, error: Failed) -> None:
