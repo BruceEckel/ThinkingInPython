@@ -323,7 +323,17 @@ wording, an exercise statement. The scan reads a fixed verb list, so
 "hits no `break`" and "with no exception" slipped past it and were
 fixed by hand; `NO_VERBS` in `tools/watch_words.py` is where a missed
 verb goes.
-The same day a Tier 1 survey rule joined it for the shape turned
+Since 2026-11-12 a negative pronoun as the subject of a verb is Tier 2
+(`NOBODY_SUBJECT`, C61 in `bruce_edit_db.md`): "Nothing calls `throw()`
+on the first booking" (Bruce: "what is this 'Nothing' that is calling
+throw()? I feel like this issue keeps arising, the confusing
+negativity"). The repair says who acts and what they do ("`list()`
+drives the first booking with `next()` alone"). Both forms of that
+sentence were Claude's, written while changing a listing and outside
+any prose pass, so a sentence added with a listing change gets the
+positive test before the commit. Its 25 other sites stay NEW for the
+chapter passes; three are a heading's title in link text.
+The 2026-10-28 sweep also added a Tier 1 survey rule for the shape turned
 around, a negated subject (`NO_SUBJECT`: "no annotation expresses
 it", "No tool checks the step"), printed only under `--all` or
 `--tier 1` and never counted as new, since most such sentences are

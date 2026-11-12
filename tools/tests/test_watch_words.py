@@ -34,6 +34,15 @@ def test_verb_with_no_or_none_object_is_tier_2() -> None:
     assert {h[1] for h in found} == {2}
 
 
+def test_negative_pronoun_subject_is_tier_2() -> None:
+    found = hits("Nothing calls throw on the first booking. The call "
+                 "prints nothing useful. It finishes, and nobody "
+                 "holds the lock. The sum of nothing is zero.")
+    assert [(h[1], h[2]) for h in found
+            if h[2].startswith(("nothing ", "nobody "))] == [
+        (2, "nothing calls"), (2, "nobody holds")]
+
+
 def test_negated_subject_is_an_advisory_tier_1_hit() -> None:
     found = hits("No tool checks the step. A call with no argument "
                  "raises a TypeError. It has no lock protecting it. "

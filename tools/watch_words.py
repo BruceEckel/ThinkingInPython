@@ -134,6 +134,15 @@ rule is advisory and never counts as new. A `no` after a preposition
 ("with no `await` returns") or after a `NO_VERBS` verb ("has no
 `__slots__` gives", already the object rule's hit) is skipped.
 
+A negative pronoun as the subject is Tier 2 (since 2026-11-12):
+`nothing`, `nobody`, or `no one`, then a verb ("Nothing calls
+`throw()` on the first booking", Bruce: "what is this 'Nothing' that
+is calling throw()?"). The sentence hands the action to an actor that
+does not exist. The repair says who acts and what they do ("`list()`
+drives the first booking with `next()` alone"). The pronoun after a
+verb or a preposition ("prints nothing", "of nothing") is an object
+and is skipped.
+
 Every hit a human judges a keep lives in
 `tools/data/watch_words_baseline.txt`, so a run prints only what is
 new. An entry is `path<TAB>word: clause`, whitespace normalized and no
@@ -301,6 +310,18 @@ NO_SUBJECT_PREPOSITIONS: Final = frozenset((
 """Words before `no` that make it an object or a complement, not a
 subject (and the conjunctions, which hide the governing verb)."""
 NO_VERB_WORD: Final = re.compile(NO_VERBS, re.IGNORECASE)
+NOBODY_SUBJECT: Final = (
+    r"(?:nothing|nobody|no one)(?: else)? (?:\w+ly )?"
+    r"(?!less|as|this|its|is to)"
+    r"(?:\w+s|can|could|will|would|may|might|must|should|did|had)")
+"""A negative pronoun as the subject of a verb (Tier 2, since
+2026-11-12): "Nothing calls `throw()`", "nobody holds the lock". The
+sentence gives the action an actor that does not exist, and the reader
+looks for it (Bruce: "what is this 'Nothing' that is calling
+throw()?"). The repair says who acts and what they do."""
+NOBODY_SUBJECT_AFTER: Final = (
+    NO_SUBJECT_PREPOSITIONS - {"and", "or", "but"})
+"""Words before the pronoun that make it an object or a complement."""
 IS_HOW: Final = (
     r"(?<!which )(?<!that )(?<!this )(?<!it )(?<!what )"
     r"(?:is|are) (?:how|where|when|why)")
@@ -373,6 +394,7 @@ RULES: Final[tuple[tuple[int, re.Pattern[str]], ...]] = tuple(
         (2, NO_VERBS + r" none(?: of)?"),
         (2, NO_VERBS + r" no" + NO_AFTER),
         (1, NO_SUBJECT),
+        (2, NOBODY_SUBJECT),
         (2, r"by hand"),
         (2, r"manually"),
         (2, IS_HOW),
@@ -423,8 +445,20 @@ def literal_no_subject(text: str, m: re.Match[str]) -> bool:
             or NO_VERB_WORD.fullmatch(word) is not None)
 
 
+def literal_nobody_subject(text: str, m: re.Match[str]) -> bool:
+    """Is this `nothing` or `nobody` an object, not a subject?"""
+    before = NO_SUBJECT_BEFORE.search(text[:m.start()])
+    if before is None:
+        return False
+    word = before.group(1).lower()
+    return (word in NOBODY_SUBJECT_AFTER
+            or NO_VERB_WORD.fullmatch(word) is not None)
+
+
 def literal(word: str, text: str, m: re.Match[str]) -> bool:
     """Does this match carry a sense the style guide does not flag?"""
+    if word.startswith(("nothing ", "nobody ", "no one ")):
+        return literal_nobody_subject(text, m)
     if word.startswith("no "):
         return literal_no_subject(text, m)
     if word == "even":

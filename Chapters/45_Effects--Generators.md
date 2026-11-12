@@ -1370,8 +1370,8 @@ expect(Failed, booking.throw, Failed("card declined"))
 ```
 
 Each step yields its command, then delegates inside a `try`.
-Nothing calls `throw()` on the first booking,
-so `list()` runs it to its end and no `except` clause runs.
+`list()` drives the first booking with `next()` alone.
+Each `yield from` finishes normally, and the booking runs to its end.
 
 To report the card's failure in the second booking, the driver calls `throw()`.
 Python raises `Failed` at the innermost `yield`, in the card step.

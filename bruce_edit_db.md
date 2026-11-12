@@ -4257,6 +4257,42 @@ Claude-written, Bruce: "it sounds like the driver stops":
 **Home.** ambiguity (coordination entry, Accrued shapes) | super-prose
 (pass 6 and its grep) | this file.
 
+### C61. "Nothing" and "nobody" do not act: say who acts and what they do
+
+**Test.** `Nothing`, `nobody`, or `no one` as the subject of a verb:
+"Nothing calls `throw()` on the first booking". The sentence gives the
+action an actor, and the actor does not exist, so the reader looks for
+the thing that is calling and then cancels the call. It is the
+cancelled-object shape ("receives no `throw()`") with the cancellation
+moved to the subject, and a rewrite of one into the other fixes
+nothing. Ask what does run, and write that with its real actor:
+"`list()` drives the first booking with `next()` alone." A second
+negative in the same sentence ("and no `except` clause runs") gets the
+same question: "Each `yield from` finishes normally, and the booking
+runs to its end." `tip watch-words` lists the shape as Tier 2 since
+2026-11-12 (`NOBODY_SUBJECT` in `tools/watch_words.py`); the book had
+26 sites that day.
+
+**Keep when.** The absence is the claim and no actor could be written
+("a class in a module nobody imports stays out of the registry"), or
+the words are a heading's title in link text ("Nothing Runs Yet").
+
+**Sightings.** 1, `45_Effects--Generators` 2026-11-12, Claude-written
+the same day, Bruce: "what is this 'Nothing' that is calling throw()? I
+feel like this issue keeps arising, the confusing negativity":
+- "Nothing calls `throw()` on the first booking, so `list()` runs it to
+  its end and no `except` clause runs." -> "`list()` drives the first
+  booking with `next()` alone. Each `yield from` finishes normally, and
+  the booking runs to its end."
+- The sentence's earlier form, also Claude's, was the object shape:
+  "The second booking receives no `throw()`, so ... no `except` clause
+  runs." Both were written while adding to a listing, outside any prose
+  pass, which is where the shape keeps coming back. A sentence written
+  during a listing change gets the positive test before it is saved.
+
+**Home.** positive (Accrued patterns) | super-prose (pass 2) |
+`tools/watch_words.py` `NOBODY_SUBJECT` | this file.
+
 ## Retired
 
 Rejected by Bruce, or promoted and later withdrawn. Never propose these

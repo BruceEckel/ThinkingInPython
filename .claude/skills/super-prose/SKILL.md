@@ -23,6 +23,11 @@ each pass hands the next one less to do.
 
 1. `literal`: a figure or a vague description becomes the mechanism.
 2. `positive`: a negation that is an accident of phrasing turns around.
+   A subject of "Nothing", "Nobody", or "No one" with a verb ("Nothing
+   calls `throw()` on the first booking" -> "`list()` drives the first
+   booking with `next()` alone") is Tier 2 in `tip watch-words`, C61:
+   say who acts and what they do, and do not trade it for the object
+   form ("receives no `throw()`").
 3. `straighten`: a buried actor, a subject held open, an overloaded
    sentence, a colon or "and" carrying a second claim.
 4. `cohesion`: old before new, one topic string per paragraph, R29's

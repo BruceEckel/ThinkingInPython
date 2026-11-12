@@ -198,3 +198,12 @@ before/after pair, and it becomes part of every future pass.
   structural.
   `straighten`'s Accrued patterns carries the full entry and the
   before/after pair.
+- **A negative pronoun as the subject of a verb.**
+  "Nothing calls `throw()` on the first booking, so `list()` runs it to its end and no `except` clause runs"
+  (Bruce, 2026-11-12: "what is this 'Nothing' that is calling throw()?").
+  The reader looks for the actor and finds none.
+  Ask what does run and write that with its real actor:
+  "`list()` drives the first booking with `next()` alone. Each `yield from` finishes normally, and the booking runs to its end."
+  Turning it into the object form ("receives no `throw()`") is the same fault.
+  `tip watch-words CH=NN` lists `nothing`, `nobody`, and `no one` before a verb as Tier 2; C61 in `bruce_edit_db.md`.
+  The shape is most often written outside a prose pass, in a sentence added with a listing change, so apply the test there too.
