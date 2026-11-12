@@ -1352,6 +1352,8 @@ def step(
 def book() -> Generator[str]:
     return step("flight", step("hotel", step("card")))
 
+print(list(book()))
+#: ['do flight', 'do hotel', 'do card']
 booking = book()
 print(next(booking))
 #: do flight
@@ -1363,12 +1365,13 @@ expect(Failed, booking.throw, Failed("card declined"))
 #: undo hotel
 #: undo flight
 #: [Failed] card declined
-print(list(book()))
-#: ['do flight', 'do hotel', 'do card']
 ```
 
 Each step yields its command, then delegates inside a `try`.
-To report the card's failure, the driver calls `throw()`.
+Nothing calls `throw()` on the first booking,
+so `list()` runs it to its end and no `except` clause runs.
+
+To report the card's failure in the second booking, the driver calls `throw()`.
 Python raises `Failed` at the innermost `yield`, in the card step.
 That `yield` comes before the card step's `try`,
 so the exception propagates out of the card step,
@@ -1377,9 +1380,6 @@ The exception then propagates up through the two `yield from` expressions.
 Each `except` prints its compensation and raises `Failed` again,
 hotel before flight.
 The nesting of the `try` blocks is the undo stack.
-
-The second booking receives no `throw()`,
-so `list()` runs it to its end and no `except` clause runs.
 
 ## One Generator per State
 
