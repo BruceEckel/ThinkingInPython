@@ -1207,7 +1207,6 @@ which `inspect.getgeneratorstate()` reports as `GEN_SUSPENDED`.
 The `except GeneratorExit` clause runs when the driver stops early,
 and reports what the stop left unread.
 The `finally` clause runs on every ending and turns off the sensor.
-After `close()` returns, `inspect.getgeneratorstate()` reports `GEN_CLOSED`.
 
 A generator may catch `GeneratorExit` as long as it then finishes,
 as `readings()` does by reaching the end of its body.
@@ -1227,9 +1226,9 @@ On a `GEN_CLOSED` generator,
 A generator the driver closed is `GEN_CLOSED` at collection time,
 so its `finally` block runs once.
 
-A generator at `GEN_CREATED` has run none of its body,
-because the body starts at the first `next()`.
-`close()` marks that generator `GEN_CLOSED` and the body never starts.
+A generator's body starts when the driver first calls `next()` on it.
+Until that call, the generator is at `GEN_CREATED`.
+`close()` marks a `GEN_CREATED` generator `GEN_CLOSED` and the body never starts.
 Closing `readings()` before its first `next()` prints nothing:
 the sensor never turns on,
 and execution never enters the `try` statement whose `finally` clause turns it off.
