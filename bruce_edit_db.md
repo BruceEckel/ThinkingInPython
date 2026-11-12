@@ -1988,6 +1988,14 @@ the rest of the chapter for similar issues"; 15 passages cut in
   code, put [1] and [2] markers in the code and refer to those": "The
   first run calls `throw()`." / "The second run calls `close()`." ->
   tags on the two lines and "At `[1]`, ..." / "At `[2]`, ...".
+- `45_Effects--Generators` 2026-11-12, Bruce: "it simply said what was
+  in the code": "`g` is `outer()`'s generator." -> deleted, under a
+  listing with `g = outer()`. The sentence was Claude's C59 repair of
+  the day before. A repair from another rule that swaps a description
+  for the listing's own name uses the name and stops. A sentence that
+  introduces the name reads an assignment aloud, the first shape in the
+  test above. Reread every sentence a repair adds beside a listing
+  against this rule.
 
 **Home.** CLAUDE.md (global, the "Prose beside a listing" bullet);
 deep-review (prose pass, "Restating"). Promoted on Bruce's ruling, the
@@ -4175,6 +4183,9 @@ Claude-written (88d89eff), Bruce: "jumbled":
   on it, but `inner()` prints the `caught` line." -> "`g` is `outer()`'s
   generator. The driver calls `g.throw()`, but `inner()` prints the
   `caught` line."
+  Bruce deleted "`g` is `outer()`'s generator." the next day: the
+  listing's `g = outer()` says it, so the added sentence broke R47. The
+  repair is the name alone, "The driver calls `g.throw()`".
 - same day, from the survey: "The body reads the value that `send()`
   delivered and chooses what to do next" -> "From the value that
   `send()` delivered, the body chooses what to do next"; nine more in

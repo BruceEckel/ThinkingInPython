@@ -110,7 +110,8 @@ The verb form of this shape is a relative clause that ends on its verb directly 
 The clause's verb and the main clause's second verb sit on either side of "and", so the reader joins them under the clause's subject.
 A code-span subject and a dropped "that" make it worse, since nothing marks where the clause starts.
 Fix: give the second verb its own sentence, move the relative clause to the end of its sentence,
-or replace the clause with the name the listing gives the thing ("`g` is `outer()`'s generator. The driver calls `g.throw()`").
+or replace the clause with the name the listing gives the thing ("The driver calls `g.throw()`").
+Use the name with no sentence to introduce it: "`g` is `outer()`'s generator" reads the listing's `g = outer()` aloud, and R47 cuts it.
 `tip sentence-shapes CH=NN ARGS=--survey` lists it as `[REL+AND]`; about half its hits are a real coordination inside the clause ("one value that every instance reads and writes"), which stays.
 A second verb form is a shared object that arrives after the second verb, when the first verb also reads with no object:
 "A driver that holds the outermost generator stops and cleans up every generator beneath it" (the driver stops?).

@@ -88,8 +88,9 @@ scope's line range:
   `ambiguity` reads `[SAME]`, `[PAIR]`, `[TWO]`, and `[AND+REL]` too,
   and `[REL+AND]`, a relative clause that ends on its verb directly
   before "and" and a second verb, "holds the generator `outer()`
-  returned and calls `throw()` on it" -> "`g` is `outer()`'s
-  generator. The driver calls `g.throw()`", C59, every hit printed,
+  returned and calls `throw()` on it" -> "The driver calls
+  `g.throw()`", the listing's name with no sentence to introduce it,
+  C59, every hit printed,
   and `[SAME+NEW]`, a "same" on a noun the 30 lines above never use,
   "`safe()` uses the same separation" -> "`safe()` checks each value
   while it is still separate from the literal text", R63; the survey
@@ -139,6 +140,12 @@ headings stay, and a heading changes only when the section is being
 restructured anyway, with every link to its anchor updated.
 Every claim a rewrite touches is checked against the listing it
 describes before the new sentence is written.
+A sentence a pass adds beside a listing is held to R47 like any
+other: if the listing or its `#:` markers already show it, the
+sentence goes. The usual case is a repair that swaps a description
+for the listing's own name and adds a sentence to introduce the name
+("`g` is `outer()`'s generator." under `g = outer()`, cut by Bruce
+2026-11-12). Use the name and stop.
 Bruce's "we" and his em-dashes stay.
 
 ## After the edits

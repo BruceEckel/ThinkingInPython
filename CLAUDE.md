@@ -586,7 +586,8 @@ that sentence, so the rule reads positions, and it is quiet for a
 pronoun or relative-pronoun subject, an auxiliary, and a second verb
 whose number disagrees. The repair gives the second verb its own
 sentence, moves the relative clause to the end, or names the thing
-("`g` is `outer()`'s generator. The driver calls `g.throw()`"); C59 in
+("The driver calls `g.throw()`", and no sentence to introduce `g`,
+which the listing's `g = outer()` already does, R47); C59 in
 `bruce_edit_db.md`. The first run had 19 hits and 10 rewrites; the
 keeps are a real coordination inside the clause ("one value that every
 instance reads and writes"). It has no judged list, so the nine keeps
