@@ -43,6 +43,14 @@ function the caller passed", "the case that failed"): an anterior
 reference inside present narration, not the drift the rule describes.
 The drift is a main-clause past ("One design served three jobs in this
 chapter"). `tip past-tense CH=NN ARGS=--survey` feeds an activate pass.
+"Nearly all" left some out: on 2026-11-12 Bruce changed chapter 45's
+"From the value that `send()` delivered, the body chooses" to
+"delivers", a relative-clause past in a sentence about standing
+behavior, which three passes had read as an anterior reference. The
+parse cannot tell that sentence from "resumes where it stopped", so
+the rule stays a survey, and the activate pass now tests each
+relative-clause hit by writing it in the present (C63 in
+`bruce_edit_db.md`).
 
 `[PERFECT]` (2026-11-04, from a sentence the author marked in chapter
 45) is the second survey rule: a present perfect heading a time clause,

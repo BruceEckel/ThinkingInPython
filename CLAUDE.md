@@ -644,7 +644,13 @@ Stayed Constant"), which the check reads from the document's own heading
 lines. The first run found 1283 hits, nearly all in subordinate clauses
 ("the function the caller passed"), which refer back inside present
 narration and are not the drift. `[PAST-SUB]` therefore prints only under
-`ARGS=--survey`, for the activate pass, and is never baselined. The
+`ARGS=--survey`, for the activate pass, and is never baselined.
+Since 2026-11-12 that list is not a list of keeps (Bruce on chapter
+45's "From the value that `send()` delivered, the body chooses": "this
+can be 'delivers'"; C63 in `bruce_edit_db.md`): a relative-clause past
+in a sentence about standing behavior takes the present unless the
+past alone orders the events ("resumes where it stopped") or points at
+one run, and the activate pass tests each hit by substitution. The
 second survey rule is `[PERFECT]` (2026-11-04, Bruce: "'has yielded'
 can just be 'yields'"), a present perfect heading a time clause
 ("before the generator has yielded its last value", "when every

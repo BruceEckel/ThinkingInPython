@@ -4336,6 +4336,48 @@ as the C61 repair, Bruce: "We can leave off the 'alone'":
 **Home.** positive (Accrued patterns) | super-prose (pass 2) | this
 file.
 
+### C63. A past in a relative clause of a standing-behavior sentence is the present
+
+**Test.** A simple past inside a relative clause ("the value that
+`send()` delivered", "the answer it received", "the requests `outer()`
+gave it") in a sentence whose main verb is present and states what the
+machinery does on every run. Write the clause in the present and read
+the sentence. If the order of the two events still reads right, because
+a preposition or the main verb carries it ("From the value ... the body
+chooses what to do next", "answers the requests ... gives it") or
+because the two are one event, keep the present: once a sentence states
+the rule, every verb in it states the rule. `tip past-tense CH=NN
+ARGS=--survey` lists the shape under `[PAST-SUB]`, mixed with the
+keeps.
+
+**Keep when.** The past is the only word that orders the events, so the
+present moves the clause to another time or another thing ("resumes
+where it stopped": "where it stops" is the next stop). The clause
+points at one run the reader watched ("the `Failed` the driver threw at
+`[2]`"). The act was finished by someone else before the sentence's
+scene ("hundreds it didn't write").
+
+**Sightings.** 1, `45_Effects--Generators` 2026-11-12, was
+Claude-written, Bruce: "this can be 'delivers'":
+- "From the value that `send()` delivered, the body chooses what to do
+  next" -> "From the value that `send()` delivers, the body chooses
+  what to do next"
+- Why the passes missed it, read that day. The survey listed the
+  sentence (`[PAST-SUB] delivered`), one of 39 such lines for the
+  chapter, printed on every run with no judged list. Three texts told
+  the reader to keep all of them: `tools/past_tense.py` and `CLAUDE.md`
+  called a subordinate past "an anterior reference inside present
+  narration, not the drift", the activate skill's tense category
+  allowed a backshift for "an act finished before now", which every
+  relative-clause past satisfies, and super-prose named `[PAST-SUB]`
+  with no test and no example beside `[PERFECT]`'s. C57 covered the
+  present perfect in a time clause and sent a perfect in a relative
+  clause to the standing-behavior test, and no line did the same for
+  the simple past.
+
+**Home.** activate (tense category and Accrued patterns) | super-prose
+(pass 7 and Before the read) | this file.
+
 ## Retired
 
 Rejected by Bruce, or promoted and later withdrawn. Never propose these

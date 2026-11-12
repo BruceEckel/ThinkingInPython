@@ -75,7 +75,9 @@ each pass hands the next one less to do.
    script runs and prints") and a set pair ("opens and closes a
    file") stay.
 7. `activate`: passives with a natural actor, nominalizations,
-   metadiscourse, empty frames, tense drift, and a verb of rest with
+   metadiscourse, empty frames, tense drift (a relative-clause past
+   in a sentence about standing behavior included: "the value that
+   `send()` delivered" -> "delivers", C63), and a verb of rest with
    nothing after it ("the generator that is waiting" -> "the generator
    paused at the innermost `yield`", C58). No survey tool lists that
    shape: grep the scope for `wait`, `pending`, `idle`, `suspended`,
@@ -141,6 +143,12 @@ scope's line range:
   message shown for `stubborn()`", the actor named with the verb the book
   taught, raises or reports, R62)
 - `tip past-tense CH=NN ARGS=--survey` (for `activate`: `[PAST-SUB]`,
+  a past in a subordinate clause, "From the value that `send()`
+  delivered, the body chooses" -> "the value that `send()` delivers",
+  C63: put each relative-clause hit in the present and keep the past
+  only where it alone orders the events, "resumes where it stopped",
+  or points at one run; the list has no judged baseline, so every hit
+  prints and each one is read, never skipped as a reference back;
   and `[PERFECT]`, a present perfect in a time clause, "before the
   generator has yielded" -> "before the generator yields", C57)
 - `tip stutter CH=NN` (for `stutter`: `[CODE!]`, `[CODE]`, `[STEM~]`,

@@ -255,6 +255,15 @@ reads as a sequence, when the two are competing alternatives.
 One exception: a verb still backshifts inside a present-tense sentence
 when it reports an act finished before now,
 so "hundreds it didn't write" is correct, since someone else wrote them earlier.
+The exception is narrow.
+A relative clause about what the machinery does on every run
+is not an act finished before now, even though its event comes first:
+"From the value that `send()` delivered, the body chooses what to do next"
+is "From the value that `send()` delivers" (Bruce, 2026-11-12, C63).
+Write the clause in the present and read the sentence.
+Keep the past only when it is the one word that orders the events
+("resumes where it stopped", where "where it stops" is the next stop),
+or when the clause points at a run the reader watched.
 Otherwise a general statement stays generic throughout.
 That same sentence ended "and got one wrong" in a draft,
 pointing at the failure the reader watched in the `CountingList` listing.
@@ -456,6 +465,25 @@ and it becomes part of every future pass.
   received") is a different question: ask whether the sentence reports
   standing behavior, and if so write the present ("moves to a new
   state", not "has moved").
+- "From the value that `send()` delivered, the body chooses what to do
+  next" becomes "From the value that `send()` delivers, the body
+  chooses what to do next" (2026-11-12, Bruce: "this can be
+  'delivers'"; C63).
+  A simple past in a relative clause of a sentence that states standing
+  behavior takes the present when the sentence still orders the two
+  events without it: here "From" and "what to do next" put the delivery
+  before the choice.
+  `tip past-tense CH=NN ARGS=--survey` lists the shape as `[PAST-SUB]`
+  with the keeps mixed in, and the pass substitutes the present in
+  each relative-clause hit and reads the result.
+  The past stays when it alone orders the events ("resumes where it
+  stopped", "the code that resumed it" beside a later resumption), when
+  the clause points at one run ("the `Failed` the driver threw at
+  `[2]`"), and for an act someone else finished earlier ("hundreds it
+  didn't write").
+  The passes missed this sentence because every text about `[PAST-SUB]`
+  said a subordinate past refers back and is not the drift, so the
+  list was read as keeps.
 - "A driver ends a generator early by calling `close()`" becomes
   "To end a generator early, a driver calls `close()`" (Bruce,
   2026-11-09: "mine is more active and it also starts with the most

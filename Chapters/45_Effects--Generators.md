@@ -1483,11 +1483,11 @@ so `booking.close()` skips `[1]` and finishes each started step.
 
 [State Machines](31_Patterns--State_Machines.md)
 builds its mousetrap from an `Enum` of rows,
-each holding a state's entry message and a transition function,
-and an engine that calls the current state's function on every input.
+each holding a state's entry message and a transition function.
+The engine calls the current state's function on every input.
 
 Every resumption of a generator is a decision point.
-From the value that `send()` delivered, the body chooses what to do next:
+From the value that `send()` delivers, the body chooses what to do next:
 yield again, or return and finish.
 `answering_proxy.py` makes that choice with an `if`,
 between yielding a request to the driver and answering it from its table.
