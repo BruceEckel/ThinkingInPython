@@ -43,7 +43,17 @@ each pass hands the next one less to do.
    `only`, `tip negatives CH=NN` counts them per paragraph, and
    `tip overclaims CH=NN` lists "X alone". Read the list for the
    scope, since both words are also what Claude reaches for when it
-   turns a negative sentence positive.
+   turns a negative sentence positive. A thing named by "with no" and
+   a construct elsewhere in the listing that would match or handle it
+   ("An input with no `case` leaves the state's `while` loop
+   running") gets the positive case first and then "any other", and
+   the construct that produces the behavior becomes a subject, named
+   as the listing writes it ("Each state's `while True` loop keeps
+   the machine in that state. An input that matches a `case` returns
+   the next state ... After any other input, the loop runs its
+   `yield` again", C66). No tool lists it: grep the scope for
+   `with no` and keep a property of the thing itself ("a function
+   with no parameters").
 3. `straighten`: a buried actor, a subject held open, an overloaded
    sentence, a colon or "and" carrying a second claim.
 4. `cohesion`: old before new, one topic string per paragraph, R29's

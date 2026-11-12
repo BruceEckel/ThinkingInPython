@@ -216,3 +216,14 @@ before/after pair, and it becomes part of every future pass.
   "`book()` creates every `undo` generator, and an `undo` body starts only at `[1]`" lost its "only" the same day,
   because the next sentence ("The successful run finishes without reaching `[1]`") carried the contrast.
   `tip watch-words CH=NN ARGS="--tier 1"` lists every `only`.
+- **"X with no Y" for a thing that nothing handles.**
+  "An input with no `case` leaves the state's `while` loop running, so the machine stays in that state"
+  (Bruce, 2026-11-12: "'with no case' is negative and confusing").
+  The phrase gives the input a possession it lacks, and the fact is a relation: no `case` in the `match` matches it.
+  State the positive case first, then name the rest as "any other":
+  "An input that matches a `case` returns the next state, which ends the loop.
+  After any other input, the loop runs its `yield` again and reports the state's name."
+  The construct that produces the behavior gets a sentence as its subject, named as the listing writes it:
+  "Each state's `while True` loop keeps the machine in that state."
+  Keep "with no" for a property of the thing itself ("a function with no parameters", "`f()` with no arguments").
+  `tip watch-words` skips a `no` after a preposition, so grep the scope for `with no`. C66 in `bruce_edit_db.md`.

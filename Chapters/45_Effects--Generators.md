@@ -1557,8 +1557,10 @@ and returns the next state, or `None` to halt.
 The `type` statement evaluates its right side lazily,
 so the alias can name itself.
 
-An input with no `case` leaves the state's `while` loop running,
-so the machine stays in that state.
+Each state's `while True` loop keeps the machine in that state.
+An input that matches a `case` returns the next state, which ends the loop.
+After any other input,
+the loop runs its `yield` again and reports the state's name.
 The entry action sits above the loop, so it runs once, on entry.
 `trap_states.py`'s `waiting()` returns `TrapState.WAITING` from its `case _`,
 and `state_machine.py` re-enters the state and prints its message again.

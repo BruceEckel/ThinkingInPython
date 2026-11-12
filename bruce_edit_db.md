@@ -4436,6 +4436,49 @@ sentence as C64:
 
 **Home.** super-prose (pass 4) | this file.
 
+### C66. "X with no Y" for a thing nothing handles: say the positive case, then "any other"
+
+**Test.** A noun defined by "with no" and a construct that sits
+elsewhere in the listing and would match, handle, or receive it: "An
+input with no `case`", "a request with no handler", "a key with no
+entry". The phrase gives the thing a possession it lacks, when the
+fact is a relation: no `case` in the `match` matches this input. The
+reader must find the `match`, list its cases, and take the complement.
+State the positive case first, with the construct as written in the
+listing, then name the rest as "any other": "An input that matches a
+`case` returns the next state, which ends the loop. After any other
+input, the loop runs its `yield` again." If the sentence then reports
+a behavior ("the machine stays in that state"), the construct that
+produces the behavior is the subject of a sentence of its own, named as
+the listing writes it ("Each state's `while True` loop keeps the
+machine in that state"), and not the object of "leaves ... running"
+(R61's demoted actor, with a participle where R61 has an infinitive).
+
+**Keep when.** The absence is a property of the thing itself, seen at
+the thing: "a function with no parameters", "`f()` with no arguments",
+"a field with no default", "a class with no `__slots__`".
+
+**Sightings.** 1, `45_Effects--Generators` 2026-11-12, was
+Claude-written, Bruce: "'with no case' is negative and confusing. Also
+we should mention that the 'while True' is what keeps it in that
+state":
+- "An input with no `case` leaves the state's `while` loop running, so
+  the machine stays in that state." -> "Each state's `while True` loop
+  keeps the machine in that state. An input that matches a `case`
+  returns the next state, which ends the loop. After any other input,
+  the loop runs its `yield` again and reports the state's name."
+- Why the passes missed it: `tip watch-words` lists a `no` after a
+  `NO_VERBS` verb or as a subject, and skips a `no` after a preposition
+  by design, since most "with no" phrases are the keep above (231 sites
+  in the book, nearly all "with no arguments" and its kin). `CLAUDE.md`
+  records the same gap from 2026-10-28 ("with no exception" slipped past
+  the scan and was fixed by hand). `tip negatives` counts the word per
+  paragraph and this paragraph held one. `[CAUS]` reads an infinitive
+  after its verb list, and "leaves" with a participle is outside it.
+
+**Home.** positive (Accrued patterns) | super-prose (pass 2) | this
+file.
+
 ## Retired
 
 Rejected by Bruce, or promoted and later withdrawn. Never propose these
