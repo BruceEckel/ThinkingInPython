@@ -4323,6 +4323,15 @@ resources").
 as the C61 repair, Bruce: "We can leave off the 'alone'":
 - "`list(book())` drives the steps with `next()` alone." -> "`list(book())`
   drives the steps with `next()`."
+- same chapter and day, Claude-written an hour later in the
+  `saga_generators.py` walkthrough, Bruce: "Is 'only' necessary or
+  useful here? Seems similar to the overuse of 'alone'": "`book()`
+  creates every `undo` generator, and an `undo` body starts only at
+  `[1]`." -> "... starts at `[1]`." The next sentence ("The successful
+  run finishes without reaching `[1]`") already carried the contrast.
+  The deletion test, added that day: read the sentence without the
+  limiter, and keep the word only where the reader would otherwise
+  assume the excluded case.
 
 **Home.** positive (Accrued patterns) | super-prose (pass 2) | this
 file.

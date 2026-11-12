@@ -212,3 +212,7 @@ before/after pair, and it becomes part of every future pass.
   "Alone", "only", "just", and "nothing but" tell the reader an alternative is excluded and leave them to find it.
   Cut the limiter when the passage has not yet named the alternative, or names it in the next sentence.
   Keep it when the exclusion is the claim and the alternative is on the page. C62 in `bruce_edit_db.md`.
+  The test is deletion: read the sentence without the limiter.
+  "`book()` creates every `undo` generator, and an `undo` body starts only at `[1]`" lost its "only" the same day,
+  because the next sentence ("The successful run finishes without reaching `[1]`") carried the contrast.
+  `tip watch-words CH=NN ARGS="--tier 1"` lists every `only`.
