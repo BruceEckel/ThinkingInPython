@@ -109,6 +109,14 @@ each pass hands the next one less to do.
     a `try`-driven listing; "`C().show()` then runs `B`'s version"
     after a framed opener) gets the lightest frame that carries over
     ("In that version", "If `__init__()` assigns `_value_`"), R57.
+    A sentence about another chapter's listing counts, even with
+    that listing's file name on it, when the listing on the page
+    defines the same name ("`trap_states.py`'s `waiting()` returns
+    `TrapState.WAITING` from its `case _`" under a listing with its
+    own `waiting()`): cut it if the walkthrough reads complete
+    without it, and otherwise open on this listing's thing and put
+    the other design second under "In chapter NN's `file.py`,".
+    Grep the scope for a file name the chapter does not define.
     It runs after the passes above because a split or a reframed
     sentence can strand an alternative's continuation from its
     opener, and before `stutter`, since a frame is new words.

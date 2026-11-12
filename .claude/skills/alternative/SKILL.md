@@ -135,6 +135,22 @@ The lightest marker that carries over, keeping the claim's words:
 - Advice, a `Done when:` paragraph about the reader's own run, a
   quoted diagnostic, prose that names another listing by file name,
   a reference to another chapter.
+  A file name is a frame only when the name it qualifies is absent
+  from the listing on the page. "`trap_states.py`'s `waiting()`
+  returns `TrapState.WAITING` from its `case _`" sat under a listing
+  with a `waiting()` of its own (Bruce, 2026-11-12: "very confusing
+  because our waiting() has none of that, maybe this isn't
+  necessary"), and the reader looked for `TrapState` and `case _` in
+  the function on the page. For a comparison with another chapter's
+  listing inside this listing's walkthrough:
+  first test whether the walkthrough needs it, and cut it when the
+  paragraph reads complete without it or a comparison paragraph
+  further on covers the point;
+  if it stays, open on this listing's thing and give the other design
+  second, under "In chapter NN's `file.py`,"
+  ("`holding()`'s entry action is two `print()` calls, the message
+  and the chime. In chapter 31's `trap_states.py`, the chime is a
+  third element in `TrapState.HOLDING`'s row.").
 
 When the test is close, keep it and say so in the report.
 

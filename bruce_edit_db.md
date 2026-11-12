@@ -2608,6 +2608,34 @@ the book-wide read that day (Opus agents, brief in
 - `07_Foundations--Classes` 2026-11-08, was Claude-written, an Opus
   agent, the continuation shape: "`C().show()` then runs `B`'s
   version." -> "In that order, `C().show()` runs `B`'s version."
+- `45_Effects--Generators` 2026-11-12, was Claude-written, Bruce:
+  "very confusing because our waiting() has none of that, maybe this
+  isn't necessary": "`trap_states.py`'s `waiting()` returns
+  `TrapState.WAITING` from its `case _`, and `state_machine.py`
+  re-enters the state and prints its message again." -> cut. The
+  sentence after it had the same fault and was turned to face the
+  listing: "`TrapState.HOLDING`'s `chime` is a third field in its row;
+  here `holding()`'s entry code prints it after the message." ->
+  "`holding()`'s entry action is two `print()` calls, the message and
+  the chime. In chapter 31's `trap_states.py`, the chime is a third
+  element in `TrapState.HOLDING`'s row."
+  Why the passes missed it: the Keep-when below let "prose that names
+  another listing by file name" stand, and a filename possessive
+  counted as that name. Two things made it no frame here. The listing
+  on the page defines a `waiting()` too, so the reader took the
+  sentence for a claim about it and found no `TrapState` and no
+  `case _`. And `trap_states.py` is another chapter's file, last
+  mentioned 80 lines up. `survey alternative` was quiet for the
+  filename, and `survey absent-subject` for `waiting()`, which the
+  listing names. The tests added that day: (1) a file name frames an
+  alternative only when the name it qualifies is absent from the
+  listing on the page, and when both listings define the name the
+  sentence opens "In chapter NN's `file.py`,"; (2) a comparison with
+  another chapter's listing, inside the walkthrough of this one, is
+  first tested for need: if the walkthrough reads complete without it,
+  or a comparison paragraph further on covers the point, cut it; (3)
+  a comparison that stays opens on this listing's thing and says the
+  other design second.
 
 **Home.** alternative (its own pass, `.claude/skills/alternative/SKILL.md`)
 | ambiguity (catalog and Accrued shapes) |
