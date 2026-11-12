@@ -1375,8 +1375,7 @@ expect(Failed, booking.throw, Failed("no taxi"))
 ```
 
 Each step yields its command, then delegates inside a `try`.
-`list(book())` drives the steps with `next()`.
-Each `yield from` finishes normally, and every step runs to its end.
+In `list(book())` every step succeeds, so each `yield from` finishes normally.
 
 Three `next()` calls leave `booking` paused in the taxi step,
 at the `yield` that produced `do taxi`.
