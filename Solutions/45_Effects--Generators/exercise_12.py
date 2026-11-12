@@ -27,8 +27,10 @@ def book() -> Commands:
         commands("void ticket", "release seat"),
         step(commands("hold room"),
              commands("release room"),
-             step(commands("charge card"),
-                  commands("refund card"))),
+             step(commands("book taxi"),
+                  commands("cancel taxi"),
+                  step(commands("charge card"),
+                       commands("refund card")))),
     )
 
 def unwind(saga: Commands, error: Failed) -> None:
@@ -47,10 +49,11 @@ unwind(booking, Failed("printer jammed"))  # [2]
 #: release seat
 #: Failed: printer jammed
 booking = book()
-print([next(booking) for _ in range(4)][-1])
+print([next(booking) for _ in range(5)][-1])
 #: charge card
 unwind(booking, Failed("card declined"))  # [3]
 #: refund card
+#: cancel taxi
 #: release room
 #: void ticket
 #: release seat

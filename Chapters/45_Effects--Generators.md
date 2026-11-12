@@ -1429,27 +1429,35 @@ def book() -> Commands:
         commands("void ticket", "release seat"),
         step(commands("hold room"),
              commands("release room"),
-             step(commands("charge card"),
-                  commands("refund card"))),
+             step(commands("book taxi"),
+                  commands("cancel taxi"),
+                  step(commands("charge card"),
+                       commands("refund card")))),
     )
 
-print(*book(), sep=", ")
-#: reserve seat, issue ticket, hold room, charge card
+print(*book(), sep="\n")
+#: reserve seat
+#: issue ticket
+#: hold room
+#: book taxi
+#: charge card
 booking = book()
 print([next(booking) for _ in range(4)][-1])
-#: charge card
-print(booking.throw(Failed("card declined")))  # [2]
+#: book taxi
+print(booking.throw(Failed("no taxi")))  # [2]
 #: release room
 print(next(booking))
 #: void ticket
 print(next(booking))
 #: release seat
 expect(Failed, next, booking)  # [3]
-#: [Failed] card declined
+#: [Failed] no taxi
 ```
 
 In `saga.py`, `throw()` raises `Failed` in the driver.
 At `[2]`, `throw()` returns a command.
+`Failed` starts in the taxi step's `do`, which is outside that step's `try`,
+so the exception leaves the taxi step and the card step never starts.
 The hotel step's `except` clause catches `Failed` and delegates to its `undo` at `[1]`,
 and the first command that `undo` yields is the value `throw()` returns.
 The driver carries out that command and calls `next()` for the following ones.
@@ -1460,7 +1468,7 @@ whose `undo` yields `void ticket` and `release seat`.
 
 `book()` creates every `undo` generator, and an `undo` body starts at `[1]`.
 The successful run finishes without reaching `[1]`,
-and Python discards the three unstarted generators.
+and Python discards the four unstarted generators.
 
 [A generator must finish when `GeneratorExit` arrives](#close-requires-the-generator-to-finish),
 and a `yield` in an `except` clause looks like a risk to that rule.

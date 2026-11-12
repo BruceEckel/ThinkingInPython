@@ -29,20 +29,26 @@ def book() -> Commands:
         commands("void ticket", "release seat"),
         step(commands("hold room"),
              commands("release room"),
-             step(commands("charge card"),
-                  commands("refund card"))),
+             step(commands("book taxi"),
+                  commands("cancel taxi"),
+                  step(commands("charge card"),
+                       commands("refund card")))),
     )
 
-print(*book(), sep=", ")
-#: reserve seat, issue ticket, hold room, charge card
+print(*book(), sep="\n")
+#: reserve seat
+#: issue ticket
+#: hold room
+#: book taxi
+#: charge card
 booking = book()
 print([next(booking) for _ in range(4)][-1])
-#: charge card
-print(booking.throw(Failed("card declined")))  # [2]
+#: book taxi
+print(booking.throw(Failed("no taxi")))  # [2]
 #: release room
 print(next(booking))
 #: void ticket
 print(next(booking))
 #: release seat
 expect(Failed, next, booking)  # [3]
-#: [Failed] card declined
+#: [Failed] no taxi
