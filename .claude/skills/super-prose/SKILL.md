@@ -55,8 +55,16 @@ each pass hands the next one less to do.
    success case after the failure case). Each starts a paragraph,
    even at one sentence. A sentence written for a statement the
    listing gained is placed by this test, never appended to the
-   paragraph already there.
+   paragraph already there. A "then" in a walkthrough that already
+   narrates in order is read without the word and cut when the order
+   survives ("The bare `raise` then re-raises" -> "The bare `raise`
+   re-raises", C65); no tool lists it, so grep the scope for `then`.
 5. `antecedents`: every pointer with two candidates gets its noun.
+   A link is a pointer too: when its target teaches a named
+   construct, the link text starts on the name ("The bare `raise`
+   then [re-raises the exception the clause caught](...)" -> "The
+   [bare `raise` re-raises the exception the clause caught](...)",
+   C64). Read each link in the scope for where its brackets sit.
 6. `ambiguity`: every sentence that counts, compares, coordinates,
    modifies, or limits keeps one reading: a count with two units, a
    word with two senses, a modifier with two heads, an open scope, a

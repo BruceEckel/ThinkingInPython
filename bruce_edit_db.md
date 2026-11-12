@@ -4378,6 +4378,64 @@ Claude-written, Bruce: "this can be 'delivers'":
 **Home.** activate (tense category and Accrued patterns) | super-prose
 (pass 7 and Before the read) | this file.
 
+### C64. Link text holds the name of the thing the target teaches
+
+**Test.** A link to a section that teaches a named construct ("bare
+`raise`", "`yield from`", a pattern), where the construct's name sits
+in the sentence just outside the brackets and the link text is the
+predicate alone: "The bare `raise` then [re-raises the exception the
+clause caught](...#errors-and-exceptions)". A reader who looks at the
+link text sees a verb phrase and cannot tell what the target is about.
+Move the opening bracket so the link text starts on the name: "The
+[bare `raise` re-raises the exception the clause caught](...)".
+
+**Keep when.** The target teaches the claim and not the construct (the
+sentence's subject is this chapter's own object, "`step()` [re-raises
+what it caught](...)"), or the name is the whole link text already.
+
+**Sightings.** 1, `45_Effects--Generators` 2026-11-12, was
+Claude-written (2a6ffd5a), Bruce's edit in the working tree:
+- "The bare `raise` then [re-raises the exception the clause
+  caught](04_Foundations--Control_Flow.md#errors-and-exceptions)" ->
+  "The [bare `raise` re-raises the exception the clause caught](...)"
+- Why the passes missed it: no pass reads where a link's brackets sit.
+  `heading_links.py` checks the anchor, `tip link-support` asks whether
+  the section covers the sentence's claim, and both pass with the name
+  outside the brackets. No tool lists the shape.
+
+**Home.** super-prose (pass 5) | this file.
+
+### C65. "then" goes where the sentence order already gives the order
+
+**Test.** A "then" between subject and verb in a walkthrough that
+narrates events in the order they happen ("Each `except` clause prints
+its step's undo line. The bare `raise` then re-raises the exception"),
+most of all when a sentence nearby already carries one ("The exception
+then propagates up through the `yield from`", two sentences above).
+Read the sentence without it. If the order still reads right, cut it:
+the word marks every step as a step, and the reader gets no news from
+it.
+
+**Keep when.** The order is the claim, or the sentence breaks from the
+order of the page: a step the reader would place elsewhere ("the
+`finally` clause then runs, before the exception reaches the caller"),
+a consequence after a condition ("If ..., then ..."), or the first
+"then" after a pause in the action (the exception arrives, and then
+propagates).
+
+**Sightings.** 1, `45_Effects--Generators` 2026-11-12, was
+Claude-written (2a6ffd5a), Bruce's edit in the working tree, same
+sentence as C64:
+- "The bare `raise` then re-raises the exception the clause caught" ->
+  "The bare `raise` re-raises the exception the clause caught"
+- Why the passes missed it: "then" is in no watch list, and the
+  stutter scan reads a window of three tokens inside one sentence, so
+  two "then"s two sentences apart print nothing. The cohesion skill
+  tests a connective for a real relation, and sequence is a real
+  relation here, so the word passed.
+
+**Home.** super-prose (pass 4) | this file.
+
 ## Retired
 
 Rejected by Bruce, or promoted and later withdrawn. Never propose these
