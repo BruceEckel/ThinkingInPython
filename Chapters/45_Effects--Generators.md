@@ -1330,7 +1330,8 @@ Each step is an undoable [*Command*](27_Patterns--Function_Objects.md#a-callable
 an action paired with the operation that reverses it.
 We can create a saga using one generator per step,
 each delegating to the steps after it.
-A failure is an exception that propagates from the innermost generator outward,
+A failure is an exception that starts in the generator of the step that failed.
+The exception propagates outward through the generators of the earlier steps,
 and a step's undo is an `except` clause around its `yield from`:
 
 ```python
