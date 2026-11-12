@@ -1438,3 +1438,156 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+
+## 11. Saga steps as functions
+
+> `step()` in `saga.py` takes a name and prints its undo.
+> Replace `name` with two functions: `action`,
+> which the step calls and whose result it yields, and `undo`,
+> which the `except` clause calls.
+> Build one booking whose three actions succeed and one whose card action raises `Failed`.
+> The driver of the second booking calls only `next()`.
+> Say where `Failed` starts,
+> and why the hotel and the flight are still undone.
+
+<details>
+<summary>Where to look</summary>
+
+[Through `yield from` to the Innermost Generator](../../Chapters/45_Effects--Generators.md#throw-and-close-reach-the-innermost-generator)
+says that an exception leaving the innermost generator propagates into the generator that delegates to it,
+as if the `yield from` expression had raised it.
+An exception that the innermost generator's own body raises takes that path too,
+with no `throw()`.
+Ask which generators are waiting at a `yield from` when the card step calls its action.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_11.py
+from collections.abc import Callable, Generator
+from exceptions import expect
+
+class Failed(Exception):
+    pass
+
+type Action = Callable[[], str]
+type Undo = Callable[[], None]
+
+def step(
+    action: Action, undo: Undo,
+    rest: Generator[str] | None = None,
+) -> Generator[str]:
+    ...
+
+def doing(name: str) -> Action:
+    ...
+
+def undoing(name: str) -> Undo:
+    ...
+
+def decline() -> str:
+    ...
+
+def book(card: Action) -> Generator[str]:
+    ...
+```
+
+<details>
+<summary>Done when</summary>
+
+the first booking lists three results,
+the second prints `undo hotel` and `undo flight` before `Failed` reaches the driver,
+no line calls `throw()`,
+and your answer says which `try` blocks are open when the card's action runs.
+
+<details>
+<summary>Solution</summary>
+
+`doing()` and `undoing()` build a step's action and its undo from its name.
+`decline()` is the card action that fails:
+
+```python
+# exercise_11.py
+from collections.abc import Callable, Generator
+from exceptions import expect
+
+class Failed(Exception):
+    pass
+
+type Action = Callable[[], str]
+type Undo = Callable[[], None]
+
+def step(
+    action: Action, undo: Undo,
+    rest: Generator[str] | None = None,
+) -> Generator[str]:
+    yield action()  # [1]
+    if rest is None:
+        return
+    try:
+        yield from rest
+    except Failed:
+        undo()  # [2]
+        raise
+
+def doing(name: str) -> Action:
+    return lambda: f"do {name}"
+
+def undoing(name: str) -> Undo:
+    return lambda: print(f"undo {name}")
+
+def decline() -> str:
+    raise Failed("card declined")
+
+def book(card: Action) -> Generator[str]:
+    return step(
+        doing("flight"), undoing("flight"),
+        step(doing("hotel"), undoing("hotel"),
+             step(card, undoing("card"))),
+    )
+
+print(list(book(doing("card"))))
+#: ['do flight', 'do hotel', 'do card']
+booking = book(decline)
+print(next(booking))
+#: do flight
+print(next(booking))
+#: do hotel
+expect(Failed, next, booking)  # [3]
+#: undo hotel
+#: undo flight
+#: [Failed] card declined
+```
+
+**The step calls its action.**
+`[1]` calls `action()` and yields the result,
+where `saga.py` yields a string built from `name`.
+`[2]` calls `undo()` where `saga.py` prints.
+The `try`, the `yield from`, and the bare `raise` stay as `saga.py` has them.
+
+**`Failed` starts in the card step's body.**
+The `next()` at `[3]` resumes the flight step, which waits at its `yield from`.
+That `yield from` resumes the hotel step,
+and the hotel step's `yield from` starts the card step.
+The card step runs `[1]`, and `decline()` raises `Failed` there.
+No `try` in the card step encloses `[1]`, so the exception leaves the card step.
+It arrives at the hotel step's `yield from`,
+which sits inside the hotel step's `try`.
+The hotel step's `except` clause calls its `undo()` and raises `Failed` again,
+and the flight step's `except` clause does the same.
+Both `try` blocks are open when the card's action runs.
+
+`throw()` raises an exception at a `yield` for the driver.
+Here the generator's own code raises the exception,
+and it propagates through the two `yield from` expressions as it does in `saga.py`.
+The driver's part is the `next()` call,
+where `Failed` arrives after both undo lines.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
+</details>
+</details>
+</details>
+</details>

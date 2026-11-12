@@ -2292,6 +2292,14 @@ Try each exercise before opening its [solution](../Solutions/45_Effects--Generat
     and leaves out the counts.
     Keep the walk's position in a list that you use as a stack.
     Then say what `Paths` stores that `visit()` leaves to Python.
+11. `step()` in `saga.py` takes a name and prints its undo.
+    Replace `name` with two functions: `action`,
+    which the step calls and whose result it yields, and `undo`,
+    which the `except` clause calls.
+    Build one booking whose three actions succeed and one whose card action raises `Failed`.
+    The driver of the second booking calls only `next()`.
+    Say where `Failed` starts,
+    and why the hotel and the flight are still undone.
 
 [^clu-history]: Barbara Liskov,
 [A History of CLU](https://dspace.mit.edu/handle/1721.1/149734),
