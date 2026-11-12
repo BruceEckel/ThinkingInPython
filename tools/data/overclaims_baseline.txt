@@ -1352,7 +1352,7 @@ Solutions/45_Effects--Generators/README.md	[BOUND] A CODE holds the two things o
 Solutions/45_Effects--Generators/README.md	[BOUND] A send that supplies a collector's first value produces one line
 Solutions/45_Effects--Generators/README.md	[BOUND] After four lines, with the walk at CODE, CODE holds three levels
 Solutions/45_Effects--Generators/README.md	[BOUND] Annotating a Generator describes the three parameters of CODE
-Solutions/45_Effects--Generators/README.md	[BOUND] CODE equals the six path lines that CODE prints, a tree with an empty subtree produces the lines of its other entries, CODE contains no CODE, and your answer names the two things each stack entry holds and says where CODE keeps them
+Solutions/45_Effects--Generators/README.md	[BOUND] CODE equals the six path lines that CODE prints, a tree with an empty subtree produces the lines of its other entries, CODE contains no CODE, and your answer names the two things in each stack entry and says where CODE keeps them
 Solutions/45_Effects--Generators/README.md	[BOUND] CODE takes the two arguments that CODE takes, so CODE pushes a level where CODE calls itself
 Solutions/45_Effects--Generators/README.md	[BOUND] CODE's annotation alone gives the checker a declared type to compare with the call's type
 Solutions/45_Effects--Generators/README.md	[BOUND] So at runtime the first CODE accepts CODE alone, a value the CODE excludes

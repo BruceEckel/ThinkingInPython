@@ -128,6 +128,12 @@ SOURCES: Final[tuple[str, ...]] = (
     "It makes the check safe.",
     "The pool needs a lock.",
     "The class is required to define it.",
+    "The driver holds the generator `outer()` returned and calls `throw()` on it, but `inner()` prints the `caught` line.",
+    "The driver calls `g.throw()`, but `inner()` prints the `caught` line.",
+    "A `TypedDict` describes the `dict` that `json.loads()` returns and declares the keys for the type checker.",
+    "A generator that receives or returns values needs the full annotation.",
+    "It checks the keys you specify and ignores the rest.",
+    "A protocol also clarifies what the Liskov Substitution Principle does and does not guarantee.",
 )
 """Markdown paragraphs; each is cleaned the way the checks clean it."""
 

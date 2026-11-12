@@ -118,7 +118,7 @@ print(p == Point(3.5, 2.0, 3.0))
 #: True
 ```
 
-`@dataclass` reads the fields the class body declares and generates `__init__()`,
+`@dataclass` reads the class body's fields and generates `__init__()`,
 `__repr__()`, and `__eq__()` to match.
 Adding `z: float` extends the constructor to three positional arguments,
 the `repr()` to three fields, and the equality comparison to three values,
@@ -534,7 +534,7 @@ since every field keeps the value `__post_init__()` checked.
 Python raises an `AttributeError` at class creation if a `NamedTuple` class defines `__new__()` or `__init__()`,
 so a `NamedTuple` [runs its check in a factory function](../../Chapters/12_Techniques--Data_Classes_as_Types.md#namedtuple-cannot-validate)
 that a caller can bypass.
-A `TypedDict` describes the `dict` that `json.loads()` returns and declares the keys for the type checker,
+A `TypedDict` declares the keys for the type checker and describes the `dict` that `json.loads()` returns,
 but at runtime it is a `dict`, which stores the values `json.loads()` gives it.
 A `SimpleNamespace` accepts any name with any value,
 at runtime and under the type checker, so the record holds what the JSON held.

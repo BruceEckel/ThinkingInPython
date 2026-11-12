@@ -577,6 +577,20 @@ reread after a passage is restructured. The other two survey rules,
 `[AND]` and `[COLON]`, print every hit on every run, 1,203 over the
 book that day; they are judgments made per sentence in a chapter
 pass, so a judged list would record style choices, not keeps.
+The ninth survey rule is `[REL+AND]` (2026-11-11), a relative or
+complement clause that ends on its verb directly before a conjunction
+and a second verb ("The driver holds the generator `outer()` returned
+and calls `throw()` on it", Bruce: "jumbled"): the reader joins the two
+verbs under the clause's subject. The parser makes the same mistake on
+that sentence, so the rule reads positions, and it is quiet for a
+pronoun or relative-pronoun subject, an auxiliary, and a second verb
+whose number disagrees. The repair gives the second verb its own
+sentence, moves the relative clause to the end, or names the thing
+("`g` is `outer()`'s generator. The driver calls `g.throw()`"); C59 in
+`bruce_edit_db.md`. The first run had 19 hits and 10 rewrites; the
+keeps are a real coordination inside the clause ("one value that every
+instance reads and writes"). It has no judged list, so the nine keeps
+print on every survey run, and the `ambiguity` pass reads them.
 The fifth default rule is `[PRT]` (2026-11-04), a phrasal verb split
 around a noun-phrase object ("the driver carries the request out",
 Bruce: "general style: carries out the request"); the particle holds

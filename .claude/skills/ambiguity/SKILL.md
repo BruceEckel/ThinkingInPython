@@ -59,7 +59,8 @@ most of the book's hits read one way.
   and `construct xN` and `ordinal+span` are definite or ordinal pointers at a listing that has several of the thing.
   `survey alternative` (2026-11-08) is a sentence in a walkthrough paragraph that names a construct the listing lacks, with no marker word;
   it sees the opener of an alternative, and the continuation shape below is read by hand.
-- `tip sentence-shapes CH=NN ARGS=--survey`: `[SAME]`, `[SAME+NEW]`, `[PAIR]`, `[TWO]`, and `[AND+REL]`.
+- `tip sentence-shapes CH=NN ARGS=--survey`: `[SAME]`, `[SAME+NEW]`, `[PAIR]`, `[TWO]`, `[AND+REL]`, and `[REL+AND]`.
+  `[REL+AND]` (2026-11-11) is a relative clause that ends on its verb directly before a conjunction and a second verb; it has no judged list, so every hit prints.
   `[SAME+NEW]` (2026-11-09) is a "same" on a noun that no line in the 30 above uses, and it prints the noun (`[SAME+NEW] separation: ...`);
   ask "same as what?" and check that the passage called the thing by that noun.
   The survey prints only the `[SAME]`, `[SAME+NEW]`, and `[TWO]` hits not yet judged and ends on `K survey, J judged` (`[ADD]` is judged the same way; `[PAIR]` and `[AND+REL]` are default rules with the ordinary baseline).
@@ -104,6 +105,13 @@ Fix: move the modifier next to its head, or split the sentence so each head keep
 "old tests and docs", "a handler or a driver and a generator".
 Test: bracket the "and" or "or" each way.
 Fix: repeat the shared word ("old tests and old docs"), move the shared word to the end, or split.
+The verb form of this shape is a relative clause that ends on its verb directly before the conjunction:
+"The driver holds the generator `outer()` returned and calls `throw()` on it" (does `outer()` call, or the driver?).
+The clause's verb and the main clause's second verb sit on either side of "and", so the reader joins them under the clause's subject.
+A code-span subject and a dropped "that" make it worse, since nothing marks where the clause starts.
+Fix: give the second verb its own sentence, move the relative clause to the end of its sentence,
+or replace the clause with the name the listing gives the thing ("`g` is `outer()`'s generator. The driver calls `g.throw()`").
+`tip sentence-shapes CH=NN ARGS=--survey` lists it as `[REL+AND]`; about half its hits are a real coordination inside the clause ("one value that every instance reads and writes"), which stays.
 
 **A negation or a limiter with open scope.**
 "every driver does not answer", "all generators are not closed",
@@ -216,3 +224,7 @@ Shapes Bruce flags that the catalog above did not name, dated, with the sentence
   "makes the same substitution" under a quoted "Liskov Substitution Principle" is now "does the same".
   So is "the same shape", a quiet noun: check that the sentence before or after says what the shape is.
   The fourth was the second test: "The weapon ranking is a cycle. ... The same cycle appears at the group level" named a second, different cycle, and is now "A second cycle appears at the group level".
+- 2026-11-11, chapter 45: a relative clause's verb, a conjunction, and the main clause's second verb.
+  "The driver holds the generator `outer()` returned and calls `throw()` on it" (Bruce: "jumbled").
+  The catalog's coordination entry showed nouns only, `[AND]` needs two subjects, and `[AND+REL]` needs a comma and a second subject, so no pass and no tool saw it.
+  Added to the coordination entry above, as C59, and as the `[REL+AND]` survey rule; the first book-wide run had 19 hits and 10 rewrites.

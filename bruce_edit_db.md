@@ -4145,6 +4145,44 @@ Claude-written (88d89eff), Bruce: "passive":
 
 **Home.** activate (Accrued patterns) | this file.
 
+### C59. A relative clause's verb does not sit beside "and" and the main clause's next verb
+
+**Test.** A relative or complement clause with its own noun or code-span
+subject ends on its verb, and a conjunction and a second verb follow at
+once: "holds the generator `outer()` returned and calls `throw()` on
+it". The reader joins the two verbs under the clause's subject
+("`outer()` returned and calls") and backs up when the object makes that
+impossible. A dropped "that" and a code-span subject make it worse,
+since nothing marks where the clause starts. Give the second verb its
+own sentence, move the relative clause to the end of its sentence
+("declares the keys and describes the `dict` that `json.loads()`
+returns"), or replace the clause with a shorter name for the thing ("the
+class body's fields", "`g`"). `tip sentence-shapes ARGS=--survey` lists
+the shape as `[REL+AND]` (`tools/sentence_shapes.py`, 2026-11-11); the
+book had 19 hits that day.
+
+**Keep when.** Both verbs belong to the clause's subject ("one value
+that every instance reads and writes", "the Effects the function
+performs and leaves out of its declared row", "whether the read succeeds
+or raises an exception"). A pronoun subject that is the main subject
+again ("the keys it specifies and ignores the rest") and a second verb
+whose number disagrees with the clause's subject read once, and the
+survey skips them.
+
+**Sightings.** 1, `45_Effects--Generators` 2026-11-11, was
+Claude-written (88d89eff), Bruce: "jumbled":
+- "The driver holds the generator `outer()` returned and calls `throw()`
+  on it, but `inner()` prints the `caught` line." -> "`g` is `outer()`'s
+  generator. The driver calls `g.throw()`, but `inner()` prints the
+  `caught` line."
+- same day, from the survey: "The body reads the value that `send()`
+  delivered and chooses what to do next" -> "From the value that
+  `send()` delivered, the body chooses what to do next"; nine more in
+  chapters 08, 43, 44 and Solutions 12, 14, 28, 29, 45
+
+**Home.** ambiguity (coordination entry, Accrued shapes) |
+`tools/sentence_shapes.py` `[REL+AND]` | this file.
+
 ## Retired
 
 Rejected by Bruce, or promoted and later withdrawn. Never propose these

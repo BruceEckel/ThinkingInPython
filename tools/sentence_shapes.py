@@ -328,9 +328,31 @@ candidates. A heading with the shape ("Telling the Wrappers Apart")
 takes one verb instead ("Distinguishing the Wrappers"), but headings
 are outside the paragraph reader, so the rule never sees one.
 
+`[REL+AND]` (2026-11-11, from a sentence the author marked "jumbled"
+in chapter 45) is a relative or complement clause that ends on its
+verb directly before a conjunction and a second verb: "The driver
+holds the generator CODE returned and calls CODE on it". The clause's
+verb and the main clause's second verb sit on either side of "and",
+so the reader joins them under the clause's subject ("CODE returned
+and calls") and backs up when the object makes that impossible. The
+parser makes the same mistake on that sentence, so
+`relative_then_verb()` reads positions: a finite verb with dep `relcl`
+or `ccomp` and a noun or CODE subject of its own, a `REL_JOINERS`
+conjunction, any adverbs, and a finite verb. Quiet by design: a clause
+whose subject is a relative pronoun, a personal pronoun, or a
+wh-phrase; an auxiliary, "do", or "have" before the conjunction ("does
+and does not guarantee"); and a second verb whose number disagrees
+with the clause's subject. It is a survey rule with no judged list:
+the first book-wide run had 21 hits, and about half were a real
+coordination inside the clause ("one value that every instance reads
+and writes"), which the positions cannot tell from the misreading.
+The repair gives the second verb its own sentence or clause, moves the
+relative clause to the end of its sentence, or replaces the clause
+with the name the listing gives the thing.
+
 Five rules run by default, `RULES`: `[IMP]`, `[COLON+AND]`, `[PAIR]`,
-`[AND+REL]`, and `[PRT]`, judged against a baseline. Eight are survey rules, `SURVEY_RULES`: `[AND]`,
-plain `[COLON]`, `[ADD]`, `[TWO]`, `[CAN]`, `[SAME]`, `[SAME+NEW]`, and `[CAUS]`. The calibration shows why. `[AND]` fired on 7 before
+`[AND+REL]`, and `[PRT]`, judged against a baseline. Nine are survey rules, `SURVEY_RULES`: `[AND]`,
+plain `[COLON]`, `[ADD]`, `[TWO]`, `[CAN]`, `[SAME]`, `[SAME+NEW]`, `[CAUS]`, and `[REL+AND]`. The calibration shows why. `[AND]` fired on 7 before
 only, 1 both, and 6 after only of the 72 rewritten pairs, so the
 author's own rewrites carry the shape: it is a judgment made per
 sentence in an editing pass, not a fault, and the whole book yields
@@ -506,12 +528,15 @@ SURVEY_RULES: Final = {
     "SAME": "a same with nothing to compare against",
     "SAME+NEW": "a same on a noun the passage above has not used",
     "CAUS": "a causative verb that demotes the actor to its object",
+    "REL+AND": "a relative clause's verb, a conjunction, and a verb",
 }
 """Printed only under `--survey`; never in the default baseline."""
 JUDGED_SURVEY_RULES: Final = frozenset(
     {"ADD", "CAN", "CAUS", "SAME", "SAME+NEW", "TWO"})
 """The survey rules whose read hits are kept in `SURVEY_BASELINE`."""
 ALL_RULES: Final = tuple(RULES) + tuple(SURVEY_RULES)
+REL_JOINERS: Final = frozenset({"and", "or", "but"})
+"""The conjunctions `[REL+AND]` reads after a relative clause's verb."""
 COUNT_WORDS: Final = frozenset(
     "both several twice two three four five six seven eight nine ten "
     "pair couple".split())
@@ -733,6 +758,12 @@ CALIBRATION_EXAMPLES: Final[tuple[tuple[str, str, bool], ...]] = (
     ("PRT", "Gradual typing leaves the amount up to you.", False),
     ("PRT", "The `Result` that `ask()` returns stops one level up.", False),
     ("PRT", "`check()` rejects negatives but lets zero through.", False),
+    ("REL+AND", "The driver holds the generator `outer()` returned and calls `throw()` on it, but `inner()` prints the `caught` line.", True),
+    ("REL+AND", "The driver calls `g.throw()`, but `inner()` prints the `caught` line.", False),
+    ("REL+AND", "A `TypedDict` describes the `dict` that `json.loads()` returns and declares the keys for the type checker.", True),
+    ("REL+AND", "A generator that receives or returns values needs the full annotation.", False),
+    ("REL+AND", "It checks the keys you specify and ignores the rest.", False),
+    ("REL+AND", "A protocol also clarifies what the Liskov Substitution Principle does and does not guarantee.", False),
 )
 """The style rules' own examples: (rule, text, should it fire)."""
 
@@ -1506,6 +1537,56 @@ def split_particle(sentence: Sentence) -> bool:
     return False
 
 
+def relative_then_verb(sentence: Sentence) -> bool:
+    """Does a relative clause end on its verb right before "and" + verb?
+
+    "The driver holds the generator CODE returned and calls CODE on
+    it": the clause's verb and the main clause's second verb sit on
+    either side of the conjunction, so the reader joins them under
+    the clause's subject. Fires on a `REL_JOINERS` conjunction whose
+    previous token is a finite verb with dep `relcl` or `ccomp` and
+    a noun or CODE subject of its own, and whose next token, after
+    any adverbs, is a finite verb. The parser makes the reader's
+    mistake (it calls the contact clause above a `ccomp` and hangs
+    "calls" on "returned"), so the rule reads positions and ignores
+    which verb the second one is attached to. Quiet: a clause whose
+    subject is a relative pronoun ("a generator that receives or
+    returns values", one actor for both verbs), a personal pronoun
+    ("the keys it specifies and ignores the rest", the main subject
+    again), or a wh-phrase ("which failure occurred"); an auxiliary
+    before the conjunction ("does and does not guarantee"); and a
+    second verb whose number disagrees with the clause's subject
+    ("where these failures arise and leaves"), since agreement sends
+    the reader back to the main subject at once.
+    """
+    toks = sentence.tokens
+    for tok in toks[1:-1]:
+        if tok.pos != "CCONJ" or tok.text.lower() not in REL_JOINERS:
+            continue
+        before = toks[tok.i - 1]
+        if before.dep not in ("relcl", "ccomp") or not is_finite(before):
+            continue
+        if before.pos == "AUX" or before.lemma.lower() in ("do", "have"):
+            continue
+        subjects = [c for c in children(before, sentence)
+                    if c.dep in SUBJECT_DEPS and c.i < before.i
+                    and c.pos in ("NOUN", "PROPN")]
+        if not subjects or any(
+                toks[i].tag in WH_TAGS
+                for s in subjects for i in subtree(s, sentence)):
+            continue
+        k = tok.i + 1
+        while k < len(toks) and toks[k].pos == "ADV":
+            k += 1
+        if k == len(toks) or not is_finite(toks[k]):
+            continue
+        plural = subjects[-1].tag in ("NNS", "NNPS")
+        if (toks[k].tag, plural) in (("VBZ", True), ("VBP", False)):
+            continue
+        return True
+    return False
+
+
 def shapes(paragraph: Paragraph, source: Sequence[str] = (),
            ) -> Iterator[tuple[str, Sentence]]:
     """(rule, sentence) for each hit in one paragraph.
@@ -1541,6 +1622,8 @@ def shapes(paragraph: Paragraph, source: Sequence[str] = (),
             yield "SAME+NEW", sentence
         if causative(sentence) is not None:
             yield "CAUS", sentence
+        if relative_then_verb(sentence):
+            yield "REL+AND", sentence
     for sentence in colon_units(paragraph):
         label = colon_clause(sentence)
         if label:

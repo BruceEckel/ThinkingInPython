@@ -335,7 +335,8 @@ the `class` statement raises an `AttributeError`, and `Stars` stays undefined.
 The message is `Cannot overwrite NamedTuple attribute __new__`.
 [A `NamedTuple` Cannot Validate Itself](../../Chapters/12_Techniques--Data_Classes_as_Types.md#namedtuple-cannot-validate)
 shows the same failure in its third test.
-The prohibition covers the body that `NamedTuple` processes and leaves its subclasses free,
+The prohibition covers the class body that `NamedTuple` processes.
+A subclass of that class is free of it,
 so the solution defines `__new__()` in a subclass.
 
 ```python

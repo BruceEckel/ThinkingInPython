@@ -568,6 +568,10 @@ def sentence_shapes(v: Vars) -> None:
     whose subject differs from the previous sentence's, where the
     reader attaches the adverb to the new subject ("the generator
     keeps its place as well" read as the closure keeping its place).
+    [REL+AND] is a relative clause that ends on its verb directly
+    before "and" and a second verb ("holds the generator `outer()`
+    returned and calls `throw()` on it"), where the reader joins the
+    two verbs under the clause's subject.
     Two more survey rules follow: [CAN] a modal "can" that hedges an
     event the sentence reports, and [SAME] a "same" with nothing to
     compare against ("the same `yield`" where the listing has one

@@ -517,7 +517,8 @@ a different design, a detail, or an equivalent alternative.
 <summary>Where to look</summary>
 
 [Decorators With Optional Parentheses](../../Chapters/14_Techniques--Decorators.md#decorators-with-optional-parentheses)
-tests whether the function argument arrived and returns either the wrapper or a decorator.
+tests whether the function argument arrived,
+then returns either the wrapper or a decorator.
 Give `memo` a `func` parameter that defaults to `None` and a keyword-only `maxsize`.
 A `dict` remembers insertion order,
 so the first key is the oldest entry to drop.

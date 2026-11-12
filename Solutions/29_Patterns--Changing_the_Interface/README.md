@@ -396,7 +396,7 @@ If you remove it, you lose that translation.
 The caller's `read()` then raises an `AttributeError`,
 because `next_chunk()` is the wrapped object's one method.
 
-An *Adapter* changes the name the caller uses and leaves the call's behavior as it is.
+An *Adapter* changes the method name and leaves the call's behavior as it is.
 A *Decorator* keeps the name and adds behavior.
 Both wrappers forward.
 The interface tells them apart.

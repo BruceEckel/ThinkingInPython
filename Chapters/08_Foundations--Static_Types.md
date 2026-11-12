@@ -377,7 +377,7 @@ A `Protocol` is a checking-time construct,
 so `isinstance(Circle(), Drawable)` raises a `TypeError` instead of returning `True` or `False`.
 Decorating the Protocol with `@runtime_checkable` allows the call,
 but `isinstance()` then makes a [weaker check](25_Patterns--Surrogate.md#what-the-implementation-supplies).
-It confirms that each method exists and ignores its signature.
+It ignores each method's signature and confirms only that the method exists.
 
 ## Classes as Values: `type[C]` {#classes-as-values-type}
 

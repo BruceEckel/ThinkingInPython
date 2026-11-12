@@ -73,6 +73,10 @@ scope's line range:
   and the default `[PRT]`, a phrasal verb split around a noun phrase,
   "carries the request out" -> "carries out the request", R56;
   `ambiguity` reads `[SAME]`, `[PAIR]`, `[TWO]`, and `[AND+REL]` too,
+  and `[REL+AND]`, a relative clause that ends on its verb directly
+  before "and" and a second verb, "holds the generator `outer()`
+  returned and calls `throw()` on it" -> "`g` is `outer()`'s
+  generator. The driver calls `g.throw()`", C59, every hit printed,
   and `[SAME+NEW]`, a "same" on a noun the 30 lines above never use,
   "`safe()` uses the same separation" -> "`safe()` checks each value
   while it is still separate from the literal text", R63; the survey

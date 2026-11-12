@@ -311,7 +311,7 @@ Standard practice combines the first and third,
 the `Result` and the `NonZero` type.
 `parse_run()` receives input as text, parses the text into a `NonZero`,
 and returns a `Result` instead of raising an exception.
-`slope()` takes the `NonZero` that `parse_run()` built and stays total:
+`slope()` stays total and takes the `NonZero` that `parse_run()` built:
 
 ```python
 # slope_edge.py

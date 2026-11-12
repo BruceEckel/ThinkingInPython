@@ -1304,7 +1304,7 @@ def prefixes(walk: Iterator[str] | None) -> list[Path]:
 `list(Paths(garden))` equals the six path lines that `color_count.py` prints,
 a tree with an empty subtree produces the lines of its other entries,
 `Paths` contains no `yield`,
-and your answer names the two things each stack entry holds and says where `visit()` keeps them.
+and your answer names the two things in each stack entry and says where `visit()` keeps them.
 
 <details>
 <summary>Solution</summary>

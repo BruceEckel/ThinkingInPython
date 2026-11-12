@@ -147,6 +147,12 @@ def rules(source: str) -> list[str]:
     ("It makes the check safe.", []),
     ("The pool needs a lock.", []),
     ("The class is required to define it.", []),
+    ("The driver holds the generator `outer()` returned and calls `throw()` on it, but `inner()` prints the `caught` line.", ["REL+AND"]),
+    ("The driver calls `g.throw()`, but `inner()` prints the `caught` line.", []),
+    ("A `TypedDict` describes the `dict` that `json.loads()` returns and declares the keys for the type checker.", ["REL+AND"]),
+    ("A generator that receives or returns values needs the full annotation.", []),
+    ("It checks the keys you specify and ignores the rest.", []),
+    ("A protocol also clarifies what the Liskov Substitution Principle does and does not guarantee.", []),
 ])
 def test_rules(source: str, expected: list[str]) -> None:
     assert rules(source) == expected
@@ -183,7 +189,8 @@ def test_calibration_examples_name_known_rules() -> None:
     assert {rule for rule, _, _ in CALIBRATION_EXAMPLES} <= set(ALL_RULES)
     assert set(RULES) == {"IMP", "COLON+AND", "PAIR", "AND+REL", "PRT"}
     assert set(SURVEY_RULES) == {
-        "AND", "COLON", "ADD", "TWO", "CAN", "SAME", "SAME+NEW", "CAUS"}
+        "AND", "COLON", "ADD", "TWO", "CAN", "SAME", "SAME+NEW", "CAUS",
+        "REL+AND"}
     assert JUDGED_SURVEY_RULES == {
         "ADD", "CAN", "CAUS", "SAME", "SAME+NEW", "TWO"}
     assert JUDGED_SURVEY_RULES <= set(SURVEY_RULES)

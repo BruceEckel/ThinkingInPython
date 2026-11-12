@@ -1382,7 +1382,7 @@ each holding a state's entry message and a transition function,
 and an engine that calls the current state's function on every input.
 
 Every resumption of a generator is a decision point.
-The body reads the value that `send()` delivered and chooses what to do next:
+From the value that `send()` delivered, the body chooses what to do next:
 yield again, or return and finish.
 `answering_proxy.py` makes that choice with an `if`,
 between yielding a request to the driver and answering it from its table.

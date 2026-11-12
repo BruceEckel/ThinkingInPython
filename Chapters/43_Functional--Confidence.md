@@ -456,7 +456,7 @@ Avoid a law that restates the implementation.
 Asserting `encode(text) == text.encode().hex()` compares `encode()` with a copy of its body,
 so the test and the code share any bug.
 A good law, like the roundtrip law,
-constrains what the function computes and leaves the body to decide how.
+constrains the function's result and leaves the body to decide how to compute it.
 
 Every shape in the family requires purity.
 Hypothesis can rerun and shrink freely because each call depends on its arguments alone.
