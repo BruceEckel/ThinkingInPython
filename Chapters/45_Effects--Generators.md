@@ -1304,8 +1304,8 @@ g.close()
 #: outer cleanup
 ```
 
-The driver holds the generator `outer()` returned and calls `throw()` on it,
-but `inner()` prints the `caught` line.
+`g` is `outer()`'s generator.
+The driver calls `g.throw()`, but `inner()` prints the `caught` line.
 `outer()` is paused at its `yield from` expression,
 and `inner()` is paused at its `yield`.
 `yield from` forwards the exception to that innermost `yield`.
