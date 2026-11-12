@@ -1476,8 +1476,8 @@ and Python discards the four unstarted generators.
 
 [A generator must finish when `GeneratorExit` arrives](#close-requires-the-generator-to-finish),
 and a `yield` in an `except` clause looks like a risk to that rule.
-The clause here catches `Failed` and lets `GeneratorExit` pass,
-so `close()` on a booking ends every step with no further command.
+The `except Failed` clause in `step()` lets `GeneratorExit` pass,
+so `booking.close()` skips `[1]` and finishes each started step.
 
 ## One Generator per State
 
