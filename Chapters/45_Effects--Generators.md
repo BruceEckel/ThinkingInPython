@@ -1210,8 +1210,6 @@ The `finally` clause runs on every ending and turns off the sensor.
 
 A generator may catch `GeneratorExit` as long as it then finishes,
 as `readings()` does by reaching the end of its body.
-[`close()`: The Generator Must Finish](#close-requires-the-generator-to-finish)
-shows the generator that yields instead.
 
 A driver that stops without calling `close()` leaves the generator paused.
 When Python's garbage collector reclaims a paused generator,
@@ -1274,7 +1272,7 @@ by cleaning up and returning.
 
 ### Through `yield from` to the Innermost Generator {#throw-and-close-reach-the-innermost-generator}
 
-A `yield from` forwards `throw()` and `close()` to the generator that is waiting:
+A `yield from` forwards `throw()` and `close()` to the generator paused at the innermost `yield`:
 
 ```python
 # throw_through.py
