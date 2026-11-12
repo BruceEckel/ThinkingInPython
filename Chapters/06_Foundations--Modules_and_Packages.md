@@ -192,7 +192,7 @@ To make a directory a package, you put a special file named `__init__.py` in it.
 `__init__.py` runs once,
 the first time a program imports the package or any module inside it.
 An empty `__init__.py`, the common case,
-only flags the directory as a package.^[The name `__init__.py` often confuses people. In hindsight, it might have been better to name the file `__package__.py`.]
+flags the directory as a package.^[The name `__init__.py` often confuses people. In hindsight, it might have been better to name the file `__package__.py`.]
 An `__init__.py` with content usually re-exports the package's public names.
 If `a_package/__init__.py` re-exports `function1`,
 callers write `from a_package import function1`.

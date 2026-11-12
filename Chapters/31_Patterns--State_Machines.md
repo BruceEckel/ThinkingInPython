@@ -731,7 +731,7 @@ def test_no_transition_raises() -> None:
 ## Which Design Should You Use?
 
 The first design, [Each State Decides](#each-state-decides),
-suits a machine whose states have only a few transitions.
+suits a machine whose states have few transitions.
 Reading `trap_states.py`'s `LURING` and `luring()` tells you what that state does and which states can follow it.
 Adding a state is one row, one function,
 and a `case` in each existing function that leads to it.

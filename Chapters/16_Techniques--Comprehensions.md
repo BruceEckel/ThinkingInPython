@@ -568,7 +568,7 @@ and a `for` loop when you want the side effect alone.
 A comprehension evaluates eagerly,
 so it immediately builds the entire result in memory.
 For a large data set, that wastes time and space,
-especially if you consume the result only once.
+especially if you consume the result once.
 A *generator expression* uses the same syntax with parentheses instead of brackets,
 and produces its values one at a time, on demand:
 

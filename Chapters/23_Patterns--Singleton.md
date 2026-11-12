@@ -127,7 +127,7 @@ and it stands in for a direct call to the class constructor.
 *memoizes* a function.
 The first call with a given set of arguments runs the function and stores the result.
 Every repeat call with those arguments returns the stored result.
-A constructor function with no parameters has only one possible call,
+A constructor function with no parameters has one possible call,
 so caching it constructs the instance once and returns that same object on every later call:
 
 ```python

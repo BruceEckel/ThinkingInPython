@@ -1157,7 +1157,7 @@ letting you capture a context and run something else inside it later.
 
 Everything so far has overlapped waiting on one thread.
 Computing is the other half, and it needs a second mechanism.
-A CPU-bound task cannot overlap if only a single core is available.
+A CPU-bound task cannot overlap if a single core is available.
 With several cores, it can.
 `ProcessPoolExecutor` runs each call in one of its worker processes.
 Each worker has its own interpreter and its own [*Global Interpreter Lock*](#the-gil-and-free-threading)

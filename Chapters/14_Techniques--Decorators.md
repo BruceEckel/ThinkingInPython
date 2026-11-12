@@ -140,7 +140,7 @@ A wrapper that must accept any function's arguments uses the [argument-unpacking
 The wrapper collects the arguments with `*args, **kwargs` and passes them on to the original function.
 Here, the `trace` decorator traces calls, and its `wrapper()` takes that shape.
 The helper `call_text()` formats a call as text, such as `add(2, b=3)`,
-so `wrapper()` holds only the trace lines, the forwarded call, and the return:
+so `wrapper()` holds the trace lines, the forwarded call, and the return:
 
 ```python
 # tracer.py
