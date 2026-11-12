@@ -17,7 +17,10 @@ def step(
         print(f"undo {name}")
         raise
 
-booking = step("flight", step("hotel", step("card")))
+def book() -> Generator[str]:
+    return step("flight", step("hotel", step("card")))
+
+booking = book()
 print(next(booking))
 #: do flight
 print(next(booking))
@@ -28,3 +31,5 @@ expect(Failed, booking.throw, Failed("card declined"))
 #: undo hotel
 #: undo flight
 #: [Failed] card declined
+print(list(book()))
+#: ['do flight', 'do hotel', 'do card']
