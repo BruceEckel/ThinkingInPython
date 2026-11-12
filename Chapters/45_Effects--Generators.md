@@ -1379,8 +1379,10 @@ That `yield` comes before the card step's `try`,
 so the exception propagates out of the card step,
 whose own action is the one that failed.
 The exception then propagates up through the two `yield from` expressions.
-Each `except` prints its compensation and raises `Failed` again,
-hotel before flight.
+Each `except` clause prints its step's undo line.
+The bare `raise` then [re-raises the exception the clause caught](04_Foundations--Control_Flow.md#errors-and-exceptions),
+so `Failed` continues out to the enclosing step.
+The hotel step prints its undo line before the flight step does.
 The nesting of the `try` blocks is the undo stack.
 
 ## One Generator per State
