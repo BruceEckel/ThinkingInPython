@@ -272,9 +272,12 @@ Moved from `CLAUDE.md`, which keeps the rule that you never start an upgrade you
   `reveal_type(field(default_factory=set))` is `Unknown` in both;
   the annotation is what supplies the type). That ended the
   section's point, that subscripting the factory buys a check; the
-  listing became one `Mismatched` class with a `# type: ignore`, and
-  exercise 7 and its solution swap `dict` for `list` in place of the
-  subscripted form. `tip quoted-diagnostics-probe` found 5 of 43
+  listing `factory_checking.py` and the subscripted-factory paragraph
+  were cut (Bruce's choice, eb315a0c), one sentence in the section
+  says the checker compares the factory's type with the annotation
+  and points at exercise 7, and exercise 7 and its solution swap
+  `dict` for `list` in place of the subscripted form, under a
+  `# type: ignore`. `tip quoted-diagnostics-probe` found 5 of 43
   STALE, all rule names or the one new headline; 43 of 43 after the
   requote. The pyright delta was two NEW in `singledispatch_trap.py`
   (pyright rejects `.register` there, which the removed ignores had
