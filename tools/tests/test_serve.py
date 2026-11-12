@@ -184,3 +184,68 @@ def test_a_first_server_that_dies_ends_the_session(
     code = Path("build_site.py")
     assert run_supervisor(monkeypatch, [FakeChild([1])],
                           [{code: 1.0}]) == (1, 1)
+
+
+SAMPLE = """\
+# Title
+
+## First {#first}
+
+The clause catches `Failed`.
+
+## Second
+
+[A generator must finish](#close-requires) when it is told to,
+and the clause catches `Failed` and lets
+`GeneratorExit` pass.
+
+```python
+print(table[0](arg))  # [1]
+```
+"""
+
+
+@pytest.fixture
+def sample(tmp_path: Path) -> Path:
+    md = tmp_path / "sample.md"
+    md.write_text(SAMPLE, encoding="utf-8")
+    return md
+
+
+def test_a_passage_with_a_code_span_is_found(sample: Path) -> None:
+    assert serve.locate(sample, "The clause catches Failed.") == 5
+
+
+def test_a_passage_across_a_line_break_starts_on_its_first_line(
+        sample: Path) -> None:
+    assert serve.locate(sample, "lets GeneratorExit pass") == 10
+
+
+def test_a_repeated_passage_resolves_under_its_heading(
+        sample: Path) -> None:
+    assert serve.locate(sample, "clause catches Failed", "First") == 5
+    assert serve.locate(sample, "clause catches Failed", "Second") == 10
+
+
+def test_link_text_matches_without_its_target(sample: Path) -> None:
+    assert serve.locate(
+        sample, "A generator must finish when it is told") == 9
+
+
+def test_a_call_after_a_subscript_is_no_link_target(
+        sample: Path) -> None:
+    assert serve.locate(sample, "print(table[0](arg))  # [1]") == 14
+
+
+def test_a_passage_the_file_lacks_is_not_located(sample: Path) -> None:
+    assert serve.locate(sample, "no such words") is None
+    assert serve.locate(sample, "   ") is None
+
+
+@pytest.mark.book
+def test_a_page_maps_to_its_markdown() -> None:
+    chapter = next(CHAPTERS_DIR.glob("45_*.md"))
+    assert serve.page_source(f"{chapter.stem}.html") == chapter
+    assert serve.page_source(f"{chapter.stem}.solutions.html") == (
+        SOLUTIONS_DIR / chapter.stem / SOLUTIONS_MD)
+    assert serve.page_source("index.html") is None

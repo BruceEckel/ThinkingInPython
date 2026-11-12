@@ -46,7 +46,19 @@ text is wrapped in guillemets and followed by its source, so a pasted
 passage reads `«...» (31 State Machines › Table-Driven State Machine
 #table-driven-state-machine)`: the chapter number and title, the
 section title, and the section's anchor. Neither « nor » occurs in the
-book, so the marks cannot be mistaken for quoted text. `tip local` passes it. Both scripts are added to the response as it is served, so
+book, so the marks cannot be mistaken for quoted text. The script then
+asks the server (`/__locate`) where the passage sits in the Markdown
+and copies it again with the answer appended:
+`«...» (31 State Machines › ... #anchor, Chapters/31_....md:412)`, the
+source file and the line the passage starts on, so whoever receives
+the paste opens that line and does not search for the words (Bruce,
+2026-11-12, after each pasted passage cost a search). `locate()`
+drops what the page does not show (backticks, asterisks, brackets, a
+link's target) and all whitespace from both sides, so a passage with a
+code span or one that crosses a source line break still matches, and a
+passage the chapter holds twice resolves to the first copy at or after
+its section heading. A passage it cannot find keeps the first form.
+`tip local` passes it. Both scripts are added to the response as it is served, so
 the files in `build/site/`, the ones the published site is built from,
 never contain either.
 
@@ -62,7 +74,9 @@ import argparse
 import contextlib
 import functools
 import http.server
+import json
 import os
+import re
 import subprocess
 import sys
 import threading
@@ -74,10 +88,13 @@ from pathlib import Path
 from tools import build_site
 from tools.config import BUILD_SITE_DIR as SITE
 from tools.config import CHAPTERS_DIR, ROOT, SOLUTIONS_DIR
-from tools.repo import chapter_stem, is_solutions_file, md_files
+from tools.repo import (
+    chapter_stem, is_solutions_file, md_files, solutions_file,
+)
 
 POLL_SECONDS = 1.0
 RELOAD_PATH = "/__reload"
+LOCATE_PATH = "/__locate"
 
 # Changing one of these rebuilds every page, not one: they are inputs to
 # the whole site rather than to a single chapter. The build code is not
@@ -122,6 +139,10 @@ RELOAD_SCRIPT = """
 # on a LAN address, where navigator.clipboard is absent; it copies the
 # bare selection, since it cannot see the wrapped text. The toast makes
 # the copy visible, since every drag-select overwrites the clipboard.
+# The first write happens inside the mouseup handler, where the gesture
+# is certain; the second, with the source line from /__locate, follows
+# the fetch and replaces it. If the fetch or the second write fails,
+# the clipboard keeps the first form.
 COPY_SCRIPT = """
 <script>
 (() => {
@@ -144,13 +165,23 @@ COPY_SCRIPT = """
     const number = file.includes("_") ? file.split("_")[0] : "";
     const parts = [number ? number + " " + title : title];
     let section = null;
+    let heading = "";
     for (const h of document.querySelectorAll("h2, h3")) {
       if (range.comparePoint(h, 0) > 0) break;
-      section = h.textContent.trim();
+      heading = h.textContent.trim();
+      section = heading;
       if (h.id) section += " #" + h.id;
     }
     if (section) parts.push(section);
-    return parts.join(" › ");
+    return {label: parts.join(" › "), file, heading};
+  };
+  const locate = async (text, where) => {
+    const response = await fetch("%s", {
+      method: "POST",
+      body: JSON.stringify(
+        {page: where.file, heading: where.heading, text}),
+    });
+    return response.ok ? (await response.text()).trim() : "";
   };
   document.addEventListener("mouseup", (event) => {
     const tag = event.target.tagName;
@@ -158,18 +189,94 @@ COPY_SCRIPT = """
     const selection = document.getSelection();
     const text = selection.toString();
     if (text.trim() === "" || selection.rangeCount === 0) return;
-    const wrapped = "«" + text + "» ("
-      + source(selection.getRangeAt(0)) + ")";
+    const where = source(selection.getRangeAt(0));
+    const wrap = (line) => "«" + text + "» (" + where.label
+      + (line ? ", " + line : "") + ")";
     const fallback = () => { if (document.execCommand("copy")) show(); };
     if (navigator.clipboard) {
-      navigator.clipboard.writeText(wrapped).then(show, fallback);
+      navigator.clipboard.writeText(wrap("")).then(show, fallback);
+      locate(text, where).then((line) => {
+        if (line) return navigator.clipboard.writeText(wrap(line));
+      }).catch(() => {});
     } else {
       fallback();
     }
   });
 })();
 </script>
-"""
+""" % LOCATE_PATH
+
+# What a rendered page does not show of its Markdown: a link's target,
+# then (dropped from both sides of the comparison) backticks,
+# asterisks, square brackets, and all whitespace. The target must look
+# like one (an anchor, a URL, a file), so `table[0](arg)` in a listing
+# keeps its call. Typographic quotes and the ellipsis are pandoc's.
+LINK_TARGET = re.compile(
+    r"\]\((?:#|https?:|[\w./-]*\.(?:md|svg|png|html))[^)\s]*\)")
+HEADING_ID = re.compile(r"\s*\{#[^}]*\}\s*$")
+DROPPED = re.compile(r"[\s`*\[\]]+")
+TYPOGRAPHIC = str.maketrans(
+    {"‘": "'", "’": "'", "“": '"', "”": '"'})
+
+
+def squeeze(text: str) -> str:
+    """`text` as the comparison sees it: ASCII quotes, three dots for
+    an ellipsis, and no whitespace, backticks, asterisks, or brackets."""
+    text = text.translate(TYPOGRAPHIC).replace("…", "...")
+    return DROPPED.sub("", text)
+
+
+def page_source(page: str) -> Path | None:
+    """The Markdown file a served page was rendered from, if it has one:
+    a chapter for `<stem>.html`, its solutions file for
+    `<stem>.solutions.html`."""
+    name = Path(page).name
+    if name.endswith(".solutions.html"):
+        md = solutions_file(name.removesuffix(".solutions.html"))
+    elif name.endswith(".html"):
+        md = CHAPTERS_DIR / f"{name.removesuffix('.html')}.md"
+    else:
+        return None
+    return md if md.is_file() else None
+
+
+def locate(md: Path, text: str, heading: str = "") -> int | None:
+    """The 1-based line of `md` on which the rendered passage `text`
+    starts, or None when the file does not hold it.
+
+    Both sides are compared squeezed, so a passage that crosses a
+    source line break or holds a code span matches. With `heading`, the
+    section title the passage sits under, the first match at or after
+    that heading's line wins; a passage found only above it (a heading
+    the page renders differently from its source) still resolves.
+    """
+    needle = squeeze(text)
+    if not needle:
+        return None
+    want = squeeze(heading)
+    starts: list[int] = []   # offset in `flat` where each line begins
+    parts: list[str] = []
+    offset = section = 0     # `section`: offset of the heading's line
+    lines = md.read_text(encoding="utf-8").splitlines()
+    for line in lines:
+        if want and line.startswith("#") and squeeze(
+                HEADING_ID.sub("", line.lstrip("#"))) == want:
+            section = offset
+        part = squeeze(LINK_TARGET.sub("]", line))
+        starts.append(offset)
+        parts.append(part)
+        offset += len(part)
+    flat = "".join(parts)
+    found = flat.find(needle, section)
+    if found < 0:
+        found = flat.find(needle)
+    if found < 0:
+        return None
+    # The last line that starts at or before the match and has text.
+    for index in range(len(starts) - 1, -1, -1):
+        if starts[index] <= found and parts[index]:
+            return index + 1
+    return None
 
 
 def watched_sources() -> list[Path]:
@@ -327,6 +434,31 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 self.reply_page(path)
             else:
                 super().do_GET()
+
+    def do_POST(self) -> None:  # noqa: N802
+        """Answer /__locate: `Chapters/NN_....md:LINE` for the passage
+        in the request, or an empty body when it cannot be placed."""
+        if self.path.split("?")[0] != LOCATE_PATH:
+            self.send_error(404)
+            return
+        answer = ""
+        try:
+            size = int(self.headers.get("Content-Length", "0"))
+            request = json.loads(self.rfile.read(size))
+            md = page_source(str(request["page"]))
+            if md is not None:
+                line = locate(md, str(request["text"]),
+                              str(request.get("heading", "")))
+                if line is not None:
+                    answer = f"{md.relative_to(ROOT).as_posix()}:{line}"
+        except (ValueError, KeyError, TypeError, OSError):
+            answer = ""
+        body = answer.encode()
+        self.send_response(200)
+        self.send_header("Content-Type", "text/plain; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
 
     def reply_token(self) -> None:
         watcher = type(self).watcher
