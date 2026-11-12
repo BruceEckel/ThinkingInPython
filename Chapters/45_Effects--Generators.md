@@ -1495,7 +1495,7 @@ and it yields any other request to the driver.
 A `match` on the received input chooses with one `case` per input.
 A generator that returns from a `case` moves to a new state.
 
-A generator therefore offers a third design.
+A generator offers a third design.
 Each state is a generator function:
 
 - The entry action is the code before the first `yield`
