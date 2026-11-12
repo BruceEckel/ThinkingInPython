@@ -1278,45 +1278,45 @@ A `yield from` forwards `throw()` and `close()` to the generator paused at the i
 # throw_through.py
 from collections.abc import Generator
 
-def inner() -> Generator[str]:
+def innermost() -> Generator[str]:
     try:
-        yield "inner ready"
+        yield "innermost ready"
     except ValueError as e:
-        print(f"inner caught: {e}")
-        yield "inner recovered"
+        print(f"innermost caught: {e}")
+        yield "innermost recovered"
     finally:
-        print("inner cleanup")
+        print("innermost cleanup")
 
 def outer() -> Generator[str]:
     try:
-        yield from inner()
+        yield from innermost()
     finally:
         print("outer cleanup")
 
 g = outer()
 print(next(g))
-#: inner ready
+#: innermost ready
 print(g.throw(ValueError("bad input")))
-#: inner caught: bad input
-#: inner recovered
+#: innermost caught: bad input
+#: innermost recovered
 g.close()
-#: inner cleanup
+#: innermost cleanup
 #: outer cleanup
 ```
 
 `g` is `outer()`'s generator.
-The driver calls `g.throw()`, but `inner()` prints the `caught` line.
+The driver calls `g.throw()`, but `innermost()` prints the `caught` line.
 `outer()` is paused at its `yield from` expression,
-and `inner()` is paused at its `yield`.
+and `innermost()` is paused at its `yield`.
 `yield from` forwards the exception to that innermost `yield`.
-`inner()`'s `except` clause handles it and yields `"inner recovered"`.
+`innermost()`'s `except` clause handles it and yields `"innermost recovered"`.
 `yield from` relays that value to the driver, as it relays every yielded value.
-If the exception propagates out of `inner()`, it propagates into `outer()`,
+If the exception propagates out of `innermost()`, it propagates into `outer()`,
 as if `outer()`'s `yield from` expression had raised it.
 `outer()`'s `finally` block then runs as the exception leaves.
 
-`g.close()`, like `throw()`, reaches `inner()` through the `yield from`.
-Python raises `GeneratorExit` in `inner()` first, then in `outer()`,
+`g.close()`, like `throw()`, reaches `innermost()` through the `yield from`.
+Python raises `GeneratorExit` in `innermost()` first, then in `outer()`,
 so the two cleanup lines print from the inside out.
 A driver that holds the outermost generator stops and cleans up every generator beneath it with one call.
 

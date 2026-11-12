@@ -1,27 +1,27 @@
 # throw_through.py
 from collections.abc import Generator
 
-def inner() -> Generator[str]:
+def innermost() -> Generator[str]:
     try:
-        yield "inner ready"
+        yield "innermost ready"
     except ValueError as e:
-        print(f"inner caught: {e}")
-        yield "inner recovered"
+        print(f"innermost caught: {e}")
+        yield "innermost recovered"
     finally:
-        print("inner cleanup")
+        print("innermost cleanup")
 
 def outer() -> Generator[str]:
     try:
-        yield from inner()
+        yield from innermost()
     finally:
         print("outer cleanup")
 
 g = outer()
 print(next(g))
-#: inner ready
+#: innermost ready
 print(g.throw(ValueError("bad input")))
-#: inner caught: bad input
-#: inner recovered
+#: innermost caught: bad input
+#: innermost recovered
 g.close()
-#: inner cleanup
+#: innermost cleanup
 #: outer cleanup
