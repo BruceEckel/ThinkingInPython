@@ -1203,7 +1203,14 @@ topic-string test passes such a paragraph), so read for what is being
 explained, not for who the subject is. Usual seams: a design reason
 beside a mechanism, a construct's explanation beside a walkthrough of
 the listing's run, what the code does beside when to use it, one
-listing's discussion beside the next listing's. A pronoun or "This"
+listing's discussion beside the next listing's, one run of a listing
+beside its next run (a second object, a second driver sequence, the
+success case after the failure case). A second seam test needs no
+summary: find the paragraph's concluding sentence, the one that says
+what the walk showed ("The nesting of the `try` blocks is the undo
+stack."). A sentence after it belongs to the next paragraph, since
+the reader takes the conclusion as the end and reads what follows as
+more of the same walk. A pronoun or "This"
 that opens the new paragraph gets its noun. The break is often not
 the whole fix (Bruce, 2026-10-30: "sometimes this requires rewriting
 both paragraphs"): a half that leaned on the other, through an
@@ -1218,8 +1225,10 @@ not only in a paragraph sweep.
 **Keep when.** The halves need each other: a claim and its reason, the
 two halves of a contrast, the steps of one walkthrough, a rule and the
 one-sentence exception that qualifies it. A paragraph of three sentences
-or fewer rarely splits. Never split inside a list item, a block quote,
-a footnote, or an exercise statement.
+or fewer rarely splits. Neither keep covers a sentence that follows
+the paragraph's conclusion or walks another run: it gets its own
+paragraph even when it is one sentence long. Never split inside a
+list item, a block quote, a footnote, or an exercise statement.
 
 **Sightings.** 1 chapter (additive: adds a break, cuts nothing).
 Promoted by Bruce on that evidence, 2026-10-05: "a paragraph will hold
@@ -1293,6 +1302,19 @@ multiple primary concepts, and this makes it confusing."
   one Opus agent per chapter with its Solutions file, reading every
   paragraph with the rewrite clause in force (see the sweep log in
   project memory `paragraph-sweep-2026-10-30`).
+- `45_Effects--Generators` 2026-11-12, Claude-written, Bruce added the
+  break by hand: under `saga.py` the walkthrough of the failed booking
+  ended "Each `except` prints its compensation and raises `Failed`
+  again, hotel before flight. The nesting of the `try` blocks is the
+  undo stack." and ran on with "The second booking receives no
+  `throw()`, so `list()` runs it to its end and no `except` clause
+  runs." The last sentence was written when `print(list(book()))`
+  joined the listing, and it was appended to the paragraph that was
+  there. It walks another generator, and it sat after the paragraph's
+  conclusion. The keeps had argued for leaving it: a one-sentence
+  half, "the steps of one walkthrough". Both were narrowed that day.
+  When a listing gains a statement, the sentence about it is placed by
+  this rule, not by where the old paragraph happens to end.
 
 **Sweep notes.** A seam whose next sentence carries "though", "also",
 "the same way", or a mid-sentence "it"/"one" still leans on the

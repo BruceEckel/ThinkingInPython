@@ -1377,6 +1377,7 @@ The exception then propagates up through the two `yield from` expressions.
 Each `except` prints its compensation and raises `Failed` again,
 hotel before flight.
 The nesting of the `try` blocks is the undo stack.
+
 The second booking receives no `throw()`,
 so `list()` runs it to its end and no `except` clause runs.
 

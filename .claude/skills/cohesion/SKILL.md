@@ -204,9 +204,16 @@ and it becomes part of every future pass.
   The usual seams: a design reason beside a mechanism,
   a construct's explanation beside a walkthrough of the listing's run,
   what the code does beside when to use it,
-  one listing's discussion beside the next listing's.
+  one listing's discussion beside the next listing's,
+  one run of a listing beside its next run.
   Keep together a claim and its reason, the two halves of a contrast,
   and the steps of one walkthrough.
+  A second test finds a seam the summary test can miss (Bruce, 2026-11-12, chapter 45's `saga.py`):
+  find the paragraph's concluding sentence, the one that says what the walk showed
+  ("The nesting of the `try` blocks is the undo stack.").
+  A sentence after it starts a new paragraph, even a single sentence
+  ("The second booking receives no `throw()`, ...", which walks another generator).
+  The usual cause is a sentence written for a statement the listing gained and appended to the paragraph already there.
   A pronoun or "This" that opens the new paragraph gets its noun,
   since its antecedent now sits in the paragraph before.
   The break is often not the whole fix

@@ -26,7 +26,15 @@ each pass hands the next one less to do.
 3. `straighten`: a buried actor, a subject held open, an overloaded
    sentence, a colon or "and" carrying a second claim.
 4. `cohesion`: old before new, one topic string per paragraph, R29's
-   one primary concept per paragraph.
+   one primary concept per paragraph. Two seams to read for in every
+   walkthrough: a sentence after the paragraph's concluding sentence
+   ("The nesting of the `try` blocks is the undo stack." followed by
+   "The second booking receives no `throw()`, ..."), and a sentence
+   that walks another run of the listing (a second object, the
+   success case after the failure case). Each starts a paragraph,
+   even at one sentence. A sentence written for a statement the
+   listing gained is placed by this test, never appended to the
+   paragraph already there.
 5. `antecedents`: every pointer with two candidates gets its noun.
 6. `ambiguity`: every sentence that counts, compares, coordinates,
    modifies, or limits keeps one reading: a count with two units, a
