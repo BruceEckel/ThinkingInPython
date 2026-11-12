@@ -408,7 +408,7 @@ The driver interprets them.
 ### A Request Built from an Answer
 
 `interview()` asks the same three questions no matter what answers it receives.
-A generator can build its next request from the answer it received:
+A generator can build its next request from the answer it receives:
 
 ```python
 # follow_up.py
@@ -942,7 +942,7 @@ print(drive(
 `proxy()` is a [*Proxy*](25_Patterns--Surrogate.md#proxy):
 the same interface as the object it wraps, with a forwarding loop of its own.
 It is also the shape of [layering handlers](46_Effects--Stateless.md#layering-handlers)
-in Stateless, where a handler answers the requests `supply()` gave it and re-yields the rest to the handler outside it.
+in Stateless, where a handler answers the requests `supply()` gives it and re-yields the rest to the handler outside it.
 
 The priming call to `next()` sits in a `try` because `proxy()` is a generator,
 and a `StopIteration` that propagates out of a generator's body becomes a `RuntimeError`.
@@ -1072,7 +1072,7 @@ so the clause for `GeneratorExit` wraps the whole statement.
 The exception leaves the inner `try` through its `finally` block,
 which prints `cleanup`.
 The outer `except GeneratorExit` clause then catches it and returns `"closed"`.
-`close()` hands the driver the value the generator returned while handling `GeneratorExit`,
+`close()` hands the driver the value the generator returns while handling `GeneratorExit`,
 so the driver prints `closed`,
 and the call returns the way an ordinary method call does.
 
@@ -1096,8 +1096,8 @@ All three generators end in `GEN_CLOSED`.
 
 A generator yields a request and waits while the driver carries out the request.
 When the attempt succeeds, the driver calls `send()` with the answer.
-When the attempt fails, say the file the generator asked for is missing,
-the driver calls `throw()` with the exception the attempt raised,
+When the attempt fails, say the file the generator asks for is missing,
+the driver calls `throw()` with the exception the attempt raises,
 so the generator learns which failure occurred and chooses what to do about it.
 The generator either handles the exception and yields again,
 or lets it propagate.
