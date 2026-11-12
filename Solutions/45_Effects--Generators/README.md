@@ -1444,7 +1444,9 @@ a different design, a detail, or an equivalent alternative.
 > Replace `name` with two functions: `action`,
 > which the step calls and whose result it yields, and `undo`,
 > which the `except` clause calls.
-> Build one booking whose three actions succeed and one whose card action raises `Failed`.
+> Build one booking of a flight, a hotel,
+> and a card whose three actions succeed,
+> and one whose card action raises `Failed`.
 > The driver of the second booking calls only `next()`.
 > Say where `Failed` starts,
 > and why the hotel and the flight are still undone.

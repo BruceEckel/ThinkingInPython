@@ -1355,33 +1355,38 @@ def step(
         raise
 
 def book() -> Generator[str]:
-    return step("flight", step("hotel", step("card")))
+    return step(
+        "flight", step("hotel", step("taxi", step("card")))
+    )
 
 print(list(book()))
-#: ['do flight', 'do hotel', 'do card']
+#: ['do flight', 'do hotel', 'do taxi', 'do card']
 booking = book()
 print(next(booking))
 #: do flight
 print(next(booking))
 #: do hotel
 print(next(booking))
-#: do card
-expect(Failed, booking.throw, Failed("card declined"))
+#: do taxi
+expect(Failed, booking.throw, Failed("no taxi"))
 #: undo hotel
 #: undo flight
-#: [Failed] card declined
+#: [Failed] no taxi
 ```
 
 Each step yields its command, then delegates inside a `try`.
 `list(book())` drives the steps with `next()`.
 Each `yield from` finishes normally, and every step runs to its end.
 
-To report the card's failure, the driver calls `booking.throw()`.
-Python raises `Failed` at the innermost `yield`, in the card step.
-That `yield` is outside the card step's `try`,
-so the exception leaves the card step directly.
-The declined card is the action that failed,
-so the saga undoes the two steps before it.
+Three `next()` calls leave `booking` paused in the taxi step,
+at the `yield` that produced `do taxi`.
+To report the taxi's failure, the driver calls `booking.throw()`,
+and Python raises `Failed` at that `yield`.
+The taxi step has not yet delegated to the card step,
+whose generator never starts.
+The `yield` is outside the taxi step's `try`,
+so the exception leaves the taxi step directly.
+The taxi is the action that failed, so the saga undoes the two steps before it.
 The exception propagates up through the two `yield from` expressions.
 Each `except` clause prints its step's undo line.
 The bare `raise` then [re-raises the exception the clause caught](04_Foundations--Control_Flow.md#errors-and-exceptions),
@@ -2376,7 +2381,9 @@ Try each exercise before opening its [solution](../Solutions/45_Effects--Generat
     Replace `name` with two functions: `action`,
     which the step calls and whose result it yields, and `undo`,
     which the `except` clause calls.
-    Build one booking whose three actions succeed and one whose card action raises `Failed`.
+    Build one booking of a flight, a hotel,
+    and a card whose three actions succeed,
+    and one whose card action raises `Failed`.
     The driver of the second booking calls only `next()`.
     Say where `Failed` starts,
     and why the hotel and the flight are still undone.

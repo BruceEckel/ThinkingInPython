@@ -18,18 +18,20 @@ def step(
         raise
 
 def book() -> Generator[str]:
-    return step("flight", step("hotel", step("card")))
+    return step(
+        "flight", step("hotel", step("taxi", step("card")))
+    )
 
 print(list(book()))
-#: ['do flight', 'do hotel', 'do card']
+#: ['do flight', 'do hotel', 'do taxi', 'do card']
 booking = book()
 print(next(booking))
 #: do flight
 print(next(booking))
 #: do hotel
 print(next(booking))
-#: do card
-expect(Failed, booking.throw, Failed("card declined"))
+#: do taxi
+expect(Failed, booking.throw, Failed("no taxi"))
 #: undo hotel
 #: undo flight
-#: [Failed] card declined
+#: [Failed] no taxi
