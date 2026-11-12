@@ -327,12 +327,14 @@ Since 2026-11-12 a negative pronoun as the subject of a verb is Tier 2
 (`NOBODY_SUBJECT`, C61 in `bruce_edit_db.md`): "Nothing calls `throw()`
 on the first booking" (Bruce: "what is this 'Nothing' that is calling
 throw()? I feel like this issue keeps arising, the confusing
-negativity"). The repair says who acts and what they do ("`list()`
-drives the first booking with `next()` alone"). Both forms of that
+negativity"). The repair says who acts and what they do ("`list(book())`
+drives the steps with `next()`", and no "alone" on the end,
+which puts the negation back, C62). Both forms of that
 sentence were Claude's, written while changing a listing and outside
 any prose pass, so a sentence added with a listing change gets the
-positive test before the commit. Its 25 other sites stay NEW for the
-chapter passes; three are a heading's title in link text.
+positive test before the commit. The read of its 25 other sites that day rewrote 17 and
+kept 8, which are in the baseline: four link texts and four absences
+that are the claim.
 The 2026-10-28 sweep also added a Tier 1 survey rule for the shape turned
 around, a negated subject (`NO_SUBJECT`: "no annotation expresses
 it", "No tool checks the step"), printed only under `--all` or

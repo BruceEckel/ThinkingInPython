@@ -877,7 +877,7 @@ Assigning `need(Console)` binds a generator to `console`,
 and the next line calls `print()` on it as if it were a `Console`.
 The type checker evaluates that call and rejects it.
 A type checker verifies how a program uses its values,
-so a value nobody uses is a value nobody checks.
+so an unused value goes unchecked.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -997,8 +997,7 @@ The exceptions are a `success()` Effect, which replays its value,
 and a `memoize()` Effect, which hands a second `run()` its cached result.
 Resuming a finished generator raises `StopIteration` immediately,
 which `run()` reads as "already returned, with no value."
-So a spent Effect looks the same as one that succeeded and returned `None`,
-and nothing reports the difference.
+So a spent Effect looks the same as one that succeeded and returned `None`.
 
 **Build a fresh Effect per run.**
 The stored value changes from a generator, which `run()` consumes once,

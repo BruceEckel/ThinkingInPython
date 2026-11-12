@@ -1421,7 +1421,7 @@ and its message names the input's class: `Nickel`.
 and `type(Nickel("nickel", 5))` is `Nickel`.
 A dictionary probe compares keys by equality,
 so the `Nickel` key misses the `Money` rule although `Nickel` subclasses `Money`.
-Nothing walks the [MRO](../../Chapters/07_Foundations--Classes.md#method-resolution-order).
+The lookup skips the [MRO](../../Chapters/07_Foundations--Classes.md#method-resolution-order).
 That lookup is the exact-type dispatch the chapter describes,
 and most readers first meet it through a subclass of an input type.
 

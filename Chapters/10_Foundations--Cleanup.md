@@ -368,8 +368,8 @@ Its `alive` attribute reports whether it can still run.
 
 `b` holds the only strong reference to its `Connection`,
 so `del b` destroys the object here, where the `del c` in `cleanup.py` does not.
-Nobody calls `close()`, but the callback still runs, at `del b`,
-before interpreter shutdown rather than during it.
+The callback runs at `del b`, without a call to `close()`,
+and before interpreter shutdown rather than during it.
 
 An object still alive when the program ends gets its callback too.
 `finalize()` runs that callback from the `atexit` module's exit handlers,

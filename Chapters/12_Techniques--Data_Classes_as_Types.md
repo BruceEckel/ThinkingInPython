@@ -101,8 +101,7 @@ The `int` annotation says "any integer,"
 a far larger set than the ratings you mean.
 `f3()` shows a forgotten check.
 `11` lies outside the legal range.
-Nothing objects: not the annotation, not the type checker,
-not the running program.
+The annotation, the type checker, and the running program all accept it.
 `f3(11)` returns 1100, beyond anything a legal rating produces,
 and the caller receives it as if it were fine.
 

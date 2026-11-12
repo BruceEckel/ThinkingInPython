@@ -84,7 +84,7 @@ you have the focal point around which to structure your design.
 
 You discover a vector of change.
 You do not predict it.
-Guessing at it up front often adds complexity to allow flexibility in a direction nobody uses.
+Guessing at it up front often adds complexity to allow flexibility in a direction that goes unused.
 The second time a requirement changes the same part of the design,
 you have evidence.
 
@@ -194,7 +194,7 @@ and `apply()` replaces the context class,
 holding the chosen algorithm in `strategy` for one call.
 
 This listing shows only the shape.
-Nobody designs a `Strategy` class hierarchy around calling `max()` or `sum()`.
+`max()` and `sum()` are too small to justify a `Strategy` class hierarchy.
 [Function Objects](27_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime)
 works through three root-finding algorithms that a caller chooses between at runtime.
 

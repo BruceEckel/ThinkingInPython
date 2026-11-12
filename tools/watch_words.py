@@ -138,8 +138,8 @@ A negative pronoun as the subject is Tier 2 (since 2026-11-12):
 `nothing`, `nobody`, or `no one`, then a verb ("Nothing calls
 `throw()` on the first booking", Bruce: "what is this 'Nothing' that
 is calling throw()?"). The sentence hands the action to an actor that
-does not exist. The repair says who acts and what they do ("`list()`
-drives the first booking with `next()` alone"). The pronoun after a
+does not exist. The repair says who acts and what they do ("`list(book())`
+drives the steps with `next()`"). The pronoun after a
 verb or a preposition ("prints nothing", "of nothing") is an object
 and is skipped.
 

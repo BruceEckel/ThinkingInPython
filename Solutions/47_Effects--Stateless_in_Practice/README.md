@@ -2317,7 +2317,7 @@ Both satisfy their `Protocol`s, so the type checker accepts the call.
 An *Abstract Factory* in a language with a family type expresses "these come from one world" in the type.
 Here the matching is in `kitties_and_puzzles()`'s body,
 a fact about how someone wrote that function.
-Nothing checks it.
+It lies outside what the type checker verifies.
 
 So the shared signature prevents some mismatches and permits others.
 A caller that takes a `Cast` can no longer assemble a mismatched set by accident,

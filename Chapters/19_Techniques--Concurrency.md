@@ -2447,10 +2447,10 @@ How many threads can one machine support before `Thread.start()` raises `Runtime
 That number depends on the machine, not on Python.
 On one well-provisioned machine,
 60,000 threads started in about four seconds with room to spare,
-each blocked on a `threading.Event` that nothing sets.
+each blocked on a `threading.Event` that stays unset.
 A laptop with far less memory can fail at a fraction of that.
 To find your machine's number,
-start threads that block on a `threading.Event` that nothing sets and increase the count until `start()` raises an exception.
+start threads that block on a `threading.Event` that stays unset and increase the count until `start()` raises an exception.
 A task's limit is heap memory alone,
 because a task uses neither of the per-thread OS resources that limit threads:
 a stack reservation and a scheduler entry.

@@ -24,10 +24,16 @@ each pass hands the next one less to do.
 1. `literal`: a figure or a vague description becomes the mechanism.
 2. `positive`: a negation that is an accident of phrasing turns around.
    A subject of "Nothing", "Nobody", or "No one" with a verb ("Nothing
-   calls `throw()` on the first booking" -> "`list()` drives the first
-   booking with `next()` alone") is Tier 2 in `tip watch-words`, C61:
+   calls `throw()` on the first booking" -> "`list(book())` drives the
+   steps with `next()`") is Tier 2 in `tip watch-words`, C61:
    say who acts and what they do, and do not trade it for the object
-   form ("receives no `throw()`").
+   form ("receives no `throw()`"). A limiter added to the positive
+   sentence ("with `next()` alone", "only", "just", "nothing but")
+   puts the negation back: it tells the reader an alternative is
+   excluded and leaves them to find it. Cut the limiter when the
+   passage has not yet named the alternative, or names it in the
+   next sentence (C62). `tip negatives CH=NN` shows each paragraph's
+   `only` count, and `tip overclaims CH=NN` lists "X alone".
 3. `straighten`: a buried actor, a subject held open, an overloaded
    sentence, a colon or "and" carrying a second claim.
 4. `cohesion`: old before new, one topic string per paragraph, R29's

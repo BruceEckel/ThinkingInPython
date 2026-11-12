@@ -495,11 +495,10 @@ A reader must work backward from a `<generator object ...>` in a report to the m
 
 The runtime failure is quiet: no exception, an exit code of zero,
 and output that a log scraper accepts.
-When Python reclaims a coroutine that nothing awaits,
-it issues a `RuntimeWarning`,
+When Python reclaims an unawaited coroutine, it issues a `RuntimeWarning`,
 as [Concurrency](../../Chapters/19_Techniques--Concurrency.md#asyncio-mechanics)
 shows.
-Python reclaims a generator that nothing drives, silently.
+Python reclaims an unused generator silently.
 
 Once you remove the annotation, the type checker accepts `survey()`.
 For `profile = interview()` it infers the expression's own type,

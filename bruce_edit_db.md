@@ -4266,9 +4266,9 @@ the thing that is calling and then cancels the call. It is the
 cancelled-object shape ("receives no `throw()`") with the cancellation
 moved to the subject, and a rewrite of one into the other fixes
 nothing. Ask what does run, and write that with its real actor:
-"`list()` drives the first booking with `next()` alone." A second
+"`list(book())` drives the steps with `next()`." A second
 negative in the same sentence ("and no `except` clause runs") gets the
-same question: "Each `yield from` finishes normally, and the booking
+same question: "Each `yield from` finishes normally, and every step
 runs to its end." `tip watch-words` lists the shape as Tier 2 since
 2026-11-12 (`NOBODY_SUBJECT` in `tools/watch_words.py`); the book had
 26 sites that day.
@@ -4281,9 +4281,19 @@ the words are a heading's title in link text ("Nothing Runs Yet").
 the same day, Bruce: "what is this 'Nothing' that is calling throw()? I
 feel like this issue keeps arising, the confusing negativity":
 - "Nothing calls `throw()` on the first booking, so `list()` runs it to
-  its end and no `except` clause runs." -> "`list()` drives the first
-  booking with `next()` alone. Each `yield from` finishes normally, and
-  the booking runs to its end."
+  its end and no `except` clause runs." -> "`list(book())` drives the
+  steps with `next()` alone. Each `yield from` finishes normally, and
+  every step runs to its end." Bruce cut "alone" the same day (C62).
+- Book read 2026-11-12, the 25 other sites `NOBODY_SUBJECT` listed: 17
+  rewritten ("Nothing objects: not the annotation, not the type
+  checker, not the running program." -> "The annotation, the type
+  checker, and the running program all accept it."; "a coroutine that
+  nothing awaits" -> "an unawaited coroutine"; "Nobody audits their
+  imports" -> "Programmers stopped auditing their imports"), 8 kept:
+  four link texts, and four where the absence is the claim ("If
+  nothing touches the lazily imported name", "a module nobody
+  imports", "a type nobody else provides", "Nothing absorbs the
+  change" as the answer to an exercise that asks which part did).
 - The sentence's earlier form, also Claude's, was the object shape:
   "The second booking receives no `throw()`, so ... no `except` clause
   runs." Both were written while adding to a listing, outside any prose
@@ -4292,6 +4302,30 @@ feel like this issue keeps arising, the confusing negativity":
 
 **Home.** positive (Accrued patterns) | super-prose (pass 2) |
 `tools/watch_words.py` `NOBODY_SUBJECT` | this file.
+
+### C62. A limiter on a positive sentence puts the negation back
+
+**Test.** A positive statement ends on "alone", or carries "only",
+"just", or "nothing but": "`list(book())` drives the steps with
+`next()` alone." The limiter says an alternative is excluded, so the
+reader looks for it, as with the negative the sentence replaced. Ask
+whether the passage has named the alternative yet. If it has not, or
+the next sentence names it ("To report the card's failure in the second
+booking, the driver calls `throw()`"), cut the limiter: the plain
+statement is true, and the contrast arrives where the passage makes it.
+
+**Keep when.** The exclusion is the claim and the alternative is on the
+page ("the first `send()` accepts only `None`", "A task's limit is heap
+memory alone, because a task uses neither of the per-thread OS
+resources").
+
+**Sightings.** 1, `45_Effects--Generators` 2026-11-12, Claude-written
+as the C61 repair, Bruce: "We can leave off the 'alone'":
+- "`list(book())` drives the steps with `next()` alone." -> "`list(book())`
+  drives the steps with `next()`."
+
+**Home.** positive (Accrued patterns) | super-prose (pass 2) | this
+file.
 
 ## Retired
 

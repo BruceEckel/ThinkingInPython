@@ -288,8 +288,8 @@ print(nectar.dispatch(Ranunculus)
 
 `nectar.registry` maps each registered type to its implementation.
 `nectar.dispatch(cls)` reports the implementation to which `cls` resolves.
-Nothing registers `Ranunculus`,
-so `Ranunculus` resolves to the same implementation `Flower` does,
+`Ranunculus` is unregistered,
+so it resolves to the same implementation `Flower` does,
 the one stored under `object`.
 
 A new `Flower` subclass gets the default answer until someone registers it.

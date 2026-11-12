@@ -203,7 +203,12 @@ before/after pair, and it becomes part of every future pass.
   (Bruce, 2026-11-12: "what is this 'Nothing' that is calling throw()?").
   The reader looks for the actor and finds none.
   Ask what does run and write that with its real actor:
-  "`list()` drives the first booking with `next()` alone. Each `yield from` finishes normally, and the booking runs to its end."
+  "`list(book())` drives the steps with `next()`. Each `yield from` finishes normally, and every step runs to its end."
   Turning it into the object form ("receives no `throw()`") is the same fault.
   `tip watch-words CH=NN` lists `nothing`, `nobody`, and `no one` before a verb as Tier 2; C61 in `bruce_edit_db.md`.
   The shape is most often written outside a prose pass, in a sentence added with a listing change, so apply the test there too.
+- **A limiter that puts the negation back.**
+  "`list(book())` drives the steps with `next()` alone" (Bruce, 2026-11-12: "We can leave off the 'alone'").
+  "Alone", "only", "just", and "nothing but" tell the reader an alternative is excluded and leave them to find it.
+  Cut the limiter when the passage has not yet named the alternative, or names it in the next sentence.
+  Keep it when the exclusion is the claim and the alternative is on the page. C62 in `bruce_edit_db.md`.

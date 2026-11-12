@@ -1092,7 +1092,7 @@ Each time, the pattern is the same.
 Something the programmer tracks by hand works in small programs.
 Systems grow until hand-tracking fails.
 The solution moves that tracking into the language or the toolchain,
-and a generation later, nobody can imagine doing it by hand.
+and a generation later, programmers take it for granted.
 
 Namespaces are an example.
 Early languages put every name in one global namespace.
@@ -1105,7 +1105,7 @@ The practice is so settled that the Zen of Python celebrates it:
 <!-- vale House.EmDash = NO -->
 "Namespaces are one honking great idea -- let's do more of those!"
 <!-- vale House.EmDash = YES -->
-Nobody audits their imports for name collisions anymore.
+Programmers stopped auditing their imports for name collisions.
 The language does the bookkeeping.
 
 The same pattern repeats across the field.

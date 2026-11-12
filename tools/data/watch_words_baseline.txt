@@ -535,7 +535,6 @@ Chapters/43_Functional--Confidence.md	only: Narrow CODE to compare only the coun
 Chapters/43_Functional--Confidence.md	want: *Declarative* code states the result you want
 Chapters/44_Effects--Effect_Management.md	by hand: Something the programmer tracks by hand works in small programs
 Chapters/44_Effects--Effect_Management.md	by hand: and which technique from Effects by Hand applies to the rest
-Chapters/44_Effects--Effect_Management.md	by hand: nobody can imagine doing it by hand
 Chapters/44_Effects--Effect_Management.md	carry no: almost all of which carry no Effect annotations
 Chapters/44_Effects--Effect_Management.md	could: Could Python itself gain Effect tracking
 Chapters/44_Effects--Effect_Management.md	does it: Does it behave differently in a different environment
@@ -941,3 +940,11 @@ Chapters/41_Functional--Toolkits.md	draw code: Four tools draw CODE elements fro
 Solutions/26_Patterns--Factory/README.md	draws from code: CODE draws from CODE
 Solutions/32_Patterns--Multiple_Dispatching/README.md	draws with code: a wet CODE draws with CODE whether CODE or CODE calls CODE
 Solutions/36_Patterns--Memento/README.md	draws after code: Then write a test that draws after CODE and compares the memento's contents as a list
+Chapters/06_Foundations--Modules_and_Packages.md	nothing touches: If nothing touches the lazily imported name
+Chapters/17_Techniques--Metaprogramming.md	nobody imports: a class in a module nobody imports stays out of the registry
+Chapters/46_Effects--Stateless.md	nothing runs: Nothing Runs Yet explains why that request must be a value of its own
+Chapters/46_Effects--Stateless.md	nobody else provides: A dependency injection container often lets you register a fallback for a type nobody else provides
+Chapters/46_Effects--Stateless.md	nothing stops: Nothing stops an undeclared Effect examines that limit
+Solutions/21_Patterns--Design_Patterns/README.md	nothing absorbs: Nothing absorbs the change
+Solutions/46_Effects--Stateless/README.md	nothing runs: Nothing Runs Yet shows that calling a generator function builds an Effect without running its body
+Solutions/47_Effects--Stateless_in_Practice/README.md	nothing stops: Nothing stops an undeclared Effect explains why a signature cannot describe what a body does before it returns

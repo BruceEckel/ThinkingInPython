@@ -395,7 +395,7 @@ so `s.upper().casefold() == s.casefold()` holds for both characters.
 Like `upper()` and `lower()`, `casefold()` has no inverse.
 
 A hand-written loop over `"abcde"` never tests `µ`.
-The generated strings include characters nobody thinks to type.
+The generated strings include the characters a hand-written loop leaves out.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
