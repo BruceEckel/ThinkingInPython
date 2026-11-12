@@ -1323,15 +1323,15 @@ and each one runs its cleanup.
 ### Sagas with Generators {#sagas-with-generators}
 
 A [*Saga*](39_Patterns--Pattern_Catalog.md#distributed-and-cloud)
-relies on an exception that propagates from the inside out.
-A saga runs a long transaction as a series of steps.
+runs a long transaction as a series of steps.
 When a later step fails, each earlier step undoes what it did,
 most recent first.
 Each step is an undoable [*Command*](27_Patterns--Function_Objects.md#a-callable-object-as-a-command):
 an action paired with the operation that reverses it.
 We can create a saga using one generator per step,
 each delegating to the steps after it.
-A step's undo is an `except` clause around its `yield from`:
+A failure is an exception that propagates from the innermost generator outward,
+and a step's undo is an `except` clause around its `yield from`:
 
 ```python
 # saga.py
