@@ -1489,9 +1489,10 @@ The engine calls the current state's function on every input.
 Every resumption of a generator is a decision point.
 From the value that `send()` delivers, the body chooses what to do next:
 yield again, or return and finish.
-`answering_proxy.py` makes that choice with an `if`,
-between yielding a request to the driver and answering it from its table.
-A `match` on the received input makes the same choice with one `case` per input.
+`proxy()` in `answering_proxy.py` chooses with an `if`:
+it answers a request found in `known`,
+and it yields any other request to the driver.
+A `match` on the received input chooses with one `case` per input.
 A generator that returns from a `case` moves to a new state.
 
 A generator therefore offers a third design.
