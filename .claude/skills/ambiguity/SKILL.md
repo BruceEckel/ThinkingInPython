@@ -112,6 +112,12 @@ A code-span subject and a dropped "that" make it worse, since nothing marks wher
 Fix: give the second verb its own sentence, move the relative clause to the end of its sentence,
 or replace the clause with the name the listing gives the thing ("`g` is `outer()`'s generator. The driver calls `g.throw()`").
 `tip sentence-shapes CH=NN ARGS=--survey` lists it as `[REL+AND]`; about half its hits are a real coordination inside the clause ("one value that every instance reads and writes"), which stays.
+A second verb form is a shared object that arrives after the second verb, when the first verb also reads with no object:
+"A driver that holds the outermost generator stops and cleans up every generator beneath it" (the driver stops?).
+Test: cover the sentence from the conjunction on. If what is left is a complete sentence, the reader has taken it as the claim.
+Fix: give the first verb its object at once, with the thing that acts as the subject
+("One `close()` call on the outermost generator stops that generator and every generator beneath it, and each one runs its cleanup").
+The keeps are a first verb meant with no object ("the script runs and prints") and a set pair ("opens and closes a file"). C60 in `bruce_edit_db.md`.
 
 **A negation or a limiter with open scope.**
 "every driver does not answer", "all generators are not closed",
@@ -228,3 +234,9 @@ Shapes Bruce flags that the catalog above did not name, dated, with the sentence
   "The driver holds the generator `outer()` returned and calls `throw()` on it" (Bruce: "jumbled").
   The catalog's coordination entry showed nouns only, `[AND]` needs two subjects, and `[AND+REL]` needs a comma and a second subject, so no pass and no tool saw it.
   Added to the coordination entry above, as C59, and as the `[REL+AND]` survey rule; the first book-wide run had 19 hits and 10 rewrites.
+- 2026-11-12, chapter 45: a verb that reads with or without an object, a conjunction, a second verb, and then the object both share.
+  "A driver that holds the outermost generator stops and cleans up every generator beneath it with one call" (Bruce: "it sounds like the driver stops").
+  `[REL+AND]` is quiet because the relative clause ends on a noun, and that noun before "stops" gives a second false clause, "the outermost generator stops".
+  Added to the coordination entry above and as C60. No tool lists it: grep the scope for
+  `\b(stop|start|end|run|close|open|resume|return|finish|move|change|fail)e?s? (and|or|then) \w+` and apply the cover test to each line.
+  The grep of both trees that day had about 55 lines and this one site.

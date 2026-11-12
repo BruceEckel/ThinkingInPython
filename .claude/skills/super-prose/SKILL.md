@@ -31,7 +31,20 @@ each pass hands the next one less to do.
 6. `ambiguity`: every sentence that counts, compares, coordinates,
    modifies, or limits keeps one reading: a count with two units, a
    word with two senses, a modifier with two heads, an open scope, a
-   definite noun the listing has several of, a missing comparand.
+   definite noun the listing has several of, a missing comparand,
+   and a verb that reads with or without an object set before "and"
+   and a second verb, with the object both share after the second
+   ("A driver that holds the outermost generator stops and cleans up
+   every generator beneath it" -> "One `close()` call on the
+   outermost generator stops that generator and every generator
+   beneath it, and each one runs its cleanup", C60). Cover the
+   sentence from the conjunction on: if what is left is a complete
+   sentence, the reader has taken it as the claim. No survey tool
+   lists that shape: grep the scope for
+   `\b(stop|start|end|run|close|open|resume|return|finish|move|change|fail)e?s? (and|or|then) \w+`
+   and read each line; a first verb meant with no object ("the
+   script runs and prints") and a set pair ("opens and closes a
+   file") stay.
 7. `activate`: passives with a natural actor, nominalizations,
    metadiscourse, empty frames, tense drift, and a verb of rest with
    nothing after it ("the generator that is waiting" -> "the generator

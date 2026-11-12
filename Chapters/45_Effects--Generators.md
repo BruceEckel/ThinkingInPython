@@ -1304,7 +1304,6 @@ g.close()
 #: outer cleanup
 ```
 
-`g` is `outer()`'s generator.
 The driver calls `g.throw()`, but `innermost()` prints the `caught` line.
 `outer()` is paused at its `yield from` expression,
 and `innermost()` is paused at its `yield`.
@@ -1318,7 +1317,8 @@ as if `outer()`'s `yield from` expression had raised it.
 `g.close()`, like `throw()`, reaches `innermost()` through the `yield from`.
 Python raises `GeneratorExit` in `innermost()` first, then in `outer()`,
 so the two cleanup lines print from the inside out.
-A driver that holds the outermost generator stops and cleans up every generator beneath it with one call.
+One `close()` call on the outermost generator stops that generator and every generator beneath it,
+and each one runs its cleanup.
 
 A [*Saga*](39_Patterns--Pattern_Catalog.md#distributed-and-cloud)
 relies on that inside-out order.

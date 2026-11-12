@@ -4183,6 +4183,47 @@ Claude-written (88d89eff), Bruce: "jumbled":
 **Home.** ambiguity (coordination entry, Accrued shapes) |
 `tools/sentence_shapes.py` `[REL+AND]` | this file.
 
+### C60. A verb that reads with or without an object keeps its object beside it
+
+**Test.** A verb that makes a complete statement with no object (stops,
+starts, ends, runs, closes, opens, resumes, returns, finishes, moves,
+changes, fails) sits directly before "and", "or", or "then" and a second
+verb, and the object both verbs share comes after the second verb: "A
+driver that holds the outermost generator stops and cleans up every
+generator beneath it". Cover the sentence from the conjunction on and
+read what is left. If it is a complete sentence ("A driver ... stops"),
+the reader has already taken it as the claim, and the shared object
+arrives too late to turn the verb around. The chapter 45 sentence has
+three more faults that the same repair removes. Its relative clause puts
+a noun directly before the verb, so "the outermost generator stops"
+reads as a clause too. "Beneath it" has the driver and the generator as
+candidates. The actor, the `close()` call, sits in a trailing "with one
+call". Repair: give the first verb its object at once, and make the
+thing that acts the subject ("One `close()` call on the outermost
+generator stops that generator and every generator beneath it"). The
+second verb then gets its own clause with its own subject ("and each one
+runs its cleanup").
+
+**Keep when.** The first verb is meant with no object ("the script runs
+and prints the same output", "the first task finishes and releases both
+locks"). The two verbs are a set pair with the object directly after
+the second ("opens and closes a file", "loads and saves itself", "close
+or swallow that second splice"), where the covered reading ("the class
+opens") is no claim the passage could make.
+
+**Sightings.** 1, `45_Effects--Generators` 2026-11-12, was
+Claude-written, Bruce: "it sounds like the driver stops":
+- "A driver that holds the outermost generator stops and cleans up every
+  generator beneath it with one call." -> "One `close()` call on the
+  outermost generator stops that generator and every generator beneath
+  it, and each one runs its cleanup."
+- same day, a grep of both trees for these verbs before a conjunction
+  and a second verb: about 55 lines, this the one site. The rest are the
+  first verb with no object, and three set pairs.
+
+**Home.** ambiguity (coordination entry, Accrued shapes) | super-prose
+(pass 6 and its grep) | this file.
+
 ## Retired
 
 Rejected by Bruce, or promoted and later withdrawn. Never propose these
