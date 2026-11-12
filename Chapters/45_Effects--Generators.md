@@ -1321,12 +1321,13 @@ One `close()` call on the outermost generator stops that generator and every gen
 and each one runs its cleanup.
 
 A [*Saga*](39_Patterns--Pattern_Catalog.md#distributed-and-cloud)
-relies on that inside-out order.
+relies on an exception that propagates from the inside out.
 A saga runs a long transaction as a series of steps.
 When a later step fails, each earlier step undoes what it did,
-latest step first.
-With one generator per step,
-a step's undo is an `except` clause around its `yield from`:
+most recent first.
+We can create a saga using one generator per step,
+each delegating to the steps after it.
+A step's undo is an `except` clause around its `yield from`:
 
 ```python
 # saga.py
@@ -1361,8 +1362,7 @@ expect(Failed, booking.throw, Failed("card declined"))
 #: [Failed] card declined
 ```
 
-Each step yields its command,
-then delegates to the steps after it inside a `try`.
+Each step yields its command, then delegates inside a `try`.
 To report the card's failure, the driver calls `throw()`.
 Python raises `Failed` at the innermost `yield`, in the card step.
 That `yield` comes before the card step's `try`,
