@@ -1380,7 +1380,7 @@ In `list(book())` every step succeeds, so each `yield from` finishes normally.
 Three `next()` calls leave `booking` paused in the taxi step,
 at the `yield` that produced `do taxi`.
 To report the taxi's failure, the driver calls `booking.throw()`,
-and Python raises `Failed` at that `yield`.
+raising `Failed` at that `yield`.
 The taxi step has not yet delegated to the card step,
 whose generator never starts.
 The `yield` is outside the taxi step's `try`,
