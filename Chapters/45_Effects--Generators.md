@@ -1381,12 +1381,9 @@ Three `next()` calls leave `booking` paused in the taxi step,
 at the `yield` that produced `do taxi`.
 To report the taxi's failure, the driver calls `booking.throw()`,
 raising `Failed` at that `yield`.
-The taxi step has not yet delegated to the card step,
-whose generator never starts.
-The `yield` is outside the taxi step's `try`,
-so the exception leaves the taxi step directly.
-The taxi is the action that failed, so the saga undoes the two steps before it.
-The exception propagates up through the two `yield from` expressions.
+That `yield` comes before the taxi step's `try`,
+so `Failed` leaves the taxi step, and the card step never starts.
+The exception then propagates up through the `yield from` in the hotel step and the one in the flight step.
 Each `except` clause prints its step's undo line.
 The bare `raise` then [re-raises the exception the clause caught](04_Foundations--Control_Flow.md#errors-and-exceptions),
 so `Failed` continues out to the enclosing step.
