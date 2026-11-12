@@ -1461,9 +1461,10 @@ In `saga.py`, `throw()` raises `Failed` in the driver.
 At `[2]`, `throw()` returns a command.
 `Failed` starts in the taxi step's `do`, which is outside that step's `try`,
 so the exception leaves the taxi step and the card step never starts.
-The hotel step's `except` clause catches `Failed` and delegates to its `undo` at `[1]`,
-and the first command that `undo` yields is the value `throw()` returns.
-The driver carries out that command and calls `next()` for the following ones.
+The hotel step's `except` clause catches `Failed` and delegates to its `undo` at `[1]`.
+The `undo` yields `release room`,
+and `throw()` returns that command to the driver.
+The driver carries it out and calls `next()` for the following ones.
 When the hotel step's `undo` finishes,
 the bare `raise` sends `Failed` to the flight step,
 whose `undo` yields `void ticket` and `release seat`.
