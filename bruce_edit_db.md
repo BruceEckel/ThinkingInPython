@@ -4112,6 +4112,39 @@ had captured this kind of thing somewhere in super-prose":
 **Home.** activate (Accrued patterns) | `tools/past_tense.py`
 `[PERFECT]` | this file.
 
+### C58. A state verb says where the thing stopped or what it waits for
+
+**Test.** A clause whose verb names a state of rest ("is waiting",
+"waits", "is pending", "is idle", "sits", "is suspended", "is paused")
+and ends on that verb: "to the generator that is waiting", "the `yield`
+that is waiting". The verb reports that the thing does nothing and stops
+before the one fact the reader can picture, which is where it stopped or
+which event resumes it. Ask "waiting where, or for what?" and write the
+answer, with the state verb the chapter taught: "the generator paused at
+the innermost `yield`", "the `yield` where the inner generator waits",
+"waits for the third answer". Bruce reads the bare form as passive: the
+clause is active in grammar and has no action in it. No tool lists the
+shape: `tip passive` needs a passive auxiliary, and the activate skill's
+relative-clause and progressive rules both exempt a clause with a real
+actor in a state that is mid-flight.
+
+**Keep when.** The place or the awaited event follows the verb ("waits
+at a `yield`", "is waiting to receive a value", "waits while the driver
+carries out the request"), or the previous sentence supplies it and an
+additive links to it ("Both tasks wait forever ... the one task that can
+wake each of them is waiting too").
+
+**Sightings.** 1, `45_Effects--Generators` 2026-11-11, was
+Claude-written (88d89eff), Bruce: "passive":
+- "A `yield from` forwards `throw()` and `close()` to the generator
+  that is waiting:" -> "to the generator paused at the innermost
+  `yield`:"
+- same pass, found by grep: "passes back down to the `yield` that is
+  waiting" -> "passes back down to the `yield` where the inner generator
+  waits"
+
+**Home.** activate (Accrued patterns) | this file.
+
 ## Retired
 
 Rejected by Bruce, or promoted and later withdrawn. Never propose these

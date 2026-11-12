@@ -33,7 +33,11 @@ each pass hands the next one less to do.
    word with two senses, a modifier with two heads, an open scope, a
    definite noun the listing has several of, a missing comparand.
 7. `activate`: passives with a natural actor, nominalizations,
-   metadiscourse, empty frames, tense drift.
+   metadiscourse, empty frames, tense drift, and a verb of rest with
+   nothing after it ("the generator that is waiting" -> "the generator
+   paused at the innermost `yield`", C58). No survey tool lists that
+   shape: grep the scope for `wait`, `pending`, `idle`, `suspended`,
+   `paused`, and `sits`, and read each for its place or its event.
 8. `bruce-edit-apply`: the Rules section of `bruce_edit_db.md`.
 9. `elements-of-style:writing-clearly-and-concisely`: Strunk's rules,
    mostly needless words and emphatic words at the end.

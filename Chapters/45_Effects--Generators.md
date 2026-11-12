@@ -462,7 +462,7 @@ During that delegation,
 the outer generator sits suspended at the `yield from` expression,
 and the driver's calls on the outer generator reach the inner one.
 Every request the inner generator yields passes out to the driver,
-and every answer the driver sends passes back down to the `yield` that is waiting.
+and every answer the driver sends passes back down to the `yield` where the inner generator waits.
 The driver still supplies each answer; `yield from` relays it.
 
 In the simplest case,

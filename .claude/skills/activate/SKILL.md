@@ -486,3 +486,24 @@ and it becomes part of every future pass.
   After reading a chapter's hits, record the keeps with
   `tip sentence-shapes CH=NN ARGS=--survey-accept`, which takes in
   every unjudged hit in the chapter and its Solutions file.
+- "forwards `throw()` and `close()` to the generator that is waiting"
+  becomes "to the generator paused at the innermost `yield`" (Bruce,
+  2026-11-11: "passive"). A clause that ends on a verb of rest (is
+  waiting, waits, is pending, is idle, sits, is suspended, is paused)
+  is active in grammar and holds no action: it reports that the thing
+  does nothing and omits where it stopped or which event resumes it.
+  Ask "waiting where, or for what?" and write the answer with the state
+  verb the chapter taught ("paused at its `yield`", "waits for the third
+  answer", "the `yield` where the inner generator waits").
+  The two rules above that come nearest both exempt this clause.
+  "Relative clauses with no actor" leaves a clause alone when its verb
+  has a real actor, and the generator is one. "Progressive where the
+  simple present says it" keeps a progressive for a state mid-flight,
+  and a suspended generator is one. Neither exemption covers a state
+  verb with nothing after it. No tool lists the shape, so grep the scope
+  for the verbs of rest (`wait`, `pending`, `idle`, `suspended`,
+  `paused`, `sits`) and read each for its place or its event.
+  Keep one that has it ("waits at a `yield`", "is waiting to receive a
+  value"), or whose previous sentence supplies it ("Both tasks wait
+  forever ... the one task that can wake each of them is waiting too").
+  C58 in `bruce_edit_db.md`.
