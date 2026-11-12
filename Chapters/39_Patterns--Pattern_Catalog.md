@@ -213,7 +213,7 @@ built on the operating system's I/O completion ports.
 | *Command Query Responsibility Segregation* (CQRS) | Separate the read model from the write model. |
 | *Event Sourcing* | Store state as a log of events instead of current values. |
 | [*Retry*](47_Effects--Stateless_in_Practice.md#retry-and-a-flaky-database) | Re-attempt a failed operation, often with backoff. |
-| [*Saga*](45_Effects--Generators.md#throw-and-close-reach-the-innermost-generator) | Run a long transaction as a series of compensable steps. |
+| [*Saga*](45_Effects--Generators.md#sagas-with-generators) | Run a long transaction as a series of compensable steps. |
 | *Service Discovery* | Locate service instances dynamically. |
 | *Sidecar* | Attach helper functionality to a service as a separate process. |
 | *Strangler Fig* | Replace a legacy system incrementally by routing around it. |

@@ -1320,6 +1320,8 @@ so the two cleanup lines print from the inside out.
 One `close()` call on the outermost generator stops that generator and every generator beneath it,
 and each one runs its cleanup.
 
+### Sagas with Generators {#sagas-with-generators}
+
 A [*Saga*](39_Patterns--Pattern_Catalog.md#distributed-and-cloud)
 relies on an exception that propagates from the inside out.
 A saga runs a long transaction as a series of steps.
@@ -1375,15 +1377,91 @@ Each `yield from` finishes normally, and every step runs to its end.
 
 To report the card's failure, the driver calls `booking.throw()`.
 Python raises `Failed` at the innermost `yield`, in the card step.
-That `yield` comes before the card step's `try`,
-so the exception propagates out of the card step,
-whose own action is the one that failed.
-The exception then propagates up through the two `yield from` expressions.
+That `yield` is outside the card step's `try`,
+so the exception leaves the card step directly.
+The declined card is the action that failed,
+so the saga undoes the two steps before it.
+The exception propagates up through the two `yield from` expressions.
 Each `except` clause prints its step's undo line.
 The bare `raise` then [re-raises the exception the clause caught](04_Foundations--Control_Flow.md#errors-and-exceptions),
 so `Failed` continues out to the enclosing step.
 The hotel step prints its undo line before the flight step does.
 The nesting of the `try` blocks is the undo stack.
+
+A step's action and its undo are often several commands each.
+Here both are generators that yield their commands to the driver,
+and `step()` delegates to them:
+
+```python
+# saga_generators.py
+from collections.abc import Generator
+from exceptions import expect
+
+class Failed(Exception):
+    pass
+
+type Commands = Generator[str]
+
+def commands(*names: str) -> Commands:
+    yield from names
+
+def step(
+    do: Commands, undo: Commands,
+    rest: Commands | None = None,
+) -> Commands:
+    yield from do
+    if rest is None:
+        return
+    try:
+        yield from rest
+    except Failed:
+        yield from undo  # [1]
+        raise
+
+def book() -> Commands:
+    return step(
+        commands("reserve seat", "issue ticket"),
+        commands("void ticket", "release seat"),
+        step(commands("hold room"),
+             commands("release room"),
+             step(commands("charge card"),
+                  commands("refund card"))),
+    )
+
+print(*book(), sep=", ")
+#: reserve seat, issue ticket, hold room, charge card
+booking = book()
+print([next(booking) for _ in range(4)][-1])
+#: charge card
+print(booking.throw(Failed("card declined")))  # [2]
+#: release room
+print(next(booking))
+#: void ticket
+print(next(booking))
+#: release seat
+expect(Failed, next, booking)  # [3]
+#: [Failed] card declined
+```
+
+In `saga.py`, `throw()` raises `Failed` in the driver.
+At `[2]`, `throw()` returns a command.
+The hotel step's `except` clause catches `Failed` and delegates to its `undo` at `[1]`,
+and the first command that `undo` yields is the value `throw()` returns.
+The driver carries out that command and calls `next()` for the following ones.
+When the hotel step's `undo` finishes,
+the bare `raise` sends `Failed` to the flight step,
+whose `undo` yields `void ticket` and `release seat`.
+`Failed` reaches the driver at `[3]`, after the last undo command.
+
+`book()` creates every `undo` generator,
+and an `undo` body starts only at `[1]`.
+The successful run finishes without reaching `[1]`,
+and Python discards the three unstarted generators.
+
+[A generator must finish when `GeneratorExit` arrives](#close-requires-the-generator-to-finish),
+and a `yield` in an `except` clause looks like a risk to that rule.
+The clause here catches `Failed` and lets `GeneratorExit` pass,
+so `close()` on a booking ends every step with no further command.
 
 ## One Generator per State
 
@@ -2302,6 +2380,11 @@ Try each exercise before opening its [solution](../Solutions/45_Effects--Generat
     The driver of the second booking calls only `next()`.
     Say where `Failed` starts,
     and why the hotel and the flight are still undone.
+12. Drive a booking from `saga_generators.py` to `issue ticket` and throw `Failed` there.
+    Say which command the driver has carried out and which undo commands it receives.
+    Then change `step()` so that a step that fails partway through its `do` is undone as well.
+    Throw `Failed` at `issue ticket` and at `charge card`,
+    and say what an `undo` must now tolerate.
 
 [^clu-history]: Barbara Liskov,
 [A History of CLU](https://dspace.mit.edu/handle/1721.1/149734),

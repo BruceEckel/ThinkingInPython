@@ -1590,3 +1590,149 @@ a different design, a detail, or an equivalent alternative.
 </details>
 </details>
 </details>
+
+## 12. Undoing a step that fails partway
+
+> Drive a booking from `saga_generators.py` to `issue ticket` and throw `Failed` there.
+> Say which command the driver has carried out and which undo commands it receives.
+> Then change `step()` so that a step that fails partway through its `do` is undone as well.
+> Throw `Failed` at `issue ticket` and at `charge card`,
+> and say what an `undo` must now tolerate.
+
+<details>
+<summary>Where to look</summary>
+
+[Sagas with Generators](../../Chapters/45_Effects--Generators.md#sagas-with-generators)
+puts each step's `try` around `yield from rest`.
+Find the line where `step()` is paused when the driver has just received `issue ticket`,
+and check whether that line is inside the `try`.
+For the change, move one line and remove the early `return`.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_12.py
+from collections.abc import Generator
+
+class Failed(Exception):
+    pass
+
+type Commands = Generator[str]
+
+def commands(*names: str) -> Commands:
+    ...
+
+def step(
+    do: Commands, undo: Commands,
+    rest: Commands | None = None,
+) -> Commands:
+    ...
+
+def book() -> Commands:
+    ...
+
+def unwind(saga: Commands, error: Failed) -> None:
+    ...
+```
+
+<details>
+<summary>Done when</summary>
+
+you can say why the chapter's `step()` leaves the seat reserved,
+your `step()` yields `void ticket` and `release seat` for a failure at `issue ticket`,
+it yields `refund card` first for a failure at `charge card`,
+and your answer names the undo commands whose actions failed.
+
+<details>
+<summary>Solution</summary>
+
+With the chapter's `step()`,
+the driver has carried out `reserve seat` when it throws `Failed` at `issue ticket`.
+The flight step is paused inside `yield from do`, which comes before its `try`.
+`Failed` leaves the flight step and reaches the driver with no undo command,
+and the seat stays reserved.
+
+This `step()` puts `do` inside the `try`:
+
+```python
+# exercise_12.py
+from collections.abc import Generator
+
+class Failed(Exception):
+    pass
+
+type Commands = Generator[str]
+
+def commands(*names: str) -> Commands:
+    yield from names
+
+def step(
+    do: Commands, undo: Commands,
+    rest: Commands | None = None,
+) -> Commands:
+    try:
+        yield from do  # [1]
+        if rest is not None:
+            yield from rest
+    except Failed:
+        yield from undo
+        raise
+
+def book() -> Commands:
+    return step(
+        commands("reserve seat", "issue ticket"),
+        commands("void ticket", "release seat"),
+        step(commands("hold room"),
+             commands("release room"),
+             step(commands("charge card"),
+                  commands("refund card"))),
+    )
+
+def unwind(saga: Commands, error: Failed) -> None:
+    try:
+        print(saga.throw(error))
+        for command in saga:
+            print(command)
+    except Failed as e:
+        print(f"Failed: {e}")
+
+booking = book()
+print([next(booking) for _ in range(2)][-1])
+#: issue ticket
+unwind(booking, Failed("printer jammed"))  # [2]
+#: void ticket
+#: release seat
+#: Failed: printer jammed
+booking = book()
+print([next(booking) for _ in range(4)][-1])
+#: charge card
+unwind(booking, Failed("card declined"))  # [3]
+#: refund card
+#: release room
+#: void ticket
+#: release seat
+#: Failed: card declined
+```
+
+**Every command of a step is inside its `try`.**
+`[1]` moves `yield from do` into the `try`,
+so a `Failed` thrown at any of a step's commands reaches that step's `except` clause.
+At `[2]` the flight step yields `void ticket` and `release seat`,
+and the driver releases the seat.
+
+**An `undo` now runs for an action that failed.**
+At `[2]`, `void ticket` asks the driver to void a ticket whose printing failed.
+At `[3]` the failure is in the card step, and its `undo` runs first:
+`refund card` asks the driver to refund a charge that the bank declined.
+Each undo command must therefore be safe to carry out when its action did not complete.
+The chapter's `step()` undoes completed steps,
+which is enough while each `do` is a single command.
+
+Before you move on, name what separates your attempt from this one:
+a different design, a detail, or an equivalent alternative.
+
+</details>
+</details>
+</details>
+</details>
