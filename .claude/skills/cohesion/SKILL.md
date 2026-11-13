@@ -362,10 +362,23 @@ and it becomes part of every future pass.
   set of local variables."
   Keep two paragraphs when the second illustrates the first with an
   example of its own, or when later text uses each one separately.
-  Grep the scope for `^(That|This) (difference|distinction|contrast|asymmetry)`
-  and read the paragraph above each hit for two parallel sentences
-  that state the two sides
-  (chapter 19's "A task is *I/O-bound* when ... A task is *CPU-bound* when ..." is the form).
+  The pointer that opened the next paragraph was part of the fault,
+  and the first repair left it there (Bruce, an hour later: "what difference").
+  Two parallel sentences above a pointer are not enough:
+  the paragraph must call the relation by the pointer's noun,
+  state both sides in the one sentence before it,
+  or give the two sides defined names
+  (chapter 19's *I/O-bound* and *CPU-bound*, then "That distinction").
+  Otherwise the next paragraph opens on its own subject,
+  an example with "Consider",
+  and its sentences repeat the claim's words:
+  "Consider a producer that computes a series of values and a
+  consumer that uses them one at a time. ... If the consumer calls
+  the producer, the consumer keeps its loop. Without generators, the
+  producer starts at its first line on every call".
+  Grep the scope for
+  `^(That|This|These|Those) (difference|distinction|contrast|asymmetry|trade-off|gap|split|separation|overlap)`
+  (C82, and the antecedents skill's Accrued patterns).
   Read the first sentence of each section for a subject that is the
   chapter or its opening.
   A sentence repaired phrase by phrase at two flags gets its whole

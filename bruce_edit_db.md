@@ -5262,7 +5262,10 @@ sentences subjects of one kind: "the caller ... The called function
 "An ordinary function, when called,", a kind. A qualifier both sides
 need ("ordinary") goes in the sentence that sets up the pair. Cut the
 premise when the chapter has already made it, and keep one statement
-of each half (R19).
+of each half (R19). The pointer that opens the next paragraph is part
+of the fault and goes in the same edit (C82, and sighting 2 below):
+the next paragraph opens on its own subject, an example with
+"Consider", and its sentences reuse the claim's words.
 
 **Keep when.** The first paragraph is a claim the second illustrates
 with an example or a listing of its own. Later text uses each
@@ -5284,8 +5287,9 @@ possibly combine into one paragraph that makes the point":
   called function returns, the caller continues from that position,
   with its local variables intact. The called function starts at its
   first line on every call, with a new set of local variables." Six
-  sentences in two paragraphs became three in one, and the paragraph
-  that follows still opens "That difference matters when".
+  sentences in two paragraphs became three in one. The repair left
+  "That difference matters when" at the head of the next paragraph
+  (sighting 2).
 - Why the passes missed it: every sentence passes the sentence tests
   (active, literal, positive, short), and the fault is the distance
   from the first sentence to the point. R29 and the cohesion skill
@@ -5303,15 +5307,40 @@ possibly combine into one paragraph that makes the point":
   new locals beside it.
 - A grep for the second tell,
   `^(That|This) (difference|distinction|contrast|asymmetry)`, finds
-  three sentences in `Chapters/`. The other two are keeps, and they
-  show the form the repair aims at. Chapter 19's "That distinction
-  determines which tool to use" follows "A task is *I/O-bound* when
-  ... A task is *CPU-bound* when ...", two sentences with one kind of
-  subject. Chapter 37's "That asymmetry is the expression problem"
+  three sentences in `Chapters/`. The other two are keeps. Chapter
+  19's "That distinction determines which tool to use" follows two
+  italic definitions, *I/O-bound* and *CPU-bound*, so the two sides
+  have names. Chapter 37's "That asymmetry is the expression problem"
   follows one sentence that states both sides. "The difference is
   ..." (six more) states the relation itself and is not the tell.
   `tip overclaims`, `tip pointers`, `tip stutter`, and `tip
   sentence-shapes` print no hit on the new paragraph.
+
+2, the same section an hour later, Bruce: "what difference":
+- "That difference matters when a producer computes a series of
+  values and a consumer uses them one at a time. ... Consider a
+  consumer that calls the producer. The consumer keeps its loop.
+  Without generators, the producer restarts at its first line on
+  every call," -> "Consider a producer that computes a series of
+  values and a consumer that uses them one at a time. ... If the
+  consumer calls the producer, the consumer keeps its loop. Without
+  generators, the producer starts at its first line on every call,".
+  The second paragraph now opens on its example. Its case sentences
+  carry the tie to the first paragraph: "calls" gives the roles, and
+  "starts at its first line on every call" repeats the first
+  paragraph's words, which is why "restarts" became "starts". The
+  two cases are a pair of "If" sentences (R40).
+- Sighting 1 named this pointer as the tell and kept it. Claude had
+  just written both sides of the contrast, read "That difference"
+  with the answer in mind, and reported that the two parallel
+  sentences above it were enough. The rewrite had given the pointer
+  less than the old text did. "Preserves ... loses" set two verbs
+  against each other. The new sentences say what each function does,
+  with four details that differ (waits, continues, the first line,
+  the locals), and nothing calls any of them a difference. A rewrite
+  of a paragraph retests every pointer in the paragraph after it,
+  with the rewritten paragraph covered. C82 has the test for the
+  pointer.
 
 **Home.** cohesion (Accrued patterns) | super-prose (pass 4) | this
 file.
@@ -5362,6 +5391,72 @@ Claude-written, Bruce: "'each' and 'its' seem odd here":
 
 **Home.** antecedents (Accrued patterns) | super-prose (pass 5) | this
 file.
+
+### C82. A demonstrative with a relation noun points at a relation the passage has stated
+
+**Test.** A sentence opens on "That", "This", "These", or "Those" and
+a noun for a relation between things: difference, distinction,
+contrast, asymmetry, trade-off, gap, split, separation, overlap. The
+passage above describes the things and never states the relation. No
+one sentence holds both sides, and the noun has no cognate above it
+("differ", "unlike", "separately"). The reader has the parts and must
+decide which of their details the noun means. Bruce, on chapter 45's
+"That difference matters when a producer computes a series of values
+and a consumer uses them one at a time": "what difference". This is
+`[SAME+NEW]` (R63) for a demonstrative: the noun after the pointer is
+one the passage has not used. In that sentence the pointer, the noun,
+and the verdict "matters" told the reader nothing, and the content of
+"matters", which function keeps its loop, came three sentences later.
+Repair: drop the frame and say what happens. A sentence that leads
+from a claim into an example opens the example ("Consider a producer
+that computes a series of values and a consumer that uses them one at
+a time"), and the example's sentences repeat the claim's words so the
+reader can match them ("The called function starts at its first line
+on every call" above, "the producer starts at its first line on every
+call" below). Where the bridge has to stay, put both sides in it
+("The difference between X and Y").
+
+**Keep when.** One sentence directly before the pointer states both
+sides (chapter 37: "In a design where adding a type means writing one
+new class, adding an operation ordinarily means editing every class.
+That asymmetry is the expression problem"). The two sides are terms
+the passage defined (chapter 19's *I/O-bound* and *CPU-bound*). The
+phrase states its own two terms ("That separation of a request from
+its fulfillment", "That split between the table and the body"). The
+noun is a nominalization of the sentence before it, the form the
+antecedents skill asks for ("The generator chooses what to ask next
+... That choice is the conversation"; "Both move into it. That
+overlap breaks the invariant").
+
+**Sightings.** 1, `45_Effects--Generators` 2026-11-13, was
+Claude-written, Bruce: "what difference":
+- the pair quoted in C80's second sighting.
+- Why the passes missed it: the antecedents skill said to keep a
+  "this" that carries its noun, and `tip pointers` lists a
+  demonstrative pronoun and skips a demonstrative with a noun.
+  `[SAME+NEW]` reads "same" alone. C67 tests the noun after "such a",
+  "this", or "that" when it is a role noun for a function. The
+  literal pass reads for a verdict in place of a mechanism and passed
+  "matters", since the sentence's when-clause has content. The
+  sentence stood from 2026-11-05 with "preserves ... loses" above it,
+  and Bruce flagged it the hour that paragraph was rewritten (C80).
+- Scale, measured the same day. 231 sentences in `Chapters/` open on
+  a demonstrative and a noun, and in 100 of them the noun's first
+  five letters are absent from the 12 lines above. Most of the 100
+  are the kept nominalization ("That sharing", "That guarantee",
+  "That ordering"), so the wide shape is no survey rule. The relation
+  nouns are few:
+  `^(That|This|These|Those) (difference|distinction|contrast|asymmetry|trade-off|gap|split|separation|overlap)`
+  finds 12 sentences in both trees after this repair, and all 12 were
+  read. Eleven are keeps under the four conditions above. One is a
+  possible second sighting, left for Bruce:
+  `20_Patterns--Rethinking_Objects` "This trade-off is the expression
+  problem", where the two sides are in the paragraph before and "The
+  OOP approach assumes ... That assumption often fails." stands
+  between them and the pointer.
+
+**Home.** antecedents (Accrued patterns, and the keep for "this" with
+its noun) | super-prose (pass 5) | this file.
 
 ## Retired
 

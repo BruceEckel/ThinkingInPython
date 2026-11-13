@@ -77,9 +77,14 @@ Add the noun, or restate the claim as the subject:
 - "The type checker accepts the code. This is the problem."
   becomes "... That acceptance is the problem."
 
-Keep "this" when it carries its noun ("this proxy", "this listing")
+Keep "this" when it carries a noun the passage has used
+("this proxy", "this listing")
 or when the whole preceding sentence is unmistakably the referent
 and no noun phrase inside it competes.
+A noun the passage has not used is no anchor:
+"That difference", after three sentences that never say "differ",
+is the bare "That" with a label on it
+(see "A demonstrative with a relation noun" under Accrued patterns).
 
 **"It" with two candidates.**
 Two singular nouns in the previous sentence make "it" a coin toss:
@@ -261,6 +266,42 @@ and it becomes part of every future pass.
   Grep the scope for
   `\b(are|were|have|do|keep|hold|take|get|need|run|return) each\b[^.]*\b(its|it|itself)\b`.
   C81 in `bruce_edit_db.md`.
+- **A demonstrative with a relation noun the passage never stated.**
+  "That difference matters when a producer computes a series of
+  values and a consumer uses them one at a time"
+  (Bruce, 2026-11-13, chapter 45: "what difference").
+  The paragraph above said what a caller does and what a called
+  function does, in three sentences,
+  and no sentence called any of it a difference.
+  "Difference", "distinction", "contrast", "asymmetry", "trade-off",
+  "gap", "split", "separation", and "overlap" each stand for a
+  relation between two things, so the reader needs both things and
+  the respect in which they are compared.
+  The pointer passes when one sentence directly before it states
+  both sides ("In a design where adding a type means writing one new
+  class, adding an operation ordinarily means editing every class.
+  That asymmetry is the expression problem"),
+  when the two sides are terms the passage defined
+  (*I/O-bound* and *CPU-bound*, then "That distinction"),
+  when the phrase states its own terms
+  ("That split between the table and the body"),
+  or when the noun turns the previous sentence's verb into a noun
+  ("chooses ... That choice").
+  Otherwise drop the frame and say what happens.
+  Chapter 45's sentence led from a claim into an example, so the
+  example now opens the paragraph
+  ("Consider a producer that computes a series of values and a
+  consumer that uses them one at a time"),
+  and its sentences repeat the claim's words
+  ("starts at its first line on every call") so the reader can match them.
+  Where the bridge has to stay, put both sides in it
+  ("The difference between X and Y").
+  Grep the scope for
+  `^(That|This|These|Those) (difference|distinction|contrast|asymmetry|trade-off|gap|split|separation|overlap)`.
+  After a paragraph is rewritten, cover it and reread the first
+  sentence of the paragraph after it:
+  a pointer there was written against the old text.
+  C82 in `bruce_edit_db.md`.
 - **A pointer at a listing or example by position.**
   "This codec has a bug:" (the one below), "the last example",
   "the single generic surrogate above".

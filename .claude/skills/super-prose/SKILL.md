@@ -138,11 +138,11 @@ each pass hands the next one less to do.
    with its local variables intact. The called function starts at
    its first line on every call, with a new set of local variables",
    C80). Each side of a contrast gets one concrete sentence, and the
-   two subjects are one kind of noun, two roles or two kinds. Grep
-   the scope for `^(That|This) (difference|distinction|contrast|asymmetry)`
-   and read the paragraph above each hit for the two parallel
-   sentences. Read each section's first sentence for a subject that
-   is the chapter or its opening: it is the recap R19 cuts.
+   two subjects are one kind of noun, two roles or two kinds. The
+   pointer that opens the paragraph after them goes in the same
+   edit (pass 5, C82). Read each section's first sentence for a
+   subject that is the chapter or its opening: it is the recap R19
+   cuts.
 5. `antecedents`: every pointer with two candidates gets its noun.
    A link is a pointer too: when its target teaches a named
    construct, the link text starts on the name ("The bare `raise`
@@ -171,6 +171,21 @@ each pass hands the next one less to do.
    C81). After any repair that changes a sentence's subject, reread
    the verb and every pronoun after it for number. Grep the scope for
    `\b(are|were|have|do|keep|hold|take|get|need|run|return) each\b[^.]*\b(its|it|itself)\b`.
+   A demonstrative with a relation noun ("That difference matters
+   when a producer computes a series of values ...", Bruce: "what
+   difference") points at a relation the passage must have stated:
+   both sides in the one sentence before it, two defined terms, the
+   phrase's own terms ("That split between the table and the body"),
+   or the previous sentence's verb made a noun ("chooses ... That
+   choice"). Otherwise drop the frame and say what happens; a bridge
+   from a claim into an example becomes the example's opener
+   ("Consider a producer that computes a series of values and a
+   consumer that uses them one at a time"), and the example repeats
+   the claim's words (C82). Grep the scope for
+   `^(That|This|These|Those) (difference|distinction|contrast|asymmetry|trade-off|gap|split|separation|overlap)`.
+   After any paragraph is rewritten, cover it and reread the first
+   sentence of the next paragraph: a pointer there was written
+   against the old text.
 6. `ambiguity`: every sentence that counts, compares, coordinates,
    modifies, or limits keeps one reading. A list of what two things
    share ("has `send()`, `throw()`, and `close()`, as a generator
