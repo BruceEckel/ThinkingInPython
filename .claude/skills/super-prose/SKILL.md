@@ -34,9 +34,12 @@ each pass hands the next one less to do.
    catches the `StopIteration` from a job ... and drops that job" ->
    "`next(job)` raises `StopIteration` ... before `append()` runs,
    and that job stays out of `ready`", C73). The exception comes from
-   the call that raises it (`next(job)`), not from the object. Grep
-   the scope for `except`, `pass`, and `continue` and read each
-   sentence against its line.
+   the call that raises it (`next(job)`), not from the object. A
+   thing that "leaves" or "drops out of" a container is the same
+   shape: a statement removed it ("the job leaves `ready`" ->
+   "`popleft()` has already removed that job from `ready`"). Grep
+   the scope for `except`, `pass`, `continue`, and `leaves?` and
+   read each sentence against its line.
 2. `positive`: a negation that is an accident of phrasing turns around.
    A subject of "Nothing", "Nobody", or "No one" with a verb ("Nothing
    calls `throw()` on the first booking" -> "`list(book())` drives the

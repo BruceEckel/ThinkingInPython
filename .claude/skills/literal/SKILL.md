@@ -319,3 +319,11 @@ and it becomes part of every future pass.
   `remove()`, a comprehension's `if`).
   Grep the scope for `except`, `pass`, and `continue`, and read each
   sentence against its line. C73 in `bruce_edit_db.md`.
+  The intransitive form is the same fault (Bruce, the same day:
+  "'leaves' is a strange way to put it" on "and the job leaves
+  `ready`"): a thing that "leaves", "exits", or "drops out of" a
+  container did nothing, and a statement removed it, often several
+  lines earlier. Give that statement the verb: "`popleft()` has
+  already removed that job from `ready`, and the `continue` skips the
+  `append()` that puts a job back". Add `leaves?` to the grep; the
+  transitive "leaves `x` as it was" is a keep.

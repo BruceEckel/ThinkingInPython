@@ -1141,8 +1141,8 @@ because another thread can lease or return between the count and its use.
 ### Testing the Lease
 
 Three tests check what the lease guarantees:
-the item leaves the pool and comes back,
-it also comes back when the block raises an exception,
+the lease takes an item from the pool and returns it,
+the lease also returns the item when the block raises an exception,
 and the pool hands out the same object rather than a new one:
 
 ```python

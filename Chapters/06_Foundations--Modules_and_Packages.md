@@ -670,7 +670,7 @@ print("noisy" in sys.lazy_modules)
 
 This script marks one import lazy, yet the set holds more than one name.
 `sys.lazy_modules` mixes the standard library's deferred imports with your program's deferred imports.
-`noisy` leaves the set once `announce()` loads it,
+Python removes `noisy` from the set once `announce()` loads it,
 so the set tracks names still waiting, not names your program ever deferred.
 Check it for a specific name you marked lazy.
 

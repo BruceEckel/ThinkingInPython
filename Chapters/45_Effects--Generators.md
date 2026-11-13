@@ -1788,8 +1788,9 @@ task_runner(deque([download(), index()]))
 and `next()` runs it to its next `yield`.
 `[3]` puts that job at the back of the queue, behind the other job,
 so the two jobs alternate.
-A finished job raises `StopIteration` at its `next()`,
-and the `continue` at `[2]` skips `[3]`, so the finished job leaves the queue.
+For a finished job, `next(job)` raises `StopIteration`,
+and the `continue` at `[2]` skips `[3]`.
+`[1]` has already removed that job from the queue, so it stays out.
 
 We can modify `task_runner()` so that jobs can make requests:
 
@@ -1850,7 +1851,8 @@ When a job finishes before its first `yield`,
 so the exception arrives before `append()` runs,
 and that job stays out of `ready`.
 When a job finishes in the `while` loop, its `send()` raises `StopIteration`.
-The `continue` then skips the `append`, and the job leaves `ready`.
+`popleft()` has already removed that job from `ready`,
+and the `continue` skips the `append()` that puts a job back.
 
 `index()` discards what it receives.
 It yields only to take turns.

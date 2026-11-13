@@ -4873,6 +4873,29 @@ StopIteration":
   `append`"). A grep for `except`, `pass`, or `continue` with such a
   verb found no second site in `Chapters/` or `Solutions/`.
 
+2, the same paragraph the same day, Bruce: "I see what this is saying
+but 'leaves' is a strange way to put it":
+- "The `continue` then skips the `append`, and the job leaves
+  `ready`." -> "`popleft()` has already removed that job from `ready`,
+  and the `continue` skips the `append()` that puts a job back."
+- The thing removed was the subject of its own removal, with an
+  intransitive verb (leaves, exits, drops out), and the statement that
+  removed it ran several lines earlier. The test is the same: find the
+  statement, and give its actor the verb. Sighting 1's repair left
+  this sentence alone and its analysis called it "the right form", so
+  a repair under this rule reads the neighboring sentences with the
+  rule too.
+- The session's sweep for a thing that "leaves" a container
+  (`leaves? (the (queue|list|set|pool)|a code span)`, 46 lines, all
+  but four the transitive "leaves `x` as it was") rewrote three more:
+  chapter 45's `task_runner.py` walkthrough ("so the finished job
+  leaves the queue" -> "`[1]` has already removed that job from the
+  queue, so it stays out"), chapter 06 ("`noisy` leaves the set" ->
+  "Python removes `noisy` from the set"), and chapter 15 ("the item
+  leaves the pool and comes back" -> "the lease takes an item from
+  the pool and returns it"). These are Claude's finds, not flags of
+  Bruce's, so they are not counted toward promotion.
+
 **Home.** literal (Accrued patterns) | super-prose (pass 1) | this
 file.
 
