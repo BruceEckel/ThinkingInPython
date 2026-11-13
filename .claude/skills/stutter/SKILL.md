@@ -191,3 +191,11 @@ Shapes Bruce flags that the catalog above lacks go here, with the
 sentence, the date, and the repair.
 
 - (none yet beyond the three chapter 45 cases, 2026-11-07)
+- 2026-11-13, chapter 45: a predicate repeated across sentences for
+  two cases ("the `await` expression evaluates to that result" ...
+  "and the `await` expression evaluates to the `Future`'s result";
+  Bruce: "echoes an earlier sentence in the paragraph so it confuses
+  me"). The scan's window stops at the sentence, so read each
+  paragraph that walks two cases for a clause said of both, and state
+  it once after both ("In both cases ..."). C78 in
+  `bruce_edit_db.md`; the cohesion skill has the repair.

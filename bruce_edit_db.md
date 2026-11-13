@@ -5106,6 +5106,43 @@ construct's own (`send()` delivers, a function returns).
 **Home.** literal (Accrued patterns) | super-prose (pass 1) | this
 file.
 
+### C78. Two cases that end alike state the shared ending once
+
+**Test.** A paragraph walks two cases, and the walk of the second
+ends on the predicate that ended the first ("the `await` expression
+evaluates to that result" ... four sentences on, "and the `await`
+expression evaluates to the `Future`'s result"). The reader hears the
+first case again and asks whether the walk has gone back to it. Walk
+the case with the steps first, give the short case one sentence, and
+state the ending they share once, after both, marked as shared ("In
+both cases the `await` expression evaluates to the `Future`'s
+result").
+
+**Keep when.** The repeat is the claim, a deliberate parallel set
+side by side ("returns `None` ... also returns `None`"), or the two
+endings differ in a word the reader needs.
+
+**Sightings.** 1, `45_Effects--Generators` 2026-11-13, Bruce: "echoes
+an earlier sentence in the paragraph so it confuses me":
+- "If a coroutine awaits a `Future` that has its result, the `await`
+  expression evaluates to that result and the coroutine keeps
+  running. If the `Future` is still waiting ... the task calls
+  `send(None)` again, and the `await` expression evaluates to the
+  `Future`'s result." -> the waiting case first, ending "which
+  resumes the coroutine at the `await`", then "If the `Future` has
+  its result when the coroutine reaches the `await`, the coroutine
+  keeps running. In both cases the `await` expression evaluates to
+  the `Future`'s result."
+- Why the passes missed it: the echo is Claude's, made in two steps.
+  The C70 repair added the first case in front of a paragraph that
+  already ended on that predicate, and the C77 repair then gave both
+  sentences one verb. `tip stutter` reads a window of three tokens
+  inside a sentence. A repair that adds a case to a paragraph rereads
+  the whole paragraph for what the new sentence now repeats.
+
+**Home.** cohesion (Accrued patterns) | stutter (Accrued shapes) |
+super-prose (pass 4) | this file.
+
 ## Retired
 
 Rejected by Bruce, or promoted and later withdrawn. Never propose these

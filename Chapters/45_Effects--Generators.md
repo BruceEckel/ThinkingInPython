@@ -1874,15 +1874,16 @@ and receives the value the coroutine yields.
 [Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics)
 describes `await` as suspending a task until the event loop resumes it.
 In this chapter's terms, that suspension is a `yield`.
-If a coroutine awaits a `Future` that has its result,
-the `await` expression evaluates to that result and the coroutine keeps running.
-If the `Future` is still waiting for its result,
+If a coroutine awaits a `Future` that is still waiting for its result,
 the coroutine pauses at the `await`,
 and the task's `send(None)` call returns the `Future`.
 The `Future` is the request, and its result is the reply.
 When the result arrives, the event loop puts the task back in the queue,
-the task calls `send(None)` again,
-and the `await` expression evaluates to the `Future`'s result.
+and the task calls `send(None)` again,
+which resumes the coroutine at the `await`.
+If the `Future` has its result when the coroutine reaches the `await`,
+the coroutine keeps running.
+In both cases the `await` expression evaluates to the `Future`'s result.
 
 The event loop is the single driver at the edge of the program.
 Each request passes through every awaiting caller on its way to the event loop,

@@ -295,3 +295,18 @@ and it becomes part of every future pass.
   Grep the scope for `describes`, `calls`, and `defines` after a
   chapter link and read the sentence that follows.
   C76 in `bruce_edit_db.md`.
+- **Two cases that end alike state the shared ending once.**
+  "If a coroutine awaits a `Future` that has its result, the `await`
+  expression evaluates to that result ... If the `Future` is still
+  waiting ... and the `await` expression evaluates to the `Future`'s
+  result." (Bruce, 2026-11-13: "echoes an earlier sentence in the
+  paragraph so it confuses me").
+  The second case ended on the first case's predicate, so the reader
+  took it for a return to the first case.
+  Walk the case with the steps first, give the short case one
+  sentence, and put the shared ending after both, marked as shared:
+  "In both cases the `await` expression evaluates to the `Future`'s
+  result."
+  A repair that adds a case to a paragraph rereads the whole
+  paragraph for what the new sentence repeats.
+  C78 in `bruce_edit_db.md`.
