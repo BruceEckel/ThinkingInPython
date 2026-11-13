@@ -2057,7 +2057,7 @@ When the input ends on a single asterisk,
 `__next__()` must read the character after an asterisk to tell a single asterisk from a pair.
 At `[2]` the call holds a single asterisk and the character after it,
 two characters to deliver with one return value.
-The call returns the asterisk and stores the second character in `_held`.
+The call stores the second character in `_held` and returns the asterisk.
 The test at `[1]` begins every call and chooses between returning a stored character and reading a new one.
 Conway calls that test "a switch which bifurcates the subroutine and selects the part to be used at each call depending on the situation at the last call."
 A harder task, he notes, "would necessitate an absurd arrangement of switches."
@@ -2221,9 +2221,10 @@ for value in Fibonacci(7):
 #: value=8 total=20
 ```
 
-The class moves the locals `a` and `b` into the attributes `_a` and `_b` and turns the control flow inside out.
-In `fibonacci_callback.py`,
-the running function's stack frame holds the `for` loop's count of values.
+The class moves the locals `a` and `b` into the attributes `_a` and `_b`,
+and each `__next__()` call computes one value,
+as one pass of the `for` loop in `fibonacci_callback.py` does.
+In that listing, the running function's stack frame holds the `for` loop's count of values.
 In `Fibonacci`, that count is the attribute `remaining`,
 which `__next__()` decrements and tests on every call.
 
@@ -2234,7 +2235,7 @@ Each approach gives up one side's loop or the alternation between the two loops:
   a function the producer's loop calls.
 - The list keeps both loops but runs the producer's loop to completion before the consumer's loop starts.
 - The class turns the producer inside out:
-  its loop becomes the bookkeeping in `__next__()`.
+  its loop becomes the `remaining` count that `__next__()` decrements and tests.
 
 All three approaches work around the same missing ability:
 pausing `fibonacci()` in the middle of its loop, handing out a value,
@@ -2246,7 +2247,7 @@ with three differences:
 
 1. A generator holds no items.
    A value goes out, the generator stays suspended until the driver sends a value,
-   and then the next value goes out.
+   and the next value goes out.
 2. Control moves with the value,
    so at any moment either the driver or the generator body is running.
 3. The generator cannot start an exchange.
@@ -2256,7 +2257,7 @@ with three differences:
 
 PEP 255's authors wanted the useful part of a coroutine without the whole mechanism.
 The useful part is that a suspended generator keeps its [execution frame](05_Foundations--Functions.md#names-inside-a-function)
-alive and resumes it on the next call.
+alive, and a later call resumes it.
 Python discards a function's stack frame when the function returns.
 At `yield`, Python unlinks the generator's execution frame from the call stack,
 so the frame stops being a stack frame.
@@ -2270,7 +2271,7 @@ Icon's `suspend` produces a value and leaves the procedure ready to produce anot
 CLU and Sather use the word `yield` for the same step inside an iterator,
 which hands one element at a time to a loop.
 
-Generators are now ordinary.
+Many languages now have generators.
 JavaScript adopted Python's design first,
 in Mozilla's JavaScript 1.7 for Firefox 2 (2006):
 Python-inspired generators with `send()`, `throw()`, and `close()`.
@@ -2294,7 +2295,7 @@ so that a program needs a single stack.
 
 ### The Restriction Behind the Driver
 
-PEP 255 kept the suspended frame and dropped a coroutine's ability to hand control to any other coroutine.
+PEP 255 kept the suspended frame and left out a coroutine's ability to hand control to any other coroutine.
 Each `yield` hands control back to the caller of `next()` or `send()`.
 In 2001, handing control anywhere else meant preserving part of the C stack along with the frame,
 because CPython ran each Python call inside a nested call of its interpreter.
@@ -2305,7 +2306,7 @@ The suspended generator is the one-shot continuation that [What a Suspended Gene
 describes.
 PEP 255's restriction says who resumes it:
 the code that called `next()` or `send()`.
-That restriction requires a driver: something must call `next()` and `send()`.
+That restriction requires a driver, the code that calls `next()` and `send()`.
 A generator cannot specify its driver, so you write it.
 
 In May 1999, two years before the PEP,
@@ -2321,8 +2322,7 @@ Such programs need to pass a value or an exception into a generator at its suspe
 which `send()` and `throw()` do.
 The PEP also permits `yield` inside `try`/`finally` and adds `close()`,
 so that an abandoned generator runs its cleanup code.
-The PEP's trampoline combines the loop in `trap_generators_demo.py` with a scheduler like `task_runner_send.py`,
-which runs many generators from one driver.
+The PEP's trampoline combines the loop in `trampoline()` from `trap_generators_demo.py` with a scheduler like `task_runner()` in `task_runner_send.py`.
 
 A generator has a second restriction.
 A `yield` suspends one frame,
@@ -2339,9 +2339,8 @@ and it evaluates to the helper's return value,
 so you can compose a conversation from parts that never refer to their driver.
 
 An event loop is one such driver.
-`async`/`await` (PEP 492, Python 3.5, 2015)
-reuses the generator's implementation,
-with a syntax that marks a function as one the event loop resumes.
+PEP 492 added `async`/`await` to Python 3.5 in 2015.
+The new syntax reuses the generator's implementation and marks a function as one the event loop resumes.
 `await` uses the implementation of `yield from`,
 so the second restriction holds for it.
 An `await` suspends the `async` function that contains it,
@@ -2349,13 +2348,12 @@ so a caller that awaits that function suspends at its own `await` and must be `a
 [The Driver You Already Use](#the-driver-you-already-use) states the result:
 every awaiting caller is `async` in turn.
 
-An Effect system builds on a generator rather than a full coroutine,
-for the reason the 2001 design chose the half it did.
+An Effect system builds on a generator rather than a full coroutine because of PEP 255's restriction.
 A generator hands each request to the code that resumed it.
 That code is the driver you write.
 
-[Stateless](46_Effects--Stateless.md)
-builds on all three of this chapter's ideas.
+[Stateless](46_Effects--Stateless.md) builds on this chapter's three ideas:
+the driver, the request and its answer, and `yield from`.
 It describes a function by what it requests and writes those requests into its return type.
 
 ## Exercises
