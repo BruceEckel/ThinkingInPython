@@ -28,6 +28,8 @@
 //     (navigation is the Contents drop-down, the section menu with its
 //     listing list, the chapter's own contents, previous/next, and a
 //     footnote's back-link);
+//   - a link to an authored anchor (an empty span opening a listing's
+//     lead-in) whose panel holds no listing;
 //   - a panel that is empty, keeps an id or a footnote back-link, or holds
 //     a "#place" link taken from another page and still naming this one;
 //   - a link inside a panel opening a second panel, or Escape not closing;
@@ -135,6 +137,22 @@ function openPage(jsdom, name, script) {
 
 const panelIn = w => w.document.querySelector(".link-preview");
 
+// True when `href` names an authored anchor: the empty span that
+// `[]{#id}` in the Markdown puts at the start of a listing's lead-in.
+const pageText = new Map();
+function targetsAuthoredAnchor(name, href) {
+  const hash = href.indexOf("#");
+  if (hash < 0 || /^[a-z][a-z0-9+.-]*:/i.test(href)) return false;
+  const page = href.slice(0, hash) || name;
+  if (!pageText.has(page)) {
+    const file = path.join(SITE, page);
+    pageText.set(page,
+                 fs.existsSync(file) ? fs.readFileSync(file, "utf8") : "");
+  }
+  const id = decodeURIComponent(href.slice(hash + 1));
+  return pageText.get(page).includes(`<span id="${id}"></span>`);
+}
+
 async function hoverEvery(w, name, counts, problems) {
   const firstOfKind = new Map();
   let codeLines = 0;
@@ -164,6 +182,9 @@ async function hoverEvery(w, name, counts, problems) {
     }
     if (panel.querySelector(".link-preview-go")) {
       problems.push(`${at}: "Go there" in a hovered panel`);
+    }
+    if (targetsAuthoredAnchor(name, href) && !panel.querySelector("pre")) {
+      problems.push(`${at}: an authored anchor's panel holds no listing`);
     }
     if (href[0] !== "#") {
       for (const inner of panel.querySelectorAll("a[href^='#']")) {

@@ -7,6 +7,8 @@
 //     listing;
 //   a heading, on this page or another chapter's: the heading and the
 //     text under it, up to the next heading of its level or MAX_BLOCKS;
+//   an authored anchor (an empty span opening a listing's lead-in): the
+//     lead-in and the listing under it;
 //   a whole chapter (a link with no #anchor): its title and opening text;
 //   a footnote reference: the note.
 //
@@ -139,6 +141,16 @@
         return !part.classList.contains("footnote-back");
       });
       return { nodes: note, more: false };
+    }
+    if (el.tagName === "SPAN" && !el.firstChild && el.closest("p")) {
+      // An authored anchor ([]{#id} in the Markdown) opens the lead-in
+      // of a listing: show the lead-in and the listing under it.
+      var listed = false;
+      return collect(el.closest("p"), function (next) {
+        if (listed || level(next)) return true;
+        listed = next.matches("div.sourceCode, pre");
+        return false;
+      });
     }
     if (el.matches("div, pre, p, li, table, blockquote")) {
       return { nodes: [el], more: false };
