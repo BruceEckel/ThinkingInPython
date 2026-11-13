@@ -266,3 +266,15 @@ Shapes Bruce flags that the catalog above did not name, dated, with the sentence
   coroutine", not "drives", C67).
   Grep the scope for `, an? \w+ (like|that|which|for)` after a verb
   with a code-span subject and object.
+- 2026-11-13, chapter 45: a list of shared members that omits one the reader knows.
+  "A coroutine object has `send()`, `throw()`, and `close()`, as a
+  generator does" (Bruce: "but no next()?").
+  The chapter drives every generator with `next()`, so the reader
+  counts three of four and cannot tell an omission from a difference.
+  Probe the second thing for the missing member and say what it does:
+  "It is not an iterator, so `next()` on a coroutine object raises a
+  `TypeError`, and each `asyncio` task starts and resumes one
+  coroutine with `send(None)`".
+  For each "as X does", "like X", or "the same methods as", list what
+  the chapter has taught X to have and compare.
+  C75 in `bruce_edit_db.md`.

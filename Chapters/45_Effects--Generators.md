@@ -1862,8 +1862,9 @@ It yields only to take turns.
 `asyncio.run()` starts the `asyncio` event loop.
 The event loop is a driver like `task_runner()` in `task_runner_send.py`,
 with the work divided between the loop and its tasks.
-A coroutine object has `send()`, `throw()`, and `close()`, as a generator does,
-and each `asyncio` task resumes one coroutine with `send()`.
+A coroutine object has `send()`, `throw()`, and `close()`, as a generator does.
+It is not an iterator, so `next()` on a coroutine object raises a `TypeError`,
+and each `asyncio` task starts and resumes one coroutine with `send(None)`.
 The event loop keeps a queue of the tasks that are ready to run,
 as `task_runner()` keeps `ready`, and runs the task at the front.
 [Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics)

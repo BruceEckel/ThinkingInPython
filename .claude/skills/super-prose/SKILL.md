@@ -138,7 +138,14 @@ each pass hands the next one less to do.
    thing that fits the definition. The noun after "such a", "this",
    or "that" is one the passage has used for that thing.
 6. `ambiguity`: every sentence that counts, compares, coordinates,
-   modifies, or limits keeps one reading. A modifier that narrows a
+   modifies, or limits keeps one reading. A list of what two things
+   share ("has `send()`, `throw()`, and `close()`, as a generator
+   does") is counted against what the chapter taught the first
+   thing to have; for a member left out, probe the second thing and
+   say what it does ("It is not an iterator, so `next()` on a
+   coroutine object raises a `TypeError`", C75). A trailing
+   appositive with a role noun ("starts the event loop, a driver
+   like ...") gets a sentence with its own subject (C67). A modifier that narrows a
    true claim tells the reader the other cases differ ("raise a
    `TypeError` on a suspended generator", Bruce: "can a generator in
    any state be copied?"): run the claim with the modifier removed,

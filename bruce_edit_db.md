@@ -4960,6 +4960,37 @@ generator with ansering the request":
 **Home.** cohesion (Accrued patterns) | super-prose (pass 4) | this
 file.
 
+### C75. A list of what two things share says what the reader's missing member does
+
+**Test.** A sentence lists the members two things have in common ("A
+coroutine object has `send()`, `throw()`, and `close()`, as a
+generator does") and the chapter has taught one more member of the
+first thing (`next()`, used in every listing). The reader counts the
+list against what they know and asks about the one left out. Probe
+the second thing for that member and state the result in the next
+sentence, with its consequence: "It is not an iterator, so `next()`
+on a coroutine object raises a `TypeError`, and each `asyncio` task
+starts and resumes one coroutine with `send(None)`."
+
+**Keep when.** The list is complete for what the chapter has taught,
+or the sentence says "among others" and the difference plays no part
+in what follows.
+
+**Sightings.** 1, `45_Effects--Generators` 2026-11-13, Bruce: "but no
+next()?":
+- "A coroutine object has `send()`, `throw()`, and `close()`, as a
+  generator does, and each `asyncio` task resumes one coroutine with
+  `send()`." -> the list sentence, then the two clauses quoted in the
+  test.
+- Why the passes missed it: the list is true, and every pass that
+  checks a claim checks the members listed. `tip overclaims` reads a
+  bound ("only", "three") and this list states none. C70 covers a
+  modifier that implies other cases differ; a short list implies it
+  the same way, and here the implication was true and unstated.
+
+**Home.** ambiguity (Accrued shapes) | super-prose (pass 6) | this
+file.
+
 ## Retired
 
 Rejected by Bruce, or promoted and later withdrawn. Never propose these
