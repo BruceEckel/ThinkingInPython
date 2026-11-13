@@ -4786,6 +4786,23 @@ Claude-written, Bruce's question above:
   an adjective. No pass asks what a modifier implies about the cases
   it leaves out.
 
+2, the same chapter 2026-11-13, the other outcome of the probe, Bruce:
+"'when' -- sounds like there's another option as well?":
+- "an `await` on a `Future` is a `yield` when the `Future` is still
+  waiting for its result." -> "an `await` on a `Future` has two cases.
+  If the `Future` has its result, the `await` expression takes that
+  value and the coroutine keeps running. If the `Future` is still
+  waiting for its result, the `await` is a `yield`."
+- Here the other case does differ (a probe: `send(None)` on a
+  coroutine awaiting a finished `Future` raises `StopIteration` with
+  the result and yields nothing), so the condition stays and the
+  other case gets its sentence. A "when", "if", or "unless" clause on
+  a claim about what Python does is the same modifier as an
+  adjective: say what the other branch does, or say that it is the
+  same. The sentence came from Claude's super-prose pass, which moved
+  "that has no result yet" into a "when" clause to clear a watch-word
+  hit and did not apply this test to the result.
+
 **Home.** ambiguity (Accrued shapes) | super-prose (pass 6) | this
 file.
 

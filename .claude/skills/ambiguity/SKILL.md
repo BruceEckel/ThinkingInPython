@@ -309,3 +309,16 @@ Shapes Bruce flags that the catalog above did not name, dated, with the sentence
   For each compound term in the scope (event loop, type checker,
   class attribute, stack frame), grep for its head noun alone.
   C67 in `bruce_edit_db.md`, sighting 4.
+- 2026-11-13, chapter 45: a condition clause with its other branch unstated.
+  "an `await` on a `Future` is a `yield` when the `Future` is still
+  waiting for its result" (Bruce: "sounds like there's another option
+  as well?").
+  A "when", "if", or "unless" on a claim about what Python does is
+  C70's narrowing modifier in clause form. Probe the other branch.
+  Here it differs, so both get a sentence, the short case first:
+  "If the `Future` has its result, the `await` expression takes that
+  value and the coroutine keeps running. If the `Future` is still
+  waiting for its result, the `await` is a `yield`."
+  Grep the scope for `when`, `if`, and `unless` after a main clause
+  whose verb is "is" or a behavior verb, and ask what the other
+  branch does.
