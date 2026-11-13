@@ -1859,15 +1859,18 @@ It yields only to take turns.
 
 ## The Driver You Already Use
 
-`asyncio.run()` starts an event loop,
-a driver like the one in `task_runner_send.py`.
-The event loop gives each task a turn and answers the request each task yields.
-Like a generator, a coroutine object offers `send()`, `throw()`, and `close()`.
+`asyncio.run()` starts the `asyncio` event loop,
+a driver like `task_runner()` in `task_runner_send.py`.
+A coroutine object has `send()`, `throw()`, and `close()`, as a generator does,
+and each `asyncio` task drives one coroutine with `send()`.
+The event loop keeps a queue of the tasks that are ready to run,
+as `task_runner()` keeps `ready`, and runs the task at the front.
 [Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics)
 describes `await` as suspending a task until the event loop resumes it.
-`await` suspends the coroutine and yields a request, a `Future`,
-to the task that drives it.
-When the `Future` has a result, the loop resumes the coroutine,
+`await` suspends the coroutine and yields a `Future` to the task that drives it.
+The `Future` is the request, and its result is the reply.
+When the `Future` has a result, the loop puts the task back in the queue,
+the task resumes the coroutine,
 and the `await` expression evaluates to that result.
 
 That event loop is the single driver at the edge of the program.

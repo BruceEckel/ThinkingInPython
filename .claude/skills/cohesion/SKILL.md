@@ -262,3 +262,23 @@ and it becomes part of every future pass.
   The paragraph that returns to the running example starts a new paragraph and names its function.
   For each listing, compare its names with the listing before it; when none carry over, read the lead-in for the tie.
   C71 in `bruce_edit_db.md`.
+- **An analogy to an earlier listing maps its terms before it uses them.**
+  "`asyncio.run()` starts an event loop, a driver like the one in
+  `task_runner_send.py`. The event loop gives each task a turn and
+  answers the request each task yields." (Bruce, 2026-11-13:
+  "unclear, and is this the asincio event loop? It sounds like a
+  generator with ansering the request").
+  The second sentence used the listing's words (turn, request,
+  answer) for `asyncio` before the paragraph had said that a
+  coroutine has `send()` or that `await` yields anything, so the
+  reader could not tell which system it described.
+  Name the system in the sentence ("the `asyncio` event loop",
+  "each `asyncio` task").
+  Put each fact before the sentence that depends on it: a coroutine
+  object has `send()`, a task drives it, the loop keeps a queue as
+  `task_runner()` keeps `ready`, `await` yields a `Future`.
+  State the mapping in a sentence of its own: "The `Future` is the
+  request, and its result is the reply."
+  Probe the real system before writing the mapping.
+  Grep the scope for `like the`, `as in`, and `the same as` beside a listing name.
+  C74 in `bruce_edit_db.md`.

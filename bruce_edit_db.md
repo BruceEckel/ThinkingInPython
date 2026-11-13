@@ -4899,6 +4899,51 @@ but 'leaves' is a strange way to put it":
 **Home.** literal (Accrued patterns) | super-prose (pass 1) | this
 file.
 
+### C74. An analogy to an earlier listing names the real system and maps the listing's terms before using them
+
+**Test.** A paragraph says a real system is like an earlier listing
+("an event loop, a driver like the one in `task_runner_send.py`") and
+then describes the system in the listing's words (turn, request,
+answer). Three things can be missing. The system is not named in the
+sentence, so the reader asks which loop. A fact the sentence depends
+on comes later in the paragraph (that a coroutine has `send()`, that
+`await` yields). The listing's words are used for the system's parts
+with no sentence saying which part is which. Name the system, put
+each fact before the sentence that uses it, and state the mapping in
+a sentence of its own ("The `Future` is the request, and its result
+is the reply"). Probe the real system before writing the mapping.
+
+**Keep when.** The paragraph only points at the likeness and says no
+more about the system, or the terms are the system's own (the
+documentation calls it a request).
+
+**Sightings.** 1, `45_Effects--Generators` 2026-11-13, Bruce:
+"unclear, and is this the asincio event loop? It sounds like a
+generator with ansering the request":
+- "`asyncio.run()` starts an event loop, a driver like the one in
+  `task_runner_send.py`. The event loop gives each task a turn and
+  answers the request each task yields. Like a generator, a coroutine
+  object offers `send()`, `throw()`, and `close()`." -> "`asyncio.run()`
+  starts the `asyncio` event loop, a driver like `task_runner()` in
+  `task_runner_send.py`. A coroutine object has `send()`, `throw()`,
+  and `close()`, as a generator does, and each `asyncio` task drives
+  one coroutine with `send()`. The event loop keeps a queue of the
+  tasks that are ready to run, as `task_runner()` keeps `ready`, and
+  runs the task at the front." The `await` sentences follow, with
+  "The `Future` is the request, and its result is the reply." and
+  "the loop puts the task back in the queue, the task resumes the
+  coroutine".
+- Why the passes missed it: each sentence passes alone. It is
+  active, literal, and true of `task_runner()`. The cohesion pass
+  tests old-before-new on a sentence's subject, and "the event loop"
+  was old; the new information the sentence leaned on ("each task
+  yields") was in its object. `tip overclaims` and the survey rules
+  read no cross-system claim, and no listing stands under the
+  paragraph for a pass to check it against.
+
+**Home.** cohesion (Accrued patterns) | super-prose (pass 4) | this
+file.
+
 ## Retired
 
 Rejected by Bruce, or promoted and later withdrawn. Never propose these

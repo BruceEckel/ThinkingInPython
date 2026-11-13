@@ -88,7 +88,15 @@ each pass hands the next one less to do.
    "the" and a second noun, and name the things the stand-in nouns
    ("value", "record", "object") point at.
 4. `cohesion`: old before new, one topic string per paragraph, R29's
-   one primary concept per paragraph. Two seams to read for in every
+   one primary concept per paragraph. A paragraph that likens a real
+   system to an earlier listing ("a driver like the one in
+   `task_runner_send.py`") names the system (`asyncio`'s event
+   loop), states each fact before the sentence that uses it, and
+   maps the listing's words onto the system's parts ("The `Future`
+   is the request, and its result is the reply") before using them
+   ("answers the request each task yields" came two sentences before
+   anything said a coroutine yields, C74). Grep the scope for
+   `like the`, `as in`, and `the same as` beside a listing name. Two seams to read for in every
    walkthrough: a sentence after the paragraph's concluding sentence
    ("The nesting of the `try` blocks is the undo stack." followed by
    "The second booking receives no `throw()`, ..."), and a sentence
