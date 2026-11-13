@@ -1895,9 +1895,10 @@ so an `await` in a function makes each of those callers `async` in turn.
 ### Asynchronous Generators
 
 An `async def` function can contain `yield`.
-The result is an *asynchronous generator*, which has two drivers at once.
+The result is an *asynchronous generator*, which has two drivers at once:
+the `asyncio` event loop for its `await`s and an `async for` loop for its `yield`s.
 Each `await` passes a request up to the event loop,
-while each `yield` hands a value to the `async for` loop that consumes it:
+while each `yield` hands a value to the `async for` loop:
 
 ```python
 # async_generator.py
