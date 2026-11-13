@@ -1998,8 +1998,8 @@ so `AsyncGenerator[YieldType, SendType]` takes two parameters where `Generator` 
 Writing `return` with a value in an asynchronous generator is a `SyntaxError`,
 as is `yield from`.
 In place of `send()`, `throw()`, and `close()`,
-an asynchronous generator has `asend()`, `athrow()`, and `aclose()`,
-and the caller must `await` a call to any of the three.
+an asynchronous generator has `asend()`, `athrow()`, and `aclose()`.
+The caller must `await` a call to any of those three.
 
 ## Half a Coroutine by Design
 
