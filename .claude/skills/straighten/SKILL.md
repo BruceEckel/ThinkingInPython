@@ -405,3 +405,14 @@ before/after pair, and it becomes part of every future pass.
   Keep a clause whose subject is a pronoun or one short code span with
   the verb right after it ("the value it sends").
   Grep the scope for `whose`. C69 in `bruce_edit_db.md`.
+  The form with no pronoun, at the end of a sentence, the same day:
+  "A *Memento* belongs to the enum designs, which keep the state in a
+  value a record can hold" (Bruce: "awkward confusing").
+  "A value a record" is two noun phrases with no verb between them,
+  and both are stand-ins: the value is an `Enum` member and the
+  record is the *Memento*.
+  Name them, and the clause turns into subject-verb-object:
+  "In the enum designs, the current state is an `Enum` member, which
+  a *Memento* can store in a field."
+  No grep finds this form; read for a noun followed directly by "a"
+  or "the" and a second noun.

@@ -4663,6 +4663,21 @@ Claude-written, Bruce: "??":
   The same edit made "chapter 31's table" into "chapter 31's `Enum`
   design": the paragraph opens on "Chapter 31's `Enum`", and "table"
   was a second name for it (C67).
+- same section and day, Bruce: "awkward confusing": "A *Memento*
+  belongs to the enum designs, which keep the state in a value a
+  record can hold." -> "In the enum designs, the current state is an
+  `Enum` member, which a *Memento* can store in a field."
+  The shape sat at the end of the sentence this time, with no
+  relative pronoun: "a value a record can hold" puts "a value" and "a
+  record" side by side. Both nouns were also stand-ins: the value is
+  an `Enum` member and the record is the *Memento*, so the repair
+  names them and the clause becomes subject-verb-object with "which".
+  "Belongs to" gave a verdict where the sentence could say what the
+  *Memento* does (the literal pass's vague description). Additions to
+  the test: the shape counts anywhere in the sentence, with or without
+  "that"; and a clause built on "value", "thing", "object", or
+  "record" as a stand-in gets the named thing first, which usually
+  removes the clause.
 - Why the passes missed it: `tip subject-gap` lists a subject nine or
   more words from its verb, and "machine" is six from "belongs". The
   straighten pass reads for a subject held open by length, and this

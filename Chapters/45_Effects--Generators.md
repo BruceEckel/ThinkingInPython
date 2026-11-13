@@ -1688,8 +1688,9 @@ The generator design has a second limit.
 `copy.deepcopy()` and `pickle.dumps()` raise a `TypeError` for every generator,
 started or not.
 A machine in this design is a generator, so a program cannot copy it or save it.
-A [*Memento*](36_Patterns--Memento.md#the-classic-memento)
-belongs to the enum designs, which keep the state in a value a record can hold.
+In the enum designs, the current state is an `Enum` member,
+which a [*Memento*](36_Patterns--Memento.md#the-classic-memento)
+can store in a field.
 
 One shape looks like a transition and is a delegation:
 

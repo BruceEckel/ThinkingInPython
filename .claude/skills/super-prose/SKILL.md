@@ -68,7 +68,12 @@ each pass hands the next one less to do.
    machine's states, use chapter 31's `Enum` design", C69).
    `tip subject-gap` misses it, since the gap is short: grep the
    scope for `whose` and read each clause for the order of its
-   subject and object.
+   subject and object. The form with no pronoun counts too, anywhere
+   in the sentence ("keep the state in a value a record can hold"
+   -> "the current state is an `Enum` member, which a *Memento* can
+   store in a field"): read for a noun followed directly by "a" or
+   "the" and a second noun, and name the things the stand-in nouns
+   ("value", "record", "object") point at.
 4. `cohesion`: old before new, one topic string per paragraph, R29's
    one primary concept per paragraph. Two seams to read for in every
    walkthrough: a sentence after the paragraph's concluding sentence
