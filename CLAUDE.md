@@ -1247,6 +1247,13 @@ and how it was measured.
 - **Anchors:** pandoc auto-slugs a heading (backticks/punctuation dropped, but `.`
   is kept). Give headings an explicit `{#id}` when the auto-slug would be ugly
   (e.g. anything containing `type[...]` or `__init__`). `heading_links.py` gates it.
+  A link that must land on a listing with no heading above it (a non-Python
+  listing gets no build-time `listing-` id) targets an empty span,
+  `[]{#id}`, at the start of the listing's lead-in paragraph (since
+  2026-11-13; chapter 44's `koka-greeting` is the first). `heading_links.py`
+  accepts the span as an anchor, `build_epub.namespace_spans()` prefixes it
+  for the EPUB and PDF, and `search_index.py` strips it. The `ix-` prefix is
+  reserved for `book_index.py`.
 - **A new third-party dependency may not install on the pinned Python.**
   `requires-python` tracks a bleeding-edge version (3.15, a beta from the book's
   start until its final release on 2026-10-11), so a package can lack a wheel for it (source

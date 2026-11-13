@@ -42,7 +42,12 @@ import re
 from pathlib import Path
 from typing import NamedTuple
 
-from tools.heading_links import ATTR_BLOCK, EXPLICIT_ID, pandoc_anchor
+from tools.heading_links import (
+    ATTR_BLOCK,
+    EXPLICIT_ID,
+    SPAN_ID,
+    pandoc_anchor,
+)
 from tools.config import BUILD_SITE_DIR as DEFAULT_OUT
 from tools.config import FENCE_ANY_RE as FENCE
 from tools.repo import md_files
@@ -94,6 +99,7 @@ def clean(lines: list[str]) -> str:
     """Strip Markdown decoration, leaving text worth matching against."""
     text = "\n".join(lines)
     text = STEP_SUMMARY.sub(" ", text)
+    text = SPAN_ID.sub("", text)  # an authored `[]{#id}` anchor
     text = MD_IMAGE.sub(" ", text)
     text = MD_LINK.sub(r"\1", text)
     text = FOOTNOTE.sub(" ", text)

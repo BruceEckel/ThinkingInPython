@@ -88,7 +88,13 @@ from pathlib import Path
 from tools import book_index, build_site, check_tools
 from tools.build_site import Chapter
 from tools import listing_links
-from tools.heading_links import ATTR_BLOCK, EXPLICIT_ID, LINK, pandoc_anchor
+from tools.heading_links import (
+    ATTR_BLOCK,
+    EXPLICIT_ID,
+    LINK,
+    SPAN_ID,
+    pandoc_anchor,
+)
 from tools.config import BUILD_EPUB_DIR as DEFAULT_OUT
 from tools.config import ROOT
 from tools.markdown import Document
@@ -240,6 +246,28 @@ def namespace_headings(lines: list[str], doc: Document,
         new = f"{prefix}-{old}"
         lines[index] = f"{m.group(1)} {text} {{#{new}}}"
         assigned.add(new)
+    return assigned
+
+
+def namespace_spans(lines: list[str], doc: Document,
+                    prefix: str) -> set[str]:
+    """Give each authored `[]{#id}` span in `lines` the id `prefix-id`.
+
+    The span ids share the headings' namespace, so `relink()` resolves a
+    link to one the same way. Returns the ids assigned.
+    """
+    assigned: set[str] = set()
+
+    def repl(m: re.Match[str]) -> str:
+        new = f"{prefix}-{m.group(1)}"
+        assigned.add(new)
+        return f"[]{{#{new}}}"
+
+    fenced = doc.in_fence()
+    for index, line in enumerate(lines):
+        if not fenced[index]:
+            lines[index] = outside_code(
+                line, lambda part: SPAN_ID.sub(repl, part))
     return assigned
 
 
@@ -701,6 +729,7 @@ def book_markdown(chapters: list[Chapter], missing: set[str],
         prefix = prefixes[ch.md.stem]
         known.add(prefix)
         known |= namespace_headings(lines, doc, prefix)
+        known |= namespace_spans(lines, doc, prefix)
         prepared.append((ch, doc, lines))
 
     # A link naming a chapter's own title heading reaches the chapter

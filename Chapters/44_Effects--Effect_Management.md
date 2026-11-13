@@ -625,7 +625,8 @@ shows how different Effect Management Systems work:
 - Two languages with native Effects: Koka and Flix
 - Two library Effect systems: ZIO for Scala and Effect for TypeScript
 
-[Koka](https://koka-lang.github.io/) is a research language with native Effects.
+[]{#koka-greeting}[Koka](https://koka-lang.github.io/)
+is a research language with native Effects.
 Its greeting program has the same `ask` and `tell` as `ask_tell.py`:
 
 ```koka

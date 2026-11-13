@@ -25,6 +25,7 @@ from tools.build_epub import (
     listing_html,
     metadata_yaml,
     namespace_headings,
+    namespace_spans,
     outside_code,
     polish_nav,
     polish_ncx,
@@ -76,6 +77,17 @@ def test_returns_the_ids_it_assigned() -> None:
 def test_heading_with_no_letters_gets_no_id() -> None:
     doc = Document.from_text("## 42\n")
     assert heading_ids(doc) == [(0, None)]
+
+def test_authored_span_id_is_namespaced_and_index_span_is_not() -> None:
+    text = ("[]{#koka-greeting}Koka has `[]{#shown}` and more.\n\n"
+            "[]{#ix-12-3}Indexed.\n\n```koka\n[]{#in-fence}\n```\n")
+    doc = Document.from_text(text)
+    lines = list(doc.lines)
+    assert namespace_spans(lines, doc, "ch44") == {"ch44-koka-greeting"}
+    assert lines[0] == \
+        "[]{#ch44-koka-greeting}Koka has `[]{#shown}` and more."
+    assert lines[2] == "[]{#ix-12-3}Indexed."
+    assert lines[5] == "[]{#in-fence}"
 
 # ── rewriting links ───────────────────────────────────────────────────────────
 

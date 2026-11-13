@@ -12,6 +12,10 @@ hyphens, and remove everything up to the first letter. A heading may instead set
 an explicit id with a trailing `{#id}`. This tool reproduces that rule, collects
 every heading id, and checks that each `#anchor` link points at one.
 
+A paragraph can carry an anchor too: an empty span, `[]{#id}`, at its start.
+That is how a link lands on a listing with no heading above it (chapter 44's
+`koka-greeting`). build_epub.py namespaces these ids along with the headings'.
+
 A broken anchor renders as a dead in-page link with no other warning, so this is
 a gate. It reports `path:line` and exits non-zero. There is nothing to auto-fix:
 correct the anchor, or give the target heading an explicit `{#id}`.
@@ -27,6 +31,11 @@ from tools.repo import add_paths_arg, is_solutions_file, md_files
 from tools.report import Check, Finding, report
 
 EXPLICIT_ID = re.compile(r"\{#([\w-]+)[^}]*\}\s*$")
+# An authored inline anchor, `[]{#id}`: an empty pandoc span that puts
+# an id on a paragraph, so a link can land on the listing below it,
+# where no heading sits. The `ix-` ids are book_index.py's, injected at
+# build time, and are never link targets in the source.
+SPAN_ID = re.compile(r"\[\]\{#(?!ix-)([\w-]+)\}")
 ATTR_BLOCK = re.compile(r"\s*\{[^}]*\}\s*$")
 INLINE_CODE = re.compile(r"`[^`]*`")
 INLINE_LINK = re.compile(r"\[([^\]]*)\]\([^)]*\)")
@@ -76,6 +85,18 @@ def heading_anchors(doc: Document) -> set[str]:
     return anchors
 
 
+def span_anchors(doc: Document) -> set[str]:
+    """Every id an authored `[]{#id}` span gives a paragraph."""
+    return {m.group(1)
+            for _, line in doc.outside_fences()
+            for m in SPAN_ID.finditer(INLINE_CODE.sub("", line))}
+
+
+def anchors(doc: Document) -> frozenset[str]:
+    """Every anchor a link can name: heading ids and span ids."""
+    return frozenset(heading_anchors(doc) | span_anchors(doc))
+
+
 def anchor_links(doc: Document) -> Iterator[tuple[int, str | None, str]]:
     """(lineno, target_stem_or_None, anchor) for each #-anchor link."""
     for lineno, line in doc.outside_fences():
@@ -97,7 +118,7 @@ def anchors_of(path: Path) -> frozenset[str] | None:
     """
     if not path.exists():
         return None
-    return frozenset(heading_anchors(Document.parse(path)))
+    return anchors(Document.parse(path))
 
 
 def find(doc: Document) -> Iterator[Finding]:
@@ -108,7 +129,7 @@ def find(doc: Document) -> Iterator[Finding]:
     and never disagrees with the text it was handed. Only cross-file
     links go to disk, through the cache.
     """
-    own = frozenset(heading_anchors(doc))
+    own = anchors(doc)
     # Only the book's files pass through build_site and build_epub;
     # tools/README.md is rendered by GitHub, where such anchors work.
     built = (doc.path.parent.name in BUILT_DIRS
