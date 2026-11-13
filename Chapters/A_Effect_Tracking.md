@@ -106,7 +106,7 @@ so a lambda passed to `Stream.map()` cannot throw a checked one.
 Programmers wrap the exception in an unchecked one, which the compiler accepts.
 
 **Handling subtracts.**
-In the Koka greeting program of [Native Effect Management](44_Effects--Effect_Management.md#native-effect-management),
+In the [Koka greeting program](44_Effects--Effect_Management.md#native-effect-management),
 `main()` handles `ask` and `tell`, so neither appears in its row,
 `<console,exn>`.
 The handler syntax and the subtraction are one construct,
