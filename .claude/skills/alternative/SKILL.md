@@ -207,3 +207,23 @@ Then the close calls kept, with the marker or the reason each one
 stood, and the baseline pairs accepted.
 A pass that frames more than a few sentences per chapter is reading
 general facts as alternatives; the sweep's rate was 0 to 4 a chapter.
+
+## Accrued shapes
+
+- 2026-11-13, chapter 45: a comparison with an earlier listing that
+  never says it is a comparison.
+  "The asynchronous generator `countdown()` in `async_generator.py`
+  computes `Countdown`'s sequence in a `while` loop with a `yield`,
+  and Python supplies the generator's `__aiter__()` and
+  `__anext__()`." under `async_iterator_class.py` (Bruce: "is this
+  somehow contrasting to the current listing?").
+  The file name framed it and its own paragraph set it apart, and it
+  still gave one side only, so the reader had to work out what the
+  class does in each place.
+  Open on what the two share ("`Countdown(5)` and `countdown(5)` in
+  `async_generator.py` produce the same sequence"), then give this
+  listing's side and the other side as parallel sentences, part for
+  part: where `n` is kept, who defines `__anext__()`, who raises
+  `StopAsyncIteration`.
+  For each sentence about another listing, ask what the listing on
+  the page does in each place the sentence mentions, and write it.

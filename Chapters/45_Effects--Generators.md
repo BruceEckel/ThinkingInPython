@@ -1986,8 +1986,12 @@ and the `async for` makes the rest.
 The `async for` ends when `__anext__()` raises `StopAsyncIteration`,
 the asynchronous counterpart of `StopIteration`.
 
-The asynchronous generator `countdown()` in `async_generator.py` computes `Countdown`'s sequence in a `while` loop with a `yield`,
-and Python supplies the generator's `__aiter__()` and `__anext__()`.
+`Countdown(5)` and `countdown(5)` in `async_generator.py` produce the same sequence.
+`Countdown` keeps `n` in an attribute, defines `__anext__()`,
+and raises `StopAsyncIteration` itself.
+`countdown()` keeps `n` in a local variable and yields in a `while` loop.
+Python supplies the generator's `__aiter__()` and `__anext__()`,
+and that `__anext__()` raises `StopAsyncIteration` when the body ends.
 
 An asynchronous generator has a yield channel and a send channel and no return channel,
 so `AsyncGenerator[YieldType, SendType]` takes two parameters where `Generator` takes three.
