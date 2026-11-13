@@ -87,6 +87,19 @@ each pass hands the next one less to do.
    narrates in order is read without the word and cut when the order
    survives ("The bare `raise` then re-raises" -> "The bare `raise`
    re-raises", C65); no tool lists it, so grep the scope for `then`.
+   A third seam is a listing that leaves the section's running
+   example: new names (`tick()`, `tock()` after two listings about
+   the mousetrap) under a lead-in that names neither the example nor
+   the question ("One shape looks like a transition and is a
+   delegation:"). The lead-in is rewritten from the running example:
+   what that example does, the alternative or question the listing
+   takes up, and the new names as an instance of it ("In
+   `trap_generators.py`, a state returns the next state ... The
+   alternative is for each state to delegate to the next state
+   itself ... `tick()` and `tock()` are two states written that
+   way:", C71). For each listing in the scope, compare its names
+   with the listing before it; when none carry over, read the
+   lead-in for the tie.
 5. `antecedents`: every pointer with two candidates gets its noun.
    A link is a pointer too: when its target teaches a named
    construct, the link text starts on the name ("The bare `raise`
@@ -257,6 +270,11 @@ a higher level.
 Edit prose only: fenced blocks, `#:` markers, quoted material, and
 headings stay, and a heading changes only when the section is being
 restructured anyway, with every link to its anchor updated.
+One addition is in scope: a section with no subsections whose listing
+leaves the running example to take up a question of its own gets a
+subsection heading that names the question (C71, "### Why a
+Trampoline" in chapter 45's "One Generator per State"). Report each
+heading added, since it changes the chapter's table of contents.
 Every claim a rewrite touches is checked against the listing it
 describes before the new sentence is written.
 A sentence a pass adds beside a listing is held to R47 like any

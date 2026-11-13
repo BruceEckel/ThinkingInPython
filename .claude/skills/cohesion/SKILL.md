@@ -248,3 +248,17 @@ and it becomes part of every future pass.
   and its baseline entry holds both:
   when you edit or move either sentence, the hit prints again for a read.
   `bruce_edit_db.md` R49 has the sightings.
+- **A listing that leaves the section's running example.**
+  Chapter 45's "One Generator per State" followed the mousetrap through two listings,
+  then showed `tick()` and `tock()` under "One shape looks like a transition and is a delegation:"
+  (Bruce, 2026-11-12: "this subsection has been about mousetraps and so the rest of this is kind of an abrupt change").
+  The lead-in named neither the mousetrap nor the question the listing answers.
+  Write it from the running example: what the example does, the alternative or question the listing takes up,
+  and the new names as an instance of it
+  ("In `trap_generators.py`, a state returns the next state and `trampoline()` delegates to it.
+  The alternative is for each state to delegate to the next state itself ...
+  `tick()` and `tock()` are two states written that way:").
+  A section with no subsections gets a heading that names the question ("Why a Trampoline").
+  The paragraph that returns to the running example starts a new paragraph and names its function.
+  For each listing, compare its names with the listing before it; when none carry over, read the lead-in for the tie.
+  C71 in `bruce_edit_db.md`.

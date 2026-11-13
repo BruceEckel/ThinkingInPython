@@ -1385,7 +1385,7 @@ That `yield` comes before the taxi step's `try`,
 so `Failed` leaves the taxi step, and the card step never starts.
 The exception then propagates up through the `yield from` in the hotel step and the one in the flight step.
 Each `except` clause prints its step's undo line.
-The [bare `raise` re-raises the exception the clause caught](04_Foundations--Control_Flow.md#errors-and-exceptions),
+The bare `raise` then [re-raises the exception the clause caught](04_Foundations--Control_Flow.md#errors-and-exceptions),
 so `Failed` continues out to the enclosing step.
 The hotel step prints its undo line before the flight step does.
 The nesting of the `try` blocks is the undo stack.
@@ -1692,7 +1692,13 @@ In the enum designs, the current state is an `Enum` member,
 which a [*Memento*](36_Patterns--Memento.md#the-classic-memento)
 can store in a field.
 
-One shape looks like a transition and is a delegation:
+### Why a Trampoline
+
+In `trap_generators.py`,
+a state returns the next state and `trampoline()` delegates to it.
+The alternative is for each state to delegate to the next state itself,
+with `return (yield from luring())` in place of `return luring()`.
+`tick()` and `tock()` are two states written that way:
 
 ```python
 # tail_delegation.py
@@ -1723,7 +1729,8 @@ but `tick()` stays suspended at its `yield from` until `tock()` returns.
 Every transition nests one generator deeper,
 and each `next()` passes through every level on its way to the innermost `yield`.
 After about a thousand transitions the chain is deeper than Python's recursion limit.
-The trampoline keeps the chain one level deep.
+
+`trampoline()` keeps the chain one level deep.
 `yield from state` finishes when the state returns,
 and the loop takes up the next state at the same depth.
 [The Restriction Behind the Driver](#the-restriction-behind-the-driver)

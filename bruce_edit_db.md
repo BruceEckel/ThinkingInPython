@@ -4744,6 +4744,49 @@ Claude-written, Bruce's question above:
 **Home.** ambiguity (Accrued shapes) | super-prose (pass 6) | this
 file.
 
+### C71. A listing that leaves the section's running example says what question about that example it answers
+
+**Test.** A section has followed one example (the mousetrap, the
+booking) through several listings, and the next listing uses new
+names that the example never had (`tick()`, `tock()`), under a
+lead-in that names neither the example nor the question: "One shape
+looks like a transition and is a delegation:". The reader cannot tell
+whether the section has moved on. Write the lead-in from the running
+example: say what that example does ("a state returns the next state
+and `trampoline()` delegates to it"), state the alternative or the
+question the new listing takes up ("The alternative is for each state
+to delegate to the next state itself, with `return (yield from
+luring())` in place of `return luring()`"), and introduce the new
+names as an instance of it ("`tick()` and `tock()` are two states
+written that way:"). When the section has no subsections and the new
+listing opens a question of its own, it also gets a heading that
+names the question ("Why a Trampoline"). The paragraph that returns
+to the running example afterward starts a new paragraph and names the
+example's function ("`trampoline()` keeps the chain one level deep").
+
+**Keep when.** The new listing reuses the example's names or imports
+its module, so the tie is in the code; or the previous paragraph
+already posed the question the listing answers.
+
+**Sightings.** 1, `45_Effects--Generators` 2026-11-12, was
+Claude-written, Bruce: "this subsection has been about mousetraps and
+so the rest of this is kind of an abrupt change; does it need it's
+own subsection or some other clarification?":
+- "One shape looks like a transition and is a delegation:" -> a
+  heading, "### Why a Trampoline", and the three-sentence lead-in
+  quoted in the test.
+- Why the passes missed it: every prose pass reads sentences and
+  paragraphs, and this fault is between a listing and the section
+  around it. Super-prose's scope says headings stay, so no pass could
+  add one. `survey self-name` and `survey absent-name` test a lead-in
+  against the listing under it and never against the listings above.
+  The lead-in's "One shape" is a vague subject the literal pass could
+  have caught, and it would have rewritten the sentence without
+  supplying the tie.
+
+**Home.** cohesion (Accrued patterns) | super-prose (pass 4 and Scope)
+| this file.
+
 ## Retired
 
 Rejected by Bruce, or promoted and later withdrawn. Never propose these
