@@ -1886,7 +1886,10 @@ the coroutine keeps running.
 In both cases the `await` expression evaluates to the `Future`'s result.
 
 The event loop is the single driver at the edge of the program.
-Each request passes through every awaiting caller on its way to the event loop,
+An `await` on a coroutine delegates to that coroutine,
+as `yield from` delegates to an inner generator,
+and it evaluates to the coroutine's return value.
+Each request the inner coroutine yields passes through every awaiting caller on its way to the event loop,
 so an `await` in a function makes each of those callers `async` in turn.
 
 An `async def` function can also contain `yield`.

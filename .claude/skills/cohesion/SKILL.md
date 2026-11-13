@@ -310,3 +310,17 @@ and it becomes part of every future pass.
   A repair that adds a case to a paragraph rereads the whole
   paragraph for what the new sentence repeats.
   C78 in `bruce_edit_db.md`.
+- **A mechanism the chapter taught under a name is called by that name when it returns.**
+  "Each request passes through every awaiting caller on its way to
+  the event loop" (Bruce, 2026-11-13: "is this like 'yield from'?").
+  The chapter taught this relay for `yield from`, with its own
+  words, and the sentence described it again in general words for
+  `await`, so the reader had to ask whether it was the same thing.
+  Probe that it is, then name the taught construct and reuse its
+  vocabulary: "An `await` on a coroutine delegates to that coroutine,
+  as `yield from` delegates to an inner generator, and it evaluates
+  to the coroutine's return value."
+  For each sentence that describes a relay, a delegation, a
+  suspension, or a cleanup in general words, check the chapter's
+  headings for the section that taught it.
+  C79 in `bruce_edit_db.md`.

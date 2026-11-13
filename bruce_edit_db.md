@@ -5143,6 +5143,39 @@ an earlier sentence in the paragraph so it confuses me":
 **Home.** cohesion (Accrued patterns) | stutter (Accrued shapes) |
 super-prose (pass 4) | this file.
 
+### C79. A mechanism the chapter taught under a name is called by that name when it returns
+
+**Test.** A sentence describes behavior in general words ("Each
+request passes through every awaiting caller on its way to the event
+loop") and the chapter has a section that taught that behavior for
+another construct, with a name and a vocabulary (`yield from`:
+"delegates to an inner generator", "every request the inner generator
+yields passes out to the driver", "evaluates to the inner generator's
+return value"). The reader recognizes it and has to ask whether it is
+the same thing. Probe that it is, then say so with the taught
+construct's name and its words: "An `await` on a coroutine delegates
+to that coroutine, as `yield from` delegates to an inner generator,
+and it evaluates to the coroutine's return value."
+
+**Keep when.** The likeness is partial and the difference would need
+a paragraph, or the taught section is in a later chapter.
+
+**Sightings.** 1, `45_Effects--Generators` 2026-11-13, Bruce: "is
+this like 'yield from'?":
+- "Each request passes through every awaiting caller on its way to
+  the event loop," -> the delegation sentence quoted in the test, in
+  front of "Each request the inner coroutine yields passes through
+  every awaiting caller on its way to the event loop,".
+- Why the passes missed it: the sentence is true and literal. C74
+  tests an analogy that is on the page for its mapping, and nothing
+  tests for an analogy that is missing. The section 400 lines later
+  says "`await` uses the implementation of `yield from`", so the
+  chapter had the fact and stated it after the place the reader
+  needed it.
+
+**Home.** cohesion (Accrued patterns) | super-prose (pass 4) | this
+file.
+
 ## Retired
 
 Rejected by Bruce, or promoted and later withdrawn. Never propose these
