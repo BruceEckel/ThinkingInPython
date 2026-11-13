@@ -327,3 +327,18 @@ and it becomes part of every future pass.
   already removed that job from `ready`, and the `continue` skips the
   `append()` that puts a job back". Add `leaves?` to the grep; the
   transitive "leaves `x` as it was" is a keep.
+- **An expression evaluates to a value.**
+  "the `await` expression takes that value and the coroutine keeps
+  running" (Bruce, 2026-11-13: "'takes' is unclear").
+  "Takes" has three readings here: accepts an argument, removes the
+  value from the `Future`, or has it as its result. The Python
+  reference's verb is "evaluates to", and the chapter uses it for
+  `yield from` ("it evaluates to the helper's return value").
+  An expression "takes", "gets", "picks up", or "receives" nothing;
+  write "evaluates to", and keep the noun the sentence already used
+  ("that result" after "has its result", not "that value").
+  Both sites were Claude's, written to avoid repeating "result" and
+  to show the result does not arrive through `send()`. The first aim
+  was elegant variation, and the second is carried by the
+  `send(None)` in the same sentence.
+  Grep the scope for `expression` and for `takes (its|that|the) value`.

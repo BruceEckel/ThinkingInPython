@@ -5075,6 +5075,37 @@ it, and says so.
 **Home.** cohesion (Accrued patterns) | super-prose (pass 4) | this
 file.
 
+### C77. An expression "evaluates to" its value; keep the taught verb and the noun already used
+
+**Test.** A sentence gives an expression a verb other than the one
+the Python reference and the chapter use for it: an `await`, `yield`,
+or `yield from` expression "takes", "gets", "picks up", or "receives"
+a value. The reader tries the verb's ordinary senses (accepts an
+argument, removes the thing) before the meant one. Write "evaluates
+to". In the same sentence, the thing keeps the noun it had a clause
+earlier: "has its result ... evaluates to that result", not "that
+value".
+
+**Keep when.** The sentence is about the type ("the type the `yield`
+expression produces", chapters 45 and 46), or the verb is the
+construct's own (`send()` delivers, a function returns).
+
+**Sightings.** 1, `45_Effects--Generators` 2026-11-13, Bruce:
+"'takes' is unclear":
+- "the `await` expression takes that value and the coroutine keeps
+  running" -> "evaluates to that result"; and, found by grep, "the
+  `await` expression takes its value from the `Future`'s result" ->
+  "evaluates to the `Future`'s result".
+- Why the passes missed it: Claude's super-prose pass wrote both,
+  replacing "evaluates to that result", to avoid a third "result" in
+  the paragraph and to show that the reply does not arrive through
+  `send()`. The stutter skill forbids a synonym for a technical term,
+  and its test was not applied to a verb. The literal pass's list of
+  figures has no entry for a plain verb with several plain senses.
+
+**Home.** literal (Accrued patterns) | super-prose (pass 1) | this
+file.
+
 ## Retired
 
 Rejected by Bruce, or promoted and later withdrawn. Never propose these
