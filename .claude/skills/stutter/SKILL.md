@@ -199,3 +199,12 @@ sentence, the date, and the repair.
   paragraph that walks two cases for a clause said of both, and state
   it once after both ("In both cases ..."). C78 in
   `bruce_edit_db.md`; the cohesion skill has the repair.
+- 2026-11-13, chapter 45: a derived word beside its keyword.
+  "each of those three returns an awaitable for the caller to
+  `await`" (Bruce: "kind of hard to read"). "Awaitable" and `await`
+  are one stem in two forms three tokens apart, and the scan compares
+  whole identifiers, so it printed nothing. The noun added no fact:
+  an awaitable is a thing to await. Say the action once, with its
+  actor: "the caller must `await` a call to any of the three".
+  Read for `awaitable` near `await`, `iterable` near "iterate",
+  `callable` near "call", and `hashable` near "hash".

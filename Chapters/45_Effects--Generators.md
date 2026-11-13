@@ -1999,7 +1999,7 @@ Writing `return` with a value in an asynchronous generator is a `SyntaxError`,
 as is `yield from`.
 In place of `send()`, `throw()`, and `close()`,
 an asynchronous generator has `asend()`, `athrow()`, and `aclose()`,
-and each of those three returns an awaitable for the caller to `await`.
+and the caller must `await` a call to any of the three.
 
 ## Half a Coroutine by Design
 
