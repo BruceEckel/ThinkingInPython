@@ -2276,6 +2276,26 @@ baseline holds them):
   keeps were half the hits: "No lock protects the cell", "No type
   reports the race", "No tool reads the behavior behind the
   signature", where the absence is the lesson.
+- `45_Effects--Generators` 2026-11-13, Claude-written the same hour,
+  Bruce: "another 'negative' piece of prose which makes it confusing.
+  Analyze why this wasn't caught": "The first `next()` call in
+  `__next__()` passes no second argument. When `chars` ends there,
+  `StopIteration` leaves `__next__()`" -> "When `chars` ends at
+  `char = next(self.chars)`, `StopIteration` leaves `__next__()`". The
+  reader has to recall the argument the other call has and subtract
+  it, and "the first `next()` call" also made them count. Naming the
+  statement removed both.
+- Why it was not caught: `tip watch-words` listed it (`passes no`,
+  Tier 2), and no step ran `tip watch-words`. The sentence was written
+  in the session as part of the C83 repair, outside any prose pass,
+  and `tip verify-ch` ran before the commit and runs no report-only
+  prose check. It is the third such sentence in two days (C61's
+  "receives no `throw()`" and "Nothing calls `throw()`"), and C61's
+  remedy was a reminder to test "a sentence written during a listing
+  change", which this sentence, written during a prose change, fell
+  outside. The remedy is now a check: `tools/watch_words.py --changed`
+  reads the clauses on lines that differ from HEAD, and `tip
+  verify-ch` fails on a NEW Tier 2 or 3 hit among them.
 
 **Home.** CLAUDE.md (global, the `<verb> nothing` paragraph of the watch
 list, widened to `no X` and `none of`, and to the negated subject);

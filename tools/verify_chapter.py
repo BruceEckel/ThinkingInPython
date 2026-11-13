@@ -38,7 +38,11 @@ The steps, in order, mirror `verify` (fixers first, markers before sync):
    diagnostics in both, prose references to numbered exercises in
    both (the ones these two files make; a reference another chapter
    makes to this chapter's exercises needs the whole-book run),
-   exercise/solution numbering, unique slugs.
+   exercise/solution numbering, unique slugs, and
+   ``watch_words --changed``: a NEW Tier 2 or 3 watch word in a clause
+   on a line that differs from HEAD fails the run (since 2026-11-13),
+   so a sentence written in the session is read for a cancelled verb
+   or a negative subject before its commit.
 8. ``ty``, ``ruff``, ``run_examples``, and ``pytest`` over the chapter's
    directory in each build tree (the private ones under ``--build-dir``).
 
@@ -223,6 +227,9 @@ def main(argv: list[str] | None = None) -> int:
              "--build-dir", str(build_dir), *map(str, prose)]),
         run("exercise-refs",
             [*PY, "-m", "tools.exercise_refs", *map(str, prose)]),
+        run("watch-words on changed lines",
+            [*PY, "-m", "tools.watch_words", "--changed",
+             *map(str, prose)]),
         run("solutions-numbering",
             [*PY, "-m", "tools.check_solutions", number]),
         run("unique-slugs", [*PY, "-m", "tools.check_unique_slugs"]),

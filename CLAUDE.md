@@ -332,7 +332,14 @@ drives the steps with `next()`", and no "alone" on the end,
 which puts the negation back, C62). Both forms of that
 sentence were Claude's, written while changing a listing and outside
 any prose pass, so a sentence added with a listing change gets the
-positive test before the commit. The read of its 25 other sites that day rewrote 17 and
+positive test before the commit. Since 2026-11-13 `tip verify-ch`
+makes that test for any sentence: it runs `tools/watch_words.py
+--changed`, which reads the clauses on lines that differ from HEAD and
+fails on a NEW Tier 2 or 3 watch word among them (the third such
+sentence, "passes no second argument", was written in a prose repair
+and committed with `tip watch-words` never run). A keep is accepted
+with `tip watch-words-accept CH=NN`, after the chapter's other NEW
+hits are read. The read of its 25 other sites that day rewrote 17 and
 kept 8, which are in the baseline: four link texts and four absences
 that are the claim.
 The 2026-10-28 sweep also added a Tier 1 survey rule for the shape turned

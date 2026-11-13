@@ -2086,8 +2086,7 @@ The `next()` call in the `match` statement passes `""` as a second argument,
 so at the end of `chars` it returns `""` instead of raising `StopIteration`.
 When the input ends on a single asterisk,
 `case "":` matches that `""` and delivers the asterisk.
-The first `next()` call in `__next__()` passes no second argument.
-When `chars` ends there,
+When `chars` ends at `char = next(self.chars)`,
 `StopIteration` leaves `__next__()` and ends the `Squasher`'s iteration.
 
 `__next__()` must read the character after an asterisk to tell a single asterisk from a pair.

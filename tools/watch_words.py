@@ -158,17 +158,31 @@ given paths compares against those files' entries alone, and `--accept`
 with paths adds and drops entries for those files and keeps
 every other file's entries.
 
+`--changed` (since 2026-11-13) reads only the clauses on lines that
+differ from HEAD in the working tree and exits 1 on any NEW Tier 2 or
+3 hit among them. `tip verify-ch` runs it on the chapter and its
+Solutions file, so a sentence written in the session is tested before
+its commit while the chapter's older unread hits stay out of the
+result. Three times in two days Claude wrote a cancelled verb or a
+"Nothing" subject outside a prose pass ("receives no `throw()`",
+"Nothing calls `throw()`", "passes no second argument"), each listed
+by this tool and each committed unread because no step of the verify
+loop ran it. A keep is accepted with `tip watch-words-accept CH=NN`
+after the chapter's other NEW hits are read.
+
     uv run python -m tools.watch_words          # new hits
     uv run python -m tools.watch_words --all    # every hit
     uv run python -m tools.watch_words --tier 3 # Tier 3 only
     uv run python -m tools.watch_words --tier 1 # advisory Tier 1
     uv run python -m tools.watch_words --accept # judged keeps
+    uv run python -m tools.watch_words --changed PATH
     uv run tip watch-words CH=30
     uv run tip watch-words-accept
 """
 
 import argparse
 import re
+import subprocess
 from collections.abc import Iterator
 from pathlib import Path
 from typing import Final
@@ -185,6 +199,7 @@ from tools.stranded_prepositions import (
 )
 
 BASELINE: Final = DATA_DIR / "watch_words_baseline.txt"
+HUNK: Final = re.compile(r"^@@ -\S+ \+(\d+)(?:,(\d+))? @@", re.MULTILINE)
 HEADER: Final = (
     "# Watch-word hits a human read and judged a keep: a literal\n"
     "# sense, or a word that earns its place. An entry is not an\n"
@@ -481,6 +496,35 @@ def bounds(text: str) -> list[tuple[int, int]]:
     return spans
 
 
+def changed_lines(path: Path) -> set[int]:
+    """Line numbers of `path` that differ from HEAD in the working tree.
+
+    Read from the `@@ -a,b +c,d @@` headers of `git diff -U0 HEAD`.
+    A file git does not track, or a failed git call, yields no lines.
+    """
+    proc = subprocess.run(
+        ["git", "diff", "-U0", "HEAD", "--", str(path)],
+        cwd=ROOT, capture_output=True, text=True, encoding="utf-8",
+        check=False)
+    lines: set[int] = set()
+    for m in HUNK.finditer(proc.stdout):
+        start = int(m.group(1))
+        count = 1 if m.group(2) is None else int(m.group(2))
+        lines.update(range(start, start + count))
+    return lines
+
+
+def clause_lines(doc: Document) -> dict[str, set[int]]:
+    """Every clause in a document, mapped to the lines it covers."""
+    covered: dict[str, set[int]] = {}
+    for paragraph in paragraphs(doc):
+        text, lines = joined(paragraph)
+        for begin, end in bounds(text):
+            clause = " ".join(text[begin:end].split())
+            covered.setdefault(clause, set()).update(lines[begin:end])
+    return covered
+
+
 def find(doc: Document) -> Iterator[tuple[Path, int, int, str, str]]:
     """(path, line, tier, word, clause) per watch word in a document."""
     for paragraph in paragraphs(doc):
@@ -517,10 +561,15 @@ def main(argv: list[str] | None = None) -> int:
                     help="add the NEW Tier 2 and 3 hits (with --tier "
                          "1, the Tier 1 hits) to the baseline and "
                          "drop stale entries")
+    ap.add_argument("--changed", action="store_true",
+                    help="read only clauses on lines that differ from "
+                         "HEAD, and exit 1 on any NEW Tier 2 or 3 hit")
     args = ap.parse_args(argv)
     if args.accept and args.tier in (2, 3):
         ap.error("--accept covers Tiers 2 and 3; give no --tier, "
                  "or --tier 1")
+    if args.accept and args.changed:
+        ap.error("--changed reports; it does not accept")
     paths = md_files(args.paths or [ROOT / "Chapters", ROOT / "Solutions"])
     shown_paths = {display(p) for p in paths}
     found = sorted(
@@ -528,6 +577,24 @@ def main(argv: list[str] | None = None) -> int:
         for path in paths
         for p, line, tier, word, clause in find(Document.parse(path))
     )
+    if args.changed:
+        fresh: set[tuple[str, str]] = set()
+        for path in paths:
+            edited = changed_lines(path)
+            if not edited:
+                continue
+            covered = clause_lines(Document.parse(path))
+            fresh.update((display(path), clause)
+                         for clause, lines in covered.items()
+                         if lines & edited)
+        baseline = load_baseline(BASELINE)
+        hits = [h for h in found
+                if h[2] != 1 and (h[0], h[4]) in fresh
+                and key(h[0], h[3], h[4]) not in baseline]
+        for path, line, tier, word, clause in hits:
+            print(f"NEW      {path}:{line}: [T{tier}] {word}: {clause}")
+        print(f"{len(hits)} new on changed lines")
+        return 1 if hits else 0
     baseline = load_baseline(BASELINE)
     scope = {e for e in baseline if e.split("\t", 1)[0] in shown_paths}
     current = {key(s, w, c) for s, _, _, w, c in found}
