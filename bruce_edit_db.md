@@ -4600,6 +4600,22 @@ Claude-written, Bruce: "first it calls it an engine, then a driver":
   word with two senses, and this is the reverse, two words for one
   thing. No pass checks a defined term against its definition.
 
+2, the same chapter 2026-11-13, the reverse case, one role noun for
+two things, Bruce: "is run() or the event loop the driver?":
+- "`asyncio.run()` starts the `asyncio` event loop, a driver like
+  `task_runner()` in `task_runner_send.py`. ... each `asyncio` task
+  drives one coroutine with `send()`." -> "`asyncio.run()` starts the
+  `asyncio` event loop. The event loop is a driver like
+  `task_runner()` in `task_runner_send.py`, with the work divided
+  between the loop and its tasks. ... each `asyncio` task resumes one
+  coroutine with `send()`."
+- The trailing appositive could rename `asyncio.run()` or the loop,
+  and Claude's C74 rewrite an hour earlier had added "each task
+  drives", so the paragraph had three candidates for the driver. The
+  appositive got its own sentence, and "drives" stays with the thing
+  the section calls the driver. The appositive shape is in the
+  ambiguity skill's Accrued shapes.
+
 **Home.** antecedents (Accrued patterns) | super-prose (pass 5) | this
 file.
 

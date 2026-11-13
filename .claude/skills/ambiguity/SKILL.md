@@ -252,3 +252,17 @@ Shapes Bruce flags that the catalog above did not name, dated, with the sentence
   Apply the test to the repair before the commit.
   For each restricting adjective or participle on the object of a claim about what Python does (suspended, started, frozen, empty, nested, async), run the claim on the other case.
   Keep the modifier when the other case differs, and say how. The claim check passes these sentences because they are true. C70 in `bruce_edit_db.md`.
+- 2026-11-13, chapter 45: a trailing appositive after "X starts Y".
+  "`asyncio.run()` starts the `asyncio` event loop, a driver like
+  `task_runner()`" (Bruce: "is run() or the event loop the driver?").
+  A noun phrase after a comma can rename the object beside it or
+  sum up the whole clause, so a role noun there has two candidates:
+  the subject that acts and the object it acts on. The appositive
+  gets a sentence with its own subject: "`asyncio.run()` starts the
+  `asyncio` event loop. The event loop is a driver like
+  `task_runner()`". Where the role is split between two parts, say
+  so ("with the work divided between the loop and its tasks") and
+  keep the role verb for one of them ("each task resumes one
+  coroutine", not "drives", C67).
+  Grep the scope for `, an? \w+ (like|that|which|for)` after a verb
+  with a code-span subject and object.
