@@ -2080,7 +2080,7 @@ print(list(Squasher(iter("a**b*c***"))))
 #: ['a', '^', 'b', '*', 'c', '^', '*']
 ```
 
-In Conway's flowchart the cards keep coming.
+In Conway's version the cards keep coming.
 A Python iterator ends.
 The `next()` call in the `match` statement passes `""` as a second argument,
 so at the end of `chars` it returns `""` instead of raising `StopIteration`.
@@ -2133,8 +2133,6 @@ When the consumer asks for another character,
 the body continues from that point and delivers `following_char` at `[2]`.
 A generator suspended at `[1]` has a character waiting,
 so its position replaces the switch.
-Conway's flowchart of the coroutine version has those two steps in a row:
-a write of the asterisk, then a write of the character after it.
 
 ### Three Ways to Write the Producer
 

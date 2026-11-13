@@ -115,7 +115,12 @@ each pass hands the next one less to do.
    paragraph Bruce has flagged twice is read this way before a third
    phrase is repaired.
 4. `cohesion`: old before new, one topic string per paragraph, R29's
-   one primary concept per paragraph. A paragraph that likens a real
+   one primary concept per paragraph. A sentence after a walkthrough
+   that reports what a figure or flowchart in a cited source shows,
+   where the page does not show that source and the listing has made
+   the point, is cut ("Conway's flowchart of the coroutine version
+   has those two steps in a row", C84); a quotation, or a fact about
+   the source that the listing lacks, stays. A paragraph that likens a real
    system to an earlier listing ("a driver like the one in
    `task_runner_send.py`") names the system (`asyncio`'s event
    loop), states each fact before the sentence that uses it, and

@@ -5576,6 +5576,39 @@ Claude-written, Bruce's question quoted above:
 **Home.** literal (Accrued patterns) | super-prose (pass 1) | this
 file.
 
+### C84. A sentence that reports what an unseen source shows, to confirm the listing, is cut
+
+**Test.** After a listing and its walkthrough, a sentence says that a
+figure, flowchart, or table in a cited source has the same parts
+("Conway's flowchart of the coroutine version has those two steps in a
+row: a write of the asterisk, then a write of the character after
+it"). The page does not show that source, and the listing has already
+made the point, so the sentence asks the reader to picture an artifact
+in order to learn nothing new. Bruce: "not sure if this is necessary,
+we don't see or want to look at the flowchart". Cut it. A reference
+that only places a fact in the source names the source without its
+artifact ("In Conway's flowchart the cards keep coming" -> "In
+Conway's version").
+
+**Keep when.** The sentence quotes the source's words, the source's
+artifact is reproduced on the page, or it reports a fact about the
+source that the listing does not show (how it differs from the
+listing, a date, a name the source coined).
+
+**Sightings.** 1, `45_Effects--Generators` 2026-11-13, Claude-written:
+- the two sites quoted above, one cut and one reworded.
+- Why the passes missed it: the sentence is true, literal, positive,
+  and sourced, and every pass tests how a sentence says its claim. No
+  pass asks whether the reader can see the thing the sentence
+  describes or whether the listing already made the point. It was
+  written to tie the generator back to Conway's paper, a goal the
+  quotations above it already meet.
+- Scale: a grep of both trees for `flowchart` and for a possessive
+  before `diagram`, `figure`, `table`, or `pseudocode` found no other
+  site (the four other hits are the book's own figures and tables).
+
+**Home.** super-prose (pass 4) | this file.
+
 ## Retired
 
 Rejected by Bruce, or promoted and later withdrawn. Never propose these
