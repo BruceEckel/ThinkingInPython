@@ -234,6 +234,16 @@ and it becomes part of every future pass.
   "`@final` on the two classes" when the classes were named in another
   chapter.
   Name the items where the count appears.
+  "Each" as a bare subject is the same pointer (Bruce, 2026-11-13,
+  chapter 45: "'each' vague"): "a producer computes a series of
+  values, a consumer uses them one at a time, and each is simplest to
+  write as a loop of its own" offers the values as well as the
+  producer and the consumer. Name the items: "The producer and the
+  consumer are each simplest to write as its own loop." Solutions 27
+  had two in one sentence with two referents ("holds one class for
+  each, and each is the wrong one"). Grep the scope for
+  `\beach (is|has|does|runs|keeps|returns|must|can)\b` and for
+  `for each[,.]`.
 - **A pointer at a listing or example by position.**
   "This codec has a bug:" (the one below), "the last example",
   "the single generic surrogate above".

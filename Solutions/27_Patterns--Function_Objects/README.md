@@ -1019,7 +1019,8 @@ and applies `handler()` as a call so that `expect()` can report the failure.
 **Register the wrong class.**
 The import runs cleanly through the three `@event` classes in `bank_events.py`.
 That clean run hides the mistake.
-`EVENTS` holds one class for each, and each is the wrong one.
+`EVENTS` holds one class for each of the three,
+and every class it holds is the wrong one.
 `dataclass()` with `slots=True` builds a new class,
 `event()` returns that new class,
 and the `class` statement binds `Deposit` to what `event()` returns.

@@ -2011,9 +2011,8 @@ A call preserves the caller's position and locals.
 The caller waits in the middle of its body and continues from that point when the call returns.
 An ordinary function on the called side starts at its first line on every call and loses its position and its locals when it returns.
 
-That difference matters when a producer computes a series of values,
-a consumer uses them one at a time,
-and each is simplest to write as a loop of its own.
+That difference matters when a producer computes a series of values and a consumer uses them one at a time.
+The producer and the consumer are each simplest to write as its own loop.
 One of the two must call the other.
 Without generators, the called function restarts at its first line on every call,
 so its loop becomes a state machine:
