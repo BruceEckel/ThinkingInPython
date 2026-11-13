@@ -2011,7 +2011,7 @@ The called function starts at its first line on every call,
 with a new set of local variables.
 
 That difference matters when a producer computes a series of values and a consumer uses them one at a time.
-The producer and the consumer are each simplest to write as its own loop.
+The producer is simplest to write as a loop, and so is the consumer.
 One of the two must call the other.
 Consider a consumer that calls the producer.
 The consumer keeps its loop.

@@ -163,6 +163,14 @@ each pass hands the next one less to do.
    "the loop" in a chapter full of `for` loops): for each compound
    term in the scope, grep for its head noun alone, and when one use
    of a word is changed for a clash, grep for its other uses.
+   A repair that names the items for a bare "each" gives two items a
+   clause apiece ("The producer is simplest to write as a loop, and
+   so is the consumer"), never the two names in front of the old
+   predicate ("The producer and the consumer are each simplest to
+   write as its own loop": "are" is plural and "its" is singular,
+   C81). After any repair that changes a sentence's subject, reread
+   the verb and every pronoun after it for number. Grep the scope for
+   `\b(are|were|have|do|keep|hold|take|get|need|run|return) each\b[^.]*\b(its|it|itself)\b`.
 6. `ambiguity`: every sentence that counts, compares, coordinates,
    modifies, or limits keeps one reading. A list of what two things
    share ("has `send()`, `throw()`, and `close()`, as a generator

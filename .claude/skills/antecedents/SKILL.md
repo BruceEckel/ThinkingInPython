@@ -238,12 +238,29 @@ and it becomes part of every future pass.
   chapter 45: "'each' vague"): "a producer computes a series of
   values, a consumer uses them one at a time, and each is simplest to
   write as a loop of its own" offers the values as well as the
-  producer and the consumer. Name the items: "The producer and the
-  consumer are each simplest to write as its own loop." Solutions 27
+  producer and the consumer. Name the items, one clause for each of
+  two: "The producer is simplest to write as a loop, and so is the
+  consumer." Solutions 27
   had two in one sentence with two referents ("holds one class for
   each, and each is the wrong one"). Grep the scope for
   `\beach (is|has|does|runs|keeps|returns|must|can)\b` and for
   `for each[,.]`.
+  The first repair of that sentence put the two names in front of the
+  old predicate, "The producer and the consumer are each simplest to
+  write as its own loop" (Bruce, the same day: "'each' and 'its' seem
+  odd here"). A plural subject takes "are", and an "each" after a
+  plural subject leaves the sentence plural, so "its" had no singular
+  noun to belong to, and "each simplest" read as a unit.
+  "Each" is singular as a determiner or a subject ("each worker keeps
+  its own objects"). After a plural subject the verb and every
+  pronoun stay plural ("An instance and its class each have their own
+  attribute dictionary", "the producer and the consumer each keep
+  their own loop").
+  When a repair changes a sentence's subject, reread the verb and
+  every pronoun after it for number.
+  Grep the scope for
+  `\b(are|were|have|do|keep|hold|take|get|need|run|return) each\b[^.]*\b(its|it|itself)\b`.
+  C81 in `bruce_edit_db.md`.
 - **A pointer at a listing or example by position.**
   "This codec has a bug:" (the one below), "the last example",
   "the single generic surrogate above".

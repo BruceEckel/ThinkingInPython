@@ -5316,6 +5316,53 @@ possibly combine into one paragraph that makes the point":
 **Home.** cohesion (Accrued patterns) | super-prose (pass 4) | this
 file.
 
+### C81. An "each" after a plural subject leaves the sentence plural; two named items get a clause apiece
+
+**Test.** A plural or compound subject, an "each" after the subject or
+after its verb, and then a singular pronoun or possessive that points
+back at the subject: "The producer and the consumer are each simplest
+to write as its own loop". The verb is plural and "its" is singular,
+so the reader looks for the singular noun "its" belongs to. "Each" is
+singular as a determiner or as the subject ("each worker keeps its
+own objects", "each of the two keeps its loop"). After a plural
+subject it changes nothing: the verb and every pronoun after it stay
+plural. A second tell is "each" directly before a superlative or a
+predicate adjective ("are each simplest"), which the reader tries as
+a unit. Repair: with two named items, give each one a clause ("The
+producer is simplest to write as a loop, and so is the consumer").
+With more than two, or where the pairing is the point, keep the
+plural through the sentence ("each keep their own loop").
+
+**Keep when.** The sentence is plural throughout ("An instance and
+its class each have their own attribute dictionary", chapter 9;
+"`Garlic`, `Olives`, and `Feta` each write their name once", chapter
+14), or "each" is the determiner of a singular noun.
+
+**Sightings.** 1, `45_Effects--Generators` 2026-11-13, was
+Claude-written, Bruce: "'each' and 'its' seem odd here":
+- "The producer and the consumer are each simplest to write as its
+  own loop." -> "The producer is simplest to write as a loop, and so
+  is the consumer."
+- Why the passes missed it: Claude wrote the sentence that morning
+  (`c205b2e4`) as the repair of Bruce's "'each' vague" on "and each
+  is simplest to write as a loop of its own". The repair put the two
+  names in front of the old predicate, changed "is" to "are", and
+  kept "each ... its own" from the singular sentence. The antecedents
+  skill then recorded the result as its model repair, so the next
+  pass would have copied it. No tool reads agreement. A grep of both
+  trees for a plural verb, "each", and a singular "its" finds this
+  sentence alone, and the book's other sentences with "each" after a
+  plural subject are plural throughout, chapter 45's own "the
+  producer and the consumer each keep their own loop" among them.
+  The general cause is a repair that changes a sentence's subject and
+  leaves the rest of the sentence as it was written for the old one.
+- `tip sentence-shapes ARGS=--survey` lists the new sentence under
+  `[AND]`. It is a pairing of two parallel facts (C42's keep), and
+  "so is" needs the first clause beside it.
+
+**Home.** antecedents (Accrued patterns) | super-prose (pass 5) | this
+file.
+
 ## Retired
 
 Rejected by Bruce, or promoted and later withdrawn. Never propose these
