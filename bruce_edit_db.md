@@ -4637,6 +4637,42 @@ Claude-written, Bruce: "??":
 **Home.** literal (Accrued patterns) | super-prose (pass 1) | this
 file.
 
+### C69. A subject with a fronted-object relative clause becomes a condition
+
+**Test.** A subject noun followed by a relative clause whose object
+comes first, so two noun phrases sit side by side before any verb: "A
+machine whose states a test must enumerate belongs in chapter 31's
+table". The reader gets "a machine", "whose states", "a test" in a row
+and has to hold all three until "must enumerate" says who does what to
+which, and "states" can be read as a verb on the way. The same shape
+with "that" or no pronoun: "the value that the driver the proxy wraps
+sends". The relative clause is a condition on the subject, so write it
+as one, in subject-verb-object order, and give the main clause what is
+left: "If a test must enumerate a machine's states, use chapter 31's
+`Enum` design."
+
+**Keep when.** The relative clause's subject is a pronoun or one short
+code span and the verb follows at once ("the value it sends", "the
+generator `outer()` returned"), so no two noun phrases meet.
+
+**Sightings.** 1, `45_Effects--Generators` 2026-11-12, was
+Claude-written, Bruce: "??":
+- "A machine whose states a test must enumerate belongs in chapter
+  31's table." -> "If a test must enumerate a machine's states, use
+  chapter 31's `Enum` design."
+  The same edit made "chapter 31's table" into "chapter 31's `Enum`
+  design": the paragraph opens on "Chapter 31's `Enum`", and "table"
+  was a second name for it (C67).
+- Why the passes missed it: `tip subject-gap` lists a subject nine or
+  more words from its verb, and "machine" is six from "belongs". The
+  straighten pass reads for a subject held open by length, and this
+  one is short and dense. `[REL+AND]` needs a conjunction after the
+  clause. No rule reads a relative clause for the order of its own
+  subject and object.
+
+**Home.** straighten (Accrued patterns) | super-prose (pass 3) | this
+file.
+
 ## Retired
 
 Rejected by Bruce, or promoted and later withdrawn. Never propose these

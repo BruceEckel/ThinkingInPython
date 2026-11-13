@@ -1682,7 +1682,7 @@ Chapter 31's `Enum` makes the states a closed set.
 Here the set is open: any function that returns a `Machine` is a state.
 `test_trap_states.py` iterates over `TrapState` and checks every state against every move;
 to reach a state, a test of the generator design drives the machine to it.
-A machine whose states a test must enumerate belongs in chapter 31's table.
+If a test must enumerate a machine's states, use chapter 31's `Enum` design.
 
 The generator design has a second limit.
 `copy.deepcopy()` and `pickle` both raise a `TypeError` on a suspended generator,

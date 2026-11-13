@@ -391,3 +391,17 @@ before/after pair, and it becomes part of every future pass.
   reading them, record the keeps with `ARGS=--survey-accept`, which
   takes in every unjudged hit in the chapter and its Solutions file.
   R51 in `bruce_edit_db.md` has the sightings.
+- **A relative clause with its object in front.**
+  "A machine whose states a test must enumerate belongs in chapter
+  31's table" (Bruce, 2026-11-12: "??").
+  Three noun phrases arrive before a verb ("a machine", "whose
+  states", "a test"), and "states" can be read as a verb on the way.
+  The subject is only six words from its verb, so `tip subject-gap`
+  is quiet.
+  The relative clause is a condition on the subject: write it as one,
+  in subject-verb-object order, and give the main clause what is left:
+  "If a test must enumerate a machine's states, use chapter 31's
+  `Enum` design."
+  Keep a clause whose subject is a pronoun or one short code span with
+  the verb right after it ("the value it sends").
+  Grep the scope for `whose`. C69 in `bruce_edit_db.md`.

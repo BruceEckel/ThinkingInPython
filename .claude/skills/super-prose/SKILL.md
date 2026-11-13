@@ -60,7 +60,15 @@ each pass hands the next one less to do.
    `with no` and keep a property of the thing itself ("a function
    with no parameters").
 3. `straighten`: a buried actor, a subject held open, an overloaded
-   sentence, a colon or "and" carrying a second claim.
+   sentence, a colon or "and" carrying a second claim. A subject
+   whose relative clause puts its object first sets two noun phrases
+   side by side before any verb ("A machine whose states a test must
+   enumerate belongs in chapter 31's table"); the clause is a
+   condition, so write it as one ("If a test must enumerate a
+   machine's states, use chapter 31's `Enum` design", C69).
+   `tip subject-gap` misses it, since the gap is short: grep the
+   scope for `whose` and read each clause for the order of its
+   subject and object.
 4. `cohesion`: old before new, one topic string per paragraph, R29's
    one primary concept per paragraph. Two seams to read for in every
    walkthrough: a sentence after the paragraph's concluding sentence
