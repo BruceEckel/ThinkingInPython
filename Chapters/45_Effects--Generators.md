@@ -2252,14 +2252,15 @@ In that listing, the running function's stack frame holds the `for` loop's count
 In `Fibonacci`, that count is the attribute `remaining`,
 which `__next__()` decrements and tests on every call.
 
-Each approach gives up one side's loop or the alternation between the two loops:
+Each approach rewrites one of the two loops as a function,
+or keeps both loops and runs them one after the other:
 
 - The callback turns the consumer inside out:
   the body of its loop becomes `consume()`,
   a function the producer's loop calls.
 - The list keeps both loops but runs the producer's loop to completion before the consumer's loop starts.
 - The class turns the producer inside out:
-  its loop becomes the `remaining` count that `__next__()` decrements and tests.
+  the body of its loop becomes `__next__()`, a method the consumer's loop calls.
 
 All three approaches work around the same missing ability:
 pausing `fibonacci()` in the middle of its loop, handing out a value,
