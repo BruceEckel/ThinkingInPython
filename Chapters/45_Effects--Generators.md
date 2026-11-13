@@ -1986,7 +1986,7 @@ and the `async for` makes the rest.
 The `async for` ends when `__anext__()` raises `StopAsyncIteration`,
 the asynchronous counterpart of `StopIteration`.
 
-`Countdown(5)` and `countdown(5)` in `async_generator.py` produce the same sequence.
+`Countdown(5)` produces the same sequence as `countdown(5)` in `async_generator.py`.
 `Countdown` keeps `n` in an attribute, defines `__anext__()`,
 and raises `StopAsyncIteration` itself.
 `countdown()` keeps `n` in a local variable and yields in a `while` loop.

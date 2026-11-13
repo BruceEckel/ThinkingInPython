@@ -220,8 +220,11 @@ general facts as alternatives; the sweep's rate was 0 to 4 a chapter.
   The file name framed it and its own paragraph set it apart, and it
   still gave one side only, so the reader had to work out what the
   class does in each place.
-  Open on what the two share ("`Countdown(5)` and `countdown(5)` in
-  `async_generator.py` produce the same sequence"), then give this
+  Open on what the two share, with the file name beside the one name
+  it locates ("`Countdown(5)` produces the same sequence as
+  `countdown(5)` in `async_generator.py`"; the first repair wrote
+  "`Countdown(5)` and `countdown(5)` in `async_generator.py`", which
+  put both in that file, and Bruce flagged it), then give this
   listing's side and the other side as parallel sentences, part for
   part: where `n` is kept, who defines `__anext__()`, who raises
   `StopAsyncIteration`.
