@@ -16,13 +16,14 @@ class Squasher(Iterator[str]):
         char = next(self.chars)
         if char != "*":
             return char
+        # We have a *, what's the next one?
         match next(self.chars, ""):
-            case "*":
+            case "*":  # A second *
                 return "^"
             case "":  # No more input
                 return "*"
-            case following:
-                self._held = following  # [2]
+            case following_char:  # Something else
+                self._held = following_char  # [2]
                 return "*"
 
 print(list(Squasher(iter("a**b*c***"))))

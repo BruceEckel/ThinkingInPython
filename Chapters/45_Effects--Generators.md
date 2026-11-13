@@ -2065,13 +2065,14 @@ class Squasher(Iterator[str]):
         char = next(self.chars)
         if char != "*":
             return char
+        # We have a *, what's the next one?
         match next(self.chars, ""):
-            case "*":
+            case "*":  # A second *
                 return "^"
             case "":  # No more input
                 return "*"
-            case following:
-                self._held = following  # [2]
+            case following_char:  # Something else
+                self._held = following_char  # [2]
                 return "*"
 
 print(list(Squasher(iter("a**b*c***"))))
@@ -2109,22 +2110,23 @@ def squash(chars: Iterator[str]) -> Iterator[str]:
         if char != "*":
             yield char
             continue
+        # We have a *, what's the next one?
         match next(chars, ""):
-            case "*":
+            case "*":  # A second *
                 yield "^"
             case "":  # No more input
                 yield "*"
-            case following:
+            case following_char:  # Something else
                 yield "*"  # [1]
-                yield following  # [2]
+                yield following_char  # [2]
 
 print(list(squash(iter("a**b*c***"))))
 #: ['a', '^', 'b', '*', 'c', '^', '*']
 ```
 
-The generator suspends at `[1]` with the asterisk delivered and the second character in the local variable `following`.
+The generator suspends at `[1]` with the asterisk delivered and the second character in the local variable `following_char`.
 When the consumer asks for another character,
-the body continues from that point and delivers `following` at `[2]`.
+the body continues from that point and delivers `following_char` at `[2]`.
 A generator suspended at `[1]` has a character waiting,
 so its position replaces the switch.
 Conway's flowchart of the coroutine version has those two steps in a row:

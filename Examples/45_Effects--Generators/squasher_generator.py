@@ -6,14 +6,15 @@ def squash(chars: Iterator[str]) -> Iterator[str]:
         if char != "*":
             yield char
             continue
+        # We have a *, what's the next one?
         match next(chars, ""):
-            case "*":
+            case "*":  # A second *
                 yield "^"
             case "":  # No more input
                 yield "*"
-            case following:
+            case following_char:  # Something else
                 yield "*"  # [1]
-                yield following  # [2]
+                yield following_char  # [2]
 
 print(list(squash(iter("a**b*c***"))))
 #: ['a', '^', 'b', '*', 'c', '^', '*']
