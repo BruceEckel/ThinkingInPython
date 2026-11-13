@@ -27,6 +27,16 @@ each pass hands the next one less to do.
    its job ("the machine object disappears" -> "parameters and locals
    hold the data that `VendingMachine` keeps in attributes", C68).
    Grep the scope for `disappear`, `vanish`, `goes away`, and `gone`.
+   A clause credited with an action gets the statement test: find
+   the statement in the listing that performs the verb. An `except`
+   whose body is `pass` drops nothing; the job is missing from
+   `ready` because the exception skipped a statement ("The `except`
+   catches the `StopIteration` from a job ... and drops that job" ->
+   "`next(job)` raises `StopIteration` ... before `append()` runs,
+   and that job stays out of `ready`", C73). The exception comes from
+   the call that raises it (`next(job)`), not from the object. Grep
+   the scope for `except`, `pass`, and `continue` and read each
+   sentence against its line.
 2. `positive`: a negation that is an accident of phrasing turns around.
    A subject of "Nothing", "Nobody", or "No one" with a verb ("Nothing
    calls `throw()` on the first booking" -> "`list(book())` drives the

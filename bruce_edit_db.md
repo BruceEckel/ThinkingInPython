@@ -4833,6 +4833,49 @@ Bruce: "unusual use of 'I'":
 **Home.** activate (Accrued patterns) | super-prose (pass 7) | this
 file.
 
+### C73. An action verb needs a statement that performs it; an effect of a skipped statement is told as the skip
+
+**Test.** A walkthrough sentence gives a clause an action verb
+(drops, discards, removes, filters out, ignores) and the listing has
+no statement that performs it: the clause is an `except` whose body
+is `pass`, or a `continue`. The effect is real, and its cause is a
+statement that did not run. Write the three facts in order: the call
+that raises ("`next(job)` raises `StopIteration`"), the statement the
+exception skips and why ("`next(job)` is inside the argument to
+`append()`, so the exception arrives before `append()` runs"), and
+the state that results ("that job stays out of `ready`"). The source
+of an exception is the call that raises it, not the object the call
+was made on: "`next(job)` raises", not "the `StopIteration` from a
+job".
+
+**Keep when.** A statement performs the verb (`del`, `pop()`,
+`remove()`, a comprehension's `if`), or the handler has a body that
+acts.
+
+**Sightings.** 1, `45_Effects--Generators` 2026-11-13, was
+Claude-written, Bruce: "the StopIteration comes from next(job), and
+the sentence makes it sound like this is an active thing. I think
+what happens is the append() never occurs because of the
+StopIteration":
+- "The `for` loop's `except` catches the `StopIteration` from a job
+  that finishes before its first `yield`, and drops that job." ->
+  "When a job finishes before its first `yield`, `next(job)` raises
+  `StopIteration`. `next(job)` is inside the argument to `append()`,
+  so the exception arrives before `append()` runs, and that job stays
+  out of `ready`."
+- Why the passes missed it: the sentence is active, positive, and
+  names an actor, so activate (R55, R61) and positive pass it, and a
+  pass that prefers a named actor and a positive verb would write it.
+  Every pass checks a claim against the listing by its outcome, and
+  the outcome is true: the job is not in `ready`. No pass asks which
+  statement performs the verb. The next sentence in the paragraph
+  already had the right form ("The `continue` then skips the
+  `append`"). A grep for `except`, `pass`, or `continue` with such a
+  verb found no second site in `Chapters/` or `Solutions/`.
+
+**Home.** literal (Accrued patterns) | super-prose (pass 1) | this
+file.
+
 ## Retired
 
 Rejected by Bruce, or promoted and later withdrawn. Never propose these

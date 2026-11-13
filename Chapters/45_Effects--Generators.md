@@ -1844,8 +1844,11 @@ task_runner([download(), index()])
 ```
 
 The `for` loop primes each job and pairs it with its first request.
-The `for` loop's `except` catches the `StopIteration` from a job that finishes before its first `yield`,
-and drops that job.
+When a job finishes before its first `yield`,
+`next(job)` raises `StopIteration`.
+`next(job)` is inside the argument to `append()`,
+so the exception arrives before `append()` runs,
+and that job stays out of `ready`.
 When a job finishes in the `while` loop, its `send()` raises `StopIteration`.
 The `continue` then skips the `append`, and the job leaves `ready`.
 

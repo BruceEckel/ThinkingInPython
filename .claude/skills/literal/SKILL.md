@@ -298,3 +298,24 @@ and it becomes part of every future pass.
   `VendingMachine` keeps in attributes".
   Keep the verb for a thing a narrated step removes from the page.
   Grep the scope for the four verbs. C68 in `bruce_edit_db.md`.
+- **An action credited to a clause that performs none.**
+  "The `for` loop's `except` catches the `StopIteration` from a job
+  that finishes before its first `yield`, and drops that job" (Bruce,
+  2026-11-13: "the StopIteration comes from next(job), and the
+  sentence makes it sound like this is an active thing ... the
+  append() never occurs because of the StopIteration").
+  The `except` body is `pass`, so no statement drops anything: the job
+  is absent from `ready` because the exception left the `try` before
+  `append()` ran. "Drops", "discards", "removes", "filters out", and
+  "ignores" each promise a statement. Find it in the listing. When
+  the listing has none, the effect is a statement that did not run,
+  so write the call that raises, the statement the exception skips,
+  and the state that results: "`next(job)` raises `StopIteration` ...
+  the exception arrives before `append()` runs, and that job stays
+  out of `ready`". Name the call as the source of the exception
+  ("`next(job)` raises"), not the object it was called on ("the
+  `StopIteration` from a job").
+  Keep the verb where a statement performs it (`del`, `pop()`,
+  `remove()`, a comprehension's `if`).
+  Grep the scope for `except`, `pass`, and `continue`, and read each
+  sentence against its line. C73 in `bruce_edit_db.md`.
