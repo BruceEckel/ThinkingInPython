@@ -4616,6 +4616,23 @@ two things, Bruce: "is run() or the event loop the driver?":
   the section calls the driver. The appositive shape is in the
   ambiguity skill's Accrued shapes.
 
+3, the same paragraph an hour later, Bruce: "'to its task' is
+unclear; I think of yielding as to a driver. Is the task the driver
+here?":
+- "`await` suspends the coroutine and yields a `Future` to its task."
+  -> "It drives a coroutine through a task: the task calls
+  `send(None)` on the coroutine and receives what the coroutine
+  yields." near the top, and at the `await`, "the task's `send(None)`
+  call returns the `Future`."
+- Sighting 2's repair kept "driver" for the loop by taking the verb
+  "drives" away from the task, and left the task with no stated
+  relation to the driver. A role noun the chapter defined ("the
+  driver") gets every part of the role accounted for: when a second
+  object does part of the work, one sentence says which part ("drives
+  a coroutine through a task"), and a later sentence names the call
+  the reader knows (`send(None)` returns the yielded value), not a
+  preposition ("yields to its task").
+
 **Home.** antecedents (Accrued patterns) | super-prose (pass 5) | this
 file.
 
@@ -4989,6 +5006,34 @@ next()?":
   the same way, and here the implication was true and unstated.
 
 **Home.** ambiguity (Accrued shapes) | super-prose (pass 6) | this
+file.
+
+### C76. A restatement of a cited description says how it differs from the citation
+
+**Test.** One sentence reports how another chapter describes a
+construct ("[Concurrency] describes `await` as suspending a task
+until the event loop resumes it") and the next describes the same
+construct with the same verb ("`await` suspends the coroutine and
+yields a `Future`"). The reader sees one fact stated twice and cannot
+tell which sentence is the news. Open the second with the relation
+("In this chapter's terms", "Underneath", "More exactly") and give it
+a predicate the citation lacks: "an `await` on a `Future` that has no
+result yet is a `yield`. The coroutine pauses at the `await`, and the
+task's `send(None)` call returns the `Future`."
+
+**Keep when.** The second sentence quotes the first to disagree with
+it, and says so.
+
+**Sightings.** 1, `45_Effects--Generators` 2026-11-13, Bruce:
+"describes suspending twice?":
+- the pair quoted in the test.
+- Why the passes missed it: `tip stutter` reads a stem repeated
+  within three tokens of one sentence, and these are two sentences.
+  The cohesion pass asks that a connective state a real relation and
+  has no test for a missing one between a citation and its
+  restatement.
+
+**Home.** cohesion (Accrued patterns) | super-prose (pass 4) | this
 file.
 
 ## Retired

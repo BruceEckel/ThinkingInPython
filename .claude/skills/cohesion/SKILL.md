@@ -282,3 +282,16 @@ and it becomes part of every future pass.
   Probe the real system before writing the mapping.
   Grep the scope for `like the`, `as in`, and `the same as` beside a listing name.
   C74 in `bruce_edit_db.md`.
+- **A restatement of a cited description says how it differs.**
+  "[Concurrency] describes `await` as suspending a task until the
+  event loop resumes it. `await` suspends the coroutine and yields a
+  `Future` to its task." (Bruce, 2026-11-13: "describes suspending
+  twice?").
+  A citation of another chapter followed by a sentence with the same
+  subject and verb reads as one fact stated twice.
+  Open the second sentence with the relation ("In this chapter's
+  terms", "Underneath") and give it a predicate the citation lacks:
+  "an `await` on a `Future` that has no result yet is a `yield`".
+  Grep the scope for `describes`, `calls`, and `defines` after a
+  chapter link and read the sentence that follows.
+  C76 in `bruce_edit_db.md`.
