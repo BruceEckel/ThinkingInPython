@@ -2015,11 +2015,12 @@ That difference matters when a producer computes a series of values and a consum
 The producer and the consumer are each simplest to write as its own loop.
 One of the two must call the other.
 Without generators, the called function restarts at its first line on every call,
-so its loop becomes a state machine:
+so you cannot write the called side as a loop.
+You write it as a state machine:
 variables that hold the loop's locals and its position,
 and code that reads them on every call to find where to continue.
 A generator is a called function that keeps its position and its locals,
-so its loop stays a loop.
+so you write the called side as a loop too.
 
 ### Conway's Switch
 
