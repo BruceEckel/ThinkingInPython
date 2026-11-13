@@ -535,3 +535,13 @@ and it becomes part of every future pass.
   value"), or whose previous sentence supplies it ("Both tasks wait
   forever ... the one task that can wake each of them is waiting too").
   C58 in `bruce_edit_db.md`.
+  `stays`, `remains`, and `holds` are verbs of rest too (2026-11-12,
+  Bruce: "unclear" on "The listing's second run shows a state that
+  stays"). Ask "who rests?" as well as "where?": the machine stays in
+  a state, and a state does not stay, so the verb had the wrong
+  subject. A walkthrough sentence of the form "the run shows a NOUN
+  that VERBs" gives a verdict about the run; write the call, its
+  input, and the output line ("At `[5]`, `run_all()` sends
+  `Mouse.ESCAPES` to a machine in `Waiting` ... its loop yields
+  `Waiting` again, and the trace line ends `-> Waiting`"), with a tag
+  on the call when the listing has more than one.

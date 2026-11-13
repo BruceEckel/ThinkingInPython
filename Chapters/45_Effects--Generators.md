@@ -1385,7 +1385,7 @@ That `yield` comes before the taxi step's `try`,
 so `Failed` leaves the taxi step, and the card step never starts.
 The exception then propagates up through the `yield from` in the hotel step and the one in the flight step.
 Each `except` clause prints its step's undo line.
-The [bare `raise` re-raises the exception the clause caught](04_Foundations--Control_Flow.md#errors-and-exceptions),
+The bare `raise` then [re-raises the exception the clause caught](04_Foundations--Control_Flow.md#errors-and-exceptions),
 so `Failed` continues out to the enclosing step.
 The hotel step prints its undo line before the flight step does.
 The nesting of the `try` blocks is the undo stack.
@@ -1620,7 +1620,7 @@ run_all(waiting(), MOVES)
 #: Broadcasting cheese smell
 #: Holding mouse removed -> Waiting
 
-run_all(waiting(), [Mouse.ESCAPES])
+run_all(waiting(), [Mouse.ESCAPES])  # [5]
 #: Broadcasting cheese smell
 #: Waiting mouse escapes -> Waiting
 ```
@@ -1648,10 +1648,10 @@ In `state_machine.py` the engine prints the transition line and then calls the n
 so the engine chooses the order.
 Here, each state's body runs its entry action.
 
-The listing's second run shows a state that stays.
-`waiting()` matches `Mouse.APPEARS` alone,
-so `Mouse.ESCAPES` leaves the machine in `Waiting`,
-and the entry message prints once.
+At `[5]`, `run_all()` sends `Mouse.ESCAPES` to a machine in `Waiting`.
+`waiting()`'s one `case` matches `Mouse.APPEARS`,
+so its loop yields `Waiting` again, and the trace line ends `-> Waiting`.
+The entry message prints once.
 
 [Which Design Should You Use?](31_Patterns--State_Machines.md#which-design-should-you-use)
 asks whether an action belongs to the state or to the transition.

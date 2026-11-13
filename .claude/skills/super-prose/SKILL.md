@@ -109,7 +109,15 @@ each pass hands the next one less to do.
    nothing after it ("the generator that is waiting" -> "the generator
    paused at the innermost `yield`", C58). No survey tool lists that
    shape: grep the scope for `wait`, `pending`, `idle`, `suspended`,
-   `paused`, and `sits`, and read each for its place or its event.
+   `paused`, `sits`, `stays`, `remains`, and `holds`, and read each
+   for its place or its event, and for its subject: the thing that
+   rests gets the verb ("a state that stays" is "the machine stays
+   in `Waiting`"). A walkthrough sentence "the run shows a NOUN that
+   VERBs" becomes the call, its input, and the output line ("The
+   listing's second run shows a state that stays" -> "At `[5]`,
+   `run_all()` sends `Mouse.ESCAPES` to a machine in `Waiting`");
+   grep the scope for `shows` and `demonstrates` with a run, a call,
+   or a listing as the subject.
 8. `bruce-edit-apply`: the Rules section of `bruce_edit_db.md`.
 9. `elements-of-style:writing-clearly-and-concisely`: Strunk's rules,
    mostly needless words and emphatic words at the end.

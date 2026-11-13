@@ -4200,8 +4200,34 @@ Claude-written (88d89eff), Bruce: "passive":
 - same pass, found by grep: "passes back down to the `yield` that is
   waiting" -> "passes back down to the `yield` where the inner generator
   waits"
+- `45_Effects--Generators` 2026-11-12, was Claude-written, Bruce:
+  "unclear": "The listing's second run shows a state that stays.
+  `waiting()` matches `Mouse.APPEARS` alone, so `Mouse.ESCAPES` leaves
+  the machine in `Waiting`, and the entry message prints once." ->
+  "At `[5]`, `run_all()` sends `Mouse.ESCAPES` to a machine in
+  `Waiting`. `waiting()`'s one `case` matches `Mouse.APPEARS`, so its
+  loop yields `Waiting` again, and the trace line ends `-> Waiting`.
+  The entry message prints once."
+  "Stays" is a verb of rest with no place after it, and it has the
+  wrong subject as well: the machine stays in a state, and a state
+  does not stay. The sentence was a topic sentence in the form "X
+  shows Y", which names a verdict about the run and leaves out what
+  the run sends and what it prints. Three additions to the test from
+  this sighting: (1) `stays`, `remains`, and `holds` join the verbs of
+  rest; (2) ask "who rests?" as well as "where?", and give the verb
+  to the thing that rests; (3) a walkthrough sentence of the form
+  "the run shows a NOUN that VERBs" is replaced by the call, its
+  input, and the output line, with a tag on the call when the listing
+  has more than one.
+  Why the passes missed it: the grep list for this candidate had six
+  verbs and "stays" was outside it; the literal pass reads "shows" as
+  a plain verb, and its vague-description test looks for an abstract
+  noun or a pointer phrase, where "a state that stays" is concrete
+  words in a relation the listing does not have; `tip positional` was
+  quiet for "The listing's second run".
 
-**Home.** activate (Accrued patterns) | this file.
+**Home.** activate (Accrued patterns) | super-prose (pass 7) | this
+file.
 
 ### C59. A relative clause's verb does not sit beside "and" and the main clause's next verb
 

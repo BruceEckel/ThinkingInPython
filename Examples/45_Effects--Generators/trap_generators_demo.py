@@ -49,6 +49,6 @@ run_all(waiting(), MOVES)
 #: Broadcasting cheese smell
 #: Holding mouse removed -> Waiting
 
-run_all(waiting(), [Mouse.ESCAPES])
+run_all(waiting(), [Mouse.ESCAPES])  # [5]
 #: Broadcasting cheese smell
 #: Waiting mouse escapes -> Waiting
