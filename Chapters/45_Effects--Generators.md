@@ -1685,8 +1685,9 @@ to reach a state, a test of the generator design drives the machine to it.
 If a test must enumerate a machine's states, use chapter 31's `Enum` design.
 
 The generator design has a second limit.
-`copy.deepcopy()` and `pickle` both raise a `TypeError` on a suspended generator,
-so a [*Memento*](36_Patterns--Memento.md#the-classic-memento)
+`copy.deepcopy()` and `pickle.dumps()` raise a `TypeError` for every generator,
+started or not, so a program cannot copy or save a machine that is paused in a state.
+A [*Memento*](36_Patterns--Memento.md#the-classic-memento)
 belongs to the enum designs, which keep the state in a value a record can hold.
 
 One shape looks like a transition and is a delegation:

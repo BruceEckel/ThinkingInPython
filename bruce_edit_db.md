@@ -4673,6 +4673,47 @@ Claude-written, Bruce: "??":
 **Home.** straighten (Accrued patterns) | super-prose (pass 3) | this
 file.
 
+### C70. A modifier that narrows a claim says the other cases differ: probe them
+
+**Test.** A true claim carries a restricting modifier on its object or
+subject: "`copy.deepcopy()` and `pickle` both raise a `TypeError` on a
+suspended generator". The reader takes the modifier as the boundary of
+the claim and asks about the other side (Bruce: "because a suspended
+generator cannot be copied? can a generator in any state be copied?").
+Run the claim with the modifier removed or reversed. If it still
+holds, the modifier is the case the writer had in mind and not a
+condition: state the full range ("for every generator, started or
+not") and then, as a consequence, the case the passage cares about
+("so a program cannot copy or save a machine that is paused in a
+state"). If the other cases do differ, say how in the same passage.
+
+**Keep when.** The probe shows the other case behaves differently
+("the first `send()` to an unstarted generator accepts `None`"), or
+the passage has already defined the restricted set and the sentence is
+about it by construction.
+
+**Sightings.** 1, `45_Effects--Generators` 2026-11-12, was
+Claude-written, Bruce's question above:
+- "`copy.deepcopy()` and `pickle` both raise a `TypeError` on a
+  suspended generator, so a *Memento* belongs to the enum designs" ->
+  "`copy.deepcopy()` and `pickle.dumps()` raise a `TypeError` for
+  every generator, started or not, so a program cannot copy or save a
+  machine that is paused in a state. A *Memento* belongs to the enum
+  designs"
+  Probe, `uv run python` 3.15.1: `copy.copy()`, `copy.deepcopy()`, and
+  `pickle.dumps()` each raise "TypeError: cannot pickle 'generator'
+  object" for a generator that is `GEN_CREATED`, `GEN_SUSPENDED`, and
+  `GEN_CLOSED` (closed and exhausted both).
+- Why the passes missed it: the sentence is true, so every claim check
+  passed it. `tip overclaims` lists a bound that claims too much
+  ("the only", "one restriction"), and this modifier claims too
+  little. C62's deletion test reads "only", "alone", and "just", not
+  an adjective. No pass asks what a modifier implies about the cases
+  it leaves out.
+
+**Home.** ambiguity (Accrued shapes) | super-prose (pass 6) | this
+file.
+
 ## Retired
 
 Rejected by Bruce, or promoted and later withdrawn. Never propose these

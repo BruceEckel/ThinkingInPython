@@ -241,3 +241,11 @@ Shapes Bruce flags that the catalog above did not name, dated, with the sentence
   Added to the coordination entry above and as C60. No tool lists it: grep the scope for
   `\b(stop|start|end|run|close|open|resume|return|finish|move|change|fail)e?s? (and|or|then) \w+` and apply the cover test to each line.
   The grep of both trees that day had about 55 lines and this one site.
+- 2026-11-12, chapter 45: a modifier that narrows a true claim.
+  "`copy.deepcopy()` and `pickle` both raise a `TypeError` on a suspended generator" (Bruce: "because a suspended generator cannot be copied? can a generator in any state be copied?").
+  The reader takes "suspended" as the boundary of the claim and infers that an unstarted or finished generator copies.
+  A probe showed the same `TypeError` for a generator in every state, so the modifier was the case the writer had in mind, not a condition.
+  The repair states the full range and then the case the passage cares about:
+  "raise a `TypeError` for every generator, started or not, so a program cannot copy or save a machine that is paused in a state".
+  For each restricting adjective or participle on the object of a claim about what Python does (suspended, started, frozen, empty, nested, async), run the claim on the other case.
+  Keep the modifier when the other case differs, and say how. The claim check passes these sentences because they are true. C70 in `bruce_edit_db.md`.

@@ -99,7 +99,15 @@ each pass hands the next one less to do.
    thing that fits the definition. The noun after "such a", "this",
    or "that" is one the passage has used for that thing.
 6. `ambiguity`: every sentence that counts, compares, coordinates,
-   modifies, or limits keeps one reading: a count with two units, a
+   modifies, or limits keeps one reading. A modifier that narrows a
+   true claim tells the reader the other cases differ ("raise a
+   `TypeError` on a suspended generator", Bruce: "can a generator in
+   any state be copied?"): run the claim with the modifier removed,
+   and if it still holds, state the full range and then the case the
+   passage cares about ("for every generator, started or not, so a
+   program cannot copy or save a machine that is paused in a
+   state", C70). The claim check passes such a sentence, since it is
+   true. The other shapes: a count with two units, a
    word with two senses, a modifier with two heads, an open scope, a
    definite noun the listing has several of, a missing comparand,
    and a verb that reads with or without an object set before "and"
