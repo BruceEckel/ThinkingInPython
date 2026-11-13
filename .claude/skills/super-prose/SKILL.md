@@ -22,6 +22,11 @@ The order is the order the skills' own boundary notes give:
 each pass hands the next one less to do.
 
 1. `literal`: a figure or a vague description becomes the mechanism.
+   A walkthrough sentence that names an argument a call carries says
+   what the call does with it ("the `next()` call takes a default of
+   `""`" -> "`next()` returns that default when `chars` has no more
+   characters", after a sentence that says `next()` otherwise raises
+   `StopIteration`, C83).
    A part one design has and another lacks does not "disappear",
    "vanish", or "go away": say which construct in this design does
    its job ("the machine object disappears" -> "parameters and locals

@@ -5518,6 +5518,44 @@ Claude-written, Bruce: "what difference":
 **Home.** antecedents (Accrued patterns, and the keep for "this" with
 its noun) | super-prose (pass 5) | this file.
 
+### C83. A sentence that says a call is given an argument says what the call then does
+
+**Test.** A walkthrough sentence explains a line by naming an argument
+or option the call carries ("takes a default of `""`", "passes
+`strict=True`", "with a timeout") and stops there. The reader who does
+not know the API has the name of the argument and must supply its
+effect, and the effect is the explanation. Bruce, on chapter 45's "A
+Python iterator ends, so the `next()` call in the `match` statement
+takes a default of `""`": "which means it returns "" instead of
+StopIterator?" The "so" also skipped a step: an iterator that ends is
+no reason for a default until the sentence says what `next()` does at
+the end. Repair: state what the call does without the argument, then
+what it does with it ("`next()` on an iterator with no more items
+raises `StopIteration`. The `next()` call in the `match` statement
+passes `""` as a second argument, and `next()` returns that default
+when `chars` has no more characters"). Where the listing holds the
+same call without the argument, say what happens at that one too.
+
+**Keep when.** The chapter taught the argument's effect earlier under
+that name and the sentence cites it, or the next sentence states the
+effect.
+
+**Sightings.** 1, `45_Effects--Generators` 2026-11-13, was
+Claude-written, Bruce's question quoted above:
+- Why the passes missed it: "default" is the documented term, so the
+  literal pass's first test passed it, and the vague-description read
+  looks for an abstract noun or a verdict, not an argument named in
+  place of its effect. The next sentence ("`case "":` matches that
+  default") used the default and so read as the explanation. The
+  argument walk in super-prose pass 3 tests a "so" for its licensing
+  fact outside a listing walkthrough, and this "so" is inside one.
+- Scale: a grep of both trees for `takes (a|an|the) (default|second|
+  third|optional|keyword|flag)` and `with a default of` found no
+  second site of the shape, so there is no tool and no sweep.
+
+**Home.** literal (Accrued patterns) | super-prose (pass 1) | this
+file.
+
 ## Retired
 
 Rejected by Bruce, or promoted and later withdrawn. Never propose these

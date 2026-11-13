@@ -342,3 +342,18 @@ and it becomes part of every future pass.
   was elegant variation, and the second is carried by the
   `send(None)` in the same sentence.
   Grep the scope for `expression` and for `takes (its|that|the) value`.
+- **An argument named in place of its effect.**
+  "A Python iterator ends, so the `next()` call in the `match`
+  statement takes a default of `""`" (Bruce, 2026-11-13: "which means
+  it returns "" instead of StopIterator?").
+  The sentence names the argument and leaves its effect to a reader
+  who knows the API. Say what the call does without the argument, then
+  what it does with it: "`next()` on an iterator with no more items
+  raises `StopIteration`. The `next()` call in the `match` statement
+  passes `""` as a second argument, and `next()` returns that default
+  when `chars` has no more characters". Where the listing has the same
+  call without the argument, say what happens there too.
+  Keep a bare mention when the chapter taught the argument's effect
+  under that name or the next sentence states it.
+  In a walkthrough, read each sentence about a call's argument,
+  default, or keyword against this test. C83 in `bruce_edit_db.md`.
