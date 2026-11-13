@@ -1949,7 +1949,7 @@ from collections.abc import AsyncIterator
 from dataclasses import dataclass
 from typing import override
 
-@dataclass(eq=False)
+@dataclass
 class Countdown(AsyncIterator[int]):
     n: int
 
@@ -2230,7 +2230,7 @@ from collections.abc import Iterator
 from dataclasses import dataclass, field
 from typing import override
 
-@dataclass(eq=False)
+@dataclass
 class Fibonacci(Iterator[int]):
     remaining: int
     _a: int = field(default=0, init=False)
