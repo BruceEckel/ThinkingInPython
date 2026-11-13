@@ -19,7 +19,7 @@ class Squasher(Iterator[str]):
         match next(self.chars, ""):
             case "*":
                 return "^"
-            case "":
+            case "":  # No more input
                 return "*"
             case following:
                 self._held = following  # [2]

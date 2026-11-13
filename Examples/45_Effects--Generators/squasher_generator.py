@@ -9,7 +9,7 @@ def squash(chars: Iterator[str]) -> Iterator[str]:
         match next(chars, ""):
             case "*":
                 yield "^"
-            case "":
+            case "":  # No more input
                 yield "*"
             case following:
                 yield "*"  # [1]
