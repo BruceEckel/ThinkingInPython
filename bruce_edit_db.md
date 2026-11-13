@@ -4787,6 +4787,43 @@ own subsection or some other clarification?":
 **Home.** cohesion (Accrued patterns) | super-prose (pass 4 and Scope)
 | this file.
 
+### C72. In a listing walkthrough, the code's actor gets the verb, not "I"
+
+**Test.** A paragraph walks a listing, and a sentence makes "I" or
+"we" the subject of a verb about the code: "because I typed them",
+"I added a `return`", "we pass `None`". The book's "I" gives an
+opinion or the author's history, so here the reader stops to ask who
+is speaking and why the author appears. Give the verb to the thing on
+the page ("because its annotation declares them"), or to "the
+programmer" or "you" where a person must act. Check the pronouns in
+the rest of the sentence while there: the cut "I" can leave an "it" or
+"them" with two candidates ("reads them back without comparing them
+with the calls in its body" -> "reads the annotation without comparing
+it with the calls in `greet()`'s body").
+
+**Keep when.** The sentence gives an opinion ("I find Structural and
+Behavioral far less useful"), the author's history ("I wrote *Thinking
+in C++*"), or a term the author coined ("what I call"); or the chapter
+uses "we" for a step shared with the reader ("We can modify
+`task_runner()`").
+
+**Sightings.** 1, `A_Effect_Tracking` 2026-11-13, was Claude-written,
+Bruce: "unusual use of 'I'":
+- "`greet()`'s row lists `Ask` and `Tell` because I typed them, and
+  `row()` reads them back without comparing them with the calls in its
+  body." -> "because its annotation declares them, and `row()` reads
+  the annotation without comparing it with the calls in `greet()`'s
+  body."
+- Why the passes missed it: the sentence is active and names an actor,
+  so activate's tests pass it. `tip past-tense` skips a main-clause
+  past whose subject is "I" or "we", and no other tool lists the
+  pronoun. It was the one "I" in the appendix; the 16 others in
+  `Chapters/` found by a grep for "I" plus a verb are opinion or
+  history, in chapters 01, 20, 21, and 43.
+
+**Home.** activate (Accrued patterns) | super-prose (pass 7) | this
+file.
+
 ## Retired
 
 Rejected by Bruce, or promoted and later withdrawn. Never propose these

@@ -545,3 +545,18 @@ and it becomes part of every future pass.
   `Mouse.ESCAPES` to a machine in `Waiting` ... its loop yields
   `Waiting` again, and the trace line ends `-> Waiting`"), with a tag
   on the call when the listing has more than one.
+- **The author as the actor in a walkthrough** (2026-11-13, Bruce:
+  "unusual use of 'I'" on Appendix A's "`greet()`'s row lists `Ask`
+  and `Tell` because I typed them"). The book's "I" gives an opinion
+  or the author's history ("I find Structural and Behavioral far less
+  useful", "what I call"). In a paragraph that walks a listing, "I" or
+  "we" as the subject of a verb about the code (typed, wrote, added,
+  passed, chose) puts a person where the code's own actor belongs, and
+  the reader stops to ask who is speaking. Give the verb to the thing
+  on the page: "because its annotation declares them". Where a person
+  must act, write "the programmer" or "you", as the chapter does
+  elsewhere. `tip past-tense` skips a main-clause past with an "I" or
+  "we" subject, and no other tool lists the pronoun, so grep the scope
+  for `\bI\b` and `\b[Ww]e\b` outside code spans. Keep an opinion, the
+  author's history, and a chapter's established "we" for a shared step
+  ("We can modify `task_runner()`"). C72 in `bruce_edit_db.md`.

@@ -237,8 +237,8 @@ including the `Tell` in the return annotation of `tell()`.
 Compare `undeclared_need.py` in [Stateless](46_Effects--Stateless.md#effects-propagate-and-the-type-checker-verifies-it),
 where the type checker reports the same mistake as an `invalid-yield` error.
 A row inside `Annotated` is a structured comment until a tool reads it.
-`greet()`'s row lists `Ask` and `Tell` because I typed them,
-and `row()` reads them back without comparing them with the calls in its body.
+`greet()`'s row lists `Ask` and `Tell` because its annotation declares them,
+and `row()` reads the annotation without comparing it with the calls in `greet()`'s body.
 
 `shout()`'s empty row has a second reading.
 `quiet()` declares `performs()` with no arguments, which states that it is pure.

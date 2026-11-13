@@ -149,7 +149,14 @@ each pass hands the next one less to do.
    in a sentence about standing behavior included: "the value that
    `send()` delivered" -> "delivers", C63), and a verb of rest with
    nothing after it ("the generator that is waiting" -> "the generator
-   paused at the innermost `yield`", C58). No survey tool lists that
+   paused at the innermost `yield`", C58). An "I" or "we" as the
+   actor in a listing walkthrough is the author standing where the
+   code's actor belongs ("lists `Ask` and `Tell` because I typed
+   them" -> "because its annotation declares them", C72): grep the
+   scope for `\bI\b` and `\b[Ww]e\b` outside code spans and give the
+   verb to the annotation, the function, or "the programmer"; an
+   opinion or the author's history ("I find", "what I call") stays.
+   No survey tool lists the verb-of-rest
    shape: grep the scope for `wait`, `pending`, `idle`, `suspended`,
    `paused`, `sits`, `stays`, `remains`, and `holds`, and read each
    for its place or its event, and for its subject: the thing that
