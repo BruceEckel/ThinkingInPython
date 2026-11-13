@@ -1680,8 +1680,18 @@ works", "Once you discover a hot spot", "once you decide you want one"
 said "after you have decided"). The adverb "once" meaning one time
 ("a pair used once, in one place") is a different word and stays.
 
-**Sightings.** 22, 19 chapters. Promoted 2026-10-19 on the fix-triage
+**Sightings.** 23, 19 chapters. Promoted 2026-10-19 on the fix-triage
 page's decisions (C37 -> R40).
+- `45_Effects--Generators` 2026-11-13, Bruce: "would 'if' be better
+  than 'when' here?", the rule's "when" side: "When a coroutine
+  awaits a `Future` that has its result, ... When the `Future` is
+  still waiting for its result, ..." -> "If ... If ...". Two
+  alternative branches are conditions, and the paragraph's next
+  sentence is a real time ("When the result arrives"). The test
+  reads "once" only, so a pass applying R40 never looked at a
+  "when": for a pair of sentences that give the two branches of one
+  test, write "if" on both and keep "when" for an event later in the
+  run. Claude wrote the pair an hour earlier.
 - `31_Patterns--State_Machines` 2026-10-19, Bruce's hand: "Choose a
   library once the machine needs more than a page of code." -> "Choose
   a library if the machine needs more than a page of code."

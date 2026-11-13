@@ -322,3 +322,8 @@ Shapes Bruce flags that the catalog above did not name, dated, with the sentence
   Grep the scope for `when`, `if`, and `unless` after a main clause
   whose verb is "is" or a behavior verb, and ask what the other
   branch does.
+  The two branches take "If", not "When" (Bruce, the same hour:
+  "would 'if' be better than 'when' here?"): "when" reads as a time,
+  and the paragraph's next sentence opens on a real time, "When the
+  result arrives". One of two alternative conditions is "if"; an
+  event that comes later in the run is "when" (R40).
