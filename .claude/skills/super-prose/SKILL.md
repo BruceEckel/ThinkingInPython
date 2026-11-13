@@ -104,9 +104,12 @@ each pass hands the next one less to do.
    `TypeError` on a suspended generator", Bruce: "can a generator in
    any state be copied?"): run the claim with the modifier removed,
    and if it still holds, state the full range and then the case the
-   passage cares about ("for every generator, started or not, so a
-   program cannot copy or save a machine that is paused in a
-   state", C70). The claim check passes such a sentence, since it is
+   passage cares about, joined by the fact that puts the case in the
+   range ("for every generator, started or not. A machine in this
+   design is a generator, so a program cannot copy it or save it",
+   C70). Test the repair too: the first repair of that sentence
+   ended "a machine that is paused in a state" and drew the same
+   question. The claim check passes such a sentence, since it is
    true. The other shapes: a count with two units, a
    word with two senses, a modifier with two heads, an open scope, a
    definite noun the listing has several of, a missing comparand,

@@ -245,7 +245,10 @@ Shapes Bruce flags that the catalog above did not name, dated, with the sentence
   "`copy.deepcopy()` and `pickle` both raise a `TypeError` on a suspended generator" (Bruce: "because a suspended generator cannot be copied? can a generator in any state be copied?").
   The reader takes "suspended" as the boundary of the claim and infers that an unstarted or finished generator copies.
   A probe showed the same `TypeError` for a generator in every state, so the modifier was the case the writer had in mind, not a condition.
-  The repair states the full range and then the case the passage cares about:
-  "raise a `TypeError` for every generator, started or not, so a program cannot copy or save a machine that is paused in a state".
+  The repair states the full range, then the fact that puts the passage's case in the range, then the consequence:
+  "raise a `TypeError` for every generator, started or not. A machine in this design is a generator, so a program cannot copy it or save it."
+  The first repair ended "so a program cannot copy or save a machine that is paused in a state" and drew the same question
+  (Bruce: "Only a Machine, or any generator? If it's not paused can it be copied?"): the modifier had moved to the consequence.
+  Apply the test to the repair before the commit.
   For each restricting adjective or participle on the object of a claim about what Python does (suspended, started, frozen, empty, nested, async), run the claim on the other case.
   Keep the modifier when the other case differs, and say how. The claim check passes these sentences because they are true. C70 in `bruce_edit_db.md`.

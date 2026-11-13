@@ -4683,9 +4683,12 @@ generator cannot be copied? can a generator in any state be copied?").
 Run the claim with the modifier removed or reversed. If it still
 holds, the modifier is the case the writer had in mind and not a
 condition: state the full range ("for every generator, started or
-not") and then, as a consequence, the case the passage cares about
-("so a program cannot copy or save a machine that is paused in a
-state"). If the other cases do differ, say how in the same passage.
+not") and then, as a consequence, the case the passage cares about,
+tied to the range by the fact that puts it there ("A machine in this
+design is a generator, so a program cannot copy it or save it"). The
+consequence gets the same test: it carries no modifier of its own
+that the range does not need. If the other cases do differ, say how
+in the same passage.
 
 **Keep when.** The probe shows the other case behaves differently
 ("the first `send()` to an unstarted generator accepts `None`"), or
@@ -4700,6 +4703,18 @@ Claude-written, Bruce's question above:
   every generator, started or not, so a program cannot copy or save a
   machine that is paused in a state. A *Memento* belongs to the enum
   designs"
+- the repair above, minutes later, Bruce: "Only a Machine, or any
+  generator? If it's not paused can it be copied?": "so a program
+  cannot copy or save a machine that is paused in a state." -> "A
+  machine in this design is a generator, so a program cannot copy it
+  or save it."
+  The repair moved the narrowing modifier from the first clause to
+  the consequence ("that is paused in a state" for "suspended") and
+  added a second narrowing, "a machine" for "a generator", with
+  nothing saying a machine is a generator. Claude wrote it in the same
+  edit that wrote this rule, so the rule's test goes on the repair
+  before the commit, as C62 says of a limiter added to a positive
+  rewrite.
   Probe, `uv run python` 3.15.1: `copy.copy()`, `copy.deepcopy()`, and
   `pickle.dumps()` each raise "TypeError: cannot pickle 'generator'
   object" for a generator that is `GEN_CREATED`, `GEN_SUSPENDED`, and
