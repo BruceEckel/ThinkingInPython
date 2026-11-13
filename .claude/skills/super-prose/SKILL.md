@@ -136,7 +136,11 @@ each pass hands the next one less to do.
    (driver, engine, handler, proxy, loop, wrapper); two nouns for one
    function is a hit, and a noun the chapter defined goes only to a
    thing that fits the definition. The noun after "such a", "this",
-   or "that" is one the passage has used for that thing.
+   or "that" is one the passage has used for that thing. A compound
+   term keeps both words on every mention ("the event loop", never
+   "the loop" in a chapter full of `for` loops): for each compound
+   term in the scope, grep for its head noun alone, and when one use
+   of a word is changed for a clash, grep for its other uses.
 6. `ambiguity`: every sentence that counts, compares, coordinates,
    modifies, or limits keeps one reading. A list of what two things
    share ("has `send()`, `throw()`, and `close()`, as a generator
