@@ -327,3 +327,16 @@ Shapes Bruce flags that the catalog above did not name, dated, with the sentence
   and the paragraph's next sentence opens on a real time, "When the
   result arrives". One of two alternative conditions is "if"; an
   event that comes later in the run is "when" (R40).
+- 2026-11-13, chapter 45: "alone" as "only this" or as "unaided".
+  "`AsyncIterator` supplies an `__aiter__()` that returns `self`, so
+  `Countdown` defines `__anext__()` alone" (Bruce: "not sure what
+  'alone' means here").
+  R27 writes "X alone" for an `only` on a verb's object. At the end of
+  a clause the word can also attach to the subject, and it does when
+  the sentence names a helper.
+  Test: put "by itself" after the subject. If the sentence parses and
+  means something else, say what becomes of the excluded item:
+  "`Countdown` inherits that method and defines `__anext__()`".
+  `tip overclaims CH=NN` lists every "X alone"; read each one whose
+  subject is a class or a function and whose sentence names a second
+  class or function. R27's Keep-when has the record.

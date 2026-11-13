@@ -1972,8 +1972,8 @@ asyncio.run(main())
 #: n = 1
 ```
 
-`AsyncIterator` supplies an `__aiter__()` that returns `self`,
-so `Countdown` defines `__anext__()` alone.
+`AsyncIterator` supplies an `__aiter__()` that returns `self`.
+`Countdown` inherits that method and defines `__anext__()`.
 `__anext__()` is a coroutine function,
 so `async for` must await what it returns.
 `main()` makes the first two `__anext__()` calls,

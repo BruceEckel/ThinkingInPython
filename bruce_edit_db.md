@@ -1142,7 +1142,15 @@ one Y that ...", "whose one Y is X", "leave X as the one open Y".
 `Need[Butter]`"). Write "X alone".
 
 **Keep when.** An "alone" already sits nearby, or the object is a count
-(R24 decides).
+(R24 decides). "Alone" also means "unaided", and that sense wins when
+the sentence has a helper in it: "`AsyncIterator` supplies an
+`__aiter__()` that returns `self`, so `Countdown` defines `__anext__()`
+alone" (Bruce, 2026-11-13, chapter 45: "not sure what 'alone' means
+here") reads as `Countdown` working without help, in a sentence about
+the help it gets. There, name the excluded item's fate (R9): "`Countdown`
+inherits that method and defines `__anext__()`." The test: put "by
+itself" after the subject; if the sentence still parses and means
+something else, "alone" has two readings.
 
 **Sightings.** 5, 5 files, 2026-10-04 (`c06fecc2`), the `only` sweep applying Bruce's rulings on the Only Shapes page:
 - `38_Patterns--Simulation`: "it names concepts only `Maze` uses" -> "it
