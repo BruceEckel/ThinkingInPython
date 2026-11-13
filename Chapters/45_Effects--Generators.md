@@ -1790,7 +1790,8 @@ and `next()` runs it to its next `yield`.
 so the two jobs alternate.
 For a finished job, `next(job)` raises `StopIteration`,
 and the `continue` at `[2]` skips `[3]`.
-`[1]` has already removed that job from the queue, so it stays out.
+`[1]` takes each job out of the queue before `next()` runs,
+so a finished job stays out.
 
 We can modify `task_runner()` so that jobs can make requests:
 
@@ -1851,7 +1852,7 @@ When a job finishes before its first `yield`,
 so the exception arrives before `append()` runs,
 and that job stays out of `ready`.
 When a job finishes in the `while` loop, its `send()` raises `StopIteration`.
-`popleft()` has already removed that job from `ready`,
+`popleft()` takes each job out of `ready` before `send()` runs,
 and the `continue` skips the `append()` that puts a job back.
 
 `index()` discards what it receives.
@@ -1861,32 +1862,33 @@ It yields only to take turns.
 
 `asyncio.run()` starts the `asyncio` event loop.
 The event loop is a driver like `task_runner()` in `task_runner_send.py`.
-The loop runs tasks, and a task holds one coroutine:
-the task calls `send(None)` on its coroutine and receives what the coroutine yields.
 A coroutine object has `send()`, `throw()`, and `close()`, as a generator does.
-It is not an iterator, so `next()` on a coroutine object raises a `TypeError`,
-and the task both starts and resumes its coroutine with `send(None)`.
-The event loop keeps a queue of the tasks that are ready to run,
-as `task_runner()` keeps `ready`, and runs the task at the front.
+A coroutine object is not an iterator, so `next()` on it raises a `TypeError`,
+and `send(None)` both starts and resumes it.
+The loop keeps a queue of the tasks that are ready to run,
+as `task_runner()` keeps `ready`.
+The loop runs the task at the front of the queue.
+Each task holds one coroutine, calls `send(None)` on it,
+and receives the value the coroutine yields.
 
 [Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics)
 describes `await` as suspending a task until the event loop resumes it.
 In this chapter's terms,
-an `await` on a `Future` that has no result yet is a `yield`.
+an `await` on a `Future` is a `yield` when the `Future` is still waiting for its result.
 The coroutine pauses at the `await`,
 and the task's `send(None)` call returns the `Future`.
 The `Future` is the request, and its result is the reply.
 When the `Future` has a result, the loop puts the task back in the queue,
 the task calls `send(None)` again,
-and the `await` expression evaluates to that result.
+and the `await` expression takes its value from the `Future`'s result.
 
-That event loop is the single driver at the edge of the program.
+The event loop is the single driver at the edge of the program.
 Each request passes through every awaiting caller on its way to that loop,
 so an `await` in a function makes each of those callers `async` in turn.
 
 An `async def` function can also contain `yield`.
 The result is an *asynchronous generator*, which has two drivers at once.
-Each `await` sends a request up to the event loop,
+Each `await` passes a request up to the event loop,
 while each `yield` hands a value to the `async for` loop that consumes it:
 
 ```python
@@ -1918,9 +1920,9 @@ asyncio.run(main())
 
 `async for` is an `await` in loop form:
 on each pass it awaits the generator's `__anext__()`.
-Like any `await`, it belongs inside an `async def`,
-so both `async for` loops sit in `main()`.
-The *asynchronous comprehension* `[n * n async for n in countdown(5)]` collects its values through its own `__anext__()` calls.
+Like any `await`, an `async for` must be inside an `async def`,
+so the `async for` loop and the comprehension are both in `main()`.
+The *asynchronous comprehension* `[n * n async for n in countdown(5)]` creates a second `countdown(5)` generator and awaits its `__anext__()` for each value.
 
 A class can supply that `__anext__()`,
 the way `Fibonacci` in [Iterators](22_Patterns--Iterators.md#generators)
@@ -1960,22 +1962,24 @@ asyncio.run(main())
 ```
 
 `AsyncIterator` supplies an `__aiter__()` that returns `self`,
-so the class writes `__anext__()` alone.
+so `Countdown` defines `__anext__()` alone.
 `__anext__()` is a coroutine function,
 so `async for` must await what it returns.
 `main()` makes the first two `__anext__()` calls,
 and the `async for` makes the rest.
-The loop ends when `__anext__()` raises `StopAsyncIteration`,
+The `async for` ends when `__anext__()` raises `StopAsyncIteration`,
 the asynchronous counterpart of `StopIteration`.
-The asynchronous generator `countdown()` in `async_generator.py` computes `Countdown`'s sequence in a `while` loop with a `yield`,
-and leaves the two methods to Python.
 
-An asynchronous generator drops the return channel,
+The asynchronous generator `countdown()` in `async_generator.py` computes `Countdown`'s sequence in a `while` loop with a `yield`,
+and Python supplies the generator's `__aiter__()` and `__anext__()`.
+
+An asynchronous generator has a yield channel and a send channel and no return channel,
 so `AsyncGenerator[YieldType, SendType]` takes two parameters where `Generator` takes three.
 Writing `return` with a value in an asynchronous generator is a `SyntaxError`,
 as is `yield from`.
-The send channel remains as `asend()`, alongside `athrow()` and `aclose()`.
-Each of the three returns an awaitable for the caller to `await`.
+In place of `send()`, `throw()`, and `close()`,
+an asynchronous generator has `asend()`, `athrow()`, and `aclose()`,
+and each of those three returns an awaitable for the caller to `await`.
 
 ## Half a Coroutine by Design
 
