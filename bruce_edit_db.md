@@ -4820,6 +4820,15 @@ Bruce: "unusual use of 'I'":
   pronoun. It was the one "I" in the appendix; the 16 others in
   `Chapters/` found by a grep for "I" plus a verb are opinion or
   history, in chapters 01, 20, 21, and 43.
+- Sweep, 2026-11-13: every I, me, my, we, our, us, and let's outside
+  code in `Chapters/` and `Solutions/`, 117 lines. No second site.
+  The lines are the author's history (39 in chapter 01, the openers
+  of 12, 20, 21, 38, 42, 43, and 46), quoted speech ("which build am
+  I running?"), "I/O", an essay "we" (chapter 44's closing), and nine
+  shared-step "we" sentences, all lead-ins or section openers, none
+  inside a walkthrough: 26 (two), 30 (three), 31 (two), 45 (three,
+  one of them "Here we see the typical case"). `Solutions/` has no
+  authorial first person.
 
 **Home.** activate (Accrued patterns) | super-prose (pass 7) | this
 file.
