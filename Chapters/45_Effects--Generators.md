@@ -1929,10 +1929,11 @@ asyncio.run(main())
 
 `async for` uses the iteration protocol from [Iterators](22_Patterns--Iterators.md#iteration-comes-built-in)
 with two other methods.
-In place of `__iter__()` it calls `__aiter__()` once,
-on the generator that `countdown(5)` returns,
-and that generator's `__aiter__()` returns the generator itself.
-In place of `__next__()` it awaits `__anext__()` for each value.
+When the loop starts,
+`async for` makes one `__aiter__()` call in place of `__iter__()`,
+on the generator that `countdown(5)` returns.
+That generator's `__aiter__()` returns the generator itself.
+For each value, `async for` awaits `__anext__()` in place of `__next__()`.
 `async for` contains an `await`, so it must be inside an `async def`,
 and the `async for` loop and the comprehension are both in `main()`.
 The *asynchronous comprehension* `[n * n async for n in countdown(5)]` creates a second `countdown(5)` generator and awaits its `__anext__()` for each value.
