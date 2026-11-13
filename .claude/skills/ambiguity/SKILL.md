@@ -278,3 +278,18 @@ Shapes Bruce flags that the catalog above did not name, dated, with the sentence
   For each "as X does", "like X", or "the same methods as", list what
   the chapter has taught X to have and compare.
   C75 in `bruce_edit_db.md`.
+- 2026-11-13, chapter 45: "through" as path or as means.
+  "It drives a coroutine through a task" (Bruce: "does this mean
+  through the steps of a task, or via a task").
+  After a verb of motion or control (drive, run, step, walk, send,
+  pass), "through X" first reads as the path travelled, and the book
+  uses it that way ("drive it through a sequence of inputs", "drives
+  an object through a known set of states").
+  For the means, give each actor its own verb: "The loop runs tasks,
+  and a task holds one coroutine: the task calls `send(None)` on its
+  coroutine". "Via" and "by way of" only swap the preposition and
+  leave the reader to work out who calls what.
+  Grep the scope for `through an?` after those verbs.
+  This was Claude's third repair of one paragraph in a session, each
+  flagged in turn, so a repair is reread as a new sentence under every
+  shape in this catalog before it is committed.
