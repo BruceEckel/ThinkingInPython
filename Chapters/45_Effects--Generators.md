@@ -2009,18 +2009,22 @@ Its position determines what it does next.
 
 A call preserves the caller's position and locals.
 The caller waits in the middle of its body and continues from that point when the call returns.
-An ordinary function on the called side starts at its first line on every call and loses its position and its locals when it returns.
+An ordinary function, when called,
+starts at its first line every time and loses its position and its locals when it returns.
 
 That difference matters when a producer computes a series of values and a consumer uses them one at a time.
 The producer and the consumer are each simplest to write as its own loop.
 One of the two must call the other.
-Without generators, the called function restarts at its first line on every call,
-so you cannot write the called side as a loop.
+Consider a consumer that calls the producer.
+The consumer keeps its loop.
+Without generators, the producer restarts at its first line on every call,
+so you cannot write the producer as a loop.
 You write it as a state machine:
 variables that hold the loop's locals and its position,
 and code that reads them on every call to find where to continue.
-A generator is a called function that keeps its position and its locals,
-so you write the called side as a loop too.
+If the producer calls the consumer, the consumer becomes the state machine.
+A generator keeps its position and its locals between calls,
+so a producer written as a generator is a loop too.
 
 ### Conway's Switch
 

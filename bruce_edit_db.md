@@ -2365,7 +2365,20 @@ name); the chain is a type or a path the reader must see as written
 instance"); a quoted diagnostic; an exercise statement or a Done-when
 criterion that must stay abstract so as not to give the answer away.
 
-**Sightings.** 2, both Bruce's flags on chapter 45 on 2026-10-29
+**Sightings.** 3. The third, chapter 45 on 2026-11-13, is a short
+role phrase with no "of" chain: "so you write the called side as a
+loop too" (Bruce: "the called side is confusing"), in a paragraph
+that had named a producer and a consumer three sentences up. The
+phrase was abstract because the paragraph left open which of the two
+is called. Pick the case and use the names: "Consider a consumer
+that calls the producer. The consumer keeps its loop. Without
+generators, the producer restarts at its first line on every call
+... so a producer written as a generator is a loop too", with one
+sentence for the reverse case. Claude's repair of "its loop" two
+edits earlier had put the phrase in, taking it from the paragraph
+above; a role phrase that stands in for "whichever of the two" is
+this rule's shape whatever its length. The first
+2, both Bruce's flags on chapter 45 on 2026-10-29
 (`ca045294`, `4a5d14ea`), promoted on his request to apply it across
 the book. The sweep the same day (brief `build/role-2026-10-29/`,
 21 Opus agents over 422 regex candidates in 49 chapters) rewrote 13
