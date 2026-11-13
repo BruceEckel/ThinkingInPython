@@ -1864,10 +1864,10 @@ It yields only to take turns.
 The event loop is a driver like `task_runner()` in `task_runner_send.py`.
 A coroutine object has `send()`, `throw()`, and `close()`, as a generator does.
 A coroutine object is not an iterator, so `next()` on it raises a `TypeError`,
-and `send(None)` both starts and resumes it.
-The loop keeps a queue of the tasks that are ready to run,
+so `send(None)` both starts and resumes it.
+The event loop keeps a queue of the tasks that are ready to run,
 as `task_runner()` keeps `ready`.
-The loop runs the task at the front of the queue.
+The event loop runs the task at the front of the queue.
 Each task holds one coroutine, calls `send(None)` on it,
 and receives the value the coroutine yields.
 
@@ -1878,12 +1878,12 @@ an `await` on a `Future` is a `yield` when the `Future` is still waiting for its
 The coroutine pauses at the `await`,
 and the task's `send(None)` call returns the `Future`.
 The `Future` is the request, and its result is the reply.
-When the `Future` has a result, the loop puts the task back in the queue,
+When the `Future` has a result, the event loop puts the task back in the queue,
 the task calls `send(None)` again,
 and the `await` expression takes its value from the `Future`'s result.
 
 The event loop is the single driver at the edge of the program.
-Each request passes through every awaiting caller on its way to that loop,
+Each request passes through every awaiting caller on its way to the event loop,
 so an `await` in a function makes each of those callers `async` in turn.
 
 An `async def` function can also contain `yield`.

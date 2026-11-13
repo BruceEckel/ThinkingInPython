@@ -293,3 +293,19 @@ Shapes Bruce flags that the catalog above did not name, dated, with the sentence
   This was Claude's third repair of one paragraph in a session, each
   flagged in turn, so a repair is reread as a new sentence under every
   shape in this catalog before it is committed.
+- 2026-11-13, chapter 45: a compound term shortened to its head noun.
+  "The event loop is a driver ... The loop keeps a queue of the tasks"
+  (Bruce: "the event loop?").
+  "Event loop" is a term, and "the loop" in this chapter is a `for`,
+  a `while`, or an `async for`, so the short form has a second
+  candidate at every use, however near the full term sits.
+  Write the full term each time: "The event loop keeps a queue",
+  "the event loop puts the task back".
+  Claude's super-prose pass over the section an hour earlier saw the
+  clash at "The loop ends when `__anext__()` raises" and fixed that
+  one sentence, the minority sense, while writing two new "The loop"
+  sentences for the event loop. When one use of a word is changed
+  for a clash, grep the scope for every other use of the word.
+  For each compound term in the scope (event loop, type checker,
+  class attribute, stack frame), grep for its head noun alone.
+  C67 in `bruce_edit_db.md`, sighting 4.

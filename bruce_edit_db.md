@@ -4633,6 +4633,18 @@ here?":
   the reader knows (`send(None)` returns the yielded value), not a
   preposition ("yields to its task").
 
+4, the same section the same day, Bruce: "the event loop?":
+- "The loop keeps a queue of the tasks that are ready to run" ->
+  "The event loop keeps a queue ...", and three more bare uses in the
+  section ("The loop runs the task", "the loop puts the task back",
+  "on its way to that loop").
+- A compound term shortened to its head noun is a second name, and
+  in a chapter about generators "the loop" is first a `for` or a
+  `while`. The full term goes on every mention. Two of the four were
+  written by Claude's super-prose pass over this section, which had
+  fixed the clash at one sentence ("The loop ends" -> "The `async
+  for` ends") and not looked for the word's other uses.
+
 **Home.** antecedents (Accrued patterns) | super-prose (pass 5) | this
 file.
 
