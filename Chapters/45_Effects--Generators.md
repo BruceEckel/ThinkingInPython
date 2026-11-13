@@ -1892,7 +1892,9 @@ and it evaluates to the coroutine's return value.
 Each request the inner coroutine yields passes through every awaiting caller on its way to the event loop,
 so an `await` in a function makes each of those callers `async` in turn.
 
-An `async def` function can also contain `yield`.
+### Asynchronous Generators
+
+An `async def` function can contain `yield`.
 The result is an *asynchronous generator*, which has two drivers at once.
 Each `await` passes a request up to the event loop,
 while each `yield` hands a value to the `async for` loop that consumes it:
