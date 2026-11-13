@@ -1958,15 +1958,17 @@ class Countdown(AsyncIterator[int]):
         return value
 
 async def main() -> None:
-    it = Countdown(3)
+    it = Countdown(5)
     print(await it.__anext__())
     print(await it.__anext__())
     async for n in it:
         print(f"{n = }")
 
 asyncio.run(main())
-#: 3
-#: 2
+#: 5
+#: 4
+#: n = 3
+#: n = 2
 #: n = 1
 ```
 
