@@ -22,6 +22,11 @@ The order is the order the skills' own boundary notes give:
 each pass hands the next one less to do.
 
 1. `literal`: a figure or a vague description becomes the mechanism.
+   A part one design has and another lacks does not "disappear",
+   "vanish", or "go away": say which construct in this design does
+   its job ("the machine object disappears" -> "parameters and locals
+   hold the data that `VendingMachine` keeps in attributes", C68).
+   Grep the scope for `disappear`, `vanish`, `goes away`, and `gone`.
 2. `positive`: a negation that is an accident of phrasing turns around.
    A subject of "Nothing", "Nobody", or "No one" with a verb ("Nothing
    calls `throw()` on the first booking" -> "`list(book())` drives the
@@ -135,6 +140,15 @@ each pass hands the next one less to do.
     without it, and otherwise open on this listing's thing and put
     the other design second under "In chapter NN's `file.py`,".
     Grep the scope for a file name the chapter does not define.
+    A statement in a code span (`return ...`, `yield ...`,
+    `raise ...`, `name = ...`) is searched for in the chapter's
+    listings; one found in none is hypothetical code ("passes it to
+    the next state as an argument, `return selecting(amount)`,"
+    where no listing defines `selecting()`), and it gets the design
+    it belongs to as a condition ("In a vending machine with one
+    generator per state, the state that takes the money ends with
+    `return selecting(amount)`"), with "In that design" on the
+    sentence that continues it.
     It runs after the passes above because a split or a reframed
     sentence can strand an alternative's continuation from its
     opener, and before `stutter`, since a frame is new words.

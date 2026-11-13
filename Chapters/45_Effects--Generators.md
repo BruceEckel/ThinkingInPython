@@ -1666,9 +1666,11 @@ The Moore shape and the Mealy shape both fit one function with no `action` field
 A state's local variables are its data.
 [`VendingMachine`](31_Patterns--State_Machines.md#a-vending-machine)
 keeps `amount` on the machine object because every machine shares the enum members.
-A generator state keeps such a value in a local and passes it to the next state as an argument,
-`return selecting(amount)`,
-so each state receives the data it needs and the machine object disappears.
+A generator state keeps such a value in a local and passes it to the next state as an argument.
+In a vending machine with one generator per state,
+the state that takes the money ends with `return selecting(amount)`,
+and `selecting()` receives the amount as a parameter.
+In that design, parameters and locals hold the data that `VendingMachine` keeps in attributes.
 
 Exercise 8 writes the vending machine as one generator,
 with each state a position in a single generator body.

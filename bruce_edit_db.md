@@ -2636,6 +2636,34 @@ the book-wide read that day (Opus agents, brief in
   or a comparison paragraph further on covers the point, cut it; (3)
   a comparison that stays opens on this listing's thing and says the
   other design second.
+- `45_Effects--Generators` 2026-11-12, the same section, was
+  Claude-written, Bruce: "I don't see this in the example under
+  discussion": "A generator state keeps such a value in a local and
+  passes it to the next state as an argument, `return
+  selecting(amount)`, so each state receives the data it needs and the
+  machine object disappears." -> "... passes it to the next state as
+  an argument. In a vending machine with one generator per state, the
+  state that takes the money ends with `return selecting(amount)`, and
+  `selecting()` receives the amount as a parameter. In that design,
+  parameters and locals hold the data that `VendingMachine` keeps in
+  attributes."
+  `selecting()` is defined in no listing in the book: the span was
+  invented code, set in apposition to a general claim, so it read as a
+  quotation from the listing above. Why the passes missed it:
+  `survey absent-name` reads a lead-in's colon sentence, `survey
+  absent-subject` reads a span that opens a sentence, and this span
+  sat mid-sentence, five paragraphs below its listing; `survey
+  alternative` looks for a construct the listing lacks and the
+  sentence's constructs (`return`, an argument) are all in the
+  listing. The test added: a statement in a code span (`return ...`,
+  `yield ...`, `raise ...`, `name = ...`) is searched for in the
+  chapter's listings, and one found in none is hypothetical code. It
+  gets the design it belongs to as a condition ("In a vending machine
+  with one generator per state,") and the sentences that continue it
+  get "In that design". A scratch scan that day found 9 such spans in
+  chapter 45 and 115 in `Chapters/`; the other 8 in chapter 45 were
+  framed ("If `outer()` wrote `yield one()`", "with `values.append(a)`
+  in place of `yield a`", an exercise statement).
 
 **Home.** alternative (its own pass, `.claude/skills/alternative/SKILL.md`)
 | ambiguity (catalog and Accrued shapes) |
@@ -4573,6 +4601,40 @@ Claude-written, Bruce: "first it calls it an engine, then a driver":
   thing. No pass checks a defined term against its definition.
 
 **Home.** antecedents (Accrued patterns) | super-prose (pass 5) | this
+file.
+
+### C68. A part the design lacks does not "disappear": say what holds its job
+
+**Test.** A verb of vanishing ("disappears", "vanishes", "goes away",
+"is gone", "drops out", "melts away") whose subject is a class, an
+object, a field, or a step that one design has and another lacks: "so
+each state receives the data it needs and the machine object
+disappears". Nothing on the page disappears: the design under
+discussion never had the part, and the reader asks which object, and
+from where. Say which construct in this design does the part's job, in
+the words of both listings: "parameters and locals hold the data that
+`VendingMachine` keeps in attributes".
+
+**Keep when.** Something on the page is removed by a step the prose
+narrates, and a later listing shows it gone ("Delete the `else` branch
+and the second diagnostic disappears", written as "If you delete the
+`else` branch, the type checker reports one diagnostic" by R9 where the
+positive is available).
+
+**Sightings.** 1, `45_Effects--Generators` 2026-11-12, was
+Claude-written, Bruce: "??":
+- "so each state receives the data it needs and the machine object
+  disappears." -> "In that design, parameters and locals hold the data
+  that `VendingMachine` keeps in attributes."
+- Why the passes missed it: the literal pass reads for a figure
+  standing in for a mechanism, and "disappears" is a dead metaphor
+  that reads as a plain verb. The positive pass prefers it: it is the
+  positive form of "needs no machine object", the kind of word a
+  rewrite reaches for to remove a negative (C62 records the same
+  habit for "alone" and "only"). `tip watch-words` has no entry for
+  the verbs.
+
+**Home.** literal (Accrued patterns) | super-prose (pass 1) | this
 file.
 
 ## Retired

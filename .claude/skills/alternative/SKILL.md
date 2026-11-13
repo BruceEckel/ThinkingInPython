@@ -152,6 +152,21 @@ The lightest marker that carries over, keeping the claim's words:
   and the chime. In chapter 31's `trap_states.py`, the chime is a
   third element in `TrapState.HOLDING`'s row.").
 
+A statement in a code span that no listing holds is an alternative
+too, whatever its sentence looks like (Bruce, 2026-11-12, on "passes
+it to the next state as an argument, `return selecting(amount)`,": "I
+don't see this in the example under discussion").
+Search the chapter's listings for each `return ...`, `yield ...`,
+`raise ...`, and `name = ...` span in the scope.
+One found in none is invented code, and in apposition to a general
+claim it reads as a quotation from the listing above.
+Give it the design it belongs to as a condition
+("In a vending machine with one generator per state, the state that
+takes the money ends with `return selecting(amount)`"),
+and open the sentence that continues it with "In that design".
+The survey scans miss it: the span sits mid-sentence, and the
+sentence's constructs are all in the listing.
+
 When the test is close, keep it and say so in the report.
 
 ## Boundaries

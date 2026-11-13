@@ -286,3 +286,15 @@ and it becomes part of every future pass.
   "when you pass it"). Never "produces" for a `yield`, which produces
   values. Keep the literal sense and "draws a distinction". R62 in
   `bruce_edit_db.md`; the shape is Tier 2 in `tip watch-words`.
+- **A part the design lacks does not "disappear".**
+  "so each state receives the data it needs and the machine object
+  disappears" (Bruce, 2026-11-12: "??").
+  Nothing on the page disappears: the generator design never had a
+  machine object, and the reader asks which object, and from where.
+  "Disappears", "vanishes", "goes away", and "is gone" read as plain
+  verbs, and the positive pass reaches for them to replace "needs no".
+  Say which construct in this design does the part's job, in the words
+  of both listings: "parameters and locals hold the data that
+  `VendingMachine` keeps in attributes".
+  Keep the verb for a thing a narrated step removes from the page.
+  Grep the scope for the four verbs. C68 in `bruce_edit_db.md`.
