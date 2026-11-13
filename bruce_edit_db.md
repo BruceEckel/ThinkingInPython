@@ -4507,6 +4507,48 @@ state":
 **Home.** positive (Accrued patterns) | super-prose (pass 2) | this
 file.
 
+### C67. One role, one name: a second role noun for the same thing reads as a second thing
+
+**Test.** Two sentences close together give one function or object two
+role nouns: "`trampoline()` is the engine, the loop at `[1]`. PEP 342
+calls such a driver a *trampoline*". The reader takes the new noun for
+a new thing and looks for it. Pick the role noun by the chapter's own
+definitions and keep it. A noun the chapter has defined ("the *driver*
+(the loop that runs such a conversation)", chapter 45's opening list)
+is used only for a thing that fits the definition: `trampoline()`
+delegates with `yield from` and `run_all()` calls `send()`, so
+`run_all()` is the driver and `trampoline()` is the engine. A pointer
+phrase with a role noun ("such a driver", "this handler", "that
+engine") is where the second name most often enters: the noun after
+"such a", "this", or "that" is one the passage has already used for
+that thing ("such a loop", after "The loop at `[1]`").
+
+**Keep when.** The sentence states that the two roles are one ("the
+proxy is also a driver: it calls `next()` on `inner`"), or the second
+noun is a wider class the sentence places the thing in ("`drive()` is
+a function like any other").
+
+**Sightings.** 1, `45_Effects--Generators` 2026-11-12, was
+Claude-written, Bruce: "first it calls it an engine, then a driver":
+- "`trampoline()` is the engine, the loop at `[1]`. PEP 342 calls such
+  a driver a *trampoline*" -> "The loop at `[1]` is the whole engine.
+  PEP 342 calls such a loop a *trampoline*"
+- same pass, the lead-in above the listing, found by grepping the
+  section for the two nouns: "`luring()`'s body runs when a driver
+  delegates to it. Here, `trampoline()` is that driver:" ->
+  "`luring()`'s body starts when an engine delegates to it. Here,
+  `trampoline()` is the engine and `run_all()` is its driver:"
+- Why the passes missed it: each sentence is clear alone, and the
+  fault is between them. The antecedents pass tests a pointer for two
+  candidate targets, and "such a driver" has one. `[SAME+NEW]` tests
+  the noun after "same" against the passage and nothing tests the noun
+  after "such a", "this", or "that". The ambiguity pass reads for one
+  word with two senses, and this is the reverse, two words for one
+  thing. No pass checks a defined term against its definition.
+
+**Home.** antecedents (Accrued patterns) | super-prose (pass 5) | this
+file.
+
 ## Retired
 
 Rejected by Bruce, or promoted and later withdrawn. Never propose these

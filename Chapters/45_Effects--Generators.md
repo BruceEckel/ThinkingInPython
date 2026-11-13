@@ -1563,12 +1563,10 @@ After any other input,
 the loop runs its `yield` again and reports the state's name.
 The entry action sits above the loop, so it runs once, on entry.
 `holding()`'s entry action is two `print()` calls, the message and the chime.
-In chapter 31's `trap_states.py`,
-the chime is a third element in `TrapState.HOLDING`'s row.
 
 `return luring()` creates `luring()`'s generator object and hands it out as `waiting()`'s result.
-`luring()`'s body runs when a driver delegates to it.
-Here, `trampoline()` is that driver:
+`luring()`'s body starts when an engine delegates to it.
+Here, `trampoline()` is the engine and `run_all()` is its driver:
 
 ```python
 # trap_generators_demo.py
@@ -1627,8 +1625,8 @@ run_all(waiting(), [Mouse.ESCAPES])
 #: Waiting mouse escapes -> Waiting
 ```
 
-`trampoline()` is the engine, the loop at `[1]`.
-PEP 342 calls such a driver a *trampoline*: each state returns to the loop,
+The loop at `[1]` is the whole engine.
+PEP 342 calls such a loop a *trampoline*: each state returns to the loop,
 which bounces into the next state.
 `yield from` runs the current state,
 relaying each of its `yield`s up to `run_all()` and each `send()` back down.

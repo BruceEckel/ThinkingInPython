@@ -250,3 +250,18 @@ and it becomes part of every future pass.
   "It" to `tkinter` by grammar even though the model is meant;
   "`Outlet` ... and it carries the hour" when the request carries it.
   Name the intended noun.
+- **A pointer phrase that renames its target.**
+  "`trampoline()` is the engine, the loop at `[1]`. PEP 342 calls such
+  a driver a *trampoline*" (Bruce, 2026-11-12: "first it calls it an
+  engine, then a driver").
+  "Such a driver" has one candidate target, so the two-candidate test
+  passes it, but its noun is new for that target and the reader takes
+  it for a second thing.
+  The noun after "such a", "this", or "that" is one the passage has
+  already used for the thing: "such a loop", after "The loop at `[1]`".
+  When the chapter has defined a role noun, check the thing against
+  the definition before using it: chapter 45's driver is "the loop that
+  runs such a conversation", which is `run_all()`, not `trampoline()`.
+  Grep the scope for the other uses of both nouns; the lead-in above
+  that listing had "a driver delegates to it" for the same function.
+  C67 in `bruce_edit_db.md`.

@@ -75,6 +75,16 @@ each pass hands the next one less to do.
    then [re-raises the exception the clause caught](...)" -> "The
    [bare `raise` re-raises the exception the clause caught](...)",
    C64). Read each link in the scope for where its brackets sit.
+   One role, one name: a thing called "the engine" in one sentence
+   and "such a driver" in the next reads as two things
+   ("`trampoline()` is the engine, the loop at `[1]`. PEP 342 calls
+   such a driver a *trampoline*" -> "The loop at `[1]` is the whole
+   engine. PEP 342 calls such a loop a *trampoline*", C67). For each
+   function the scope walks, list the role nouns the prose gives it
+   (driver, engine, handler, proxy, loop, wrapper); two nouns for one
+   function is a hit, and a noun the chapter defined goes only to a
+   thing that fits the definition. The noun after "such a", "this",
+   or "that" is one the passage has used for that thing.
 6. `ambiguity`: every sentence that counts, compares, coordinates,
    modifies, or limits keeps one reading: a count with two units, a
    word with two senses, a modifier with two heads, an open scope, a
