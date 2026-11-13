@@ -2003,14 +2003,12 @@ The caller must `await` a call to any of those three.
 
 ## Half a Coroutine by Design
 
-The chapter's opening treats a function's position in its body as state.
-Halfway through a loop, a function has done part of its work.
-Its position determines what it does next.
-
-A call preserves the caller's position and locals.
-The caller waits in the middle of its body and continues from that point when the call returns.
-An ordinary function, when called,
-starts at its first line every time and loses its position and its locals when it returns.
+When an ordinary function calls another,
+the caller waits in the middle of its body.
+When the called function returns, the caller continues from that position,
+with its local variables intact.
+The called function starts at its first line on every call,
+with a new set of local variables.
 
 That difference matters when a producer computes a series of values and a consumer uses them one at a time.
 The producer and the consumer are each simplest to write as its own loop.

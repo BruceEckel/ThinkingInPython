@@ -782,16 +782,38 @@ sighting (C20 -> R18).
 **Test.** Two consecutive sentences where the second says the first
 again at a different altitude (abstract after concrete, or a claim
 after its example); or a section's first sentence that restates the
-chapter's opening claim; or (widened 2026-10-11) a paragraph or a
-closing section whose every sentence restates what a listing on the
-page or an earlier paragraph already established. Keep the concrete
-one, or the opening; cut the recap.
+chapter's opening claim, or (2026-11-13) cites it ("The chapter's
+opening treats a function's position in its body as state"), which is
+the same recap with a pointer in front; or (widened 2026-10-11) a
+paragraph or a closing section whose every sentence restates what a
+listing on the page or an earlier paragraph already established. Keep
+the concrete one, or the opening; cut the recap. When the abstract
+sentence of a pair holds one noun the concrete sentence lacks, move
+the noun into the concrete sentence and cut the abstract one.
 
 **Keep when.** The second sentence, or the recap, adds a consequence or
 a mechanism the earlier text did not state. A contrast drawn across
 several listings that no one listing shows is such a consequence.
 
-**Sightings.** 9, 3 chapters
+**Sightings.** 11, 4 chapters
+- `45_Effects--Generators` 2026-11-13, was Claude-written, both found
+  while joining two paragraphs at Bruce's request (C80). The
+  section-opening shape in its citation form: "The chapter's opening
+  treats a function's position in its body as state. Halfway through
+  a loop, a function has done part of its work. Its position
+  determines what it does next." -> deleted from the opening of "Half
+  a Coroutine by Design". The 2026-11-06 repair (`f4669e3e`) had
+  changed a restatement of the chapter's first sentence into this
+  citation and kept the two sentences that argue for it. The
+  consecutive-sentence shape: "A call preserves the caller's position
+  and locals. The caller waits in the middle of its body and continues
+  from that point when the call returns." -> "the caller waits in the
+  middle of its body. When the called function returns, the caller
+  continues from that position, with its local variables intact." The
+  keep for a mechanism had held the pair. The abstract sentence's one
+  extra noun, the locals, went into the concrete sentence. A grep of
+  the book for a sentence whose subject is the chapter's opening
+  found no other section that starts this way.
 - `26_Patterns--Factory` 2026-09-15 (`a9ca27eb`), was Claude-written:
   "Builder chains have a second use, starting from an existing
   configuration and varying it, covered by `dataclasses.replace()`."
@@ -5219,6 +5241,80 @@ here otherwise":
   naming `__aiter__()` a second time ("Python supplies the
   generator's `__aiter__()` and `__anext__()`") without asking where
   it was introduced.
+
+### C80. Two paragraphs that make one point between them become one paragraph that states it
+
+**Test.** Say in one sentence what each paragraph tells the reader.
+Two short consecutive paragraphs fail when the first's sentence is a
+premise, a definition, or a recollection that the first paragraph
+never uses, so the reader reaches the break and asks "so?", and the
+point exists only when both are read together. A second tell is the
+paragraph after them: it opens on a pointer to a relation ("That
+difference matters when ...", "That asymmetry", "The distinction")
+that neither paragraph stated as a relation, and the reader assembles
+the relation from several sentences. This is R29 run the other way.
+R29 splits one paragraph that holds two concepts, and this joins two
+paragraphs that hold one. Repair: write one paragraph that states the
+point. For a contrast, give each side one sentence, in concrete terms
+(what each one does at the call and at the return), and give the two
+sentences subjects of one kind: "the caller ... The called function
+...", two roles, where the old pair set "the caller", a role, against
+"An ordinary function, when called,", a kind. A qualifier both sides
+need ("ordinary") goes in the sentence that sets up the pair. Cut the
+premise when the chapter has already made it, and keep one statement
+of each half (R19).
+
+**Keep when.** The first paragraph is a claim the second illustrates
+with an example or a listing of its own. Later text uses each
+paragraph separately. The premise is new to the chapter and needs its
+own sentences before the claim can stand on it (C18).
+
+**Sightings.** 1, `45_Effects--Generators` 2026-11-13, was
+Claude-written, Bruce: "see if you can make this clearer and simpler,
+possibly combine into one paragraph that makes the point":
+- "The chapter's opening treats a function's position in its body as
+  state. Halfway through a loop, a function has done part of its
+  work. Its position determines what it does next." and, as a second
+  paragraph, "A call preserves the caller's position and locals. The
+  caller waits in the middle of its body and continues from that
+  point when the call returns. An ordinary function, when called,
+  starts at its first line every time and loses its position and its
+  locals when it returns." -> "When an ordinary function calls
+  another, the caller waits in the middle of its body. When the
+  called function returns, the caller continues from that position,
+  with its local variables intact. The called function starts at its
+  first line on every call, with a new set of local variables." Six
+  sentences in two paragraphs became three in one, and the paragraph
+  that follows still opens "That difference matters when".
+- Why the passes missed it: every sentence passes the sentence tests
+  (active, literal, positive, short), and the fault is the distance
+  from the first sentence to the point. R29 and the cohesion skill
+  test one paragraph for two concepts and have no test for two
+  paragraphs with one concept. R29's keep says a paragraph of three
+  sentences or fewer rarely splits, and no test asks whether such a
+  paragraph makes a point. R19 let both of its shapes through (see
+  its 2026-11-13 sighting). The last sentence had been repaired twice
+  at Bruce's flags, "on the called side" on 2026-11-07 and ", when
+  called," on 2026-11-13, one phrase each time, and neither repair
+  reread the paragraph for the contrast the sentence closes. "Loses
+  its position ... when it returns" described a function that has run
+  to its end. The next paragraph uses a different fact, the first
+  line on every call, and the new sentence states that one with the
+  new locals beside it.
+- A grep for the second tell,
+  `^(That|This) (difference|distinction|contrast|asymmetry)`, finds
+  three sentences in `Chapters/`. The other two are keeps, and they
+  show the form the repair aims at. Chapter 19's "That distinction
+  determines which tool to use" follows "A task is *I/O-bound* when
+  ... A task is *CPU-bound* when ...", two sentences with one kind of
+  subject. Chapter 37's "That asymmetry is the expression problem"
+  follows one sentence that states both sides. "The difference is
+  ..." (six more) states the relation itself and is not the tell.
+  `tip overclaims`, `tip pointers`, `tip stutter`, and `tip
+  sentence-shapes` print no hit on the new paragraph.
+
+**Home.** cohesion (Accrued patterns) | super-prose (pass 4) | this
+file.
 
 ## Retired
 

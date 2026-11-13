@@ -332,3 +332,42 @@ and it becomes part of every future pass.
   the counterpart an earlier chapter taught: "In place of
   `__iter__()` it calls `__aiter__()` once ... In place of
   `__next__()` it awaits `__anext__()` on each pass."
+- **Two paragraphs that make one point between them.**
+  Chapter 45's "Half a Coroutine by Design" opened with a paragraph
+  that recalled a premise ("The chapter's opening treats a function's
+  position in its body as state. ...") and a second paragraph that
+  held the contrast the premise was for ("A call preserves the
+  caller's position and locals. ... An ordinary function, when
+  called, starts at its first line every time ...").
+  The third paragraph opened "That difference matters when"
+  (Bruce, 2026-11-13: "see if you can make this clearer and simpler,
+  possibly combine into one paragraph that makes the point").
+  This is the paragraph test run the other way: say in one sentence
+  what each paragraph tells the reader.
+  If the first's sentence is a premise or a recollection that the
+  first paragraph never uses, the reader reaches the break and asks
+  "so?", and the two are one paragraph.
+  Write the paragraph that states the point.
+  For a contrast, give each side one concrete sentence,
+  and give the two sentences subjects of one kind
+  ("the caller ... The called function ...", two roles;
+  the old pair set a role against "An ordinary function, when called,").
+  A qualifier both sides need ("ordinary") goes in the sentence that sets up the pair.
+  Cut a premise the chapter has already made,
+  and keep one statement of each half, the concrete one (R19):
+  "When an ordinary function calls another, the caller waits in the
+  middle of its body. When the called function returns, the caller
+  continues from that position, with its local variables intact. The
+  called function starts at its first line on every call, with a new
+  set of local variables."
+  Keep two paragraphs when the second illustrates the first with an
+  example of its own, or when later text uses each one separately.
+  Grep the scope for `^(That|This) (difference|distinction|contrast|asymmetry)`
+  and read the paragraph above each hit for two parallel sentences
+  that state the two sides
+  (chapter 19's "A task is *I/O-bound* when ... A task is *CPU-bound* when ..." is the form).
+  Read the first sentence of each section for a subject that is the
+  chapter or its opening.
+  A sentence repaired phrase by phrase at two flags gets its whole
+  paragraph reread at the second.
+  C80 in `bruce_edit_db.md`.

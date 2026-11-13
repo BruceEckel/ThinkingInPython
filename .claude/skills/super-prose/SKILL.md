@@ -125,7 +125,24 @@ each pass hands the next one less to do.
    itself ... `tick()` and `tock()` are two states written that
    way:", C71). For each listing in the scope, compare its names
    with the listing before it; when none carry over, read the
-   lead-in for the tie.
+   lead-in for the tie. The paragraph test also runs the other way:
+   two short paragraphs that make one point between them, a premise
+   or a recollection in the first and the contrast it is for in the
+   second, become one paragraph that states the point ("The
+   chapter's opening treats a function's position in its body as
+   state. ..." and "A call preserves the caller's position and
+   locals. ... An ordinary function, when called, starts at its
+   first line every time ..." -> "When an ordinary function calls
+   another, the caller waits in the middle of its body. When the
+   called function returns, the caller continues from that position,
+   with its local variables intact. The called function starts at
+   its first line on every call, with a new set of local variables",
+   C80). Each side of a contrast gets one concrete sentence, and the
+   two subjects are one kind of noun, two roles or two kinds. Grep
+   the scope for `^(That|This) (difference|distinction|contrast|asymmetry)`
+   and read the paragraph above each hit for the two parallel
+   sentences. Read each section's first sentence for a subject that
+   is the chapter or its opening: it is the recap R19 cuts.
 5. `antecedents`: every pointer with two candidates gets its noun.
    A link is a pointer too: when its target teaches a named
    construct, the link text starts on the name ("The bare `raise`
