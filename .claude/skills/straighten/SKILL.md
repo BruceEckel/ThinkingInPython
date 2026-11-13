@@ -416,3 +416,41 @@ before/after pair, and it becomes part of every future pass.
   a *Memento* can store in a field."
   No grep finds this form; read for a noun followed directly by "a"
   or "the" and a second noun.
+- **An argument that skips a step** (2026-11-13, Bruce on chapter 45:
+  "make this paragraph easier to understand").
+  Every sentence can be short and true while the paragraph leaves out
+  the steps between them:
+  "One of the two must call the other. If the consumer calls the
+  producer, the consumer keeps its loop. Without generators, the
+  producer starts at its first line on every call, so you cannot
+  write the producer as a loop. You write it as a state machine:
+  variables that hold the loop's locals and its position, and code
+  that reads them on every call to find where to continue."
+  In a paragraph that argues, find each "must", "cannot", and "so",
+  and ask what fact licenses it and whether that fact is on the page.
+  A "must" with no reason becomes the fact and its cases
+  ("Either the consumer calls the producer to get each value, or the
+  producer calls the consumer to deliver it").
+  A "cannot" becomes the failure the reader can picture
+  ("As the called function, the producer starts at its first line on
+  every call, so a loop in the producer starts over each time").
+  A term comes after the sentences that say what it consists of
+  ("To continue where the previous call stopped, the producer keeps
+  that loop's position and locals in variables that outlive a call.
+  Each call begins by reading those variables. A function written
+  that way is a state machine"), never before them with a colon.
+  The scenario states every condition the argument uses.
+  This one needed three: "Consider two ordinary functions in a single
+  thread: a producer that computes a series of values, and a consumer
+  that uses each value before the producer computes the next".
+  Each answers a counterexample, so probe each step with one before
+  writing it: a producer that returns a list is called once and keeps
+  its loop, and two threads with a queue keep both loops.
+  The repair adds sentences, so the paragraph splits where the
+  argument turns (R29): the situation, the case walked, the resolution.
+  Keep a step the chapter has taught by name.
+  The writer of an argument knows its missing steps, so a reread by
+  the writer confirms it; walk the "must"s instead.
+  After a second flag on one paragraph, stop repairing phrases and
+  read the paragraph as an argument.
+  C34 in `bruce_edit_db.md`.

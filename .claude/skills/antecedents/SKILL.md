@@ -290,8 +290,9 @@ and it becomes part of every future pass.
   Otherwise drop the frame and say what happens.
   Chapter 45's sentence led from a claim into an example, so the
   example now opens the paragraph
-  ("Consider a producer that computes a series of values and a
-  consumer that uses them one at a time"),
+  ("Consider two ordinary functions in a single thread: a producer
+  that computes a series of values, and a consumer that uses each
+  value before the producer computes the next"),
   and its sentences repeat the claim's words
   ("starts at its first line on every call") so the reader can match them.
   Where the bridge has to stay, put both sides in it

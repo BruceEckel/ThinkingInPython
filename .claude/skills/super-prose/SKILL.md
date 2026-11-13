@@ -92,6 +92,23 @@ each pass hands the next one less to do.
    store in a field"): read for a noun followed directly by "a" or
    "the" and a second noun, and name the things the stand-in nouns
    ("value", "record", "object") point at.
+   A paragraph that argues is walked as an argument: for each
+   "must", "cannot", and "so", find the fact that licenses it on the
+   page. A "must" with no reason becomes the fact and its cases
+   ("One of the two must call the other" -> "Either the consumer
+   calls the producer to get each value, or the producer calls the
+   consumer to deliver it", under a scenario that says "two ordinary
+   functions in a single thread"), a "cannot" becomes
+   the failure the reader can picture ("so you cannot write the
+   producer as a loop" -> "so a loop in the producer starts over each
+   time"), and a term comes after the sentences that say what it
+   consists of ("A function written that way is a state machine"),
+   C34. The scenario states every condition the argument uses, and
+   each step is probed with a counterexample before it is written.
+   No tool lists the shape: grep the scope for `\bmust\b`,
+   `\bcannot\b`, and `, so ` outside a listing walkthrough. A
+   paragraph Bruce has flagged twice is read this way before a third
+   phrase is repaired.
 4. `cohesion`: old before new, one topic string per paragraph, R29's
    one primary concept per paragraph. A paragraph that likens a real
    system to an earlier listing ("a driver like the one in
@@ -179,9 +196,10 @@ each pass hands the next one less to do.
    or the previous sentence's verb made a noun ("chooses ... That
    choice"). Otherwise drop the frame and say what happens; a bridge
    from a claim into an example becomes the example's opener
-   ("Consider a producer that computes a series of values and a
-   consumer that uses them one at a time"), and the example repeats
-   the claim's words (C82). Grep the scope for
+   ("Consider two ordinary functions in a single thread: a producer
+   that computes a series of values, and a consumer that uses each
+   value before the producer computes the next"), and the example
+   repeats the claim's words (C82). Grep the scope for
    `^(That|This|These|Those) (difference|distinction|contrast|asymmetry|trade-off|gap|split|separation|overlap)`.
    After any paragraph is rewritten, cover it and reread the first
    sentence of the next paragraph: a pointer there was written

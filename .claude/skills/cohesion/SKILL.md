@@ -372,10 +372,11 @@ and it becomes part of every future pass.
   Otherwise the next paragraph opens on its own subject,
   an example with "Consider",
   and its sentences repeat the claim's words:
-  "Consider a producer that computes a series of values and a
-  consumer that uses them one at a time. ... If the consumer calls
-  the producer, the consumer keeps its loop. Without generators, the
-  producer starts at its first line on every call".
+  "Consider two ordinary functions in a single thread: a producer
+  that computes a series of values, and a consumer that uses each
+  value before the producer computes the next. ... As the caller, the
+  consumer keeps its loop. As the called function, the producer
+  starts at its first line on every call".
   Grep the scope for
   `^(That|This|These|Those) (difference|distinction|contrast|asymmetry|trade-off|gap|split|separation|overlap)`
   (C82, and the antecedents skill's Accrued patterns).

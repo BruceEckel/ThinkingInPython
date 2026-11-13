@@ -2010,18 +2010,27 @@ with its local variables intact.
 The called function starts at its first line on every call,
 with a new set of local variables.
 
-Consider a producer that computes a series of values and a consumer that uses them one at a time.
+Consider two ordinary functions in a single thread:
+a producer that computes a series of values,
+and a consumer that uses each value before the producer computes the next.
 The producer is simplest to write as a loop, and so is the consumer.
-One of the two must call the other.
-If the consumer calls the producer, the consumer keeps its loop.
-Without generators, the producer starts at its first line on every call,
-so you cannot write the producer as a loop.
-You write it as a state machine:
-variables that hold the loop's locals and its position,
-and code that reads them on every call to find where to continue.
-If the producer calls the consumer, the consumer becomes the state machine.
-A generator keeps its position and its locals between calls,
-so a producer written as a generator is a loop too.
+Either the consumer calls the producer to get each value,
+or the producer calls the consumer to deliver it.
+
+Suppose the consumer calls the producer.
+As the caller, the consumer keeps its loop.
+As the called function, the producer starts at its first line on every call,
+so a loop in the producer starts over each time.
+To continue where the previous call stopped,
+the producer keeps that loop's position and locals in variables that outlive a call.
+Each call begins by reading those variables.
+A function written that way is a state machine.
+If the producer calls the consumer,
+the producer keeps its loop and the consumer becomes the state machine.
+
+A generator keeps its position and its locals between calls.
+When the consumer calls a producer written as a generator,
+both keep their loops.
 
 ### Conway's Switch
 

@@ -3570,11 +3570,68 @@ introduce them with a colon.
 what follows, in one chain ("so one call to several responders could
 produce several answers, or none"), or states an obligation as a lapse
 ("a caller can forget to make the call"). Write the situation, then
-what it requires, then what follows until that is met.
+what it requires, then what follows until that is met. The paragraph
+form (2026-11-13): a paragraph argues from a situation to a
+consequence, every sentence in it is short and true, and the steps
+between the sentences are missing. Find each "must", "cannot", and
+"so", and ask what fact licenses it and whether that fact is on the
+page. A "must" with no reason becomes the fact and its cases. A
+"cannot" becomes the failure the reader can picture. A term comes
+after the sentences that say what it consists of, never before them
+with a colon. The scenario states every condition the argument uses.
+Probe each step with a counterexample before writing it.
 
 **Keep when.** The consequence is one step, and the sentence states it.
+A step the chapter has taught by name needs no second telling.
 
-**Sightings.** 3, one chapter (`30_Patterns--Observer`, 2026-10-11)
+**Sightings.** 4, two chapters. The second chapter makes this a
+proposed promotion, which is Bruce's call.
+- `45_Effects--Generators` 2026-11-13, was Claude-written, Bruce:
+  "make this paragraph easier to understand", the paragraph form.
+  The argument skipped four steps:
+  - "One of the two must call the other." A "must" with no reason and
+    no count. -> "Either the consumer calls the producer to get each
+    value, or the producer calls the consumer to deliver it." The
+    scenario gained the three conditions the argument rests on:
+    "Consider two ordinary functions in a single thread: a producer
+    that computes a series of values, and a consumer that uses each
+    value before the producer computes the next", in place of "a
+    consumer that uses them one at a time". Each condition answers a
+    counterexample. A producer that returns a list is called once and
+    keeps its loop. Two threads and a queue keep both loops, and so
+    do two `asyncio` tasks. With the scenario scoped, "Without
+    generators" came off the case sentence.
+  - "the producer starts at its first line on every call, so you
+    cannot write the producer as a loop." A "cannot" with no picture
+    of the failure. -> "As the called function, the producer starts
+    at its first line on every call, so a loop in the producer starts
+    over each time."
+  - "You write it as a state machine: variables that hold the loop's
+    locals and its position, and code that reads them on every call
+    to find where to continue." The term came first and its content
+    followed in a colon list. -> "To continue where the previous call
+    stopped, the producer keeps that loop's position and locals in
+    variables that outlive a call. Each call begins by reading those
+    variables. A function written that way is a state machine."
+  - "so a producer written as a generator is a loop too." The reader
+    had to recall which case and which other loop. -> "When the
+    consumer calls a producer written as a generator, both keep their
+    loops."
+  "As the caller" and "As the called function" give the consumer and
+  the producer the role nouns of the paragraph above. One paragraph of nine
+  sentences became three paragraphs of three, seven, and two (R29:
+  the situation, the case walked, the resolution).
+- Why the passes missed it: every sentence was short, active, and
+  literal, and every inference was true once the missing steps were
+  supplied. No pass in super-prose walks an argument and asks what
+  licenses each "must", "cannot", and "so". The clarity agent's brief
+  lists "compressed reasoning that skips a step", and that agent is
+  no part of super-prose. Whoever wrote the argument knows the
+  missing steps, so a reread by the writer confirms it. The paragraph
+  had drawn five flags from Bruce in one day ("its loop", "the called
+  side", "'each' vague", "'each' and 'its'", "what difference"), and
+  each repair changed the flagged phrase. After a second flag on one
+  paragraph, read the paragraph as an argument and rewrite it whole.
 - Bruce's hand: "so one call to several responders could produce
   several answers, or none" -> three sentences: the situation, the
   rule a return value would require, and what returning `None` removes
@@ -3584,7 +3641,8 @@ what it requires, then what follows until that is met.
 - Bruce's hand: the `fields()` paragraph laid out runtime first, then
   the checker's view
 
-**Home.** this file; the deep-review skill (teaching) if promoted.
+**Home.** straighten (Accrued patterns) | super-prose (pass 3) | this
+file; the deep-review skill (teaching) if promoted.
 
 ### C35. A concrete instance in parentheses beside an abstract noun (additive)
 
@@ -5329,7 +5387,9 @@ possibly combine into one paragraph that makes the point":
   carry the tie to the first paragraph: "calls" gives the roles, and
   "starts at its first line on every call" repeats the first
   paragraph's words, which is why "restarts" became "starts". The
-  two cases are a pair of "If" sentences (R40).
+  two cases are a pair of "If" sentences (R40). The paragraph was
+  rewritten whole later the same day (C34's 2026-11-13 sighting);
+  the "Consider" opener and the repeated words stayed.
 - Sighting 1 named this pointer as the tell and kept it. Claude had
   just written both sides of the contrast, read "That difference"
   with the answer in mind, and reported that the two parallel
