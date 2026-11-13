@@ -23,6 +23,7 @@ class Squasher(Iterator[str]):
             case "":  # No more input
                 return "*"
             case following_char:  # Something else
+                # Stash it for the subsequent next() call:
                 self._held = following_char  # [2]
                 return "*"
 
