@@ -1938,7 +1938,7 @@ For each value, `async for` awaits `__anext__()` in place of `__next__()`.
 and the `async for` loop and the comprehension are both in `main()`.
 The *asynchronous comprehension* `[n * n async for n in countdown(5)]` creates a second `countdown(5)` generator and awaits its `__anext__()` for each value.
 
-A class can supply that `__anext__()`,
+A class can supply `__anext__()`,
 the way `Fibonacci` in [Iterators](22_Patterns--Iterators.md#generators)
 supplies `__next__()`:
 
