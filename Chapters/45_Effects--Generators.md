@@ -2081,13 +2081,12 @@ print(list(Squasher(iter("a**b*c***"))))
 ```
 
 In Conway's flowchart the cards keep coming.
-A Python iterator ends,
-and `next()` on an iterator with no more items raises `StopIteration`.
+A Python iterator ends.
 The `next()` call in the `match` statement passes `""` as a second argument,
-and `next()` returns that default when `chars` has no more characters.
+so at the end of `chars` it returns `""` instead of raising `StopIteration`.
 When the input ends on a single asterisk,
-`case "":` matches the default and delivers the asterisk.
-The first `next()` call in `__next__()` passes no default.
+`case "":` matches that `""` and delivers the asterisk.
+The first `next()` call in `__next__()` passes no second argument.
 When `chars` ends there,
 `StopIteration` leaves `__next__()` and ends the `Squasher`'s iteration.
 
