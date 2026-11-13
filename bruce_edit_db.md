@@ -5184,6 +5184,29 @@ this like 'yield from'?":
 **Home.** cohesion (Accrued patterns) | super-prose (pass 4) | this
 file.
 
+2, the same section the same day, a name with no introduction, Bruce:
+"have we talked about `__aiter__()`? not clear why it's mentioned
+here otherwise":
+- "`AsyncIterator` supplies an `__aiter__()` that returns `self`."
+  stood under the second listing, and no sentence in the book had
+  said what `__aiter__()` is. The first listing's walkthrough said
+  only "on each pass it awaits the generator's `__anext__()`". ->
+  that walkthrough now gives the protocol by its taught counterpart:
+  "`async for` follows the `for` loop's protocol from [Iterators]
+  with two other methods. In place of `__iter__()` it calls
+  `__aiter__()` once ... In place of `__next__()` it awaits
+  `__anext__()` on each pass."
+- The repair is the rule's: chapter 22 taught `__iter__()` and
+  `__next__()`, so the new pair is named against that pair. The test
+  that finds the fault is a grep: for each dunder or library name in
+  a walkthrough, find its first mention in the book, and check that
+  the first mention says what calls it and when. Straighten's "a term
+  used before it is introduced" covers prose terms and was never
+  applied to a code span. Claude's 2026-11-13 pass made it worse by
+  naming `__aiter__()` a second time ("Python supplies the
+  generator's `__aiter__()` and `__anext__()`") without asking where
+  it was introduced.
+
 ## Retired
 
 Rejected by Bruce, or promoted and later withdrawn. Never propose these

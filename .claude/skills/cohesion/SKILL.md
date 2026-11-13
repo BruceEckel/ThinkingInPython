@@ -324,3 +324,11 @@ and it becomes part of every future pass.
   suspension, or a cleanup in general words, check the chapter's
   headings for the section that taught it.
   C79 in `bruce_edit_db.md`.
+  A code-span name needs the same check (Bruce, the same day: "have
+  we talked about `__aiter__()`?"). For each dunder or library name
+  in a walkthrough, grep the book for its first mention and confirm
+  that sentence says what calls it and when. If none does, introduce
+  it where the construct that calls it is first explained, against
+  the counterpart an earlier chapter taught: "In place of
+  `__iter__()` it calls `__aiter__()` once ... In place of
+  `__next__()` it awaits `__anext__()` on each pass."

@@ -1927,10 +1927,14 @@ asyncio.run(main())
 
 `asyncio.sleep(0)` models a wait for real I/O.
 
-`async for` is an `await` in loop form:
-on each pass it awaits the generator's `__anext__()`.
-Like any `await`, an `async for` must be inside an `async def`,
-so the `async for` loop and the comprehension are both in `main()`.
+`async for` follows the `for` loop's protocol from [Iterators](22_Patterns--Iterators.md#iteration-comes-built-in)
+with two other methods.
+In place of `__iter__()` it calls `__aiter__()` once,
+on the generator that `countdown(5)` returns,
+and that generator's `__aiter__()` returns the generator itself.
+In place of `__next__()` it awaits `__anext__()` on each pass.
+Each pass is an `await`, so an `async for` must be inside an `async def`,
+and the `async for` loop and the comprehension are both in `main()`.
 The *asynchronous comprehension* `[n * n async for n in countdown(5)]` creates a second `countdown(5)` generator and awaits its `__anext__()` for each value.
 
 A class can supply that `__anext__()`,
