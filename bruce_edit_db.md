@@ -1510,12 +1510,33 @@ the property the other side lacks: not "a state is an `Enum` member, a
 label, so the action must go in the table" but "a member is a bare
 name with no fields, so every action sits on a rule", set against "a
 member is also a `State` record with an `action` field".
+The sentence that says what the chosen design does, after a list of
+the alternatives, is the same contrast with each item of the list
+(widened 2026-11-14). Read each alternative on the page for the
+property the sentence claims. If one has it, the sentence does not say
+what the chosen design adds, so write what is false of every
+alternative: what the construct does that none of them does.
 
 **Keep when.** The sentence is not drawing the contrast: a shared
 property stated for its own sake, in a paragraph about one side alone.
 
-**Sightings.** 1 chapter. Promoted by Bruce on that evidence,
+**Sightings.** 2 chapters. Promoted by Bruce on the first,
 2026-10-18.
+- `45_Effects--Generators` 2026-11-14, was Claude-written, Bruce on the
+  lead-in to `fibonacci_generator.py`: "I don't find this particularly
+  illuminating". "With a generator, the producer and the consumer each
+  keep their own loop:" stood four lines below the bullet "The list
+  keeps both loops but runs the producer's loop to completion before
+  the consumer's loop starts", so the property it claimed for the
+  generator was one the list has. -> "A generator has that ability. The
+  producer's loop pauses at each `yield` while the consumer's loop uses
+  the value:", which is false of the callback (the consumer has no
+  loop), the list (the producer's loop runs to completion), and the
+  iterator class (the producer has no loop).
+- Why the passes missed it: the super-prose pass over that section the
+  same day kept the phrase, since the section's opening defines "keeps
+  its loop". A defined phrase still fails here: no pass compared the
+  sentence with the bullets above it.
 - `31_Patterns--State_Machines` 2026-10-18: "In the table-driven design
   a state is an `Enum` member, a label, so an action that runs on every
   entry into one state must go in the table." -> "In the first design a
@@ -1524,7 +1545,7 @@ property stated for its own sake, in a paragraph about one side alone.
   action sits on a rule, and an action that must run on every entry
   into a state sits on every rule that leads there."
 
-**Home.** deep-review (editing pass), this file.
+**Home.** deep-review (editing pass), super-prose (pass 8), this file.
 
 ### R34. Cut an "or" alternative that restates the first option
 

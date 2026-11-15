@@ -2261,7 +2261,8 @@ or keeps both loops and runs them one after the other:
 All three ways work around the same missing ability:
 pausing `fibonacci()` in the middle of its loop, handing out a value,
 and resuming where it stopped.
-With a generator, the producer and the consumer each keep their own loop:
+A generator has that ability.
+The producer's loop pauses at each `yield` while the consumer's loop uses the value:
 
 ```python
 # fibonacci_generator.py
