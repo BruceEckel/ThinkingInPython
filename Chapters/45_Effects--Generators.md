@@ -2140,8 +2140,7 @@ so its position replaces the switch.
 PEP 255 added generators to Python 2.2 in 2001 so that a called function can hand a value to its caller and keep its position and its locals.
 The PEP's motivating example is the standard library's `tokenize()`,
 which keeps its place in the source text from one token to the next.
-A recursive tree walk is a second producer of this kind.
-It keeps a whole recursion in progress between one node and the next.
+Another example is a recursive tree walk that keeps a whole recursion in progress between one node and the next.
 
 The consumer of such a producer has state of its own.
 It needs local variables and loops to track what it has seen,
