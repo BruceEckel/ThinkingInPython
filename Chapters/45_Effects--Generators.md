@@ -2344,7 +2344,7 @@ The execution frame lives on the heap inside the generator object,
 so it stays there with its locals and position intact.
 Resuming the generator links that frame back into the call stack.
 
-The PEP cites the "pleasant solutions" of three earlier languages:
+PEP 255 cites the "pleasant solutions" of three earlier languages:
 iterators in CLU and Sather, and generators in Ralph Griswold's Icon.
 Icon's `suspend` produces a value and leaves the procedure ready to produce another.
 CLU and Sather use the word `yield` for the same step inside an iterator,
@@ -2355,23 +2355,24 @@ In 2006, JavaScript 1.7 adopted Python-inspired generators with `send()`,
 `throw()`, and `close()`.
 ES2015 made generators standard,
 with `yield*` for Python's `yield from` behavior.
-TypeScript types the three channels as `Generator<T, TReturn, TNext>`.
+TypeScript types the yielded, returned,
+and sent values as `Generator<T, TReturn, TNext>`.
 PHP's `Generator` has `send()` and `throw()`, with `yield from` for delegation.
 A Dart generator produces values in one direction,
 through an `Iterator` that has `moveNext()` and `current`,
 and delegates with `yield*`.
 
-The languages differ in where the suspended frame lives.
+Languages differ in where the suspended frame lives.
 Python keeps the execution frame on the heap.
-C# and Kotlin compile the body into a state-machine class,
+C# and Kotlin compile the generator's body into a state-machine class,
 which holds a field per local and an integer for the suspension point in place of a frame.
 Ruby runs an external enumerator's block on a `Fiber`, a full coroutine.
 Go 1.23 reverses the protocol:
 the loop body becomes a `yield` function that the iterator calls once per value,
-so the iterator keeps its frame on the call stack while the body runs.
+so the iterator keeps its frame on the call stack while the loop body runs.
 CLU's iterators, designed in 1975, work the same way.[^clu-history]
 In CLU a `yield` calls the loop body,
-which returns to the iterator when it finishes.
+which runs to its end and returns to the iterator.
 CLU allows an iterator only in a `for` statement,
 so that a program needs a single stack.
 
