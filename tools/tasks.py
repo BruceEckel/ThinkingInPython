@@ -1242,12 +1242,15 @@ def local(v: Vars) -> None:
     --copy-on-select makes a mouse selection copy itself to the clipboard
     as «text» (NN Chapter › Section #anchor, Chapters/NN_....md:LINE), for
     lifting passages out of the rendered book; the file and line are where
-    the passage starts in the Markdown. Both scripts are added
+    the passage starts in the Markdown. --bookmark adds b (save your
+    reading place to bookmark.json and commit it, never pushing) and g
+    (go to it). All the scripts are added
     to pages as they are served; build/site/ and the published site never
     carry them. `tip serve` is the same server without the build first
     or the new browser tab.
     """
-    py("tools.serve", "--open", "--watch", "--copy-on-select")
+    py("tools.serve", "--open", "--watch", "--copy-on-select",
+       "--bookmark")
 
 
 @task("Serve the existing build/site/ at http://localhost:8000 with "
@@ -1257,8 +1260,9 @@ def serve(v: Vars) -> None:
     for restarting the server when a tab is already open. The watcher
     still rebuilds each chapter you edit, and a build-code change
     restarts the server with a full rebuild. build/site/ must exist.
+    --bookmark saves and restores a reading place with b and g.
     """
-    py("tools.serve", "--watch", "--copy-on-select")
+    py("tools.serve", "--watch", "--copy-on-select", "--bookmark")
 
 
 @task("Render Chapters/ into build/site/ with pandoc")

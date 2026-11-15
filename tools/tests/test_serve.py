@@ -16,7 +16,12 @@ The --watch supervisor restarts the server when the build code changes.
 A restart that dies, because the save caught a `tools/` module mid-edit,
 waits for the next change to the build code instead of ending the
 session, which it did before 2026-10-24.
+
+The --bookmark save validates a POST body, writes `bookmark.json`, and
+commits that file alone; the commit tests run in a temporary git repo.
 """
+import shutil
+import subprocess
 from itertools import chain, repeat
 from pathlib import Path
 
@@ -249,3 +254,132 @@ def test_a_page_maps_to_its_markdown() -> None:
     assert serve.page_source(f"{chapter.stem}.solutions.html") == (
         SOLUTIONS_DIR / chapter.stem / SOLUTIONS_MD)
     assert serve.page_source("index.html") is None
+
+
+MARK = {"page": "45_Effects--Generators.html", "title": "Generators",
+        "heading": "Close", "heading_id": "close", "text": "A passage",
+        "offset": 0.25, "source": "Chapters/45_x.md:12"}
+
+
+def test_the_bookmark_message_holds_title_heading_and_source() -> None:
+    assert serve.bookmark_message(MARK) == (
+        "Bookmark: Generators › Close (Chapters/45_x.md:12)")
+
+
+def test_the_bookmark_message_drops_what_is_empty() -> None:
+    assert serve.bookmark_message({**MARK, "heading": ""}) == (
+        "Bookmark: Generators (Chapters/45_x.md:12)")
+    assert serve.bookmark_message({**MARK, "source": ""}) == (
+        "Bookmark: Generators › Close")
+    assert serve.bookmark_message(
+        {**MARK, "heading": "", "source": ""}) == "Bookmark: Generators"
+
+
+@pytest.fixture
+def site(tmp_path: Path) -> Path:
+    out = tmp_path / "site"
+    out.mkdir()
+    (out / MARK["page"]).write_text("<html></html>", encoding="utf-8")
+    return out
+
+
+@pytest.mark.parametrize("page", [
+    "../45_Effects--Generators.html", "sub/45_Effects--Generators.html",
+    "..\45_Effects--Generators.html", "45_Effects--Generators.md",
+    "missing.html", "",
+])
+def test_a_bad_page_name_is_rejected(site: Path, page: str) -> None:
+    with pytest.raises(ValueError):
+        serve.clean_bookmark({**MARK, "page": page}, site)
+
+
+def test_a_non_object_or_a_non_string_field_is_rejected(
+        site: Path) -> None:
+    with pytest.raises(ValueError):
+        serve.clean_bookmark([], site)
+    with pytest.raises(ValueError):
+        serve.clean_bookmark({**MARK, "title": 3}, site)
+    with pytest.raises(ValueError):
+        serve.clean_bookmark({**MARK, "offset": "far"}, site)
+
+
+def test_the_offset_is_clamped_and_rounded(site: Path) -> None:
+    clean = serve.clean_bookmark
+    assert clean({**MARK, "offset": 7}, site)["offset"] == 1.0
+    assert clean({**MARK, "offset": -2}, site)["offset"] == 0.0
+    assert clean({**MARK, "offset": 0.123456}, site)["offset"] == 0.123
+    assert clean({**MARK, "offset": float("nan")}, site)["offset"] == 0.0
+
+
+def test_the_text_is_collapsed_and_cut(site: Path) -> None:
+    text = "  a \n b  " + "x" * 200
+    clean = serve.clean_bookmark({**MARK, "text": text}, site)["text"]
+    assert clean.startswith("a b xxx")
+    assert len(clean) == serve.BOOKMARK_TEXT
+
+
+def git_available() -> bool:
+    return shutil.which("git") is not None
+
+
+@pytest.fixture
+def repo(tmp_path: Path) -> Path:
+    if not git_available():
+        pytest.skip("git is not installed")
+    root = tmp_path / "repo"
+    root.mkdir()
+    for args in (["init", "--quiet"],
+                 ["config", "user.name", "Test"],
+                 ["config", "user.email", "test@example.com"],
+                 ["config", "commit.gpgsign", "false"]):
+        subprocess.run(["git", *args], cwd=root, check=True)
+    (root / "other.txt").write_text("one\n", encoding="utf-8")
+    subprocess.run(["git", "add", "other.txt"], cwd=root, check=True)
+    subprocess.run(["git", "commit", "--quiet", "-m", "start"],
+                   cwd=root, check=True)
+    return root
+
+
+def git_out(root: Path, *args: str) -> str:
+    return subprocess.run(["git", *args], cwd=root, check=True,
+                          capture_output=True, text=True).stdout
+
+
+def test_the_first_save_commits_and_an_identical_one_does_not(
+        repo: Path) -> None:
+    file = repo / "bookmark.json"
+    assert serve.save_bookmark(MARK, repo, file) == (
+        True, "saved and committed")
+    assert git_out(repo, "log", "-1", "--format=%s") == (
+        "Bookmark: Generators › Close (Chapters/45_x.md:12)\n")
+    assert serve.load_bookmark(file) == MARK
+    assert serve.save_bookmark(MARK, repo, file) == (False, "already saved")
+    assert git_out(repo, "rev-list", "--count", "HEAD") == "2\n"
+    moved = {**MARK, "offset": 0.5}
+    assert serve.save_bookmark(moved, repo, file)[0]
+    assert git_out(repo, "rev-list", "--count", "HEAD") == "3\n"
+
+
+def test_a_save_leaves_other_modified_and_staged_files_out(
+        repo: Path) -> None:
+    (repo / "other.txt").write_text("two\n", encoding="utf-8")
+    (repo / "staged.txt").write_text("new\n", encoding="utf-8")
+    subprocess.run(["git", "add", "staged.txt"], cwd=repo, check=True)
+    serve.save_bookmark(MARK, repo, repo / "bookmark.json")
+    assert git_out(repo, "show", "--name-only", "--format=", "HEAD") == (
+        "bookmark.json\n")
+    status = git_out(repo, "status", "--short")
+    assert " M other.txt" in status
+    assert "A  staged.txt" in status
+
+
+def test_a_failed_commit_is_reported_not_raised(tmp_path: Path) -> None:
+    if not git_available():
+        pytest.skip("git is not installed")
+    plain = tmp_path / "not_a_repo"
+    plain.mkdir()
+    file = plain / "bookmark.json"
+    committed, message = serve.save_bookmark(MARK, plain, file)
+    assert not committed
+    assert message.startswith("saved, not committed: ")
+    assert serve.load_bookmark(file) == MARK

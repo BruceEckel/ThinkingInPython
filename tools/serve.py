@@ -62,11 +62,29 @@ its section heading. A passage it cannot find keeps the first form.
 the files in `build/site/`, the ones the published site is built from,
 never contain either.
 
+With `--bookmark`, each served page carries two buttons at the bottom
+left, `Save place (b)` and `Go to bookmark (g)`, and the keys of the
+same names. Saving POSTs the passage at the top of the viewport to
+`/__bookmark`, which writes `bookmark.json` at the repo root: the page
+file, its title, the nearest `h2`/`h3` and that heading's id, the first
+120 characters of the block at the top of the viewport and how far the
+viewport top is into it (0 to 1), the Markdown `file:line` that
+`locate()` finds for it, and a timestamp. The server then commits that
+file with `git commit --only -- bookmark.json`, so other staged or
+modified files stay out of the commit, and it reports "already saved"
+when the file is unchanged. It runs no `git push` and no amend. The
+author pushes, pulls on the other machine, and presses `g`: the page
+opens at the saved block (a section that is folded is opened first),
+or at the saved heading when the passage has changed. The script is
+added to the response as it is served, so `build/site/` and the
+published site never carry it. `GET /__bookmark` returns the file.
+
 Usage:
     python -m tools.serve             # serve build/site/ at :8000
     python -m tools.serve --open      # serve and open a browser
     python -m tools.serve --watch     # rebuild and reload on edits
     python -m tools.serve --copy-on-select  # selection copies itself
+    python -m tools.serve --bookmark  # b saves, g restores a place
     python -m tools.serve --port 9000 # serve on another port
 """
 
@@ -84,6 +102,7 @@ import time
 import traceback
 import webbrowser
 from pathlib import Path
+from typing import Any
 
 from tools import build_site
 from tools.config import BUILD_SITE_DIR as SITE
@@ -95,6 +114,10 @@ from tools.repo import (
 POLL_SECONDS = 1.0
 RELOAD_PATH = "/__reload"
 LOCATE_PATH = "/__locate"
+BOOKMARK_PATH = "/__bookmark"
+BOOKMARK_FILE = ROOT / "bookmark.json"
+BOOKMARK_TEXT = 120    # Characters of the top block a bookmark keeps
+BOOKMARK_LOCK = threading.Lock()
 
 # Changing one of these rebuilds every page, not one: they are inputs to
 # the whole site rather than to a single chapter. The build code is not
@@ -206,6 +229,176 @@ COPY_SCRIPT = """
 </script>
 """ % LOCATE_PATH
 
+# Saves and restores a reading place. The bar sits at the bottom left,
+# since the copy toast uses the bottom right, and fades to 0.45 opacity
+# until the pointer or the keyboard focus reaches it. The keys b and g
+# do the same as the buttons, and give way to a text field, a modifier,
+# or a handler that already took the key (the search uses / and Ctrl+K).
+# A place is the first block (paragraph, list item, listing, table, and
+# so on) whose bottom edge is below the top of the viewport, with the
+# fraction of it that has scrolled past. Blocks inside a closed
+# <details> have no layout box, so saving skips them. Restoring
+# searches every block, matches the saved text as a prefix of the
+# block's text, prefers a match at or after the saved heading, and opens
+# the <details> around it before it scrolls. A bookmark on another page
+# sets a sessionStorage flag and navigates; the new page restores after
+# its load event, once images have settled the layout, and does not
+# navigate a second time.
+BOOKMARK_SCRIPT = r"""
+<script>
+(() => {
+  const PATH = "__PATH__";
+  const KEY = "tip-bookmark-go";
+  const BLOCKS = "h2, h3, p, pre, li, blockquote, table, figure, summary";
+  const root = document.querySelector(".page") || document.body;
+  const bar = document.createElement("div");
+  bar.style.cssText = "position:fixed;bottom:1rem;left:1rem;display:flex;"
+    + "gap:0.4rem;align-items:center;font:0.75rem sans-serif;"
+    + "transition:opacity 0.2s;z-index:9999";
+  let hot = false;
+  let shown = false;
+  const paint = () => { bar.style.opacity = hot || shown ? "1" : "0.45"; };
+  const warm = (on) => () => { hot = on; paint(); };
+  bar.addEventListener("mouseenter", warm(true));
+  bar.addEventListener("mouseleave", warm(false));
+  bar.addEventListener("focusin", warm(true));
+  bar.addEventListener("focusout", warm(false));
+  const button = (label, action) => {
+    const b = document.createElement("button");
+    b.textContent = label;
+    b.style.cssText = "font:inherit;padding:0.2rem 0.5rem;cursor:pointer;"
+      + "border:1px solid #888;border-radius:4px;background:#fff;color:#333";
+    b.addEventListener("click", action);
+    return b;
+  };
+  const status = document.createElement("span");
+  status.style.cssText = "display:none;padding:0.2rem 0.6rem;"
+    + "background:#333;color:#fff;border-radius:4px";
+  let hide = null;
+  const say = (text) => {
+    status.textContent = text;
+    status.style.display = "";
+    shown = true;
+    paint();
+    clearTimeout(hide);
+    hide = setTimeout(() => {
+      status.style.display = "none";
+      shown = false;
+      paint();
+    }, 2500);
+  };
+  const squash = (text) => text.replace(/\s+/g, " ").trim();
+  const words = (el) => squash(el.textContent).slice(0, __SIZE__).trim();
+  const file = () => location.pathname.split("/").pop() || "index.html";
+  const blocks = (everything) => [...root.querySelectorAll(BLOCKS)].filter(
+    (el) => (everything || el.offsetParent !== null)
+      && squash(el.textContent) !== "");
+  const save = async () => {
+    const block = blocks(false).find(
+      (el) => el.getBoundingClientRect().bottom > 8);
+    if (!block) { say("nothing to save"); return; }
+    const rect = block.getBoundingClientRect();
+    const offset = rect.height > 0
+      ? Math.min(1, Math.max(0, -rect.top / rect.height)) : 0;
+    let heading = null;
+    for (const h of root.querySelectorAll("h2, h3")) {
+      if (h.offsetParent !== null
+          && h.getBoundingClientRect().top <= rect.top + 1) heading = h;
+    }
+    const h1 = document.querySelector("h1");
+    const mark = {
+      page: file(),
+      title: h1 ? squash(h1.textContent) : document.title,
+      heading: heading ? squash(heading.textContent) : "",
+      heading_id: heading ? heading.id : "",
+      text: words(block),
+      offset: Math.round(offset * 1000) / 1000,
+    };
+    try {
+      const response = await fetch(PATH, {
+        method: "POST", body: JSON.stringify(mark)});
+      if (!response.ok) {
+        say("not saved: " + (await response.text()).trim());
+        return;
+      }
+      say((await response.json()).message);
+    } catch (error) {
+      say("not saved: server unreachable");
+    }
+  };
+  const reveal = (el) => {
+    for (let d = el.closest("details"); d;
+         d = d.parentElement && d.parentElement.closest("details")) {
+      d.open = true;
+    }
+  };
+  const go = (mark) => {
+    const anchor = mark.heading_id
+      ? document.getElementById(mark.heading_id) : null;
+    let matches = [];
+    if (mark.text) {
+      matches = blocks(true).filter(
+        (el) => squash(el.textContent).startsWith(mark.text));
+    }
+    const block = matches.find((el) => anchor && (el === anchor
+      || anchor.compareDocumentPosition(el)
+        & Node.DOCUMENT_POSITION_FOLLOWING)) || matches[0];
+    if (block) {
+      reveal(block);
+      const rect = block.getBoundingClientRect();
+      window.scrollTo({
+        top: window.scrollY + rect.top + mark.offset * rect.height,
+        behavior: "instant"});
+      const before = block.style.outline;
+      block.style.outline = "2px solid #e6a100";
+      setTimeout(() => { block.style.outline = before; }, 1500);
+      say("at your bookmark");
+    } else if (anchor) {
+      reveal(anchor);
+      anchor.scrollIntoView({block: "start", behavior: "instant"});
+      say("passage not found; at its section");
+    } else {
+      say("bookmark not found on this page");
+    }
+  };
+  const restore = async (resuming) => {
+    let mark = {};
+    try {
+      mark = await (await fetch(PATH, {cache: "no-store"})).json();
+    } catch (error) {
+      say("server unreachable");
+      return;
+    }
+    if (!mark.page) { say("no bookmark yet"); return; }
+    if (mark.page === file()) { go(mark); return; }
+    if (resuming) { say("bookmark not found on this page"); return; }
+    sessionStorage.setItem(KEY, "1");
+    location.href = encodeURIComponent(mark.page);
+  };
+  bar.append(button("Save place (b)", save),
+             button("Go to bookmark (g)", () => restore(false)), status);
+  paint();
+  document.body.appendChild(bar);
+  document.addEventListener("keydown", (event) => {
+    if (event.defaultPrevented || event.ctrlKey || event.metaKey
+        || event.altKey) return;
+    const target = event.target;
+    if (target.isContentEditable
+        || ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName)) return;
+    if (event.key === "b") save();
+    else if (event.key === "g") restore(false);
+  });
+  const resume = () => {
+    if (!sessionStorage.getItem(KEY)) return;
+    sessionStorage.removeItem(KEY);
+    restore(true);
+  };
+  if (document.readyState === "complete") resume();
+  else window.addEventListener("load", resume);
+})();
+</script>
+""".replace("__PATH__", BOOKMARK_PATH).replace("__SIZE__", str(BOOKMARK_TEXT))
+
 # What a rendered page does not show of its Markdown: a link's target,
 # then (dropped from both sides of the comparison) backticks,
 # asterisks, square brackets, and all whitespace. The target must look
@@ -277,6 +470,132 @@ def locate(md: Path, text: str, heading: str = "") -> int | None:
         if starts[index] <= found and parts[index]:
             return index + 1
     return None
+
+
+def clean_bookmark(request: object, site: Path = SITE) -> dict:
+    """The bookmark fields from a POST body, coerced, or a ValueError
+    whose message says what is wrong.
+
+    `page` must be the base name of a `.html` file in `site`: no
+    separators, no `..`. `text` is collapsed and cut to 120 characters
+    the way the script cuts it, and `offset` is clamped to 0..1.
+    """
+    if not isinstance(request, dict):
+        raise ValueError("expected a JSON object")
+    fields: dict = {}
+    for key in ("page", "title", "heading", "heading_id", "text"):
+        value = request.get(key, "")
+        if not isinstance(value, str):
+            raise ValueError(f"{key} must be a string")
+        fields[key] = value
+    page = fields["page"]
+    if (not page.endswith(".html") or "/" in page or "\\" in page
+            or ".." in page or not (site / page).is_file()):
+        raise ValueError(f"unknown page: {page!r}")
+    try:
+        offset = float(request.get("offset", 0))
+    except (TypeError, ValueError):
+        raise ValueError("offset must be a number") from None
+    if offset != offset:    # NaN
+        offset = 0.0
+    fields["text"] = " ".join(fields["text"].split())[:BOOKMARK_TEXT].strip()
+    for key in ("title", "heading", "heading_id"):
+        fields[key] = " ".join(fields[key].split())
+    fields["offset"] = round(min(1.0, max(0.0, offset)), 3)
+    return fields
+
+
+def bookmark_source(page: str, text: str, heading: str) -> str:
+    """`Chapters/NN_....md:LINE` for a bookmark's passage, or "" when
+    the Markdown does not hold it. A shorter start of the text is the
+    second and third try, since the page can render a passage's end
+    differently from its source."""
+    md = page_source(page)
+    if md is None:
+        return ""
+    for size in (len(text), 60, 30):
+        if size < 1:
+            continue
+        line = locate(md, text[:size], heading)
+        if line is not None:
+            return f"{md.relative_to(ROOT).as_posix()}:{line}"
+    return ""
+
+
+def bookmark_message(mark: dict) -> str:
+    """The commit message: `Bookmark: <title> › <heading> (<source>)`,
+    without the heading or the source when it is empty."""
+    message = f"Bookmark: {mark['title']}"
+    if mark.get("heading"):
+        message += f" › {mark['heading']}"
+    if mark.get("source"):
+        message += f" ({mark['source']})"
+    return message
+
+
+def load_bookmark(file: Path | None = None) -> dict:
+    """The saved bookmark, or an empty dict when there is none."""
+    try:
+        mark = json.loads((file or BOOKMARK_FILE).read_text(
+            encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    return mark if isinstance(mark, dict) else {}
+
+
+def write_bookmark(mark: dict, file: Path | None = None) -> None:
+    file = file or BOOKMARK_FILE
+    text = json.dumps(mark, indent=2, ensure_ascii=False) + "\n"
+    with file.open("w", encoding="utf-8", newline="\n") as out:
+        out.write(text)
+
+
+def git(root: Path, *args: str) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(["git", *args], cwd=root, capture_output=True,
+                          text=True, timeout=30)
+
+
+def first_line(result: subprocess.CompletedProcess[str]) -> str:
+    lines = (result.stderr.strip() or result.stdout.strip()).splitlines()
+    return lines[0] if lines else f"git exited {result.returncode}"
+
+
+def commit_bookmark(mark: dict, root: Path | None = None,
+                    file: Path | None = None) -> tuple[bool, str]:
+    """Commit the bookmark file alone and report (committed, message).
+
+    `git commit --only -- <file>` leaves other staged and modified files
+    out of the commit. An unchanged file is "already saved". Any git
+    failure comes back as a message; nothing is pushed or amended.
+    """
+    root = root or ROOT
+    name = (file or BOOKMARK_FILE).name
+    try:
+        added = git(root, "add", "--", name)
+        if added.returncode != 0:
+            return False, f"saved, not committed: {first_line(added)}"
+        # Exit 0: the index matches HEAD for this file. Exit 1: it
+        # differs, as on the first save, when HEAD lacks the file.
+        changed = git(root, "diff", "--cached", "--quiet", "--", name)
+        if changed.returncode == 0:
+            return False, "already saved"
+        if changed.returncode != 1:
+            return False, f"saved, not committed: {first_line(changed)}"
+        done = git(root, "commit", "--only", "--quiet", "-m",
+                   bookmark_message(mark), "--", name)
+        if done.returncode != 0:
+            return False, f"saved, not committed: {first_line(done)}"
+    except (OSError, subprocess.SubprocessError) as error:
+        return False, f"saved, not committed: {error}"
+    return True, "saved and committed"
+
+
+def save_bookmark(mark: dict, root: Path | None = None,
+                  file: Path | None = None) -> tuple[bool, str]:
+    """Write the bookmark file and commit it; saves run one at a time."""
+    with BOOKMARK_LOCK:
+        write_bookmark(mark, file)
+        return commit_bookmark(mark, root, file)
 
 
 def watched_sources() -> list[Path]:
@@ -396,7 +715,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     watcher: Watcher | None = None
     # The scripts every served page gets before </body>: RELOAD_SCRIPT
-    # under --watch, COPY_SCRIPT under --copy-on-select, both, or none.
+    # under --watch, COPY_SCRIPT under --copy-on-select, BOOKMARK_SCRIPT
+    # under --bookmark, any combination, or none.
     inject: str = ""
 
     def end_headers(self) -> None:
@@ -417,6 +737,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if self.path.split("?")[0] == RELOAD_PATH:
             self.reply_token()
             return
+        if self.path.split("?")[0] == BOOKMARK_PATH:
+            self.reply(200, json.dumps(load_bookmark()).encode(),
+                       "application/json; charset=utf-8")
+            return
         if not type(self).inject:
             super().do_GET()
             return
@@ -436,15 +760,24 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 super().do_GET()
 
     def do_POST(self) -> None:  # noqa: N802
+        route = self.path.split("?")[0]
+        if route == LOCATE_PATH:
+            self.reply_locate()
+        elif route == BOOKMARK_PATH:
+            self.reply_bookmark()
+        else:
+            self.send_error(404)
+
+    def read_json(self) -> Any:
+        size = int(self.headers.get("Content-Length", "0"))
+        return json.loads(self.rfile.read(size))
+
+    def reply_locate(self) -> None:
         """Answer /__locate: `Chapters/NN_....md:LINE` for the passage
         in the request, or an empty body when it cannot be placed."""
-        if self.path.split("?")[0] != LOCATE_PATH:
-            self.send_error(404)
-            return
         answer = ""
         try:
-            size = int(self.headers.get("Content-Length", "0"))
-            request = json.loads(self.rfile.read(size))
+            request = self.read_json()
             md = page_source(str(request["page"]))
             if md is not None:
                 line = locate(md, str(request["text"]),
@@ -453,9 +786,33 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                     answer = f"{md.relative_to(ROOT).as_posix()}:{line}"
         except (ValueError, KeyError, TypeError, OSError):
             answer = ""
-        body = answer.encode()
-        self.send_response(200)
-        self.send_header("Content-Type", "text/plain; charset=utf-8")
+        self.reply(200, answer.encode(), "text/plain; charset=utf-8")
+
+    def reply_bookmark(self) -> None:
+        """Answer a POST to /__bookmark: validate, write, commit."""
+        try:
+            mark = clean_bookmark(self.read_json(), Path(self.directory))
+        except ValueError as error:
+            self.reply(400, str(error).encode(),
+                       "text/plain; charset=utf-8")
+            return
+        mark["source"] = bookmark_source(
+            mark["page"], mark["text"], mark["heading"])
+        mark["saved"] = time.strftime("%Y-%m-%dT%H:%M:%S")
+        try:
+            committed, message = save_bookmark(mark)
+        except OSError as error:
+            self.reply(500, f"could not write the file: {error}".encode(),
+                       "text/plain; charset=utf-8")
+            return
+        print(f"Bookmark: {message}")
+        body = json.dumps({"saved": True, "committed": committed,
+                           "message": message}).encode()
+        self.reply(200, body, "application/json; charset=utf-8")
+
+    def reply(self, code: int, body: bytes, content_type: str) -> None:
+        self.send_response(code)
+        self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
@@ -463,11 +820,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def reply_token(self) -> None:
         watcher = type(self).watcher
         body = (watcher.token if watcher else "0").encode()
-        self.send_response(200)
-        self.send_header("Content-Type", "text/plain; charset=utf-8")
-        self.send_header("Content-Length", str(len(body)))
-        self.end_headers()
-        self.wfile.write(body)
+        self.reply(200, body, "text/plain; charset=utf-8")
 
     def reply_page(self, path: str) -> None:
         html = Path(path).read_text(encoding="utf-8")
@@ -478,12 +831,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             html = f"{head}{inject}{marker}{tail}"
         else:
             html += inject
-        body = html.encode("utf-8")
-        self.send_response(200)
-        self.send_header("Content-Type", "text/html; charset=utf-8")
-        self.send_header("Content-Length", str(len(body)))
-        self.end_headers()
-        self.wfile.write(body)
+        self.reply(200, html.encode("utf-8"), "text/html; charset=utf-8")
 
     def log_message(self, format: str, *args) -> None:
         # The reload poll would otherwise print a line every second.
@@ -581,6 +929,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--copy-on-select", action="store_true",
                     help="copy a mouse selection to the clipboard on release "
                          "(served pages only; build/site/ is untouched)")
+    ap.add_argument("--bookmark", action="store_true",
+                    help="b saves the reading place to bookmark.json and "
+                         "commits it, g returns to it (served pages only)")
     ap.add_argument("--chapter-toc", action=argparse.BooleanOptionalAction,
                     default=build_site.CHAPTER_TOC,
                     help="per-chapter table of contents on a --watch rebuild "
@@ -608,6 +959,8 @@ def main(argv: list[str] | None = None) -> int:
         Handler.inject += RELOAD_SCRIPT
     if args.copy_on_select:
         Handler.inject += COPY_SCRIPT
+    if args.bookmark:
+        Handler.inject += BOOKMARK_SCRIPT
 
     handler = functools.partial(Handler, directory=str(SITE))
     server = http.server.ThreadingHTTPServer(("", args.port), handler)
@@ -618,6 +971,9 @@ def main(argv: list[str] | None = None) -> int:
               "pages reload after a rebuild.")
     if args.copy_on_select:
         print("Selecting text with the mouse copies it to the clipboard.")
+    if args.bookmark:
+        print("Press b to save your place in bookmark.json (committed, "
+              "never pushed) and g to return to it.")
     if args.open:
         # The server socket is already bound, so the browser will
         # connect even if it loads before serve_forever() runs.
