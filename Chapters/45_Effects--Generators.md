@@ -2390,14 +2390,14 @@ describes.
 PEP 255's restriction says who resumes it:
 the code that called `next()` or `send()`.
 That restriction requires a driver, the code that calls `next()` and `send()`.
-A generator cannot specify its driver, so you write it.
+A generator cannot specify its driver, so you write the driver.
 
-In May 1999, two years before the PEP,
+In May 1999, two years before PEP 255,
 Tim Peters called generators "half a coroutine" on python-dev.
 Coroutines, he wrote, are "equal partners," each free to resume any other,
 while a generator returns control to its caller.
 
-PEP 342, written in 2005, kept that restriction and added the send channel,
+PEP 342, written in 2005, kept PEP 255's restriction and added the send channel,
 which reached Python 2.5 in 2006.
 The PEP calls coroutines "a natural way of expressing" simulations, games,
 and asynchronous I/O.
@@ -2438,7 +2438,7 @@ That code is the driver you write.
 
 [Stateless](46_Effects--Stateless.md) builds on this chapter's three ideas:
 the driver, the request and its answer, and `yield from`.
-It describes a function by what it requests and writes those requests into its return type.
+Stateless describes a function by the requests it makes and writes those requests into the function's return type.
 
 ## Exercises
 
