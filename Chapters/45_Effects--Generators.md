@@ -2044,7 +2044,8 @@ the exponentiation operator of FORTRAN and COBOL,
 with a single up-arrow character.
 Asterisks pair off from the left,
 so three in a row become an arrow and an asterisk.
-Here is that subroutine as an iterator class, with `^` standing for the arrow:
+Here is that subroutine as an iterator class,
+with `^` standing for the up arrow:
 
 ```python
 # squasher_switch.py
@@ -2139,8 +2140,11 @@ so its position replaces the switch.
 PEP 255 added generators to Python 2.2 in 2001 so that a called function can hand a value to its caller and keep its position and its locals.
 The PEP's motivating example is the standard library's `tokenize()`,
 which keeps its place in the source text from one token to the next.
-A recursive tree walk keeps a whole recursion in progress between one node and the next.
-The consumer needs its own local variables and loops to track what it has seen,
+A recursive tree walk is a second producer of this kind.
+It keeps a whole recursion in progress between one node and the next.
+
+The consumer of such a producer has state of its own.
+It needs local variables and loops to track what it has seen,
 and it may stop early.
 
 Without generators, you have three ways to write such a producer in a single thread.

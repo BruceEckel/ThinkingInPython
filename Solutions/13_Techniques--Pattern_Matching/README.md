@@ -560,7 +560,8 @@ print(quadrant(Point(0, 7)))
 ```
 
 If you delete the final `case _` from the second version,
-the script prints the same two lines, but `ty` reports `invalid-implicit-return`.
+the script prints the same two lines,
+but `ty` reports `invalid-implicit-return`.
 The type checker finds a path that falls off the end of the function and returns `None`,
 which conflicts with the declared return type, `str`.
 The six cases cover all nine pairs of signs,
