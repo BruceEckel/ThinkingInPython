@@ -2139,17 +2139,16 @@ so its position replaces the switch.
 
 PEP 255 added generators to Python 2.2 in 2001 so that a called function can hand a value to its caller and keep its position and its locals.
 The PEP's motivating example is the standard library's `tokenize()`,
-which keeps its place in the source text from one token to the next.
+a producer that keeps its place in the source text from one token to the next.
 Another example is a recursive tree walk that keeps a whole recursion in progress between one node and the next.
 
 The consumer of such a producer is usually a loop.
-That loop keeps locals, such as a running total,
-and it stops when it has enough values, whether or not the producer has more.
+That loop keeps its variables, such as a running total,
+from one value to the next, and it stops when it has enough values,
+whether or not the producer has more.
 
 Without generators, you have three ways to write such a producer in a single thread.
-Each comes with a compromise.
-
-The first way is for the function to invoke a callback on each computed value:
+The first way is for the producer to invoke a callback on each computed value:
 
 ```python
 # fibonacci_callback.py
@@ -2183,10 +2182,10 @@ fibonacci(7, summing())
 
 The callback needs a variable that survives from one call to the next,
 to hold the running `total`.
-`summing()` returns the `consume` function,
+`summing()` returns the callback, `consume()`,
 which captures `total` as a [closure](40_Functional--Foundations.md#closures)
 variable, so `total` outlives `summing()`'s call.
-Under the `nonlocal` statement, `consume()` assigns to the captured `total`.
+With the `nonlocal` statement, `consume()` assigns to the captured `total`.
 
 `fibonacci()` controls how many times `consume()` runs and when the sequence ends.
 `consume()` receives one value per call and cannot ask for the next value or stop the loop early.
@@ -2216,13 +2215,13 @@ for value in fibonacci(7):
 #: value=8 total=20
 ```
 
-This `fibonacci()` is the generator `fibonacci()` in `iterators.py` from [Iterators](22_Patterns--Iterators.md#generators)
+This `fibonacci()` runs the same loop as the generator `fibonacci()` in `iterators.py` from [Iterators](22_Patterns--Iterators.md#generators),
 with `values.append(a)` in place of `yield a`.
 Because the list holds all the values,
 the sequence must be finite and fit in memory.
 
 The third way is an iterator class whose `__next__()` returns one value per call,
-the shape of `Squasher` in `squasher_switch.py`:
+like `Squasher` in `squasher_switch.py`:
 
 ```python
 # fibonacci_class.py
@@ -2258,29 +2257,32 @@ for value in Fibonacci(7):
 #: value=8 total=20
 ```
 
-The class moves the locals `a` and `b` into the attributes `_a` and `_b`,
-and each `__next__()` call computes one value,
+Each `__next__()` call computes one value,
 as one pass of the `for` loop in `fibonacci_callback.py` does.
-In that listing, the running function's stack frame holds the `for` loop's count of values.
-In `Fibonacci`, that count is the attribute `remaining`,
-which `__next__()` decrements and tests on every call.
+In that listing, `fibonacci()`'s stack frame holds the locals `a` and `b` along with the `for` loop's count of values.
+In `Fibonacci`, the attributes `_a` and `_b` replace those locals.
+The count of values is the attribute `remaining`,
+which `__next__()` tests on every call and decrements for each value it returns.
 
-Each approach rewrites one of the two loops as a function,
+Each way rewrites the producer's loop or the consumer's loop as a function,
 or keeps both loops and runs them one after the other:
 
 - The callback turns the consumer inside out:
   the body of its loop becomes `consume()`,
-  a function the producer's loop calls.
+  a function that the producer's loop calls.
 - The list keeps both loops but runs the producer's loop to completion before the consumer's loop starts.
 - The class turns the producer inside out:
-  the body of its loop becomes `__next__()`, a method the consumer's loop calls.
+  the body of its loop becomes `__next__()`,
+  a method that the consumer's loop calls.
 
-All three approaches work around the same missing ability:
+All three ways work around the same missing ability:
 pausing `fibonacci()` in the middle of its loop, handing out a value,
 and resuming where it stopped.
 With a generator, the producer and the consumer each keep their own loop.
 
-A pair of loops passing values in both directions resembles the queues in [Coordinating Threads with Queues](19_Techniques--Concurrency.md#coordinating-threads-with-queues),
+A generator and its driver can pass values in both directions.
+The pair resembles threads that pass items through a queue,
+as in [Coordinating Threads with Queues](19_Techniques--Concurrency.md#coordinating-threads-with-queues),
 with three differences:
 
 1. A generator holds no items.
@@ -2289,7 +2291,7 @@ with three differences:
 2. Control moves with the value,
    so at any moment either the driver or the generator body is running.
 3. The generator cannot start an exchange.
-   It runs when its driver resumes it, and it answers that driver alone.
+   It runs when its driver resumes it, and it yields each value to that driver.
 
 ### The Suspended Frame
 

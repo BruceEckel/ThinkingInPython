@@ -580,13 +580,16 @@ Chapters/44_Effects--Effect_Management.md	[SAME] Flix expresses the same design 
 Chapters/44_Effects--Effect_Management.md	[TWO] An AI can start using that language as soon as it works, while people take years to adopt a new language.
 Chapters/44_Effects--Effect_Management.md	[TWO] Python demonstrates that this tracking can work, and hard-codes it to a single Effect, asynchrony, rather than letting you declare your own.
 Chapters/45_Effects--Generators.md	[ADD] A function that the generator calls runs in a frame of its own and cannot suspend the generator's frame, so a helper that makes a request must be a generator too. | after: A CODE suspends one frame, the frame of the function that contains the CODE.
-Chapters/45_Effects--Generators.md	[CAN] A class can supply that CODE, the way CODE in Iterators supplies CODE:
-Chapters/45_Effects--Generators.md	[CAN] A generator can build its next request from the answer it received:
+Chapters/45_Effects--Generators.md	[CAN] A class can supply CODE, the way CODE in Iterators supplies CODE:
+Chapters/45_Effects--Generators.md	[CAN] A generator and its driver can pass values in both directions.
+Chapters/45_Effects--Generators.md	[CAN] A generator can build its next request from the answer it receives:
 Chapters/45_Effects--Generators.md	[CAN] A generator's driver can do the first two.
+Chapters/45_Effects--Generators.md	[CAN] An CODE function can contain CODE.
 Chapters/45_Effects--Generators.md	[CAN] Because each CODE hands a result back to its caller, a recursive generator can combine results on the way back up a tree.
 Chapters/45_Effects--Generators.md	[CAN] CODE carries a request out of the body and CODE carries the answer back in, so the body can ask for something and receive the answer.
 Chapters/45_Effects--Generators.md	[CAN] The CODE statement evaluates its right side lazily, so the alias can name itself.
 Chapters/45_Effects--Generators.md	[CAUS] let exception end: It can handle the exception and yield again, clean up, or let the exception end the generator:
+Chapters/45_Effects--Generators.md	[CAUS] lets CODE pass: The CODE clause in CODE lets CODE pass, so CODE skips CODE and finishes each started step.
 Chapters/45_Effects--Generators.md	[CAUS] lets CODE propagate: After CODE, the generator returns, or it lets CODE propagate out of its body.
 Chapters/45_Effects--Generators.md	[CAUS] lets exception propagate: A body that lets the exception propagate finishes on its own, and CODE returns.
 Chapters/45_Effects--Generators.md	[SAME] CLU's iterators, designed in 1975, work the same way.[^clu-history]

@@ -717,32 +717,26 @@ Chapters/44_Effects--Effect_Management.md	[BOUND] The read leaves the environmen
 Chapters/44_Effects--Effect_Management.md	[BOUND] Three calls down, a helper that formats currency reads a configuration service and writes to an audit log
 Chapters/44_Effects--Effect_Management.md	[BOUND] Three things pass from callee to caller
 Chapters/45_Effects--Generators.md	[BOUND] A CODE added above CODE in CODE runs when the mouse is trapped and at no other time
-Chapters/45_Effects--Generators.md	[BOUND] A driver that holds the outermost generator stops and cleans up every generator beneath it with one call
 Chapters/45_Effects--Generators.md	[BOUND] A handler can do three things with a continuation
-Chapters/45_Effects--Generators.md	[BOUND] A pair of loops passing values in both directions resembles the queues in Coordinating Threads with Queues, with three differences
 Chapters/45_Effects--Generators.md	[BOUND] A suspended generator preserves two things
-Chapters/45_Effects--Generators.md	[BOUND] An asynchronous generator drops the return channel, so CODE takes two parameters where CODE takes three
+Chapters/45_Effects--Generators.md	[BOUND] All three ways work around the same missing ability
+Chapters/45_Effects--Generators.md	[BOUND] An asynchronous generator has a yield channel and a send channel and no return channel, so CODE takes two parameters where CODE takes three
 Chapters/45_Effects--Generators.md	[BOUND] An ordinary call keeps that state for the caller alone
 Chapters/45_Effects--Generators.md	[BOUND] CODE has the yield channel alone, so the type checker rejects CODE on anything annotated CODE
-Chapters/45_Effects--Generators.md	[BOUND] CODE matches CODE alone, so CODE leaves the machine in CODE, and the entry message prints once
 Chapters/45_Effects--Generators.md	[BOUND] CODE puts that job at the back of the queue, behind the other job, so the two jobs alternate
-Chapters/45_Effects--Generators.md	[BOUND] CODE starts an event loop, a driver like the one in CODE
-Chapters/45_Effects--Generators.md	[BOUND] CODE supplies an CODE that returns CODE, so the class writes CODE alone
 Chapters/45_Effects--Generators.md	[BOUND] Code before a CODE runs on that transition alone, the Mealy shape, where the action belongs to the transition
-Chapters/45_Effects--Generators.md	[BOUND] Conway's flowchart of the coroutine version has those two steps in a row
 Chapters/45_Effects--Generators.md	[BOUND] Here the choice is between two places in one function rather than between two designs
-Chapters/45_Effects--Generators.md	[BOUND] It runs when its driver resumes it, and it answers that driver alone
-Chapters/45_Effects--Generators.md	[BOUND] One shape looks like a transition and is a delegation
+Chapters/45_Effects--Generators.md	[BOUND] Replace CODE with two functions
 Chapters/45_Effects--Generators.md	[BOUND] Replace CODE's loop in CODE with the single line CODE and run CODE over the same CODE table
 Chapters/45_Effects--Generators.md	[BOUND] Stateless builds an Effect system on the three channels, the driver, CODE, and CODE
 Chapters/45_Effects--Generators.md	[BOUND] That CODE carries CODE as its value, so CODE prints the exception's class name alone
-Chapters/45_Effects--Generators.md	[BOUND] That CODE comes before the card step's CODE, so the exception propagates out of the card step, whose own action is the one that failed
-Chapters/45_Effects--Generators.md	[BOUND] That event loop is the single driver at the edge of the program
 Chapters/45_Effects--Generators.md	[BOUND] The Moore shape and the Mealy shape both fit one function with no CODE field
 Chapters/45_Effects--Generators.md	[BOUND] The annotation describes the three channels
-Chapters/45_Effects--Generators.md	[BOUND] The asynchronous generator CODE in CODE computes CODE's sequence in a CODE loop with a CODE, and leaves the two methods to Python
 Chapters/45_Effects--Generators.md	[BOUND] The callback needs a variable that survives from one call to the next, to hold the running CODE
+Chapters/45_Effects--Generators.md	[BOUND] The event loop is the single driver at the edge of the program
+Chapters/45_Effects--Generators.md	[BOUND] The exception then propagates up through the CODE in the hotel step and the one in the flight step
 Chapters/45_Effects--Generators.md	[BOUND] The one assignment CODE replaces the CODE and the CODE
+Chapters/45_Effects--Generators.md	[BOUND] The pair resembles threads that pass items through a queue, as in Coordinating Threads with Queues, with three differences
 Chapters/45_Effects--Generators.md	[BOUND] TypeScript types the three channels as CODE
 Chapters/45_Effects--Generators.md	[BOUND] Without generators, you have three ways to write such a producer in a single thread
 Chapters/45_Effects--Generators.md	[BOUND] Written as a generator, the squasher delivers a single asterisk and the character after it with two statements in a row
@@ -1355,6 +1349,7 @@ Solutions/45_Effects--Generators/README.md	[BOUND] Annotating a Generator descri
 Solutions/45_Effects--Generators/README.md	[BOUND] CODE equals the six path lines that CODE prints, a tree with an empty subtree produces the lines of its other entries, CODE contains no CODE, and your answer names the two things in each stack entry and says where CODE keeps them
 Solutions/45_Effects--Generators/README.md	[BOUND] CODE takes the two arguments that CODE takes, so CODE pushes a level where CODE calls itself
 Solutions/45_Effects--Generators/README.md	[BOUND] CODE's annotation alone gives the checker a declared type to compare with the call's type
+Solutions/45_Effects--Generators/README.md	[BOUND] For the change, move one line and remove the early CODE
 Solutions/45_Effects--Generators/README.md	[BOUND] So at runtime the first CODE accepts CODE alone, a value the CODE excludes
 Solutions/45_Effects--Generators/README.md	[BOUND] The CODE in CODE runs the opposite direction from the one in CODE
 Solutions/45_Effects--Generators/README.md	[BOUND] The CODE meant for the conversation catches the one from the exhausted answers and treats it as a finished interview
