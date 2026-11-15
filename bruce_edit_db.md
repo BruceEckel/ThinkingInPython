@@ -404,7 +404,7 @@ Ask what the reader would observe; if the phrase does not say, replace it.
 **Keep when.** The judgment is the claim being made and the mechanism is
 already stated nearby, as in a summary sentence that closes a section.
 
-**Sightings.** 17 (3 chapters)
+**Sightings.** 18 (3 chapters)
 - `25_Patterns--Surrogate` 2026-08-31, was Claude-written, five:
 - "puts the check where it costs nothing" -> "puts the check where it
   does not restrict the surrogate"
@@ -499,6 +499,18 @@ already stated nearby, as in a summary sentence that closes a section.
   the exception through" -> "`pause()`'s `try` has a `finally` clause
   and no `except`, so Python runs the `finally` block ... and the
   `ValueError` propagates out of the generator."
+- `45_Effects--Generators` 2026-11-14, was Claude-written (a repair
+  made an hour before), Bruce: "vague, unclear, confusing": "The
+  consumer of such a producer has state of its own. It needs local
+  variables and loops to track what it has seen, and it may stop
+  early." -> "The consumer of such a producer is usually a loop. That
+  loop keeps its variables, such as a running total, from one value to
+  the next, and it stops when it has enough values, whether or not the
+  producer has more." Three abstractions each became the thing a
+  reader can picture: "has state of its own" is what the consumer is
+  (a loop) and what it keeps, "to track what it has seen" is one
+  instance (a running total), and "may stop early" is the condition
+  under which it stops.
 
 **Home.** literal (Accrued patterns and the "Vague descriptions"
 section), the pass that owns figures; deep-review (prose pass, "Vague").
@@ -795,7 +807,7 @@ the noun into the concrete sentence and cut the abstract one.
 a mechanism the earlier text did not state. A contrast drawn across
 several listings that no one listing shows is such a consequence.
 
-**Sightings.** 11, 4 chapters
+**Sightings.** 13, 4 chapters
 - `45_Effects--Generators` 2026-11-13, was Claude-written, both found
   while joining two paragraphs at Bruce's request (C80). The
   section-opening shape in its citation form: "The chapter's opening
@@ -842,6 +854,24 @@ several listings that no one listing shows is such a consequence.
   deleted whole; the binding-times advice paragraph at the chapter's
   end cut; two MVC paragraphs marked "[[just recapitulates the code]]"
   and then cut.
+- `45_Effects--Generators` 2026-11-14, was Claude-written, Bruce's
+  hand: "The callback needs a variable that survives from one call to
+  the next, to hold the running `total`. `summing()` returns the
+  callback, `consume()`, which captures `total` as a closure variable,
+  so `total` outlives `summing()`'s call." -> "`summing()` returns the
+  callback, `consume()`, which captures the running `total` as a
+  closure variable, so `total` survives from one call to the next."
+  The first sentence stated the need and the second met it. The
+  need's words ("running", "survives from one call to the next") moved
+  into the sentence that shows the mechanism.
+- `45_Effects--Generators` 2026-11-14, Bruce's hand, on a sentence
+  Claude's super-prose pass wrote earlier that day to map a
+  comparison's terms (C74): "A generator and its driver can pass values in both
+  directions. The pair resembles threads that pass items through a
+  queue" -> "The generator-driver pair resembles threads that pass
+  items through a queue". The chapter has shown values passing both
+  ways since its second section, so the setup sentence was a recap,
+  and the next sentence's subject can name the pair.
 
 **Home.** this file only. Promoted 2026-09-17 on the second chapter's
 sighting, widened from consecutive sentences to the section-opening
@@ -1522,7 +1552,8 @@ property stated for its own sake, in a paragraph about one side alone.
 
 **Sightings.** 2 chapters. Promoted by Bruce on the first,
 2026-10-18.
-- `45_Effects--Generators` 2026-11-14, was Claude-written, Bruce on the
+- `45_Effects--Generators` 2026-11-14, in the chapter since 2026-10-26
+  (1065b886), Bruce on the
   lead-in to `fibonacci_generator.py`: "I don't find this particularly
   illuminating". "With a generator, the producer and the consumer each
   keep their own loop:" stood four lines below the bullet "The list
@@ -1532,7 +1563,9 @@ property stated for its own sake, in a paragraph about one side alone.
   producer's loop pauses at each `yield` while the consumer's loop uses
   the value:", which is false of the callback (the consumer has no
   loop), the list (the producer's loop runs to completion), and the
-  iterator class (the producer has no loop).
+  iterator class (the producer has no loop). Bruce then joined the
+  two sentences: "But with a generator, the producer's loop pauses at
+  each `yield` while the consumer's loop uses the value:".
 - Why the passes missed it: the super-prose pass over that section the
   same day kept the phrase, since the section's opening defines "keeps
   its loop". A defined phrase still fails here: no pass compared the
@@ -2079,6 +2112,21 @@ the rest of the chapter for similar issues"; 15 passages cut in
   introduces the name reads an assignment aloud, the first shape in the
   test above. Reread every sentence a repair adds beside a listing
   against this rule.
+- `45_Effects--Generators` 2026-11-14, Bruce's hand: the walkthrough
+  under `fibonacci_class.py` cut whole ("Each `__next__()` call
+  computes one value, as one pass of the `for` loop in
+  `fibonacci_callback.py` does. In that listing, `fibonacci()`'s stack
+  frame holds the locals `a` and `b` ... The count of values is the
+  attribute `remaining`, which `__next__()` tests on every call and
+  decrements for each value it returns."). The bullet below the
+  listing says it in one line ("The iterator class turns the producer
+  inside out: the body of its loop becomes `__next__()`"), and
+  [Iterators] walks the identical class. Claude's super-prose pass
+  had straightened that paragraph earlier that day, sentence by
+  sentence, and never asked this rule's question of the paragraph as
+  a whole. Ask it before repairing a walkthrough: what does the
+  paragraph tell the reader that the listing, a summary beside it, or
+  an earlier chapter's walk of the same code does not?
 
 **Home.** CLAUDE.md (global, the "Prose beside a listing" bullet);
 deep-review (prose pass, "Restating"). Promoted on Bruce's ruling, the
@@ -2317,6 +2365,22 @@ baseline holds them):
   outside. The remedy is now a check: `tools/watch_words.py --changed`
   reads the clauses on lines that differ from HEAD, and `tip
   verify-ch` fails on a NEW Tier 2 or 3 hit among them.
+- `45_Effects--Generators` 2026-11-14, was Claude-written
+  (2026-11-10), four `tip watch-words` hits left unjudged for four
+  days: "`close()` changes that generator's state from `GEN_CREATED`
+  to `GEN_CLOSED`, and the body never starts. Closing `readings()`
+  before its first `next()` prints nothing: the sensor never turns on,
+  and execution never enters the `try` statement whose `finally`
+  clause turns it off." -> "..., so the body never starts. The body of
+  `readings()` starts by turning on the sensor and entering the `try`
+  statement whose `finally` clause turns it off. Closing `readings()`
+  before its first `next()` therefore prints nothing." One absence was
+  stated four ways. The two that are the claim stay, one for every
+  generator and one for this listing's output. The two that restated
+  them became the positive event they deny: what the body does when
+  it starts. When a paragraph repeats an absence, keep it once at each
+  level the reader needs and give the rest to the event that would
+  have happened.
 
 **Home.** CLAUDE.md (global, the `<verb> nothing` paragraph of the watch
 list, widened to `no X` and `none of`, and to the negated subject);
@@ -4083,6 +4147,16 @@ from a hedged event.
   introducing a new type:"). The first sweep's rewrites had a
   specific subject and no sibling ("`yield from` can take over that
   job:").
+- `45_Effects--Generators` 2026-11-14, was Claude-written an hour
+  before, Bruce's hand: "The producer computes a value each time the
+  consumer's loop asks for one, so the consumer can stop when it has
+  enough values, whether or not the producer has more." -> "The
+  producer computes a value only when the consumer loop asks for one.
+  The consumer stops when it has enough values, whether or not the
+  producer has more." The section's second paragraph says the
+  consumer "stops when it has enough values", and "can" turned that
+  statement into an option. A second chapter after chapter 20, so
+  promotion to a rule is proposed to Bruce.
 
 **Home.** CLAUDE.md (global, the "can"/"could" bullet);
 `tools/sentence_shapes.py` (`[CAN]`, with its read keeps in
@@ -4796,6 +4870,13 @@ here?":
   written by Claude's super-prose pass over this section, which had
   fixed the clash at one sentence ("The loop ends" -> "The `async
   for` ends") and not looked for the word's other uses.
+- `45_Effects--Generators` 2026-11-14, Bruce's hand: "- The class
+  turns the producer inside out:" -> "- The iterator class turns the
+  producer inside out:". The lead-in above the listing calls it "an
+  iterator class", and the bullet had shortened the term to its head
+  noun. The same day's super-prose pass changed "Each approach" and
+  "All three approaches" to "way" and "ways", the section's noun
+  since "you have three ways", and left this one.
 
 **Home.** antecedents (Accrued patterns) | super-prose (pass 5) | this
 file.
@@ -5629,6 +5710,47 @@ listing, a date, a name the source coined).
   site (the four other hits are the book's own figures and tables).
 
 **Home.** super-prose (pass 4) | this file.
+
+### C85. A second example says it is one
+
+**Test.** Two adjacent sentences each give an instance of one point,
+and the second opens on an indefinite subject in the plain present,
+with no word that marks it as another instance ("The PEP's motivating
+example is the standard library's `tokenize()`, which keeps its place
+in the source text from one token to the next. A recursive tree walk
+keeps a whole recursion in progress between one node and the next.").
+The reader cannot tell whether the second sentence continues the first
+example, describes a part of it, or starts a new one. Open it as an
+example, in one sentence that holds the marker, the thing, and what it
+does: "Another example is a recursive tree walk that keeps a whole
+recursion in progress between one node and the next." Additive: the
+repair adds the marker and cuts nothing.
+
+**Keep when.** None seen yet. The likely ones: a list whose lead-in
+counts the examples, and a sentence that already carries "also", "for
+example", or "such as".
+
+**Sightings.** 1, `45_Effects--Generators` 2026-11-14, was
+Claude-written (53eed859), Bruce on the page: "Is this talking about
+the tokenize() example or something else?"
+- the pair quoted above.
+- Claude's first repair classified the thing in one sentence and gave
+  its action in a second: "A recursive tree walk is a second producer
+  of this kind. It keeps a whole recursion in progress between one
+  node and the next." Bruce: 'Say "another example is a recursive
+  tree walk that keeps a whole recursion ..."'. His form uses the
+  plain marker and keeps the action in a relative clause, so the
+  sentence needs no pronoun to carry it.
+- Why the passes missed it: `alternative` (R57) reads a walkthrough
+  for a sentence about code the listing lacks, and `antecedents`
+  reads pointers. No pass asks whether two adjacent sentences are one
+  example or two. The first sentence also gave "such a producer", two
+  sentences down, nothing to point at, which is why the repair made
+  `tokenize()` "a producer that keeps its place".
+- Scale: this is the book's one "Another example"; no tool lists the
+  shape.
+
+**Home.** cohesion (candidate) | this file.
 
 ## Retired
 
