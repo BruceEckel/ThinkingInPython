@@ -38,6 +38,7 @@ Chapters/45_Effects--Generators.md	[PASSIVE] is suspended: The new generator is 
 Chapters/45_Effects--Generators.md	[PASSIVE] is trapped: A CODE added above CODE in CODE runs when the mouse is trapped and at no other time.
 Chapters/46_Effects--Stateless.md	[PASSIVE] 's bound: CODE's bound is CODE, and CODE's bound is CODE.
 Chapters/46_Effects--Stateless.md	[PASSIVE] be frozen: CODE is a record because CODE is a frozen data class, and a data class that inherits from a frozen one must be frozen too.
+Chapters/46_Effects--Stateless.md	[PASSIVE] is suspended: The greeting has yet to print at that point, because CODE is suspended inside CODE, at the CODE its CODE reaches.
 Chapters/47_Effects--Stateless_in_Practice.md	[PASSIVE] 's named: When CODE gains a fourth error, CODE's named CODE leaves it in the channel, so CODE's declared type no longer matches and the type checker reports an error at the CODE.
 Chapters/47_Effects--Stateless_in_Practice.md	[PASSIVE] is prepackaged: CODE is CODE with a type lookup in place of the dictionary, CODE is that loop applied after the last handler, and CODE is CODE prepackaged for CODE: a handler whose answer to CODE is the supplied instance that is a CODE.
 Solutions/04_Foundations--Control_Flow/README.md	[PASSIVE] is written: your prediction is written down, the run prints CODE, and you can say which slot the surviving CODE occupies and why the loop skipped it.

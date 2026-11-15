@@ -217,7 +217,7 @@ Chapters/46_Effects--Stateless.md	[PAST] let: Other Effect systems let you descr
 Chapters/46_Effects--Stateless.md	[PAST] made: People made the same complaint against Java's checked exceptions, where an exception added three levels down meant editing every signature above it.
 Chapters/46_Effects--Stateless.md	[PAST] measured: On Linux it measured about 75 microseconds.
 Chapters/46_Effects--Stateless.md	[PAST] measured: On Windows, CODE measured about 650 microseconds, more than four orders of magnitude above a plain function call.
-Chapters/46_Effects--Stateless.md	[PAST] provided: The driver throws a failure back into the generator, so an ordinary CODE/CODE around a CODE catches it, provided no handler sits between CODE and that Effect.
+Chapters/46_Effects--Stateless.md	[PAST] provided: The driver throws a failure back into the generator, so an ordinary CODE/CODE around a CODE catches it, provided no handler sits between CODE and that generator.
 Chapters/46_Effects--Stateless.md	[PAST] read: Both read CODE, and neither names the CODE it uses.
 Chapters/47_Effects--Stateless_in_Practice.md	[PAST] got: Python got one Effect tracked into its type system with CODE.
 Chapters/47_Effects--Stateless_in_Practice.md	[PAST] left: An CODE in a revealed type means CODE left the subtraction unfinished.

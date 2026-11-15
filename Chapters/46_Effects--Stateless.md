@@ -24,9 +24,9 @@ and `yield from`, which composes generators and produces the inner generator's r
 Every Effect in this chapter is such a generator.
 Stateless supplies the vocabulary for the requests and the driver that answers them.
 
-Besides its result, an Effect's return type declares two things:
-the dependencies it needs and the ways it can fail.
-Both travel the yield channel every generator carries.
+Besides its result, an Effect's type declares two things:
+the dependencies the Effect needs and the ways it can fail.
+Both go out on the yield channel that every generator has.
 [Stateless in Practice](47_Effects--Stateless_in_Practice.md)
 builds examples with both.
 
@@ -42,7 +42,7 @@ Effect[A, E, R]
 ```
 
 Those three parameters answer the three questions [Effect Management](44_Effects--Effect_Management.md#library-effect-management)
-asked of an Effect signature:
+asks of an Effect signature:
 
 - `A` is what the computation needs, an *Ability*.
 - `E` is its failure type.
@@ -52,6 +52,9 @@ Stateless reuses the word Effect for the whole description a function returns.
 The Effects of [Effect Management](44_Effects--Effect_Management.md#what-is-an-effect)
 are what that description declares:
 its Abilities in `A` and its failures in `E`.
+
+An Effect yields both kinds of value,
+so this chapter calls `A` the *Ability channel* and `E` the *error channel*.
 
 For example:
 
@@ -104,12 +107,11 @@ A synchronous program calls it once, at the outermost edge.
 `success()` is a function that builds an Effect.
 `Success` is the alias from the table, the type of that Effect.
 `Success[int]` says `double()` is pure.
-`double()` cannot read anything, and it cannot fail.
+`double()` depends on its argument alone, and it cannot fail.
 
 `double()` contains no `yield`, so it is an ordinary function.
 Python decides generator-function status from the body alone.
-A `yield` in the body makes a function a generator function,
-whatever the return annotation says and whatever object the body returns.
+A `yield` in the body makes a function a generator function.
 `double()` calls `success()` and returns the Effect that `success()` builds,
 the way an ordinary function returns a list.
 The annotation describes that returned object rather than how the body reads.
@@ -171,21 +173,21 @@ A caller must capture stdout to redirect the output or to test the function.
 
 `Depend[Need[Console], None]` states the dependency.
 A caller now has two options: supply a `Console`,
-or declare the same need in its own signature and pass the Ability to its caller.
+or declare `Need[Console]` in its own signature and pass the Ability to its caller.
 A caller that does neither fails the type check.
 
 Two details in `greeter.py` matter:
 
-1. `greet()` is a generator function, because it contains `yield from`,
-   so calling it builds the Effect its signature declares.
+1. `greet()` contains `yield from`, so it is a generator function.
+   Calling it builds the Effect its signature declares.
 2. `console` is of type `Console`,
    so the type checker verifies each `console.print()` call against `Console.print()`'s signature.
    `console` has that type before anything supplies an instance.
 
 ### The Effect Definition
 
-The first detail holds for every Effect,
-because `Effect` is an alias for a `Generator`:
+The first detail depends on the definition of `Effect`,
+which is an alias for a `Generator`:
 
 ```python
 Effect: TypeAlias = Generator[A | E, Any, R]
@@ -208,7 +210,7 @@ Two bounds on the library's type variables tell them apart.
 [Waiting on a Coroutine](#waiting-on-a-coroutine)
 states the `A` bound as the rule for `Depend`.
 
-At runtime, `run()`'s driver tells a request from a failure with `case Exception() as error`.
+At runtime, the driver tells a request from a failure with `case Exception() as error`.
 A yielded value that matches `Exception` is a failure.
 Everything else is an Ability request.
 The two bounds overlap.
@@ -218,41 +220,39 @@ The listings here keep requests and failures in separate classes.
 
 The second type parameter is `Any`,
 which [Generators](45_Effects--Generators.md#annotating-a-generator)
-taught you to read as the type the `yield` expression produces inside the generator.
+teaches you to read as the type the `yield` expression produces inside the generator.
 That `Any` is deliberate, and it decides how `greet()` must write its request.
 
 ### Why `yield from`
 
 The request in `greet()` reads `console = yield from need(Console)`,
 not `console = yield Need(Console)`.
-The reason is that `Any`.
+That `Any` is the reason.
 
-A generator has one SendType for its whole life.
+A generator has one `SendType`, which covers every `yield` in its body.
 An Effect needs a different answer for each request:
 
 - A `yield` that requests a `Need[Console]` should get back a `Console`.
 - A `yield` that requests a `Need[Log]` should get back a `Log`.
 
-What comes back depends on which Ability the `yield` requested.
-One SendType covers every `yield`.
-If you pin it to `Console`,
+If you pin the `SendType` to `Console`,
 the type checker reads `yield Need(Log)` as producing a `Console`.
-So the SendType is `Any`, which accepts every answer unchecked.
+So the `SendType` is `Any`, which accepts every answer unchecked.
 
-A bare `yield` produces that SendType, `Any`.
+A bare `yield` produces that `SendType`, `Any`.
 `yield from` produces the inner generator's `ReturnType`,
-so the type checker knows the answer's type.
-`need(Console)` builds a small generator that serves one request,
+so the type checker infers the answer's type.
+`need(Console)` builds a small generator that makes one request,
 so its `ReturnType` can be a specific type.
 `need()` returns `Depend[Need[T], T]`,
 which expands to `Generator[Need[T], Any, T]`.
 Calling `need(Console)` binds `T` to `Console`,
 so `console` takes its type from that `ReturnType`,
-not from the `Any` in the SendType.
+not from the `Any` in the `SendType`.
 
 For that reason every request in this chapter uses `yield from` rather than `yield`,
-and the custom Abilities of [Abilities Are Not Special](47_Effects--Stateless_in_Practice.md#abilities-are-not-special)
-get a small function of their own.
+and each custom Ability in [Abilities Are Not Special](47_Effects--Stateless_in_Practice.md#abilities-are-not-special)
+gets a small function of its own.
 
 ## Built-in Dependencies {#builtin-dependencies}
 
@@ -262,13 +262,14 @@ Stateless also provides three dependencies of its own:
 - `Console` in `stateless.console`,
   whose `print_line()` and `read_line()` *accessors* call its `print()` and `input()` methods
   (an accessor is a small function that wraps one request and declares its answer type)
-- `Files` in `stateless.files` that reads a whole file
+- `Files` in `stateless.files`, which reads a whole file
 - `Time` in `stateless.time`,
   which [Adding Behavior to an Existing Effect](47_Effects--Stateless_in_Practice.md#adding-behavior-to-an-existing-effect)
   supplies to `retry()`
 
 All three are concrete classes rather than interfaces.
-Being concrete means [a test double for one of them must inherit from it](#supplying-an-interface).
+Because they are concrete,
+[a test double for one of them must inherit from it](#supplying-an-interface).
 
 The `read_file()` accessor in `stateless.files` is also the library's own example of both channels at once.
 It carries `@throws(FileNotFoundError, PermissionError)` on a function that already returns an Effect,
@@ -276,11 +277,11 @@ so its type declares an Ability and two failures together.
 [The Error Channel](#the-error-channel) introduces that decorator.
 
 This chapter builds a `Console` of its own for illustration rather than using `stateless.console`.
-In your own code, first check what the library declares.
+In your own code, first check what the library provides.
 
 ## Nothing Runs Yet
 
-Calling `greet()` returns a `Generator` before any line of its body runs:
+Calling `greet()` returns a generator before any line of its body runs:
 
 ```python
 # describe_only.py
@@ -300,7 +301,7 @@ A library acts only on objects handed to it,
 so the request for a `Console` must be an object the function hands out.
 Driving `greet()` with `next()` and `send()` shows that object,
 the way [Generators](45_Effects--Generators.md#annotating-a-generator)
-drove `interview()`:
+drives `interview()`:
 
 ```python
 # hand_driven.py
@@ -322,12 +323,12 @@ except StopIteration:
 a frozen data class whose `t` field holds the requested class.
 `yield from` passes that `Need` out of `greet()`'s body.
 The greeting has yet to print at that point,
-because `greet()` has suspended inside `need()`,
+because `greet()` is suspended inside `need()`,
 at the `yield` its `yield from` reaches.
 
 ## Supplying the Dependency
 
-`supply()` provides an instance to the `Need` that asked for it:
+`supply()` provides an instance to the `Need` that asks for it:
 
 ```python
 # supply_console.py
@@ -345,7 +346,7 @@ Those two lines do three things:
    an object that answers `Need[Console]` with that instance.
 2. Calling the handler on `greet` returns a new function `bound` that answers the requests `greet()` makes.
 3. Calling that function with `"Alice"` builds a fully supplied Effect,
-   which `run()` then executes.
+   which `run()` executes.
 
 Supplying the `Console` changes the type:
 
@@ -362,9 +363,10 @@ if __name__ == "__main__":
     reveal_type(bound)
 ```
 
-`reveal_type()` is a message to the type checker.
-At runtime it prints only the class of its argument (`function`, here)
-to standard error, so the answer comes from `ty check reveal_bound.py`:
+The type checker reports the static type of a `reveal_type()` argument.
+At runtime, `reveal_type()` prints only the class of its argument
+(`function`, here) to standard error,
+so the answer comes from `ty check reveal_bound.py`:
 
 ```text
 info[revealed-type]: Revealed type
@@ -385,8 +387,8 @@ info[revealed-type]: Revealed type
 `bound` is a function that `supply()` built,
 so `ty` shows its signature with no name.
 The two revealed types are the expanded forms of `Depend[Need[Console], None]` and `Success[None]`.
-`Need[Console]` sits in the first type parameter of `greet` and disappears from `bound`,
-leaving the `Never` from the alias table.
+The first type parameter of the return type is `Need[Console]` for `greet` and `Never` for `bound`,
+the `Never` from the alias table.
 
 Handling an Ability *subtracts* it from the type.
 Here the subtraction empties the Ability channel.
@@ -399,10 +401,10 @@ Binding an implementation and satisfying the type checker are the same act.
 
 ## Layering Handlers
 
-A handler answers the Abilities `supply()` gave it and re-yields the rest to the next handler out.
-A second `supply()` wrapped around the first answers what the inner one re-yielded.
+A handler answers the Abilities `supply()` gives it and re-yields the rest to the next handler out.
+A second `supply()` wrapped around the first answers the requests the inner one re-yields.
 `answering_proxy.py` in [Generators](45_Effects--Generators.md#a-generator-in-the-middle)
-is the same mechanism as a generator written out:
+shows that mechanism written out as a generator:
 `proxy()` answers the questions in its table and yields the rest up to `drive()`.
 
 A dependency injection container often lets you register a fallback for a type nobody else provides.
@@ -435,7 +437,7 @@ run(fallback(chosen)("Bob"))
 
 `fallback` is an ordinary handler, applied at the edge.
 The second run wraps `greet()` in its own `supply()` first,
-and that inner `supply()` empties the Ability channel before any request reaches `fallback`.
+and that inner `supply()` answers the `Need[Console]` request before it reaches `fallback`.
 The handler nearest the Effect answers first,
 and the outer one handles the requests that remain.
 The type records which handler answered.
@@ -476,17 +478,17 @@ print(run(constant), run(constant))
 The `run()` at `[1]` exhausts the generator.
 The `run()` at `[2]` drives that exhausted generator and gets an immediate `StopIteration` whose value is `None`.
 Calling `bound("Bob")` builds a fresh description, and that one runs.
-A second `bound("Alice")` builds a fresh one too.
+A second call to `bound("Alice")` would build a fresh one too.
 
 An Effect from `success()` can run more than once,
-because `success()` returns a `SuccessEffect` instead of a generator.
-A `SuccessEffect`'s `send()` reports the value every time,
+because `success()` returns a `SuccessEffect` instead of a generator object.
+A `SuccessEffect`'s `send()` raises `StopIteration` carrying the value on every call,
 so a constant Effect replays.
 
 Here Stateless differs from Effect systems in other languages.
 A ZIO or Effect-TS value is an immutable description that you can interpret as often as you like,
-so their combinators are operations on that value.
-ZIO writes `action repeat policy`, repeating the effect the value describes.
+so the combinators in those libraries are operations on that value.
+In ZIO, `action repeat policy` repeats the effect that `action` describes.
 Stateless has `repeat()` and `retry()` too,
 but each takes a schedule and returns a decorator of type `Callable[P, Effect[...]] -> Callable[P, Effect[...]]`.
 They decorate the function,
@@ -507,14 +509,14 @@ In Stateless, that decision belongs to whoever still holds the function.
 
 `memoize()` is the one decorator that gives a second `run()` a result,
 and it caches rather than replays.
-It wraps the Effect in an object that records the result and hands that same result back on a second `run()`.
+It wraps the Effect in an object that records the result and hands back that same result on a second `run()`.
 Like `repeat()` and `retry()`, `memoize()` decorates the function.
 [`repeat()` and `memoize()`](47_Effects--Stateless_in_Practice.md#repeat-and-memoize)
 shows it in use.
 
 ## Forgetting to Supply
 
-Give `run()` an Effect that still needs a `Console`:
+Here, `run()` receives an Effect that still needs a `Console`:
 
 ```python
 # unsupplied.py
@@ -542,7 +544,7 @@ error[invalid-argument-type]: Argument to function `run` is incorrect
 
 In Stateless, an unsupplied dependency is a type error,
 not a production incident.
-The type checker finds the omission before any test exercises the path or any reviewer happens to notice it.
+The type checker reports the omission before any test exercises the path or any reviewer notices it.
 
 The expected type in that message names `Async` and `Exception`:
 
@@ -597,8 +599,8 @@ since its body names `Console` and leaves the choice of implementation to `suppl
 so the test reads the messages back out of `recorder` afterward.
 
 `as_type(Console)` is the only extra call in that test.
-It says "treat this recorder as a `Console`,"
-and at runtime it returns the object it received.
+It tells the type checker to treat `recorder` as a `Console`,
+and at runtime it returns its argument.
 `supply()` requires `as_type()` because it reads the Ability from the static type of its argument.
 At runtime, `supply()` matches the request with `isinstance()`,
 which accepts `recorder` because `Recorder` derives from `Console`.
@@ -608,7 +610,7 @@ along with what changes when the Ability is an interface rather than a class.
 ## Effects Propagate, and the Type Checker Verifies It
 
 A function that calls an effectful function becomes effectful.
-`greet_all()` must declare the `Console` even though no `Console` appears in its body:
+`greet_all()` must declare `Need[Console]` although no `Console` appears in its body:
 
 ```python
 # greet_all.py
@@ -648,16 +650,17 @@ The `yield from` inside `greet_all()` relays `greet(name)`'s request to the driv
 If you write that loop body as a bare `greet(name)`,
 `ty` reports an `invalid-implicit-return`:
 "Function always implicitly returns `None`."
-That looks like protection, but it is an accident.
+That diagnostic looks like protection, but it is an accident.
 That `yield from` is the only `yield` in `greet_all()`,
 so deleting it turns `greet_all()` into an ordinary function.
-The type checker reports the changed shape rather than the discarded Effect.
+The diagnostic is about the `None` that an ordinary function returns,
+not about the discarded Effect.
 
 A function with a second `yield` stays a generator function after the deletion.
 `greet_logged()` in [Retrofitting an Effect](#retrofitting-an-effect)
 makes two requests, one for the greeting and one for the log.
 If you write its first line as a bare `greet(name)`, every check passes.
-The type checker and `ruff` accept the code, the program runs,
+In that version, the type checker and `ruff` accept the code, the program runs,
 the log gains both entries, and no greeting prints.
 The call still builds a description, and the body discards it unrun.
 
@@ -671,7 +674,7 @@ When an Effect appears to do nothing, look for a missing `yield from`.
 
 You declare the Ability in the annotation,
 and the type checker verifies the declaration.
-If you annotate `greet_all()` as pure, the checker reports the mismatch:
+If you annotate `greet_all()` as pure, the type checker reports the mismatch:
 
 ```python
 # undeclared_need.py
@@ -752,7 +755,7 @@ while `greet()` keeps its signature.
 
 Stateless still requires those edits.
 The type checker names each place that needs changing,
-and the check passes once you have fixed the last one.
+and the check passes once you fix the last one.
 To see that, delete `| Need[Log]` from either annotation.
 If you remove it from `greet_all()`,
 `ty` reports an `invalid-yield` at `yield from greet_logged(name)`,
@@ -763,29 +766,29 @@ If you forget the new argument at a call, `ty` reports a `missing-argument`.
 The difference is how many places you edit.
 A new parameter changes every call site along with every signature,
 and each function in between accepts the object and hands it onward.
-A new Ability changes the signatures and the edge's `supply()` call.
+A new Ability changes the signatures and the `supply()` call at the edge.
 `yield from greet_logged(name)` stays as it is.
 The instance appears once, at `supply()`.
 
 Multiple Abilities combine with `|` because the union describes one request at a time.
-Each `yield` in `greet_all()` produces either a `Need[Console]` or a `Need[Log]`.
+Each request `greet_all()` yields is either a `Need[Console]` or a `Need[Log]`.
 Over the whole run, `greet_all()` makes both kinds of request,
 so `supply()` must provide a `Console` and a `Log`.
 
 `supply()` can also provide them one layer at a time.
-`supply(Log())(greet_all)` still has the type `(list[str]) -> Depend[Need[Console], None]`,
+`supply(Log())(greet_all)` has the type `(list[str]) -> Depend[Need[Console], None]`,
 and wrapping that in `supply(Console())` leaves `(list[str]) -> Success[None]`.
 You can bind some Abilities near the Effect and the others at the edge.
 The type records which Abilities each layer leaves open.
 
-The repeated union is the shape a `type` alias normally shortens.
-Elsewhere the book writes one.
+A `type` alias normally shortens a repeated union like this one.
+Elsewhere the book writes such an alias.
 Under `ty` 0.0.104 the alias checks the same as the written-out signature.
 `ty` reports an `invalid-yield` for an undeclared Ability behind `type Greeting = Depend[...]`,
 as it does for the written-out signature of `greet_all()` above.
 This book still writes out Effect signatures in full,
 because the union is the information.
-Every channel a function uses stays visible at the point of use.
+Every Ability and failure a function declares stays visible at the point of use.
 Before you shorten one with an alias,
 confirm that your type checker reports an undeclared Ability through it.
 
@@ -856,11 +859,11 @@ because `holds(material, nailer)` is easy to call four times.
 The two styles differ when a function three calls deep requests the dependency.
 The parameter version then adds two parameters to every function on the path.
 This version changes the table row alone.
-`audit_log.py`'s `greet_all()` is that depth.
+The call chain in `audit_log.py` is that deep.
 The test calls `greet_all()`, `greet_all()` calls `greet_logged()`,
 and `greet_logged()` requests `Need[Log]` and calls `greet()`,
 which requests `Need[Console]`.
-Varying the environment there again touches the table row alone:
+Varying the environment there again changes the table row alone:
 
 ```python
 # test_audit_log.py
@@ -879,19 +882,19 @@ def test_greet_all(console: Console) -> None:
 ```
 
 `greet_all()` and `greet_logged()` keep their parameter lists.
-The parameter-passed version adds a `console` argument to both,
-although `greet()`, one level further down, is the one function that uses it.
+The parameter version adds a `console` argument to both, although `greet()`,
+one level further down, is the one function that uses it.
 
 ## Supplying an Interface
 
 [Swapping the Implementation](#swapping-the-implementation)
-substitutes a `Recorder` for a `Console` but postpones the reason for using `as_type(Console)`.
+substitutes a `Recorder` for a `Console` through `as_type(Console)`.
 The substitution poses two questions,
 one for the type checker and one for the runtime check.
 
 ### What the Type Checker Reads
 
-`supply()` reads the Ability from the declared type of its argument.
+`supply()` reads the Ability from the static type of its argument.
 Handing `recorder` to `supply()` therefore builds a handler for `Need[Recorder]`,
 a different Ability from the `Need[Console]` that `greet()` requests.
 `as_type(Console)(recorder)` converts the argument's static type into `Console`,
@@ -901,10 +904,10 @@ At runtime `as_type(Console)` returns an identity function,
 which hands back the object it receives.
 Only the static type changes.
 
-`typing.cast(Console, recorder)` produces the same static type,
+`typing.cast(Console, recorder)` produces the same static type as `as_type(Console)(recorder)`,
 but the two differ in what they check.
 `cast()` is an unchecked assertion.
-The type checker accepts it whatever the object's type.
+The type checker accepts it for an object of any type.
 `as_type(Console)` returns a function annotated `(Console) -> Console`,
 so the type checker verifies that the object it receives is a `Console`.
 `as_type()` widens to a supertype.
@@ -971,7 +974,7 @@ and the second is to separate each Effect's interface from its implementation.
 `Console` as a `Protocol` is the interface.
 `Terminal` is one implementation and `Recorder` is another.
 `greet()` refers to neither.
-`Recorder` qualifies as a `Console` without inheriting from `Console`,
+An implementation qualifies as a `Console` without inheriting from it,
 because a `Protocol` matches on structure.
 
 `supply()` matches requests with `isinstance()`.
@@ -1009,15 +1012,16 @@ Structural matching decides what `isinstance()` accepts,
 not what the type checker accepts.
 `supply(Terminal())` still builds a handler for `Need[Terminal]`,
 which leaves `greet()`'s `Need[Console]` in place.
-The unhandled request stays in the type that reaches `run()`.
+The unhandled request stays in the type of the Effect that `run()` receives.
 That call is the line the type checker reports.
 An interface needs the `as_type()` upcast more than a base class does.
 You can instantiate a concrete `Console` and supply it with no upcast,
-but an interface reaches `supply()` only through an implementation.
+but you cannot instantiate a `Protocol`,
+so every object you supply for it has an implementation's static type.
 
 `console_protocol.py` is the form to write in production.
 Most listings in these two chapters use a concrete `Console`,
-because an interface adds an `as_type()` call wherever an implementation goes straight to `supply()`.
+because an interface adds an `as_type()` call wherever a listing passes an implementation directly to `supply()`.
 [Composing a Program](47_Effects--Stateless_in_Practice.md#composing-a-program)
 declares its dependencies as `Protocol`s and shows the annotation that replaces that call.
 
@@ -1063,10 +1067,10 @@ print(capture.messages)
 `Terminal` and `Capture` share no base class, and neither names the other.
 Both satisfy `Console` structurally, so `isinstance()` accepts either.
 `supply()` hands over the instance it examines first.
-`greet()` runs the same body in both runs.
+`greet()`'s body is the same in both runs.
 The type checker accepts both runs alike,
 because both bindings have the same type.
-Both instances go through `as_type(Console)`,
+Both instances need `as_type(Console)`,
 since each is a `Console` by structure alone.
 
 Here Stateless lacks a check ZIO performs.
@@ -1123,12 +1127,12 @@ greet("Alice")  # [2]
 The type is the registration key.
 A dictionary matches the key exactly,
 so `get(Console)` never returns a subclass registered under its own name.
-`supply()` takes bare instances and matches a request with `isinstance()`,
+By contrast, `supply()` takes bare instances and matches a request with `isinstance()`,
 so two instances that satisfy one `Need` are [ambiguous](#when-two-implementations-match).
 
 Besides matching lookups,
 the DI registration key sets the type for which an instance answers.
-`register(Console, Recorder())` binds an implementation to the type the caller requests,
+A call such as `register(Console, Recorder())` binds an implementation to the type the caller requests,
 as `as_type(Console)` does for `supply()`.
 `supply()` [reads each Ability from its argument's static type](#supplying-an-interface),
 so `supply(recorder)` is a `Handler[Need[Recorder]]`,
@@ -1169,7 +1173,7 @@ The dependency arrives as a parameter,
 so a static type checker validates every call that supplies one.
 You bind the dependency once, at the endpoint or the constructor.
 Every function that boundary calls passes the dependency onward as a parameter,
-the same parameter an EMS replaces with a channel in the return type.
+which an EMS replaces with an Ability in the return type.
 
 An EMS requires more than the service locator does.
 The dependency must appear in the signature so the type checker can verify it.
@@ -1181,7 +1185,7 @@ so the type checker reports errors that a programmer's memory or an exhaustive t
 
 Stateless has no container.
 `supply()` is a function call, and its arguments are the bindings.
-Having no container has three consequences:
+Three consequences follow:
 
 1. Stateless checks come before the program runs.
    A DI container reports a missing registration at the moment a lookup runs,
@@ -1190,7 +1194,7 @@ Having no container has three consequences:
    the type checker reports the [unsupplied `Need[Console]`](#forgetting-to-supply).
 
 2. Stateless bindings are per call rather than per process.
-   DI usually holds one type binding for the life of the program.
+   DI usually holds one binding per type for the life of the program.
    `supply()` binds for one execution of one Effect,
    so two bindings for the same type can be live at once,
    as the screen and memory `Console`s are in [When Two Implementations Match](#when-two-implementations-match).
@@ -1207,26 +1211,25 @@ Having no container has three consequences:
 
 An Ability that every caller inherits is also a drawback.
 [Adding an Ability](#retrofitting-an-effect)
-such as `Need[Log]` to a working function rewrites the return type of every function above it.
+such as `Need[Log]` to a working function changes the return type of every function above it.
 Under DI, the same change leaves every signature as it was.
 
 Type checking is the earliest practical time to discover a forgotten dependency,
-so the objection concerns churn and coupling rather than correctness.
+so the drawback concerns churn and coupling rather than correctness.
 A pass-through function such as `greet_all()` still declares `Need[Log]` in its type.
 Taking that Ability back out later changes every signature on the path a second time.
 People made the same complaint against [Java's checked exceptions](44_Effects--Effect_Management.md#catch-the-exception-you-expect),
 where an exception added three levels down meant editing every signature above it.
-That complaint prompts [Effects Propagate, and the Type Checker Verifies It](#effects-propagate-and-the-type-checker-verifies-it)
-to compare the propagation to `async`.
+That complaint is the reason [Effects Propagate, and the Type Checker Verifies It](#effects-propagate-and-the-type-checker-verifies-it)
+compares the propagation to `async`.
 
 ## Waiting on a Coroutine
 
-So far `Async` has appeared in one place: the type `run()` expects.
-That type names `Async` because `run()` answers `Async` requests.
+The type `run()` expects names `Async` because `run()` answers `Async` requests.
 `wait()` makes an `Async` request,
 so a function that calls it declares `Async` in its signature.
 `wait()` accepts any awaitable,
-and `yield from wait(...)` produces the value that awaitable produces:
+and `yield from wait(...)` evaluates to that awaitable's result:
 
 ```python
 # stateless_coroutine.py
@@ -1248,14 +1251,14 @@ if __name__ == "__main__":
 
 Every `Depend` signature so far reads `Depend[Need[...], ...]`,
 while this one writes the Ability bare.
-One rule covers both cases: the channel holds Abilities.
+One rule covers both cases: the first parameter of `Depend` holds Abilities.
 `Async` is an Ability, so it sits there bare.
 `Console` is an ordinary class,
 and `Need[Console]` is the Ability that asks for it.
 The first type parameter's bound is `Ability`,
 so the type checker rejects `Depend[Console, None]` at the annotation.
 [Abilities Are Not Special](47_Effects--Stateless_in_Practice.md#abilities-are-not-special)
-writes an Ability from scratch and explains what that type bound rejects.
+defines a custom Ability and explains what that type bound rejects.
 
 An `Async` request carries an awaitable and asks the driver to await it.
 `run()` does that with the event loop it starts.
@@ -1295,7 +1298,8 @@ def delayed_sum(
 `sleep()` returns `Depend[Need[Time] | Async, None]`,
 so `delayed_sum()` inherits both Abilities.
 
-Supplying the library's own `Time` waits for real time:
+With the library's own `Time` supplied,
+each `sleep(0.01)` waits the full interval:
 
 ```python
 # real_clock.py
@@ -1368,19 +1372,19 @@ The same three sleeps take at least 30 milliseconds in `real_clock.py`.
 Here `Instant` answers each one at once.
 
 `delayed_sum()` runs the same body with either clock.
-The subclass goes through [`as_type(Time)`](#supplying-an-interface),
-as `Recorder` goes through `as_type(Console)`.
+The test upcasts `clock` with [`as_type(Time)`](#supplying-an-interface),
+as `test_greeter.py` upcasts `recorder` with `as_type(Console)`.
 
 `Instant` is a record because `Time` is a frozen data class,
 and a data class that inherits from a frozen one must be frozen too.
 The record drops its slots because `Time` declares none.
 Freezing prevents rebinding `waited`.
-`sleep()` can still append to the list it holds.
+`sleep()` can still append to the list that `waited` holds.
 
 ## Where to Call `run()`
 
 `run()` starts an event loop and drives the Effect inside it.
-Its entire body is `return asyncio.run(run_async(effect))`.
+Its body is `return asyncio.run(run_async(effect))`.
 Building and tearing down that loop takes time,
 even for an Effect with no `Async` in it.
 On Windows, `run(success(42))` measured about 650 microseconds,
@@ -1421,7 +1425,8 @@ The output above shows standard output alone, so it leaves out the warning.
 The warning is harmless, and a reliable sign of this mistake.
 It appears whenever asynchronous code calls `run()`.
 
-`run_async()` is the same driver packaged as a coroutine, so you `await` it.
+`run_async()` is the driver that `run()` uses, packaged as a coroutine,
+so you `await` it.
 A synchronous program calls `run()` once at its outermost edge.
 An asynchronous program such as a web service or a bot awaits `run_async()` at the edge of each request.
 
@@ -1490,8 +1495,8 @@ but it specifies the exception types it lifts and puts them in the signature rat
 
 ### A Failure Travels as a Value
 
-Calling `score()` defers the lookup and returns an `Effect`.
-If you advance the `Effect` one step with `next()`,
+Calling `score()` defers the lookup and returns an Effect.
+If you advance the Effect one step with `next()`,
 `next()` returns the `KeyError` as a value instead of raising it:
 
 ```python
@@ -1536,8 +1541,8 @@ Every function on the path must declare the `KeyError`.
 
 Declaring an error leaves handling it up to you.
 `run()` accepts an Effect with a failure still in its error channel.
-The driver throws the failure back into the generator,
-and when no `catch()` wraps the function,
+The driver throws the failure back into the generator.
+When no `catch()` wraps the function,
 the failure propagates out of `run()` as an ordinary exception:
 
 ```python
@@ -1554,8 +1559,7 @@ expect(KeyError, run, supply(Console())(announce)("Carol"))
 The error channel records which failures can occur.
 `run()` turns any that reach it back into ordinary Python exceptions.
 
-The channel carries the failures `@throws` lifted into it.
-`@throws` lifts the exception types it specifies.
+`@throws` lifts the exception types it specifies into the error channel.
 An exception of any other type passes through the decorator as an ordinary raised exception.
 The exception stays out of every signature,
 so the type checker accepts the code that raises it.
@@ -1567,7 +1571,7 @@ examines that limit.
 
 The driver throws a failure back into the generator,
 so an ordinary `try`/`except` around a `yield from` catches it,
-provided no handler sits between `run()` and that Effect.
+provided no handler sits between `run()` and that generator.
 The generator yields the exception as a value,
 `run()` receives it and calls the generator's `throw()` method,
 and `throw()` raises the exception at the [innermost suspended `yield`](45_Effects--Generators.md#throw-and-close-reach-the-innermost-generator).
@@ -1576,10 +1580,10 @@ The exception propagates out of that Effect as any raised exception does,
 and the `except` clause around the `yield from` catches it.
 
 Catching is different from handling.
-The `KeyError` stays in the channel,
+The caught failure stays in the error channel,
 so the signature keeps declaring a failure that can no longer escape.
 `catch()` alone moves an error out of the error channel and into the result.
-A `catch()` further out takes the `KeyError` before an inner `except` can catch it.
+A `catch()` further out takes the failure before an inner `except` can catch it.
 One listing shows an `except`, a `catch()`,
 and a `catch()` wrapped around an `except`:
 
@@ -1614,8 +1618,8 @@ if __name__ == "__main__":
 #: KeyError('Carol')
 ```
 
-`run()` returns `Carol: unknown` from both `guarded()` and `moved()`,
-and the two differ in their types.
+`run()` returns `Carol: unknown` from both `guarded()` and `moved()`.
+The two differ in their types.
 `guarded()` must keep declaring a `KeyError` it can no longer emit,
 while `moved()` is a `Success`.
 Wrapping `guarded()` in a `catch()` makes its inner `except` dead code,
@@ -1623,7 +1627,7 @@ because `catch()` matches the yielded value before the driver gets it,
 returns that value as the result, and never resumes the inner generator.
 
 `supply()` returns a [`Handler`](#supplying-the-dependency),
-and that `Handler` breaks the condition that no handler sits between `run()` and the Effect.
+and that `Handler` breaks the condition that no handler sits between `run()` and the generator.
 Its loop passes an error outward instead of throwing that error back into the Effect it wraps,
 so the driver's `throw()` raises that error in the `Handler`'s own stack frame,
 not `guarded()`'s stack frame.
@@ -1649,10 +1653,10 @@ Wrapping `guarded()` in that `supply()` is enough to keep the `KeyError` out of 
 
 `catch()` empties the error channel the way `supply()` empties the Ability channel,
 but the two do different things with what they remove.
-`supply()` provides the Ability inside the Effect,
+`supply()` answers the Ability inside the Effect,
 so [the Ability parameter becomes `Never`](#supplying-the-dependency)
 and the result type stays as it was.
-`catch()` takes out the exception that `@throws` put into the channel and returns it as a value in the result:
+`catch()` takes out the exception that `@throws` puts into the error channel and returns it as a value in the result:
 
 ```python
 # catch_score.py
@@ -1687,7 +1691,7 @@ The signature for `score()` is `(str) -> Try[KeyError, int]`.
 `catch(KeyError)(score)` changes it to `(str) -> Success[int | KeyError]`.
 `catch()` removes the error from the error type parameter,
 which becomes `Never`, and adds it to the result type parameter.
-That makes `value` something to `match` on rather than an exception to catch.
+So `report()` handles the failure with a `match` rather than an `except`.
 
 `Success` describes the Effect rather than the lookup.
 Both channels are empty,
@@ -1700,9 +1704,9 @@ A returned `KeyError` is data.
 `supply()` wraps a function `run()` drives.
 The `catch()` here still works, because it matches the yielded value.
 The `except` clause in `guarded()` relies on the driver to throw the error back in.
-The `Handler` that `supply()` puts between them passes the error outward instead.
+The `Handler` that `supply()` puts between them passes the error outward.
 
-Moving the error into the result forces every caller to match on it.
+With the error in the result, every caller must match on it.
 If you drop the `match` and use `value` as a number,
 the type checker reports an error:
 
@@ -1791,12 +1795,12 @@ Each failure reaches the `match` in `all_handled()` as a value.
 
 `one` is `(str) -> Try[ValueError, int | KeyError]`.
 The caught error moves to the result.
-The uncaught one remains in the channel.
-`one_unhandled()` leaves `ValueError` in the channel,
+The uncaught one remains in the error channel.
+`one_unhandled()` leaves `ValueError` in the error channel,
 so its signature must declare that failure.
 Calling it on `"Bob"` propagates that failure to the `run()` call at the program's edge,
 which raises it as an ordinary exception,
-like `error_escapes.py` does for a single error.
+as `error_escapes.py` does for a single error.
 
 ```python
 # test_catch_subset.py
@@ -1834,30 +1838,32 @@ two of which take a vocabulary of their own:
 2. A failure is an exception.
    `@throws` lifts it into the type, and `catch()` takes it back out as a value.
 3. The driver answers `Async` on its own and throws `MissingAbilityError` into the Effect for every other Ability.
-   `Async` sits in the same channel as a `Need`,
-   and `run()` answers it by awaiting the request's awaitable in the event loop it starts.
+   `Async` sits in the same channel as a `Need`, and to answer it,
+   `run()` awaits the request's awaitable in the event loop it starts.
 
 The vocabularies differ, but the operation underneath them is the same:
 each subtracts from the type.
 `supply()` removes an Ability from the union,
-and the channel reads `Never` once a handler answers the last Ability.
+and the Ability channel reads `Never` once a handler answers the last Ability.
 `catch()` removes an error and moves it into the result,
 where a `match` must account for it.
 An Effect with both channels emptied is a `Success`.
 
 `run()` accepts more than a `Success`.
 Its parameter is `Effect[Async, Exception, R]`,
-so an `Async` request or a declared failure can still remain in its type when you call it.
+so the Effect you pass to it can still declare `Async` or a failure.
 The channels resolve differently:
 
-- `unsupplied.py` shows the type checker rejecting a `run()` call whose Effect still declares an Ability,
+- In `unsupplied.py`, the type checker rejects a `run()` call whose Effect still declares an Ability,
   before the program starts.
-- `error_escapes.py` shows `run()` accepting an Effect that still declares a failure,
-  then raising that failure at the edge.
+- In `error_escapes.py`,
+  `run()` accepts an Effect that still declares a failure,
+  then raises that failure at the edge.
 
 The difference follows from what each channel holds.
 An unbound dependency has no answer anywhere in the program,
-so a driver that receives one has one response, `MissingAbilityError`.
+so a driver that receives such a request has one response,
+`MissingAbilityError`.
 An unhandled failure has a clear meaning at the edge: raise the exception,
 which Python does with or without the Effect type.
 So the two channels guarantee different things.
@@ -1868,7 +1874,7 @@ Forgetting to declare either is a type error.
 
 Every Ability in this chapter comes from the library.
 [Stateless in Practice](47_Effects--Stateless_in_Practice.md)
-writes Abilities of your own and the handlers that answer them.
+shows how to write Abilities of your own and the handlers that answer them.
 
 ## Exercises
 

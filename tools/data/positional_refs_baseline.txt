@@ -131,9 +131,9 @@ Chapters/45_Effects--Generators.md	the innermost `yield`	Every transition nests 
 Chapters/45_Effects--Generators.md	the last call	Conway calls that test "a switch which bifurcates the subroutine and selects the part to be used at each call depending on the situation at the last call." A harder task, he notes, "would necessitate an absurd arrangement of switches."
 Chapters/45_Effects--Generators.md	the outer `except GeneratorExit`	No `except` clause specifies `TypeError`, so the exception leaves the inner `try` through its `finally` block, which prints `cleanup`, and passes the outer `except GeneratorExit` clause unmatched.
 Chapters/46_Effects--Stateless.md	both runs	The type checker accepts both runs alike, because both bindings have the same type.
-Chapters/46_Effects--Stateless.md	both runs	`greet()` runs the same body in both runs.
+Chapters/46_Effects--Stateless.md	both runs	`greet()`'s body is the same in both runs.
 Chapters/46_Effects--Stateless.md	second run	Storing one in a registry to run later, handing the same one to two consumers, or keeping one around to retry after a failure---each of these returns `None` on the second run instead of raising an exception.
-Chapters/46_Effects--Stateless.md	second run	The second run wraps `greet()` in its own `supply()` first, and that inner `supply()` empties the Ability channel before any request reaches `fallback`.
+Chapters/46_Effects--Stateless.md	second run	The second run wraps `greet()` in its own `supply()` first, and that inner `supply()` answers the `Need[Console]` request before it reaches `fallback`.
 Chapters/46_Effects--Stateless.md	the inner `except`	The error propagates out of `run()`, and the inner `except` never runs:
 Chapters/47_Effects--Stateless_in_Practice.md	Each run	Each run's last line is the outcome that `report()` returns.
 Chapters/47_Effects--Stateless_in_Practice.md	The outer loop	The outer loop then calls `plug()` again for a replacement.

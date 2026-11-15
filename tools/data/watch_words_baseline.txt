@@ -575,7 +575,6 @@ Chapters/46_Effects--Stateless.md	contains no: CODE is not an CODE and contains 
 Chapters/46_Effects--Stateless.md	cost: That is the cost behind "a synchronous program calls it once
 Chapters/46_Effects--Stateless.md	declares none: The record drops its slots because CODE declares none
 Chapters/46_Effects--Stateless.md	do nothing: When an Effect appears to do nothing
-Chapters/46_Effects--Stateless.md	even: CODE must declare the CODE even though no CODE appears in its body
 Chapters/46_Effects--Stateless.md	even: even for an Effect with no CODE in it
 Chapters/46_Effects--Stateless.md	exactly: A dictionary matches the key exactly
 Chapters/46_Effects--Stateless.md	has no: An interface has no implementation to inherit by accident
@@ -585,7 +584,6 @@ Chapters/46_Effects--Stateless.md	has no: Stateless has no container
 Chapters/46_Effects--Stateless.md	has no: Stateless has no such registration
 Chapters/46_Effects--Stateless.md	has no: it has no values and is a subtype of every other type
 Chapters/46_Effects--Stateless.md	has no: so its Effect type has no dependency to declare
-Chapters/46_Effects--Stateless.md	having no: Having no container has three consequences
 Chapters/46_Effects--Stateless.md	is how: The difference is how many places you edit
 Chapters/46_Effects--Stateless.md	is what: CODE is what it produces
 Chapters/46_Effects--Stateless.md	is what: CODE is what the computation needs
@@ -601,17 +599,15 @@ Chapters/46_Effects--Stateless.md	nothing stops: Nothing stops an undeclared Eff
 Chapters/46_Effects--Stateless.md	only: A CODE-shaped value appears in Stateless only after CODE
 Chapters/46_Effects--Stateless.md	only: A function that constructs its own CODE can use only that class
 Chapters/46_Effects--Stateless.md	only: A library acts only on objects handed to it
-Chapters/46_Effects--Stateless.md	only: At runtime it prints only the class of its argument (CODE
 Chapters/46_Effects--Stateless.md	only: CODE is the only CODE here
 Chapters/46_Effects--Stateless.md	only: CODE is the only extra call in that test
 Chapters/46_Effects--Stateless.md	only: Fix the error by changing only the annotation
 Chapters/46_Effects--Stateless.md	only: Only the static type changes
 Chapters/46_Effects--Stateless.md	only: That CODE is the only CODE in CODE
 Chapters/46_Effects--Stateless.md	only: You can catch both errors or only one
-Chapters/46_Effects--Stateless.md	only: but an interface reaches CODE only through an implementation
 Chapters/46_Effects--Stateless.md	only: so looking up a name is the only step and CODE is the only failure
 Chapters/46_Effects--Stateless.md	only: so today the parent contributes only the name CODE matches
-Chapters/46_Effects--Stateless.md	provided no: provided no handler sits between CODE and that Effect
+Chapters/46_Effects--Stateless.md	provided no: provided no handler sits between CODE and that generator
 Chapters/46_Effects--Stateless.md	share no: CODE and CODE share no base class
 Chapters/46_Effects--Stateless.md	takes no: and CODE takes no default argument
 Chapters/47_Effects--Stateless_in_Practice.md	already: CODE and CODE already share a signature

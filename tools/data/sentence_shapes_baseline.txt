@@ -35,7 +35,7 @@ Chapters/45_Effects--Generators.md	[PRT] A generator yields a request out, and t
 Chapters/45_Effects--Generators.md	[PRT] Because each CODE hands a result back to its caller, a recursive generator can combine results on the way back up a tree.
 Chapters/45_Effects--Generators.md	[PRT] Each CODE passes the CODE up and the CODE down unchanged, so the trace repeats the three request lines of CODE before the new one.
 Chapters/46_Effects--Stateless.md	[IMP] Explain what each one catches, and why the checker catches assigning a dropped request but not discarding one.
-Chapters/46_Effects--Stateless.md	[PRT] A handler answers the Abilities CODE gave it and re-yields the rest to the next handler out.
+Chapters/46_Effects--Stateless.md	[PRT] A handler answers the Abilities CODE gives it and re-yields the rest to the next handler out.
 Chapters/47_Effects--Stateless_in_Practice.md	[IMP] Explain what the types claim, what the run does, and which line restores the guarantee.
 Chapters/47_Effects--Stateless_in_Practice.md	[PRT] If you leave the CODE out, the type checker rejects the CODE call.
 Chapters/47_Effects--Stateless_in_Practice.md	[PRT] If you leave the annotation off, CODE raises a CODE at the point of decoration, since that annotation specifies the type a request must match.

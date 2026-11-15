@@ -745,11 +745,12 @@ Chapters/46_Effects--Stateless.md	[BOUND] A failure leaves the error channel in 
 Chapters/46_Effects--Stateless.md	[BOUND] A full EMS does three things, and the second is to separate each Effect's interface from its implementation
 Chapters/46_Effects--Stateless.md	[BOUND] A structural check matches on method names alone, so two supplied objects that both define CODE are indistinguishable
 Chapters/46_Effects--Stateless.md	[BOUND] Because the one CODE runs in the driver, neither CODE nor anything that calls it needs CODE
-Chapters/46_Effects--Stateless.md	[BOUND] Besides its result, an Effect's return type declares two things
-Chapters/46_Effects--Stateless.md	[BOUND] Both instances go through CODE, since each is a CODE by structure alone
+Chapters/46_Effects--Stateless.md	[BOUND] Besides its result, an Effect's type declares two things
+Chapters/46_Effects--Stateless.md	[BOUND] Both instances need CODE, since each is a CODE by structure alone
 Chapters/46_Effects--Stateless.md	[BOUND] CODE accepts an Effect whose yield channel has narrowed to those two, which is all that remains once you supply every other Ability
 Chapters/46_Effects--Stateless.md	[BOUND] CODE alone moves an error out of the error channel and into the result
 Chapters/46_Effects--Stateless.md	[BOUND] CODE binds for one execution of one Effect, so two bindings for the same type can be live at once, as the screen and memory CODEs are in When Two Implementations Match
+Chapters/46_Effects--Stateless.md	[BOUND] CODE depends on its argument alone, and it cannot fail
 Chapters/46_Effects--Stateless.md	[BOUND] CODE is the one decorator that gives a second CODE a result, and it caches rather than replays
 Chapters/46_Effects--Stateless.md	[BOUND] CODE is the only CODE here
 Chapters/46_Effects--Stateless.md	[BOUND] CODE is the only extra call in that test
@@ -758,30 +759,29 @@ Chapters/46_Effects--Stateless.md	[BOUND] CODE stores its values as CODEs, so lo
 Chapters/46_Effects--Stateless.md	[BOUND] CODE supplies two Abilities at one call site
 Chapters/46_Effects--Stateless.md	[BOUND] Everything else is an Ability request
 Chapters/46_Effects--Stateless.md	[BOUND] Explain which of the two shapes CODE requires, and why it takes a schedule and returns a decorator of type CODE, rather than being an operation on an Effect
-Chapters/46_Effects--Stateless.md	[BOUND] Having no container has three consequences
-Chapters/46_Effects--Stateless.md	[BOUND] If you advance the CODE one step with CODE, CODE returns the CODE as a value instead of raising it
+Chapters/46_Effects--Stateless.md	[BOUND] If you advance the Effect one step with CODE, CODE returns the CODE as a value instead of raising it
 Chapters/46_Effects--Stateless.md	[BOUND] If you remove it from CODE, CODE reports an CODE at CODE, since the CODE produces a CODE and the signature now declares CODE alone
 Chapters/46_Effects--Stateless.md	[BOUND] It is an ordinary class whose one method is CODE
 Chapters/46_Effects--Stateless.md	[BOUND] It requests no CODE, so the CODE around it does one thing
 Chapters/46_Effects--Stateless.md	[BOUND] One rule covers both cases
 Chapters/46_Effects--Stateless.md	[BOUND] Python decides generator-function status from the body alone
-Chapters/46_Effects--Stateless.md	[BOUND] So far CODE has appeared in one place
 Chapters/46_Effects--Stateless.md	[BOUND] So the two channels guarantee different things
 Chapters/46_Effects--Stateless.md	[BOUND] That CODE is the only CODE in CODE, so deleting it turns CODE into an ordinary function
 Chapters/46_Effects--Stateless.md	[BOUND] The failure the signature declares is the one the caller sees
 Chapters/46_Effects--Stateless.md	[BOUND] The output above shows standard output alone, so it leaves out the warning
+Chapters/46_Effects--Stateless.md	[BOUND] The parameter version adds a CODE argument to both, although CODE, one level further down, is the one function that uses it
 Chapters/46_Effects--Stateless.md	[BOUND] The parameter version then adds two parameters to every function on the path
-Chapters/46_Effects--Stateless.md	[BOUND] The parameter-passed version adds a CODE argument to both, although CODE, one level further down, is the one function that uses it
 Chapters/46_Effects--Stateless.md	[BOUND] The two calls are identical, and registration sits outside the types, so the type checker accepts both
 Chapters/46_Effects--Stateless.md	[BOUND] The two styles differ when a function three calls deep requests the dependency
 Chapters/46_Effects--Stateless.md	[BOUND] This CODE is the one that returned CODE in CODE
 Chapters/46_Effects--Stateless.md	[BOUND] This chapter builds its own CODE rather than using the one Stateless provides
 Chapters/46_Effects--Stateless.md	[BOUND] This version changes the table row alone
-Chapters/46_Effects--Stateless.md	[BOUND] Those three parameters answer the three questions Effect Management asked of an Effect signature
+Chapters/46_Effects--Stateless.md	[BOUND] Those three parameters answer the three questions Effect Management asks of an Effect signature
 Chapters/46_Effects--Stateless.md	[BOUND] Those two lines do three things
+Chapters/46_Effects--Stateless.md	[BOUND] Three consequences follow
 Chapters/46_Effects--Stateless.md	[BOUND] Two details in CODE matter
 Chapters/46_Effects--Stateless.md	[BOUND] Two implementations sharing one method name stay ambiguous under both CODEs, so say what the technique does and does not prevent
-Chapters/46_Effects--Stateless.md	[BOUND] Varying the environment there again touches the table row alone
+Chapters/46_Effects--Stateless.md	[BOUND] Varying the environment there again changes the table row alone
 Chapters/46_Effects--Stateless.md	[BOUND] ZIO reports two implementations of one requirement as a compile-time error naming both candidates, because its CODE resolves the dependency graph during compilation
 Chapters/47_Effects--Stateless_in_Practice.md	[BOUND] A function that receives everything it uses as arguments is easier to test on its own, and the split keeps the Ability requests in one place
 Chapters/47_Effects--Stateless_in_Practice.md	[BOUND] A test that runs at nine in the morning reads the clock twice on the same date and passes, so the only evidence is a bug report saying the log file is occasionally short by a few lines
