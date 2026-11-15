@@ -3308,6 +3308,94 @@ entry and Accrued shapes) | `[SAME]` (shape 5) and `[SAME+NEW]`
 (shape 6), with a shared baseline of judged keeps, in
 `tools/sentence_shapes.py` | this file.
 
+### R64. "Can" where the sentence reports what happens is the plain present
+
+**Test.** A modal "can" on a verb whose subject is a thing, in a
+sentence that reports what that thing does in the case on the page:
+the test the next sentence shows catching the failure, the handler the
+run shows reaching the state. The reader takes "can" as possibility, so
+the modal hedges a fact. Write the plain present: "A test can catch the
+broken contract" is "A test catches the broken contract". Ask: is the
+sentence about whether the thing is able to, or about what it does
+here? The same holds where the passage has stated the behavior as a
+fact ("it stops when it has enough values") and a later sentence
+restates it with "can". The style guide's "can" bullet keeps "can"
+for a standing capability, and this rule is its other half.
+
+**Keep when.** The capability is the claim ("a `set` can hold any
+hashable object", "`survey()` can delegate to either"); the subject is
+a person and the "can" is a choice or a permission ("you can skim");
+a condition sits on the page ("if you remove the guard, a subclass can
+take the slots back"); the modal is negated ("cannot").
+
+**Sightings.** 2 chapters, with a book sweep between them. Promoted by
+Bruce 2026-11-14 on the second chapter; was C49. The first, Bruce
+2026-10-30 on `20_Patterns--Rethinking_Objects`:
+"A test can catch the broken contract." (my rewrite of "No tool catches
+the broken contract, but a test can.") -> "A test catches the broken
+contract." Bruce: "note that this could be 'catches' rather than 'can
+catch'. What kind of rule can you create to discover and fix things like
+this." `[CAN]` in `tip sentence-shapes ARGS=--survey` lists the
+candidates since that day (`can_event()` in `tools/sentence_shapes.py`):
+a main-clause "can" on a lexical verb, a thing as subject, no negation,
+no "also"/"still"/"even"/"always", and no condition or option word in
+the sentence. The book has about 800 prose lines with "can"; the rule
+is a survey because the parse cannot tell a capability stated as a fact
+from a hedged event.
+- Book sweep 2026-10-30, the same day: 23 Opus agents read the 298
+  `[CAN]` hits (one to three chapters each, with their Solutions files)
+  and rewrote 21, keeping 277. The rewrites all had the chapter 20
+  shape, a generic or definite subject followed by the listing that
+  shows the event: "A test can check the model with no window" ->
+  "checks" (38, `test_robot.py` below it), "A decorator can capture
+  that pattern" -> "captures" (42, `@safe` follows), "a test can bind
+  to `Recorder`" -> "binds" (46, `test_greeter.py` follows), "`yield
+  from` can take over that job:" -> "takes over" (45, lead-in to
+  `yield_from_nested.py`), "so the listing can print `f.closed`" ->
+  "prints" (04). The keeps, by the agents' labels: a hazard or race
+  ("can fail", "can each run the constructor"), what a construct
+  permits in general ("a comprehension can use `:=`"), one option
+  among several ("A `__getattr__()` proxy can annotate it `Service`"),
+  a contrast with an inability ("can build the registry, but it stops
+  at direct subclasses"), a purpose clause ("so the listing can show
+  the runtime failure"), and an exercise or hint. The agents'
+  closest calls were sentences true of the listing but phrased as the
+  reason the design works ("Because the machine is deterministic, a
+  test can drive it"); they kept those. Bruce read every close call
+  in `build/can-2026-10-30/LEFTOVERS.md` the same day and kept them
+  all, so a "can" that gives the reason a design works, with the
+  listing as its evidence, is a keep, as is a "can" paired with a
+  "cannot" or set against a sibling option. Yield 7%, so the shape
+  is rare in this book; the rule stays a survey for new drafts.
+- Reread 2026-11-09, before the hits were recorded as judged in the
+  survey baseline: two Opus agents read the 278 hits then standing
+  (259 of them sentences the first sweep had read, 19 written since)
+  and rewrote none; the session read the 19 new ones and a
+  one-in-eight sample of the rest. A lead-in keeps its "can" when its
+  subject is generic ("A generator can wrap an iterator and check
+  each item, in fewer lines:", where the plain present would say that
+  every generator does) or when it sets one design beside a sibling
+  ("`slope()` can catch `ZeroDivisionError` ... instead of
+  introducing a new type:"). The first sweep's rewrites had a
+  specific subject and no sibling ("`yield from` can take over that
+  job:").
+- `45_Effects--Generators` 2026-11-14, was Claude-written an hour
+  before, Bruce's hand: "The producer computes a value each time the
+  consumer's loop asks for one, so the consumer can stop when it has
+  enough values, whether or not the producer has more." -> "The
+  producer computes a value only when the consumer loop asks for one.
+  The consumer stops when it has enough values, whether or not the
+  producer has more." The section's second paragraph says the
+  consumer "stops when it has enough values", and "can" turned that
+  statement into an option. The second chapter, after chapter 20.
+  (The sentence was cut later that day, when each consumer in the
+  section's listings gained a `break` that shows it.)
+
+**Home.** CLAUDE.md (global, the "can"/"could" bullet);
+`tools/sentence_shapes.py` (`[CAN]`, with its read keeps in
+`tools/data/sentence_shapes_survey_baseline.txt` since 2026-11-09);
+the `activate` skill's Accrued patterns; this file.
+
 ## Candidates
 
 One sighting each. Logged, not applied. A second sighting in a different
@@ -4079,89 +4167,6 @@ Bruce's.
 **Home.** this file only.
 
 ---
-
-### C49. "Can" where the sentence reports what happens is the plain present
-
-**Test.** A modal "can" on a verb whose subject is a thing, in a
-sentence that reports what that thing does in the case on the page:
-the test the next sentence shows catching the failure, the handler the
-run shows reaching the state. The reader takes "can" as possibility, so
-the modal hedges a fact. Write the plain present: "A test can catch the
-broken contract" is "A test catches the broken contract". Ask: is the
-sentence about whether the thing is able to, or about what it does
-here? The style guide's "can" bullet keeps "can" for a standing
-capability, and this candidate is its other half.
-
-**Keep when.** The capability is the claim ("a `set` can hold any
-hashable object", "`survey()` can delegate to either"); the subject is
-a person and the "can" is a choice or a permission ("you can skim");
-a condition sits on the page ("if you remove the guard, a subclass can
-take the slots back"); the modal is negated ("cannot").
-
-**Sightings.** 1, Bruce 2026-10-30 on `20_Patterns--Rethinking_Objects`:
-"A test can catch the broken contract." (my rewrite of "No tool catches
-the broken contract, but a test can.") -> "A test catches the broken
-contract." Bruce: "note that this could be 'catches' rather than 'can
-catch'. What kind of rule can you create to discover and fix things like
-this." `[CAN]` in `tip sentence-shapes ARGS=--survey` lists the
-candidates since that day (`can_event()` in `tools/sentence_shapes.py`):
-a main-clause "can" on a lexical verb, a thing as subject, no negation,
-no "also"/"still"/"even"/"always", and no condition or option word in
-the sentence. The book has about 800 prose lines with "can"; the rule
-is a survey because the parse cannot tell a capability stated as a fact
-from a hedged event.
-- Book sweep 2026-10-30, the same day: 23 Opus agents read the 298
-  `[CAN]` hits (one to three chapters each, with their Solutions files)
-  and rewrote 21, keeping 277. The rewrites all had the chapter 20
-  shape, a generic or definite subject followed by the listing that
-  shows the event: "A test can check the model with no window" ->
-  "checks" (38, `test_robot.py` below it), "A decorator can capture
-  that pattern" -> "captures" (42, `@safe` follows), "a test can bind
-  to `Recorder`" -> "binds" (46, `test_greeter.py` follows), "`yield
-  from` can take over that job:" -> "takes over" (45, lead-in to
-  `yield_from_nested.py`), "so the listing can print `f.closed`" ->
-  "prints" (04). The keeps, by the agents' labels: a hazard or race
-  ("can fail", "can each run the constructor"), what a construct
-  permits in general ("a comprehension can use `:=`"), one option
-  among several ("A `__getattr__()` proxy can annotate it `Service`"),
-  a contrast with an inability ("can build the registry, but it stops
-  at direct subclasses"), a purpose clause ("so the listing can show
-  the runtime failure"), and an exercise or hint. The agents'
-  closest calls were sentences true of the listing but phrased as the
-  reason the design works ("Because the machine is deterministic, a
-  test can drive it"); they kept those. Bruce read every close call
-  in `build/can-2026-10-30/LEFTOVERS.md` the same day and kept them
-  all, so a "can" that gives the reason a design works, with the
-  listing as its evidence, is a keep, as is a "can" paired with a
-  "cannot" or set against a sibling option. Yield 7%, so the shape
-  is rare in this book; the rule stays a survey for new drafts.
-- Reread 2026-11-09, before the hits were recorded as judged in the
-  survey baseline: two Opus agents read the 278 hits then standing
-  (259 of them sentences the first sweep had read, 19 written since)
-  and rewrote none; the session read the 19 new ones and a
-  one-in-eight sample of the rest. A lead-in keeps its "can" when its
-  subject is generic ("A generator can wrap an iterator and check
-  each item, in fewer lines:", where the plain present would say that
-  every generator does) or when it sets one design beside a sibling
-  ("`slope()` can catch `ZeroDivisionError` ... instead of
-  introducing a new type:"). The first sweep's rewrites had a
-  specific subject and no sibling ("`yield from` can take over that
-  job:").
-- `45_Effects--Generators` 2026-11-14, was Claude-written an hour
-  before, Bruce's hand: "The producer computes a value each time the
-  consumer's loop asks for one, so the consumer can stop when it has
-  enough values, whether or not the producer has more." -> "The
-  producer computes a value only when the consumer loop asks for one.
-  The consumer stops when it has enough values, whether or not the
-  producer has more." The section's second paragraph says the
-  consumer "stops when it has enough values", and "can" turned that
-  statement into an option. A second chapter after chapter 20, so
-  promotion to a rule is proposed to Bruce.
-
-**Home.** CLAUDE.md (global, the "can"/"could" bullet);
-`tools/sentence_shapes.py` (`[CAN]`, with its read keeps in
-`tools/data/sentence_shapes_survey_baseline.txt` since 2026-11-09);
-the `activate` skill's Accrued patterns; this file.
 
 ### C50. A part noun names its owner when a second owner is on the page
 
