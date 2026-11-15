@@ -2339,9 +2339,9 @@ with three differences:
 PEP 255's authors wanted the useful part of a coroutine without the whole mechanism.
 The useful part is that a suspended generator keeps its [execution frame](05_Foundations--Functions.md#names-inside-a-function)
 alive, whereas an ordinary function discards its stack frame when the function returns.
-At a `yield`, Python unlinks the generator's execution frame from the call stack,
-after which the execution frame lives on the heap inside the generator object,
-with its locals and position intact.
+At a `yield`, Python unlinks the generator's execution frame from the call stack.
+The execution frame lives on the heap inside the generator object,
+so it stays there with its locals and position intact.
 Resuming the generator links that frame back into the call stack.
 
 The PEP cites the "pleasant solutions" of three earlier languages:
