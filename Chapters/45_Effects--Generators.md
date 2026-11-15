@@ -2338,13 +2338,11 @@ with three differences:
 
 PEP 255's authors wanted the useful part of a coroutine without the whole mechanism.
 The useful part is that a suspended generator keeps its [execution frame](05_Foundations--Functions.md#names-inside-a-function)
-alive, and a later call resumes it.
-Python discards a function's stack frame when the function returns.
-At `yield`, Python unlinks the generator's execution frame from the call stack,
-so the frame stops being a stack frame.
-The execution frame lives on the heap inside the generator object,
-which exposes it as `gi_frame`, with its locals and position intact.
-The call that resumes the generator links that frame back into the call stack.
+alive, whereas an ordinary function discards its stack frame when the function returns.
+At a `yield`, Python unlinks the generator's execution frame from the call stack,
+after which the execution frame lives on the heap inside the generator object,
+with its locals and position intact.
+Resuming the generator links that frame back into the call stack.
 
 The PEP cites the "pleasant solutions" of three earlier languages:
 iterators in CLU and Sather, and generators in Ralph Griswold's Icon.
@@ -2353,20 +2351,21 @@ CLU and Sather use the word `yield` for the same step inside an iterator,
 which hands one element at a time to a loop.
 
 Many languages now have generators.
-JavaScript adopted Python's design first,
-in Mozilla's JavaScript 1.7 for Firefox 2 (2006):
-Python-inspired generators with `send()`, `throw()`, and `close()`.
-ES2015 made generators standard, with `yield*` for `yield from`.
+In 2006, JavaScript 1.7 adopted Python-inspired generators with `send()`,
+`throw()`, and `close()`.
+ES2015 made generators standard,
+with `yield*` for Python's `yield from` behavior.
 TypeScript types the three channels as `Generator<T, TReturn, TNext>`.
 PHP and Dart follow the same design,
-with delegation as `yield from` and `yield*`.
+with delegation as `yield from` and `yield*`, respectively.
+
 The languages differ in where the suspended frame lives.
 Python keeps the execution frame on the heap.
 C# and Kotlin compile the body into a state-machine class,
 which holds a field per local and an integer for the suspension point in place of a frame.
 Ruby runs an external enumerator's block on a `Fiber`, a full coroutine.
-Go 1.23 reverses the protocol.
-The loop body becomes a `yield` function that the iterator calls once per value,
+Go 1.23 reverses the protocol:
+the loop body becomes a `yield` function that the iterator calls once per value,
 so the iterator keeps its frame on the call stack while the body runs.
 CLU's iterators, designed in 1975, work the same way.[^clu-history]
 In CLU a `yield` calls the loop body,
@@ -2376,8 +2375,9 @@ so that a program needs a single stack.
 
 ### The Restriction Behind the Driver
 
-PEP 255 kept the suspended frame and left out a coroutine's ability to hand control to any other coroutine.
-Each `yield` hands control back to the caller of `next()` or `send()`.
+A coroutine can hand control to any other coroutine.
+PEP 255's generator keeps the coroutine's suspended frame and restricts the transfer:
+each `yield` hands control back to the caller of `next()` or `send()`.
 In 2001, handing control anywhere else meant preserving part of the C stack along with the frame,
 because CPython ran each Python call inside a nested call of its interpreter.
 Stackless Python allows such a transfer by keeping Python's state off the C stack.
