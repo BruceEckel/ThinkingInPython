@@ -45,7 +45,7 @@
  },
  "58b756be3c8da8fa": {
   "file": "12_Techniques--Data_Classes_as_Types.md",
-  "line": 239,
+  "line": 238,
   "target": "09_Foundations--Class_Attributes.md",
   "terms": [
    "depth"
@@ -56,7 +56,7 @@
  },
  "92d572806e136770": {
   "file": "12_Techniques--Data_Classes_as_Types.md",
-  "line": 691,
+  "line": 690,
   "target": "08_Foundations--Static_Types.md",
   "terms": [
    "Stars"
@@ -67,7 +67,7 @@
  },
  "ceda21ecec78c6c4": {
   "file": "12_Techniques--Data_Classes_as_Types.md",
-  "line": 1112,
+  "line": 1111,
   "target": "05_Foundations--Functions.md",
   "terms": [
    "Months"
@@ -442,7 +442,7 @@
  },
  "cfbc0527ad9d260c": {
   "file": "44_Effects--Effect_Management.md",
-  "line": 1011,
+  "line": 1012,
   "target": "19_Techniques--Concurrency.md",
   "terms": [
    "greet"
@@ -450,6 +450,28 @@
   "sentence": "Calling `greet()` builds a [coroutine object](19_Techniques--Concurrency.md#asyncio-mechanics), a description of work.",
   "p_terms": 0.0,
   "asked": "2026-10-23"
+ },
+ "bbfe6d91420386f6": {
+  "file": "45_Effects--Generators.md",
+  "line": 1684,
+  "target": "36_Patterns--Memento.md",
+  "terms": [
+   "Enum"
+  ],
+  "sentence": "In the enum designs, the current state is an `Enum` member, which a [*Memento*](36_Patterns--Memento.md#the-classic-memento) can store in a field.",
+  "p_terms": 0.01,
+  "asked": "2026-11-14"
+ },
+ "fb116a4957a08910": {
+  "file": "45_Effects--Generators.md",
+  "line": 1923,
+  "target": "22_Patterns--Iterators.md",
+  "terms": [
+   "async"
+  ],
+  "sentence": "`async for` uses the iteration protocol from [Iterators](22_Patterns--Iterators.md#iteration-comes-built-in) with two other methods.",
+  "p_terms": 0.0,
+  "asked": "2026-11-14"
  },
  "66259d22eeb4fc05": {
   "file": "47_Effects--Stateless_in_Practice.md",

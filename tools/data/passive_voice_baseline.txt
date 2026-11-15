@@ -59,5 +59,7 @@ Solutions/40_Functional--Foundations/README.md	[PASSIVE] is associated: Running 
 Solutions/43_Functional--Confidence/README.md	[PASSIVE] is SIGN: ** CODE is U+00B5 MICRO SIGN, which Unicode inherited from Latin-1 and keeps separate from the Greek letter it resembles.
 Solutions/43_Functional--Confidence/README.md	[PASSIVE] is ordered: That sort's output is always ordered, so the invariant passes.
 Solutions/44_Effects--Effect_Management/README.md	[PASSIVE] was awaited: The CODE call raises a CODE for adding an CODE and a CODE, with a CODE that CODE was never awaited.
+Solutions/45_Effects--Generators/README.md	[PASSIVE] is paused: Find the line where CODE is paused when the driver has just received CODE, and check whether that line is inside the CODE.
+Solutions/45_Effects--Generators/README.md	[PASSIVE] is paused: The flight step is paused inside CODE, which comes before its CODE.
 Solutions/45_Effects--Generators/README.md	[PASSIVE] sits suspended: Without CODE, the call to CODE builds a generator object, and that object sits suspended before its first line.
 Solutions/47_Effects--Stateless_in_Practice/README.md	[PASSIVE] is required: The guard is now required, because a process pool starts workers by re-importing the module.

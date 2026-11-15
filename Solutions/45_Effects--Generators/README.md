@@ -1597,7 +1597,7 @@ a different design, a detail, or an equivalent alternative.
 
 > Drive a booking from `saga_generators.py` to `issue ticket` and throw `Failed` there.
 > Say which command the driver has carried out and which undo commands it receives.
-> Then change `step()` so that a step that fails partway through its `do` is undone as well.
+> Then change `step()` so that a step that fails partway through its `do` also undoes what it did.
 > Throw `Failed` at `issue ticket` and at `charge card`,
 > and say what an `undo` must now tolerate.
 
