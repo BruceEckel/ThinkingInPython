@@ -6,5 +6,5 @@
   "text": "The generator cannot start an exchange. It runs when its driver resumes it, and it yields each value to that driver.",
   "offset": 0.26,
   "source": "Chapters/45_Effects--Generators.md:2334",
-  "saved": "2026-11-14T22:41:59"
+  "saved": "2026-11-14T22:54:20"
 }
