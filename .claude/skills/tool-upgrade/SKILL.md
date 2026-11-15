@@ -335,7 +335,24 @@ Moved from `CLAUDE.md`, which keeps the rule that you never start an upgrade you
   `tip version-pins ARGS=--write` bumped the ten pins. One edited
   sentence was a key in `positional_refs_baseline.txt`, so it printed
   as NEW beside a stale twin and took a scoped
-  `tip positional-accept CH=13`. The trap of the day came before any
+  `tip positional-accept CH=13`. The changelogs, read afterward,
+  list inference changes beside the renames: 0.0.102 warns by default
+  for a single `@overload`; 0.0.103 infers a value type for a bare
+  `Final` and a bare `ClassVar`; 0.0.104 narrows class objects in
+  `==` and `in` tests and gives a class that defines `__eq__` an
+  implicit `__hash__ = None`. So the "cannot, misses, accepts" read
+  ran again, on Bruce's go-ahead: four report-only Opus agents (109k
+  to 145k tokens, two to four minutes each, brief in
+  `build/upgrade-2026-11-14/CLAIMS-BRIEF.md`) probed the 117 such
+  sentences under both versions, and every one holds. Three results
+  worth keeping. `CACHE: Final = []` still reveals `list[Unknown]`,
+  so the bare-`Final` change leaves chapter 08's empty-list example
+  alone. 0.0.104 infers `__hash__` as `None` for a class with
+  `__eq__` and still reports nothing for `hash()` of an instance or
+  for its use as a `dict` key, so chapter 28's hashing sentences,
+  which describe runtime behavior, stand. And the membership test in
+  Solutions 26's `exercise_10.py` passes under the new narrowing.
+  The trap of the day came before any
   of that: Bruce ran `tip tools-upgrade` while a background agent was
   building an unrelated feature, the agent saw `uv.lock` modified,
   took the change for a side effect of its own `uv run`, and ran
