@@ -14,6 +14,8 @@ def summing() -> Callable[[int], None]:
     total = 0
     def consume(value: int) -> None:
         nonlocal total
+        if total > 10:
+            return
         total += value
         print(f"{value=} {total=}")
     return consume
@@ -32,4 +34,3 @@ fibonacci(7, summing())
 #: computed 5
 #: value=5 total=12
 #: computed 8
-#: value=8 total=20

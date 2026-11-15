@@ -2160,6 +2160,8 @@ def summing() -> Callable[[int], None]:
     total = 0
     def consume(value: int) -> None:
         nonlocal total
+        if total > 10:
+            return
         total += value
         print(f"{value=} {total=}")
     return consume
@@ -2178,7 +2180,6 @@ fibonacci(7, summing())
 #: computed 5
 #: value=5 total=12
 #: computed 8
-#: value=8 total=20
 ```
 
 `summing()` returns the callback, `consume()`,
@@ -2206,6 +2207,8 @@ total = 0
 for value in fibonacci(7):
     total += value
     print(f"{value=} {total=}")
+    if total > 10:
+        break
 #: computed 0
 #: computed 1
 #: computed 1
@@ -2219,7 +2222,6 @@ for value in fibonacci(7):
 #: value=2 total=4
 #: value=3 total=7
 #: value=5 total=12
-#: value=8 total=20
 ```
 
 Because the list holds all the values,
@@ -2254,6 +2256,8 @@ total = 0
 for value in Fibonacci(7):
     total += value
     print(f"{value=} {total=}")
+    if total > 10:
+        break
 #: computed 0
 #: value=0 total=0
 #: computed 1
@@ -2266,8 +2270,6 @@ for value in Fibonacci(7):
 #: value=3 total=7
 #: computed 5
 #: value=5 total=12
-#: computed 8
-#: value=8 total=20
 ```
 
 Each way rewrites the producer's loop or the consumer's loop as a function,
@@ -2302,6 +2304,8 @@ total = 0
 for value in fibonacci(7):
     total += value
     print(f"{value=} {total=}")
+    if total > 10:
+        break
 #: computed 0
 #: value=0 total=0
 #: computed 1
@@ -2314,13 +2318,9 @@ for value in fibonacci(7):
 #: value=3 total=7
 #: computed 5
 #: value=5 total=12
-#: computed 8
-#: value=8 total=20
 ```
 
 The producer computes a value only when the consumer loop asks for one.
-The consumer stops when it has enough values,
-whether or not the producer has more.
 
 The generator-driver pair resembles threads that pass items through a queue,
 as in [Coordinating Threads with Queues](19_Techniques--Concurrency.md#coordinating-threads-with-queues),

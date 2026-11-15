@@ -23,6 +23,8 @@ total = 0
 for value in Fibonacci(7):
     total += value
     print(f"{value=} {total=}")
+    if total > 10:
+        break
 #: computed 0
 #: value=0 total=0
 #: computed 1
@@ -35,5 +37,3 @@ for value in Fibonacci(7):
 #: value=3 total=7
 #: computed 5
 #: value=5 total=12
-#: computed 8
-#: value=8 total=20
