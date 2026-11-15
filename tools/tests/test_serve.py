@@ -383,3 +383,19 @@ def test_a_failed_commit_is_reported_not_raised(tmp_path: Path) -> None:
     assert not committed
     assert message.startswith("saved, not committed: ")
     assert serve.load_bookmark(file) == MARK
+
+
+def test_open_starts_at_the_bookmarked_page(tmp_path: Path) -> None:
+    site = tmp_path / "site"
+    site.mkdir()
+    (site / "45_Effects--Generators.html").write_text("", "utf-8")
+    file = tmp_path / "bookmark.json"
+    url = "http://localhost:8000/"
+    assert serve.start_url(url, site, file) == url
+    serve.write_bookmark({"page": "45_Effects--Generators.html"}, file)
+    assert serve.start_url(url, site, file) == (
+        f"{url}45_Effects--Generators.html#{serve.BOOKMARK_FRAGMENT}")
+    serve.write_bookmark({"page": "missing.html"}, file)
+    assert serve.start_url(url, site, file) == url
+    serve.write_bookmark({"page": "../secret.html"}, file)
+    assert serve.start_url(url, site, file) == url

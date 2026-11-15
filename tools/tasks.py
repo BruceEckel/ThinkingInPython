@@ -1244,7 +1244,8 @@ def local(v: Vars) -> None:
     lifting passages out of the rendered book; the file and line are where
     the passage starts in the Markdown. --bookmark adds b (save your
     reading place to bookmark.json and commit it, never pushing) and g
-    (go to it). All the scripts are added
+    (go to it), and the new browser tab starts at the bookmarked place
+    when bookmark.json exists. All the scripts are added
     to pages as they are served; build/site/ and the published site never
     carry them. `tip serve` is the same server without the build first
     or the new browser tab.

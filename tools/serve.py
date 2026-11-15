@@ -75,7 +75,9 @@ modified files stay out of the commit, and it reports "already saved"
 when the file is unchanged. It runs no `git push` and no amend. The
 author pushes, pulls on the other machine, and presses `g`: the page
 opens at the saved block (a section that is folded is opened first),
-or at the saved heading when the passage has changed. The script is
+or at the saved heading when the passage has changed. With `--open`
+too, the browser starts on the bookmarked page at the saved place, and
+on the contents page when there is no bookmark. The script is
 added to the response as it is served, so `build/site/` and the
 published site never carry it. `GET /__bookmark` returns the file.
 
@@ -100,6 +102,7 @@ import sys
 import threading
 import time
 import traceback
+import urllib.parse
 import webbrowser
 from pathlib import Path
 from typing import Any
@@ -118,6 +121,9 @@ BOOKMARK_PATH = "/__bookmark"
 BOOKMARK_FILE = ROOT / "bookmark.json"
 BOOKMARK_TEXT = 120    # Characters of the top block a bookmark keeps
 BOOKMARK_LOCK = threading.Lock()
+# The sessionStorage key and the URL fragment that tell a page to
+# restore the bookmark once it has loaded.
+BOOKMARK_FRAGMENT = "tip-bookmark-go"
 
 # Changing one of these rebuilds every page, not one: they are inputs to
 # the whole site rather than to a single chapter. The build code is not
@@ -243,12 +249,14 @@ COPY_SCRIPT = """
 # the <details> around it before it scrolls. A bookmark on another page
 # sets a sessionStorage flag and navigates; the new page restores after
 # its load event, once images have settled the layout, and does not
-# navigate a second time.
+# navigate a second time. `--open` reaches the same restore through the
+# fragment BOOKMARK_FRAGMENT, which the script removes from the address
+# so a later reload stays where the reader is.
 BOOKMARK_SCRIPT = r"""
 <script>
 (() => {
   const PATH = "__PATH__";
-  const KEY = "tip-bookmark-go";
+  const KEY = "__KEY__";
   const BLOCKS = "h2, h3, p, pre, li, blockquote, table, figure, summary";
   const root = document.querySelector(".page") || document.body;
   const bar = document.createElement("div");
@@ -389,15 +397,20 @@ BOOKMARK_SCRIPT = r"""
     else if (event.key === "g") restore(false);
   });
   const resume = () => {
-    if (!sessionStorage.getItem(KEY)) return;
+    const opened = location.hash === "#" + KEY;
+    if (!opened && !sessionStorage.getItem(KEY)) return;
     sessionStorage.removeItem(KEY);
+    if (opened) {
+      history.replaceState(null, "", location.pathname + location.search);
+    }
     restore(true);
   };
   if (document.readyState === "complete") resume();
   else window.addEventListener("load", resume);
 })();
 </script>
-""".replace("__PATH__", BOOKMARK_PATH).replace("__SIZE__", str(BOOKMARK_TEXT))
+""".replace("__PATH__", BOOKMARK_PATH).replace(
+    "__KEY__", BOOKMARK_FRAGMENT).replace("__SIZE__", str(BOOKMARK_TEXT))
 
 # What a rendered page does not show of its Markdown: a link's target,
 # then (dropped from both sides of the comparison) backticks,
@@ -596,6 +609,20 @@ def save_bookmark(mark: dict, root: Path | None = None,
     with BOOKMARK_LOCK:
         write_bookmark(mark, file)
         return commit_bookmark(mark, root, file)
+
+
+def start_url(url: str, site: Path = SITE,
+              file: Path | None = None) -> str:
+    """The address `--open` gives the browser: the bookmarked page,
+    with the fragment that makes it scroll to the saved place, or
+    `url`, the contents page, when no bookmark names a page in `site`.
+    """
+    page = load_bookmark(file).get("page")
+    if not isinstance(page, str) or "/" in page or "\\" in page:
+        return url
+    if not page.endswith(".html") or not (site / page).is_file():
+        return url
+    return f"{url}{urllib.parse.quote(page)}#{BOOKMARK_FRAGMENT}"
 
 
 def watched_sources() -> list[Path]:
@@ -977,7 +1004,8 @@ def main(argv: list[str] | None = None) -> int:
     if args.open:
         # The server socket is already bound, so the browser will
         # connect even if it loads before serve_forever() runs.
-        threading.Timer(0.5, lambda: webbrowser.open(url)).start()
+        first = start_url(url) if args.bookmark else url
+        threading.Timer(0.5, lambda: webbrowser.open(first)).start()
     with contextlib.suppress(KeyboardInterrupt):
         server.serve_forever()
     return 0

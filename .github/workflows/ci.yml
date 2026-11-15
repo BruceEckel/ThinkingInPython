@@ -29,6 +29,10 @@ name: CI
 on:
   push:
     branches: [master]
+    # `tip serve` commits bookmark.json, the author's reading place, on
+    # each save. A push whose changes are all in that file builds and
+    # publishes nothing new, so it starts no run.
+    paths-ignore: [bookmark.json]
   pull_request:
   workflow_dispatch:
     inputs:
