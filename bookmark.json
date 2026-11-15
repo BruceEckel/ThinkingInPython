@@ -3,8 +3,8 @@
   "title": "Generators",
   "heading": "Three Ways to Write the Producer",
   "heading_id": "three-ways-to-write-the-producer",
-  "text": "Three Ways to Write the Producer",
-  "offset": 0.0,
-  "source": "Chapters/45_Effects--Generators.md:2137",
-  "saved": "2026-11-14T20:09:27"
+  "text": "The generator cannot start an exchange. It runs when its driver resumes it, and it yields each value to that driver.",
+  "offset": 0.26,
+  "source": "Chapters/45_Effects--Generators.md:2334",
+  "saved": "2026-11-14T22:41:59"
 }
