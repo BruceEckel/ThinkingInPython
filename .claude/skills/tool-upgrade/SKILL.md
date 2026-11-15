@@ -295,6 +295,58 @@ Moved from `CLAUDE.md`, which keeps the rule that you never start an upgrade you
   verify); and probe agents work in the build trees, so the session
   runs no verify, sync, or `pyright-review` until the last one
   reports.
+  The 0.0.101 to 0.0.104 upgrade (2026-11-14, with ruff 0.17.4 to
+  0.17.5; Python, uv, pyright, and the libraries unchanged) renamed
+  rules again, with no gate failure and no prose casualty.
+  `invalid-return-type` is split in three: `invalid-implicit-return`
+  (the function can, or always does, reach its end and return
+  `None`), `invalid-explicit-return` (a `return` whose value does not
+  fit the annotation), and `invalid-generator-return-type` (a
+  generator function annotated with a type that is not a generator
+  type). `call-non-callable` is `not-callable`. Five more renames
+  touch no sentence in the book: `call-abstract-method` to
+  `abstract-method-call`, `call-top-callable` to
+  `call-to-function-with-unknown-signature`, `dataclass-field-order`
+  to `invalid-dataclass-field-order`, `unsound-return-statement` to
+  `unsound-return`, and
+  `implicit-concatenated-string-type-annotation` to
+  `implicit-string-concatenation-in-annotation`. The diff of the
+  `# name` headings of `ty explain rule` under both versions found
+  them. A split cannot be replaced mechanically, so two Opus agents
+  (about 140k tokens and two and a half minutes each, brief in
+  `build/upgrade-2026-11-14/BRIEF.md` while that directory lasts)
+  rebuilt the edit behind each of the 31 sentences that named an old
+  rule, 4 in `Chapters/` and 27 in `Solutions/`, ran 0.0.104 on it,
+  and wrote the name it printed: 22 implicit, 8 explicit, 1
+  `not-callable`, none of the generator rule, and no sentence false.
+  A sentence can read either way until it is probed: Solutions 30's
+  "appends the function and returns `None`" is implicit when the
+  `return fn` is deleted and explicit when it becomes `return None`,
+  and the prose's "on `responds()`" picked the first. `tip sweep`
+  green on both trees before and after; `tip check output-check`
+  clean; `tip unused-ignores` clean; the pyright delta empty;
+  `tip quoted-diagnostics-probe` 2 of 43 STALE (chapter 35 and
+  Solutions 46, the rule name in the brackets), 43 of 43 after the
+  edits; all 13 pinned probes HOLD, byte-identical under both
+  versions apart from the rule name in probes 1 and 3, with
+  `record(cls)` still mistyped (one report-only Opus agent, about
+  140k tokens, under four minutes, working from
+  `build/upgrade-2026-10-30/PROBES.md` with the new versions). Then
+  `tip version-pins ARGS=--write` bumped the ten pins. One edited
+  sentence was a key in `positional_refs_baseline.txt`, so it printed
+  as NEW beside a stale twin and took a scoped
+  `tip positional-accept CH=13`. The trap of the day came before any
+  of that: Bruce ran `tip tools-upgrade` while a background agent was
+  building an unrelated feature, the agent saw `uv.lock` modified,
+  took the change for a side effect of its own `uv run`, and ran
+  `git checkout uv.lock`. Every `uv run --frozen` after that synced
+  the environment back to the old versions, so the upgrade was
+  undone with a clean `git status` and a tool stamp saying the tools
+  were upgraded minutes ago. `tip tools-status` showed `ty` "behind"
+  and the lock's mtime matched the agent's run. The repair, on
+  Bruce's answer, was `uv lock --upgrade` and `uv sync`. Every agent
+  brief now says that a modified file outside the brief belongs to
+  someone else and that the agent runs no git command that writes.
   **Sweep `Solutions/` for quoted diagnostics too, not just `Chapters/`.**
   The 2026-09-02 exercise pass found ten stale `ty` quotes, every one of
   them in `Solutions/` and not one in `Chapters/`: wrong line numbers,
@@ -416,7 +468,8 @@ Moved from the root `CLAUDE.md` (2026-09-29).
   signature without `@dataclass_transform` reveals `type[E]`, so the
   marker is the cause. Inside `event()`, `built = record(cls)` therefore
   draws `invalid-argument-type` on `EVENTS.add(built)` and
-  `invalid-return-type` on `return built`. Pyright reveals
+  `invalid-explicit-return` on `return built` (`invalid-return-type`
+  before 0.0.104). Pyright reveals
   `type[E@event]` for the same call and accepts it. ty's
   `dataclass_transform` tracking issue (astral-sh/ty#1327) did not list
   this on 2026-09-17. Hence
@@ -441,8 +494,8 @@ Added 2026-09-29, when chapter 17 dropped its two `cast(EventMaker, ...)` calls.
   Generated Classes" says `ty` verifies the signature, where a cast
   would state it unchecked. Re-probe on each `ty` upgrade: in a scratch
   copy of `events.py` in `build/examples/17_*/`, add a third parameter
-  `x: int` to `init()`. It must draw `invalid-return-type` on
-  `return new_cls` with an `info:` line naming the unexpected extra
+  `x: int` to `init()`. It must draw `invalid-explicit-return`
+  (`invalid-return-type` before 0.0.104) on `return new_cls` with an `info:` line naming the unexpected extra
   parameter `x`. The unedited listing must stay clean. If `ty` stops
   following the call, the listings fail the gate (the class becomes an
   unknown type that is not an `EventMaker`), and the fix is to restore

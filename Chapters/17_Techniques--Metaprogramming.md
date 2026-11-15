@@ -205,7 +205,7 @@ so it infers that each generated class takes an hour and a minute.
 It then checks `return new_cls` against `EventMaker`,
 the two-argument signature `make()` declares.
 If `init()` gains a third parameter,
-`ty` reports an `invalid-return-type` that names the extra parameter.
+`ty` reports an `invalid-explicit-return` that names the extra parameter.
 Pyright builds the class from its bases alone,
 so it gives the class `Event`'s three-argument constructor and rejects `return new_cls`.
 Under Pyright `make()` needs `cast(EventMaker, new_cls)`.
@@ -391,7 +391,7 @@ The type checker skips the code inside the string,
 so `namespace` carries the annotation `dict[str, object]`,
 and `namespace[class_name]` is an `object`.
 If `make_class()` returns that `object` where it declares `Callable[[], Command]`,
-the type checker reports an `invalid-return-type`.
+the type checker reports an `invalid-explicit-return`.
 `cast(Callable[[], Command], ...)` states the actual no-argument signature at the one place that creates the class.
 
 `EventMakers` in `greenhouse.py` stores each class it builds.

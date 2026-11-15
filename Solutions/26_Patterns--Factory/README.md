@@ -1662,7 +1662,7 @@ If you leave out `return build`,
 the table still fills and the demo prints the same three lines.
 But `register()` then returns `None`,
 so the decorator binds the names `goblin` and `troll` to `None` rather than to the builders.
-`ty` reports `invalid-return-type`,
+`ty` reports `invalid-implicit-return`,
 since `register()` declares that it returns a `Builder`.
 The solution returns the builder unchanged,
 so `goblin()` still builds a fresh prototype when a test needs one.

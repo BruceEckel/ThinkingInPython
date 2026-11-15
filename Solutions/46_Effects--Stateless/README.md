@@ -792,7 +792,7 @@ and whether the next line uses the dropped value.
 <summary>Done when</summary>
 
 for the first deletion your record shows `ty check` and `ruff check` silent and the script printing `['greeted Alice', 'greeted Bob']` with no greetings,
-and for the second it shows `invalid-return-type` and `missing-attribute`.
+and for the second it shows `invalid-implicit-return` and `missing-attribute`.
 You can say which line makes the second break visible to the type checker.
 
 <details>
@@ -848,7 +848,7 @@ def greet(name: str) -> Depend[Need[Console], None]:
 ```
 
 ```text
-error[invalid-return-type]: Function always implicitly returns `None`,
+error[invalid-implicit-return]: Function always implicitly returns `None`,
 which is not assignable to return type
 `Generator[Need[Console], Any, None]`
  --> greeter.py:8:25
@@ -864,7 +864,7 @@ error[missing-attribute]: Object of type
    |     ^^^^^^^^^^^^^
 ```
 
-The `invalid-return-type` error says `greet()` has become an ordinary function.
+The `invalid-implicit-return` error says `greet()` has become an ordinary function.
 Removing the body's one `yield from` removes its last `yield`,
 so `greet()` returns `None` where its annotation declares a `Generator`.
 The `missing-attribute` error says the value in `console` has the wrong type,

@@ -576,7 +576,7 @@ If you add `MdWriter` to the `AnyWriter` alias and to `main()` but leave `Report
 `main("md")` prints `None`.
 The writer falls through every `case`, and `render()` reaches its end,
 where Python returns `None` implicitly.
-`ty` reports that path as `invalid-return-type`,
+`ty` reports that path as `invalid-implicit-return`,
 since `render()` declares that it returns `str`.
 
 The second version gives every writer the same method and lets `Report` specify that method through a protocol:

@@ -1693,7 +1693,7 @@ def outcome(
 <summary>Done when</summary>
 
 before you widen the annotation,
-`ty` reports `invalid-return-type` on `outcome()`'s `return` line;
+`ty` reports `invalid-explicit-return` on `outcome()`'s `return` line;
 after you add `TooLong`, it passes and a too-long article returns a `TooLong`.
 With the return annotation deleted,
 `ty` passes and `reveal_type(outcome)` shows the return type as `Unknown`.
@@ -1747,7 +1747,7 @@ The prediction is that `outcome()`'s return annotation fails the type check.
 `catch_all()` moves the entire error channel into the return type,
 so widening `research()`'s failures to include `TooLong` widens what `catch_all()` returns.
 The declared `str | Unavailable | NotInteresting | NoArticle` is now too narrow.
-`ty` reports an `invalid-return-type` on the `return run(...)` line,
+`ty` reports an `invalid-explicit-return` on the `return run(...)` line,
 naming `TooLong` as the member that does not fit.
 Adding `| TooLong` to the annotation fixes it.
 The `print()` at `[1]` exercises the new branch.

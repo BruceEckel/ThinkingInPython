@@ -1045,7 +1045,7 @@ over `[1, "two", 3, None, 4]` with `int`,
 while `typed_skipping()` and your class version both give `[1, 3, 4]`.
 `uv run ty check` passes;
 if your class version can fall off the end of `__next__()`,
-`ty` reports `invalid-return-type`.
+`ty` reports `invalid-implicit-return`.
 
 <details>
 <summary>Solution</summary>
@@ -1053,7 +1053,7 @@ if your class version can fall off the end of `__next__()`,
 If `SkippingIterator.__next__()` reads one item and tests it, with no loop,
 a mismatch falls off the end of the method, which returns `None`.
 Over the demo's `items`, the class produces `[1, None, 3, None, 4]`.
-`ty` reports an `invalid-return-type` on that version,
+`ty` reports an `invalid-implicit-return` on that version,
 since the method can implicitly return `None`.
 The solution loops until an item matches,
 so every call returns a value or raises `StopIteration`.

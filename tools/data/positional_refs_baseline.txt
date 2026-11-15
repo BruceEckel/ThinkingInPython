@@ -80,8 +80,8 @@ Chapters/25_Patterns--Surrogate.md	The next `p.level`	The next `p.level` lookup 
 Chapters/25_Patterns--Surrogate.md	the second call	With the guard, the second call to `__getattr__()` reports the typo by name.
 Chapters/26_Patterns--Factory.md	the first `build()`	Every `.topping()` call after the first `build()` adds to that same list, so a second `build()` on the same builder returns a pizza carrying the first pizza's toppings too.
 Chapters/26_Patterns--Factory.md	the first `draw()`	A base class whose `draw()` raises a `NotImplementedError` reports the omission later, at the first `draw()` call.
-Chapters/26_Patterns--Factory.md	the line that	With the abstract base classes in `abstract_factory_abc.py`, the checker reports the line that constructs the incomplete factory.
 Chapters/26_Patterns--Factory.md	the line that	In [Explicit Registration with a Protocol](#explicit-registration-with-a-protocol), the checker reports a class that lacks `draw()` at the line that registers it.
+Chapters/26_Patterns--Factory.md	the line that	With the abstract base classes in `abstract_factory_abc.py`, the checker reports the line that constructs the incomplete factory.
 Chapters/29_Patterns--Changing_the_Interface.md	The first line	The first line of each trace names that place: `ProxyAdapter.f()` for the object adapter, `WhatIUse2.op() wraps it` for Approach 2, and `WhatIHave2.f()` for Approach 3.
 Chapters/29_Patterns--Changing_the_Interface.md	each trace	The first line of each trace names that place: `ProxyAdapter.f()` for the object adapter, `WhatIUse2.op() wraps it` for Approach 2, and `WhatIHave2.f()` for Approach 3.
 Chapters/31_Patterns--State_Machines.md	the first call	A function body runs at the call, and Python evaluates an annotation lazily, so by the first call the whole module has loaded and `TrapState` exists.
@@ -177,7 +177,7 @@ Solutions/10_Foundations--Cleanup/README.md	the last `Counter`	With two referenc
 Solutions/11_Techniques--Testing/README.md	each run	**Run one body per rate.** `parametrize` runs this one test body four times, once per rate, and `pytest` reports each run as `test_add_interest_rates[0.0]`, `test_add_interest_rates[0.05]`, and so on.
 Solutions/12_Techniques--Data_Classes_as_Types/README.md	the first `@`	`partition()` splits at the first `@`, and the domain half, `"@x.com"`, holds text.
 Solutions/13_Techniques--Pattern_Matching/README.md	at line 43	The second is the same diagnostic at line 43, in `cost()`.
-Solutions/13_Techniques--Pattern_Matching/README.md	the final `case _`	If you delete the final `case _` from the second version, the script prints the same two lines, but `ty` reports `invalid-return-type`.
+Solutions/13_Techniques--Pattern_Matching/README.md	the final `case _`	If you delete the final `case _` from the second version, the script prints the same two lines, but `ty` reports `invalid-implicit-return`.
 Solutions/13_Techniques--Pattern_Matching/README.md	the last case	Python accepts `case FALLBACK:` because it is the last case, and rejects any case after it with a `SyntaxError`.
 Solutions/14_Techniques--Decorators/README.md	The outermost decorator	The outermost decorator prints first and last, and each inner layer's output appears nested in between.
 Solutions/14_Techniques--Decorators/README.md	every attempt	A real `retry` should take the exception types to retry as an argument, because some failures repeat on every attempt.

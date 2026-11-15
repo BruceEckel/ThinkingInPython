@@ -1913,7 +1913,7 @@ so the name `display` refers to `None`.
 Calling `display(5.0)` then raises a `TypeError`.
 The type checker catches the mistake before any run.
 With `-> Responder` declared,
-it reports an `invalid-return-type` on `responds()`.
+it reports an `invalid-implicit-return` on `responds()`.
 
 The return value also separates `Broadcasting.respond()` from the chapter's `Broadcaster.connect()`.
 `connect()` appends and returns `None`, so with `t` a `Broadcaster`,

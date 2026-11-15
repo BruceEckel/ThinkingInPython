@@ -694,7 +694,7 @@ The `Guarded` demo then prints `C closed` twice and omits `caught boom`.
 `__enter__()` returns `None` instead of failing,
 so the `with` block runs as though the acquisition succeeded,
 and `__exit__()` releases the resource a second time.
-The type checker (`ty`) reports that version as `invalid-return-type`,
+The type checker (`ty`) reports that version as `invalid-implicit-return`,
 since `__enter__()` now always implicitly returns `None` where its annotation declares `Guarded`.
 The solution re-raises the exception,
 so the caller sees `boom` and the `closed` line prints once.

@@ -238,7 +238,7 @@ The first total is `1 + 2 + 3`, and each later one is nine larger,
 since every batch advances the source by three.
 
 If you build the totals with a list comprehension,
-`[sum(b) for b in batched(source, n)]`, `ty` reports an `invalid-return-type`.
+`[sum(b) for b in batched(source, n)]`, `ty` reports an `invalid-explicit-return`.
 A `list[int]` has no `__next__()`, so it is not an `Iterator[int]`.
 If you change the annotation to `list[int]` to match, the demo's call hangs.
 The list comprehension sums batches from the infinite `count(1)` forever,

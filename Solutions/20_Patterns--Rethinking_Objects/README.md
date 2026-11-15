@@ -328,7 +328,7 @@ and you can say what `Weight(2.5)` returns at runtime.
 <summary>Solution</summary>
 
 If you change the annotation on `Package.total()` to `Weight` and leave `return self.weight_kg` as it is,
-`ty` reports an `invalid-return-type` error on that line.
+`ty` reports an `invalid-explicit-return` error on that line.
 The type checker expects `Weight` and finds `float`.
 A `float` becomes a `Weight` only when `Weight()` marks it as one.
 The solution wraps the return value in `Weight(...)`,
@@ -573,7 +573,7 @@ with the inferred type `Square & ~Rectangle & ~Circle`.
 If you end the `match` at the `Square` case,
 `ty check` still passes on the full listing,
 because the three cases cover the union.
-In that version, commenting out the `Square` case produces an `invalid-return-type` error.
+In that version, commenting out the `Square` case produces an `invalid-implicit-return` error.
 That error reports that `area()` can implicitly return `None`,
 and it names no shape.
 The solution keeps `assert_never()` so the report names the missing `Square`.

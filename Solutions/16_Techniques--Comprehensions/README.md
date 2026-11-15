@@ -294,7 +294,7 @@ If you leave `return line` out of `show()`,
 the function returns `None` implicitly.
 `lines` then prints as `[None, None, None]`,
 the list `comprehension_side_effects.py` builds.
-`ty` reports the omission as `invalid-return-type`,
+`ty` reports the omission as `invalid-implicit-return`,
 because `show()` declares a `str` return type.
 
 **Give the output expression a value.**

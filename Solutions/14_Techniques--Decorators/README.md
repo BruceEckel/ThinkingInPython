@@ -40,7 +40,7 @@ each of your two classes prints its name once,
 as its `class` statement finishes and before any later line runs,
 and printing each class's `__name__` afterward gives the names back.
 `uv run ty check` passes,
-and deleting the `return` from `announce` makes it report `invalid-return-type`.
+and deleting the `return` from `announce` makes it report `invalid-implicit-return`.
 
 <details>
 <summary>Solution</summary>
@@ -50,7 +50,7 @@ Python then binds `None` to `Point` and to `Empty`.
 Both `decorating` lines still print,
 but the final `print()` raises an `AttributeError`,
 since `None` has no `__name__`.
-`ty` reports an `invalid-return-type` on `announce` before the program runs.
+`ty` reports an `invalid-implicit-return` on `announce` before the program runs.
 The solution returns `cls`, so each name stays bound to its class.
 
 ```python
@@ -157,7 +157,7 @@ Swapping the two decorators moves your timing line after the `<-` line.
 If `timing`'s wrapper calls `func(*args, **kwargs)` and discards its value,
 the timing line still prints, but `add(2, 3)` returns `None`.
 `trace` then prints `<- add = None`.
-`ty` reports an `invalid-return-type`,
+`ty` reports an `invalid-implicit-return`,
 because the wrapper declares `-> R` and implicitly returns `None`.
 The solution's wrapper saves the call's value in `result` before it reads the clock again,
 and returns `result` after the report.
@@ -738,7 +738,7 @@ as `expect()` shows.
 If you re-raise the exception from inside the loop with a bare `raise` on the last attempt,
 `retry` works at runtime.
 But the type checker infers a path where the loop finishes and `wrapper()` returns `None` implicitly,
-so `ty` reports an `invalid-return-type`.
+so `ty` reports an `invalid-implicit-return`.
 The solution makes the final attempt outside the `try`.
 
 ```python

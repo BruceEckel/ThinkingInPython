@@ -472,7 +472,7 @@ If you pass the exception type to the chapter's one-layer `safe()`,
 Python then calls that wrapper with `parse()` as its argument,
 so `parse` names an `Ok` holding a `ValueError`.
 Calling `parse("42")` then raises a `TypeError`: `'Ok' object is not callable`.
-`ty` reports `call-non-callable` at the same call.
+`ty` reports `not-callable` at the same call.
 The solution adds an outer layer.
 `safe(ValueError)` returns the decorator, and the decorator wraps `parse()`.
 

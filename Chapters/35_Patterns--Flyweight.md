@@ -607,7 +607,7 @@ print(describe(Tile.GRASS))
 Without the `# type: ignore`, `ty check` reports:
 
 ```
-error[invalid-return-type]: Function can implicitly return
+error[invalid-implicit-return]: Function can implicitly return
 `None`, which is not assignable to return type `str`
  --> tile_enum_match.py:6:29
   |

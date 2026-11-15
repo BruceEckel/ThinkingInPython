@@ -230,14 +230,14 @@ class Mood(State[Input], Enum):
 
 your trace interleaves greetings with transition lines in the form of `trap_states_demo.py`'s `Waiting mouse appears -> Luring`,
 the input printed as a word, and `uv run ty check` passes.
-The type checker reports `invalid-return-type` for a transition function that can finish without returning a `Mood`.
+The type checker reports `invalid-implicit-return` for a transition function that can finish without returning a `Mood`.
 You can name one gain and one loss of a member over a class.
 
 <details>
 <summary>Solution</summary>
 
 If you leave out the `case _` arm of `happy()`,
-`ty` reports an `invalid-return-type`,
+`ty` reports an `invalid-implicit-return`,
 because the function can fall off its end and return `None`.
 The demo still prints the same lines,
 since every input that reaches `HAPPY` has a `case` there,

@@ -764,7 +764,7 @@ def summarize(items: list[str]) -> Generator[str]:
 `uv run ty check` passes,
 and your caller's output for the chapter's `["red", "green", "blue"]` ends with a line carrying `12`.
 With `report()`'s annotation changed back to `Iterator[str]`,
-`ty` reports `invalid-return-type`,
+`ty` reports `invalid-explicit-return`,
 and you can name the type parameter through which each of your two values travels.
 
 <details>
@@ -804,14 +804,14 @@ print(list(summarize(["red", "green", "blue"])))
 `report()`'s annotation changes from `Iterator[str]` to `Generator[str, None, Size]`,
 because a generator that returns something needs the long form.
 Under `Iterator[str]` a generator must return `None`,
-so `ty` rejects `report()`'s `return size` with an `invalid-return-type`:
+so `ty` rejects `report()`'s `return size` with an `invalid-explicit-return`:
 expected `None`, found `Size`.
 
 If you change `report()`'s annotation but leave out `return size`,
 the script still runs, and the printed list ends with `'total: None'`.
 `report()` returns `None`,
 and the `yield from` in `summarize()` delivers that `None` into `counted`.
-`ty` reports an `invalid-return-type` on the annotation,
+`ty` reports an `invalid-implicit-return` on the annotation,
 because `report()` declares a `Size` and, with no `return` statement,
 finishes with `None`.
 
