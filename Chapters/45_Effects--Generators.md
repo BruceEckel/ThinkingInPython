@@ -2142,9 +2142,9 @@ The PEP's motivating example is the standard library's `tokenize()`,
 which keeps its place in the source text from one token to the next.
 Another example is a recursive tree walk that keeps a whole recursion in progress between one node and the next.
 
-The consumer of such a producer has state of its own.
-It needs local variables and loops to track what it has seen,
-and it may stop early.
+The consumer of such a producer is usually a loop.
+That loop keeps locals, such as a running total,
+and it stops when it has enough values, whether or not the producer has more.
 
 Without generators, you have three ways to write such a producer in a single thread.
 Each comes with a compromise.
