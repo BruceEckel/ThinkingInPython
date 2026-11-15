@@ -34,7 +34,9 @@ param(
     [switch]$NoClaude
 )
 
-Set-Location -LiteralPath $PSScriptRoot
+# The module-qualified name reaches the cmdlet when a profile defines a
+# Set-Location function of its own, which lacks -LiteralPath.
+Microsoft.PowerShell.Management\Set-Location -LiteralPath $PSScriptRoot
 $Host.UI.RawUI.WindowTitle = 'Thinking in Python'
 
 $native = @'
@@ -56,12 +58,13 @@ $kernel = Add-Type -Namespace BookServer -Name Kernel -PassThru `
     -MemberDefinition $native
 
 # The kill-on-close job object. JOBOBJECT_EXTENDED_LIMIT_INFORMATION is
-# 144 bytes on 64-bit Windows, with LimitFlags at offset 16;
-# 0x2000 is JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE, and 9 is the
-# information class for that structure.
+# 144 bytes in a 64-bit process and 112 in a 32-bit one (the pwsh that
+# comes first on PATH can be the x86 build), with LimitFlags at offset
+# 16 in both; 0x2000 is JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE, and 9 is
+# the information class for that structure.
 $jobName = "BookServer-$PID"
 $global:BookServerHandle = $kernel::CreateJobObject([IntPtr]::Zero, $jobName)
-$size = 144
+$size = if ([IntPtr]::Size -eq 8) { 144 } else { 112 }
 $info = [Runtime.InteropServices.Marshal]::AllocHGlobal($size)
 try {
     [Runtime.InteropServices.Marshal]::Copy([byte[]]::new($size), 0, $info, $size)
