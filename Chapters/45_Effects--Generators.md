@@ -1201,11 +1201,8 @@ print(inspect.getgeneratorstate(sensor))
 `first_above()` returns at `[1]` with the first reading over the limit.
 `readings()` stays paused at its `yield`,
 with the sensor on and two readings still in `pending`.
-`sensor` still holds the generator,
-which `inspect.getgeneratorstate()` reports as `GEN_SUSPENDED`.
 `close()` at `[2]` raises `GeneratorExit` at that `yield`.
-The `except GeneratorExit` clause runs when the driver stops early,
-and reports what the stop left unread.
+The `except GeneratorExit` clause runs on an early ending and reports how many readings remain in `pending`.
 The `finally` clause runs on every ending and turns off the sensor.
 
 A generator may catch `GeneratorExit` as long as it then finishes,
@@ -1215,22 +1212,21 @@ A driver that stops without calling `close()` leaves the generator paused.
 When Python's garbage collector reclaims a paused generator,
 it calls that generator's `close()` method.
 `GeneratorExit` arrives at the paused `yield` as it does at `[2]`,
-and the `finally` block runs at collection time.
-Calling `close()` yourself runs the `finally` block at a point you choose.
+so the `finally` clause runs at collection time.
+Calling `close()` yourself runs the `finally` clause at a point you choose.
 
 A second `close()` is safe.
 On a `GEN_CLOSED` generator,
 `close()` returns `None` and leaves the generator as it is.
-A generator the driver closed is `GEN_CLOSED` at collection time,
-so its `finally` block runs once.
+A generator the driver closes is `GEN_CLOSED` at collection time,
+so its `finally` clause runs once.
 
 A generator's body starts when the driver calls `next()`.
 Until then, the generator is `GEN_CREATED`.
 `close()` changes that generator's state from `GEN_CREATED` to `GEN_CLOSED`,
-and the body never starts.
-Closing `readings()` before its first `next()` prints nothing:
-the sensor never turns on,
-and execution never enters the `try` statement whose `finally` clause turns it off.
+so the body never starts.
+The body of `readings()` starts by turning on the sensor and entering the `try` statement whose `finally` clause turns it off.
+Closing `readings()` before its first `next()` therefore prints nothing.
 
 ### `close()`: The Generator Must Finish {#close-requires-the-generator-to-finish}
 
@@ -1257,18 +1253,16 @@ expect(RuntimeError, s.close)
 
 If a generator yields inside a `finally` clause,
 `close()` also raises a `RuntimeError` with the message `generator ignored GeneratorExit`.
-As `GeneratorExit` propagates out of that generator,
-Python runs the `finally` clause.
+As `GeneratorExit` propagates out of that generator, the `finally` clause runs.
 The `yield` there suspends the generator again before it can finish.
 
 When the driver calls `close()`, the `RuntimeError` arrives in the driver,
 as in `throw_and_close_gotcha.py`.
-When the garbage collector [calls `close()` on a paused generator it reclaims](#stopping-early-with-close),
+When the [garbage collector calls `close()` on a paused generator it reclaims](#stopping-early-with-close),
 the `RuntimeError` arrives in the collector.
 Python displays it as an "Exception ignored" message and continues.
 
-A generator for a driver must therefore finish when `GeneratorExit` arrives,
-by cleaning up and returning.
+A generator must therefore clean up and finish when `GeneratorExit` arrives.
 
 ### Through `yield from` to the Innermost Generator {#throw-and-close-reach-the-innermost-generator}
 
@@ -2180,11 +2174,9 @@ fibonacci(7, summing())
 #: value=8 total=20
 ```
 
-The callback needs a variable that survives from one call to the next,
-to hold the running `total`.
 `summing()` returns the callback, `consume()`,
-which captures `total` as a [closure](40_Functional--Foundations.md#closures)
-variable, so `total` outlives `summing()`'s call.
+which captures the running `total` as a [closure](40_Functional--Foundations.md#closures)
+variable, so `total` survives from one call to the next.
 With the `nonlocal` statement, `consume()` assigns to the captured `total`.
 
 `fibonacci()` controls how many times `consume()` runs and when the sequence ends.
@@ -2215,8 +2207,6 @@ for value in fibonacci(7):
 #: value=8 total=20
 ```
 
-This `fibonacci()` runs the same loop as the generator `fibonacci()` in `iterators.py` from [Iterators](22_Patterns--Iterators.md#generators),
-with `values.append(a)` in place of `yield a`.
 Because the list holds all the values,
 the sequence must be finite and fit in memory.
 
@@ -2257,13 +2247,6 @@ for value in Fibonacci(7):
 #: value=8 total=20
 ```
 
-Each `__next__()` call computes one value,
-as one pass of the `for` loop in `fibonacci_callback.py` does.
-In that listing, `fibonacci()`'s stack frame holds the locals `a` and `b` along with the `for` loop's count of values.
-In `Fibonacci`, the attributes `_a` and `_b` replace those locals.
-The count of values is the attribute `remaining`,
-which `__next__()` tests on every call and decrements for each value it returns.
-
 Each way rewrites the producer's loop or the consumer's loop as a function,
 or keeps both loops and runs them one after the other:
 
@@ -2271,14 +2254,41 @@ or keeps both loops and runs them one after the other:
   the body of its loop becomes `consume()`,
   a function that the producer's loop calls.
 - The list keeps both loops but runs the producer's loop to completion before the consumer's loop starts.
-- The class turns the producer inside out:
+- The iterator class turns the producer inside out:
   the body of its loop becomes `__next__()`,
   a method that the consumer's loop calls.
 
 All three ways work around the same missing ability:
 pausing `fibonacci()` in the middle of its loop, handing out a value,
 and resuming where it stopped.
-With a generator, the producer and the consumer each keep their own loop.
+With a generator, the producer and the consumer each keep their own loop:
+
+```python
+# fibonacci_generator.py
+from collections.abc import Iterator
+
+def fibonacci(n: int) -> Iterator[int]:
+    a, b = 0, 1
+    for _ in range(n):
+        yield a
+        a, b = b, a + b
+
+total = 0
+for value in fibonacci(7):
+    total += value
+    print(f"{value=} {total=}")
+#: value=0 total=0
+#: value=1 total=1
+#: value=1 total=2
+#: value=2 total=4
+#: value=3 total=7
+#: value=5 total=12
+#: value=8 total=20
+```
+
+The producer computes a value each time the consumer's loop asks for one,
+so the consumer can stop when it has enough values,
+whether or not the producer has more.
 
 A generator and its driver can pass values in both directions.
 The pair resembles threads that pass items through a queue,

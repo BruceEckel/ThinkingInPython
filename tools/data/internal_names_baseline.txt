@@ -35,6 +35,7 @@ Examples/31_Patterns--State_Machines/vending_machine.py::Column.C2
 Examples/31_Patterns--State_Machines/vending_machine.py::Column.C3
 Examples/31_Patterns--State_Machines/vending_machine.py::Row.B
 Examples/33_Patterns--Visitor/recursive_accept.py::Corsage.elements
+Examples/45_Effects--Generators/fibonacci_class.py::Fibonacci.remaining
 Solutions/14_Techniques--Decorators/decorated_methods.py::Counter.total
 Solutions/14_Techniques--Decorators/exercise_1.py::Point.y
 Solutions/14_Techniques--Decorators/exercise_3.py::Extra.drink

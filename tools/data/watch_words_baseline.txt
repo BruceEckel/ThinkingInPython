@@ -52,6 +52,7 @@ Chapters/06_Foundations--Modules_and_Packages.md	explicit: This book uses an exp
 Chapters/06_Foundations--Modules_and_Packages.md	has no: because Python has no CODE keyword
 Chapters/06_Foundations--Modules_and_Packages.md	never: Callers then never write the name of the submodule that defines CODE
 Chapters/06_Foundations--Modules_and_Packages.md	never: so that work never happens
+Chapters/06_Foundations--Modules_and_Packages.md	nothing touches: If nothing touches the lazily imported name
 Chapters/06_Foundations--Modules_and_Packages.md	only: The submodule becomes an attribute of the package only when something imports it by name
 Chapters/06_Foundations--Modules_and_Packages.md	only: When the cycle exists only in annotations
 Chapters/06_Foundations--Modules_and_Packages.md	only: a keyword only inside an CODE statement
@@ -187,6 +188,7 @@ Chapters/17_Techniques--Metaprogramming.md	never: It accepts the declaration and
 Chapters/17_Techniques--Metaprogramming.md	never: The resulting CODE reports a missing CODE argument and never mentions CODE
 Chapters/17_Techniques--Metaprogramming.md	never: The type checker never runs the metaclass
 Chapters/17_Techniques--Metaprogramming.md	never: a name the module never defined prints as a CODE instead of raising a CODE
+Chapters/17_Techniques--Metaprogramming.md	nobody imports: a class in a module nobody imports stays out of the registry
 Chapters/17_Techniques--Metaprogramming.md	only: CODE and CODE normally run only because the default CODE calls them
 Chapters/17_Techniques--Metaprogramming.md	only: Only a metaclass makes the class callable in a new way
 Chapters/17_Techniques--Metaprogramming.md	only: Only three known names reach the template
@@ -359,9 +361,9 @@ Chapters/25_Patterns--Surrogate.md	only: Python calls it only after normal looku
 Chapters/26_Patterns--Factory.md	carries no: Add a CODE to CODE that satisfies CODE but carries no CODE
 Chapters/26_Patterns--Factory.md	even: A lazy import produces the same failure even when the import statement is in the file
 Chapters/26_Patterns--Factory.md	even: even momentarily
-Chapters/26_Patterns--Factory.md	explicit: In Explicit Registration with a Protocol
 Chapters/26_Patterns--Factory.md	explicit: Explicit registration fails the opposite way
 Chapters/26_Patterns--Factory.md	explicit: If registration is explicit
+Chapters/26_Patterns--Factory.md	explicit: In Explicit Registration with a Protocol
 Chapters/26_Patterns--Factory.md	explicit: as Explicit Registration with a Protocol does for a class that lacks CODE
 Chapters/26_Patterns--Factory.md	has no: An if-chain like CODE has no wildcard
 Chapters/26_Patterns--Factory.md	has no: The message names pickling because CODE falls back on the pickle protocol for a type that has no copy rule of its own
@@ -411,6 +413,7 @@ Chapters/31_Patterns--State_Machines.md	price: A CODE holds one item's price and
 Chapters/31_Patterns--State_Machines.md	price: decided by price and stock
 Chapters/31_Patterns--State_Machines.md	want: Choose one of the designs here when you don't want that dependency
 Chapters/31_Patterns--State_Machines.md	want: or want the mechanism visible in your own code
+Chapters/32_Patterns--Multiple_Dispatching.md	draws code: which draws CODE random pairs from CODE and yields each as a CODE tuple
 Chapters/32_Patterns--Multiple_Dispatching.md	even: so even elaborate behavior fits the table
 Chapters/32_Patterns--Multiple_Dispatching.md	even: so even elaborate behavior fits the table (see exercise 9)
 Chapters/32_Patterns--Multiple_Dispatching.md	exactly: It matches classes exactly
@@ -456,6 +459,7 @@ Chapters/37_Patterns--Pattern_Refactoring.md	names the shape: CODE names the sha
 Chapters/37_Patterns--Pattern_Refactoring.md	needs no: CODE needs no special handling
 Chapters/37_Patterns--Pattern_Refactoring.md	wants: Now the safety officer wants a disposal hazard printed beside the instruction
 Chapters/38_Patterns--Simulation.md	accept no: so a new item's CODE must accept no arguments
+Chapters/38_Patterns--Simulation.md	draw the code: To draw the CODE
 Chapters/38_Patterns--Simulation.md	exactly: Every target letter marks exactly two rooms
 Chapters/38_Patterns--Simulation.md	happens: What happens to the two rats that both claimed one cell
 Chapters/38_Patterns--Simulation.md	itself: CODE replaces itself
@@ -494,6 +498,7 @@ Chapters/40_Functional--Foundations.md	shares no: A function that shares no muta
 Chapters/40_Functional--Foundations.md	takes no: It also types the resulting callable as one that takes no arguments
 Chapters/40_Functional--Foundations.md	want: A closure fits when you want to configure behavior once
 Chapters/41_Functional--Toolkits.md	does it: and which one does it leave to the caller
+Chapters/41_Functional--Toolkits.md	draw code: Four tools draw CODE elements from an iterable
 Chapters/41_Functional--Toolkits.md	exactly: Groups of three are far harder to schedule so that every pair meets exactly once
 Chapters/41_Functional--Toolkits.md	exactly: how do you split every possible pair into rounds in which each player appears exactly once
 Chapters/41_Functional--Toolkits.md	explicit: using a list as an explicit stack
@@ -555,7 +560,11 @@ Chapters/45_Effects--Generators.md	by hand: "to cast that into an iterator frame
 Chapters/45_Effects--Generators.md	holds no: A generator holds no items
 Chapters/45_Effects--Generators.md	manually: "to cast that into an iterator framework requires removing the recursion manually and maintaining the state of the traversal by hand
 Chapters/45_Effects--Generators.md	never: A CODE in the driver therefore propagates to the driver's callers and never reaches the generator's CODE and CODE clauses
+Chapters/45_Effects--Generators.md	never: and the card step never starts
+Chapters/45_Effects--Generators.md	never: so the body never starts
+Chapters/45_Effects--Generators.md	never: so the exception leaves the taxi step and the card step never starts
 Chapters/45_Effects--Generators.md	never: so you can compose a conversation from parts that never refer to their driver
+Chapters/45_Effects--Generators.md	prints nothing: Closing CODE before its first CODE therefore prints nothing
 Chapters/46_Effects--Stateless.md	already: CODE is already CODE
 Chapters/46_Effects--Stateless.md	already: For a function that already returns an Effect
 Chapters/46_Effects--Stateless.md	already: It carries CODE on a function that already returns an Effect
@@ -586,6 +595,9 @@ Chapters/46_Effects--Stateless.md	never: A test then supplies a clock that never
 Chapters/46_Effects--Stateless.md	never: and never resumes the inner generator
 Chapters/46_Effects--Stateless.md	never: and the inner CODE never runs
 Chapters/46_Effects--Stateless.md	never: so CODE never returns a subclass registered under its own name
+Chapters/46_Effects--Stateless.md	nobody else provides: A dependency injection container often lets you register a fallback for a type nobody else provides
+Chapters/46_Effects--Stateless.md	nothing runs: Nothing Runs Yet explains why that request must be a value of its own
+Chapters/46_Effects--Stateless.md	nothing stops: Nothing stops an undeclared Effect examines that limit
 Chapters/46_Effects--Stateless.md	only: A CODE-shaped value appears in Stateless only after CODE
 Chapters/46_Effects--Stateless.md	only: A function that constructs its own CODE can use only that class
 Chapters/46_Effects--Stateless.md	only: A library acts only on objects handed to it
@@ -751,6 +763,7 @@ Solutions/20_Patterns--Rethinking_Objects/README.md	only: Write CODE to hold a C
 Solutions/20_Patterns--Rethinking_Objects/README.md	only: so the caller changes only the copy
 Solutions/20_Patterns--Rethinking_Objects/README.md	price: so the type checker now rejects a weight where CODE declares a price
 Solutions/21_Patterns--Design_Patterns/README.md	names none of: and the remainder fits in one sentence that states the pattern's intent and names none of its classes
+Solutions/21_Patterns--Design_Patterns/README.md	nothing absorbs: Nothing absorbs the change
 Solutions/21_Patterns--Design_Patterns/README.md	shipping: The design is the shipping calculation from CODE
 Solutions/22_Patterns--Iterators/README.md	defines no: because a generator defines no CODE
 Solutions/22_Patterns--Iterators/README.md	has no: Python's iterator protocol has no CODE
@@ -787,6 +800,7 @@ Solutions/25_Patterns--Surrogate/README.md	only: Let only a CODE class create th
 Solutions/25_Patterns--Surrogate/README.md	only: The Recursion Trap and Forwarding with CODE describe a method that Python calls only after normal lookup fails
 Solutions/25_Patterns--Surrogate/README.md	only: which runs only when normal lookup fails
 Solutions/26_Patterns--Factory/README.md	declares no: In the CODE version the concrete factory declares no base class
+Solutions/26_Patterns--Factory/README.md	draws from code: CODE draws from CODE
 Solutions/26_Patterns--Factory/README.md	explicit: Explicit Registration with a Protocol registers classes with CODE
 Solutions/26_Patterns--Factory/README.md	itself: Each class registers itself
 Solutions/26_Patterns--Factory/README.md	never: The demo never uses the name CODE
@@ -827,6 +841,7 @@ Solutions/31_Patterns--State_Machines/README.md	holds no: since the Solutions fo
 Solutions/31_Patterns--State_Machines/README.md	make no: and each CODE returns the current state on the moves that make no sense there
 Solutions/31_Patterns--State_Machines/README.md	never: Across repeated runs you never see CODE before an CODE
 Solutions/31_Patterns--State_Machines/README.md	want: so create one when you want a separate rule and not when you want a separate value
+Solutions/32_Patterns--Multiple_Dispatching/README.md	draws with code: a wet CODE draws with CODE whether CODE or CODE calls CODE
 Solutions/32_Patterns--Multiple_Dispatching/README.md	even: An even count always leaves the opposite pair to define
 Solutions/32_Patterns--Multiple_Dispatching/README.md	even: An even count leaves each weapon an opposite that draws
 Solutions/32_Patterns--Multiple_Dispatching/README.md	exactly: That is what the chapter's "matches classes exactly" means
@@ -851,6 +866,7 @@ Solutions/35_Patterns--Flyweight/README.md	has no: so the class still has no COD
 Solutions/35_Patterns--Flyweight/README.md	only: but only after CODE has pooled the instance
 Solutions/35_Patterns--Flyweight/README.md	only: whose CODE turns CODE only when the cells share one CODE
 Solutions/35_Patterns--Flyweight/README.md	takes no: Each lookup is one CODE index and takes no lock
+Solutions/36_Patterns--Memento/README.md	draws after code: Then write a test that draws after CODE and compares the memento's contents as a list
 Solutions/36_Patterns--Memento/README.md	has no: so CODE finds CODE by ordinary attribute lookup while CODE has no CODE
 Solutions/36_Patterns--Memento/README.md	only: and pass it to CODE as the only change
 Solutions/37_Patterns--Pattern_Refactoring/README.md	defines no: because a record defines no ordering for CODE to use
@@ -914,6 +930,7 @@ Solutions/46_Effects--Stateless/README.md	has no: a call to CODE has no terminal
 Solutions/46_Effects--Stateless/README.md	has none: CODE has none
 Solutions/46_Effects--Stateless/README.md	names the role: Each wrapper names the role this instance fills
 Solutions/46_Effects--Stateless/README.md	never: so the body never yields its CODE request
+Solutions/46_Effects--Stateless/README.md	nothing runs: Nothing Runs Yet shows that calling a generator function builds an Effect without running its body
 Solutions/46_Effects--Stateless/README.md	only: and only the annotation
 Solutions/46_Effects--Stateless/README.md	only: read both diagnostics and ask what the function has become once it loses its only CODE
 Solutions/46_Effects--Stateless/README.md	yield no: CODE in the yield channel means the function may yield no value of any type
@@ -927,6 +944,7 @@ Solutions/47_Effects--Stateless_in_Practice/README.md	is where: The difference i
 Solutions/47_Effects--Stateless_in_Practice/README.md	itself: whether the battery reports itself unavailable once exhausted
 Solutions/47_Effects--Stateless_in_Practice/README.md	never: CODE cannot catch what never entered the channel
 Solutions/47_Effects--Stateless_in_Practice/README.md	never: The driver never throws it into the suspended Effect
+Solutions/47_Effects--Stateless_in_Practice/README.md	nothing stops: Nothing stops an undeclared Effect explains why a signature cannot describe what a body does before it returns
 Solutions/47_Effects--Stateless_in_Practice/README.md	only: CODE is the only addition
 Solutions/47_Effects--Stateless_in_Practice/README.md	only: so the assertions together say that CODE tries every price and writes only the affordable ones
 Solutions/47_Effects--Stateless_in_Practice/README.md	price: **Prove the loop tries every price
@@ -934,17 +952,3 @@ Solutions/47_Effects--Stateless_in_Practice/README.md	price: Dropping the last p
 Solutions/47_Effects--Stateless_in_Practice/README.md	price: so the assertions together say that CODE tries every price and writes only the affordable ones
 Solutions/47_Effects--Stateless_in_Practice/README.md	price: the script runs out at the fourth price
 Solutions/47_Effects--Stateless_in_Practice/README.md	prices: The test proves from both sides that CODE attempts all four prices
-Chapters/32_Patterns--Multiple_Dispatching.md	draws code: which draws CODE random pairs from CODE and yields each as a CODE tuple
-Chapters/38_Patterns--Simulation.md	draw the code: To draw the CODE
-Chapters/41_Functional--Toolkits.md	draw code: Four tools draw CODE elements from an iterable
-Solutions/26_Patterns--Factory/README.md	draws from code: CODE draws from CODE
-Solutions/32_Patterns--Multiple_Dispatching/README.md	draws with code: a wet CODE draws with CODE whether CODE or CODE calls CODE
-Solutions/36_Patterns--Memento/README.md	draws after code: Then write a test that draws after CODE and compares the memento's contents as a list
-Chapters/06_Foundations--Modules_and_Packages.md	nothing touches: If nothing touches the lazily imported name
-Chapters/17_Techniques--Metaprogramming.md	nobody imports: a class in a module nobody imports stays out of the registry
-Chapters/46_Effects--Stateless.md	nothing runs: Nothing Runs Yet explains why that request must be a value of its own
-Chapters/46_Effects--Stateless.md	nobody else provides: A dependency injection container often lets you register a fallback for a type nobody else provides
-Chapters/46_Effects--Stateless.md	nothing stops: Nothing stops an undeclared Effect examines that limit
-Solutions/21_Patterns--Design_Patterns/README.md	nothing absorbs: Nothing absorbs the change
-Solutions/46_Effects--Stateless/README.md	nothing runs: Nothing Runs Yet shows that calling a generator function builds an Effect without running its body
-Solutions/47_Effects--Stateless_in_Practice/README.md	nothing stops: Nothing stops an undeclared Effect explains why a signature cannot describe what a body does before it returns

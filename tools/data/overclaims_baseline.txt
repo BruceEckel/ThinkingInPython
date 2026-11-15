@@ -724,6 +724,7 @@ Chapters/45_Effects--Generators.md	[BOUND] An asynchronous generator has a yield
 Chapters/45_Effects--Generators.md	[BOUND] An ordinary call keeps that state for the caller alone
 Chapters/45_Effects--Generators.md	[BOUND] CODE has the yield channel alone, so the type checker rejects CODE on anything annotated CODE
 Chapters/45_Effects--Generators.md	[BOUND] CODE puts that job at the back of the queue, behind the other job, so the two jobs alternate
+Chapters/45_Effects--Generators.md	[BOUND] CODE returns the callback, CODE, which captures the running CODE as a closure variable, so CODE survives from one call to the next
 Chapters/45_Effects--Generators.md	[BOUND] Code before a CODE runs on that transition alone, the Mealy shape, where the action belongs to the transition
 Chapters/45_Effects--Generators.md	[BOUND] Here the choice is between two places in one function rather than between two designs
 Chapters/45_Effects--Generators.md	[BOUND] Replace CODE with two functions
@@ -732,7 +733,6 @@ Chapters/45_Effects--Generators.md	[BOUND] Stateless builds an Effect system on 
 Chapters/45_Effects--Generators.md	[BOUND] That CODE carries CODE as its value, so CODE prints the exception's class name alone
 Chapters/45_Effects--Generators.md	[BOUND] The Moore shape and the Mealy shape both fit one function with no CODE field
 Chapters/45_Effects--Generators.md	[BOUND] The annotation describes the three channels
-Chapters/45_Effects--Generators.md	[BOUND] The callback needs a variable that survives from one call to the next, to hold the running CODE
 Chapters/45_Effects--Generators.md	[BOUND] The event loop is the single driver at the edge of the program
 Chapters/45_Effects--Generators.md	[BOUND] The exception then propagates up through the CODE in the hotel step and the one in the flight step
 Chapters/45_Effects--Generators.md	[BOUND] The one assignment CODE replaces the CODE and the CODE
