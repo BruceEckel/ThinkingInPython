@@ -737,7 +737,6 @@ Chapters/45_Effects--Generators.md	[BOUND] The event loop is the single driver a
 Chapters/45_Effects--Generators.md	[BOUND] The exception then propagates up through the CODE in the hotel step and the one in the flight step
 Chapters/45_Effects--Generators.md	[BOUND] The generator-driver pair resembles threads that pass items through a queue, as in Coordinating Threads with Queues, with three differences
 Chapters/45_Effects--Generators.md	[BOUND] The one assignment CODE replaces the CODE and the CODE
-Chapters/45_Effects--Generators.md	[BOUND] TypeScript types the three channels as CODE
 Chapters/45_Effects--Generators.md	[BOUND] Without generators, you have three ways to write such a producer in a single thread
 Chapters/45_Effects--Generators.md	[BOUND] Written as a generator, the squasher delivers a single asterisk and the character after it with two statements in a row
 Chapters/46_Effects--Stateless.md	[BOUND] A caller now has two options

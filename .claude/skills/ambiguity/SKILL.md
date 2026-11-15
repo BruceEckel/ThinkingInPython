@@ -340,3 +340,50 @@ Shapes Bruce flags that the catalog above did not name, dated, with the sentence
   `tip overclaims CH=NN` lists every "X alone"; read each one whose
   subject is a class or a function and whose sentence names a second
   class or function. R27's Keep-when has the record.
+- 2026-11-15, chapter 45: a bare "frame" where the passage has two kinds.
+  "A `yield` suspends one frame, the frame of the function that
+  contains the `yield`. A function that the generator calls runs in a
+  frame of its own and cannot suspend the generator's frame" (Bruce:
+  "clarify what kind of frame this paragraph references").
+  Chapter 5 defines an *execution frame*, the object that holds a
+  call's locals and its position, and a *stack frame*, that object
+  while it is on the call stack. A generator's execution frame is
+  stored in the generator object.
+  Write the kind wherever both are in the passage: "suspends one
+  execution frame, the frame of the generator whose body contains the
+  `yield`. A function that the generator calls runs in a stack frame
+  of its own and cannot suspend the generator's execution frame".
+  The pair also said "function" for the generator and then for the
+  ordinary function it calls; the chapter's noun for the first is
+  "generator" (C67).
+  Grep the scope for `\bframes?\b` and read each one that has neither
+  "execution" nor "stack" before it. C45 in `bruce_edit_db.md`.
+- 2026-11-15, chapter 45: a time word on a standing fact.
+  "Python unlinks the generator's execution frame from the call
+  stack, after which the execution frame lives on the heap inside the
+  generator object" (a sentence from Bruce's hand, found when he asked
+  for a review of his edits to the subsection).
+  "After which" says the frame is on the heap from the `yield` on,
+  and so that it was somewhere else before. It is in the generator
+  object from the generator's creation.
+  This is C70's narrowing modifier in time form. For "after which",
+  "from then on", "then", or "now" on a statement of where a thing is
+  or what it has, ask whether the statement was true before the event.
+  If it was, the standing fact gets a sentence in the present with no
+  time word, and the event keeps what it changes: "... from the call
+  stack. The execution frame lives on the heap inside the generator
+  object, so it stays there with its locals and position intact."
+  A sentence made by joining two true sentences is probed at the
+  join, whoever joined them.
+- 2026-11-15, chapter 45: "the same X" said of a list.
+  "PHP and Dart follow the same design, with delegation as `yield
+  from` and `yield*`" (Bruce: "verify the Dart and PHP claim and fix
+  it").
+  "The same design" was JavaScript's `send()`, `throw()`, and
+  `close()`. PHP's `Generator` has `send()` and `throw()`, and a Dart
+  generator has no send channel.
+  "Same" over several things is one claim for each of them (R63,
+  test 7): check every member against its reference, and give a
+  member that differs a sentence of its own.
+  Two lists paired by "respectively" or by order ("X and Y ... as A
+  and B") get the same unpacking, one sentence for each pair.

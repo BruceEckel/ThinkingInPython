@@ -239,6 +239,13 @@ and it becomes part of every future pass.
   "`@final` on the two classes" when the classes were named in another
   chapter.
   Name the items where the count appears.
+  A count of items that were named far above is the same pointer,
+  and the names go in the order of anything the reader must match
+  them against: "TypeScript types the three channels as
+  `Generator<T, TReturn, TNext>`" -> "types the yielded, returned,
+  and sent values as `Generator<T, TReturn, TNext>`" (2026-11-15,
+  chapter 45, whose list of the channels sits 2,300 lines up, in
+  another order). C33 in `bruce_edit_db.md`.
   "Each" as a bare subject is the same pointer (Bruce, 2026-11-13,
   chapter 45: "'each' vague"): "a producer computes a series of
   values, a consumer uses them one at a time, and each is simplest to
@@ -334,3 +341,51 @@ and it becomes part of every future pass.
   Grep the scope for the other uses of both nouns; the lead-in above
   that listing had "a driver delegates to it" for the same function.
   C67 in `bruce_edit_db.md`.
+- **A part noun with two owners on the page.**
+  "The body", "the loop", "the call", "the result", or "the frame"
+  stands for a part of one thing while a second thing with that kind
+  of part is in the paragraph (Bruce, 2026-11-01, chapter 45: "which
+  body?").
+  Name the owner: "the generator body", "`watch()`'s body", "the
+  innermost body".
+  "C# and Kotlin compile the body into a state-machine class", two
+  sentences above "the loop body becomes a `yield` function", is
+  "compile the generator's body", and the later "while the body runs"
+  is "while the loop body runs" (2026-11-15).
+  A construct set beside its counterpart in another language takes the
+  language's name the same way: "with `yield*` for `yield from`" in a
+  paragraph about JavaScript became, in Bruce's hand, "for Python's
+  `yield from` behavior".
+  Keep "its body" with one candidate, and the bare noun when the
+  previous sentence names the owner and nothing else on the page has
+  that part.
+  For each part noun in the scope, count the things in the paragraph
+  that have one. C50 in `bruce_edit_db.md`.
+- **A kind noun with "the" in a passage that names several of the kind.**
+  Chapter 45's history subsections cite PEPs 255, 342, 380, and 492,
+  and used "the PEP" five times (the antecedents pass Bruce asked for,
+  2026-11-15).
+  "The PEP" passes when the sentence before it names one PEP:
+  "PEP 342 ... added the send channel ... The PEP calls coroutines".
+  It fails at the head of a paragraph ("The PEP cites" -> "PEP 255
+  cites") and when the one meant is further back ("two years before
+  the PEP" -> "before PEP 255"; "kept that restriction" -> "kept
+  PEP 255's restriction").
+  The same test goes on "the listing", "the function", "the class",
+  "the exception", and "the language" wherever the section has several.
+  For each kind noun, count how many of the kind the section names.
+  With more than one, read every "the <kind>" against the sentence
+  before it. R12 in `bruce_edit_db.md`.
+- **The first noun phrase after a paragraph break.**
+  A break strands more than a pronoun.
+  Bruce split the paragraph that listed JavaScript, TypeScript, PHP,
+  and Dart from "The languages differ in where the suspended frame
+  lives" (2026-11-15), and "The languages" then opened a paragraph
+  about Python, C#, Kotlin, Ruby, Go, and CLU while pointing at the
+  four above it.
+  A generic plural drops its article ("Languages differ", R44), and a
+  definite singular takes its name ("The PEP's answer" -> "PEP 380's
+  answer").
+  After any split, read the new paragraph's first noun phrase for a
+  "the", "that", or "these" that points back across the break.
+  R29's 2026-11-15 sighting in `bruce_edit_db.md`.

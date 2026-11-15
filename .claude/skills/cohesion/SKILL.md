@@ -385,3 +385,36 @@ and it becomes part of every future pass.
   A sentence repaired phrase by phrase at two flags gets its whole
   paragraph reread at the second.
   C80 in `bruce_edit_db.md`.
+- **A design described by what it keeps and leaves out of its source.**
+  "PEP 255 kept the suspended frame and left out a coroutine's ability
+  to hand control to any other coroutine"
+  (Bruce, 2026-11-15, chapter 45: "left out from where?").
+  The part removed entered the passage as the object of "left out",
+  so the reader met the coroutine's capability and its removal in one phrase.
+  This is old before new for a premise:
+  state what the source can do in a sentence of its own,
+  with the source as subject ("A coroutine can hand control to any other coroutine.").
+  Then say what the design keeps, with its owner,
+  and what the design does where the source had the missing part, in a positive verb:
+  "PEP 255's generator keeps the coroutine's suspended frame and
+  restricts the transfer: each `yield` hands control back to the
+  caller of `next()` or `send()`."
+  Grep the scope for `left out`, `leaves? out`, `drops`, `omits`,
+  `without the`, and `kept`,
+  and read each one that compares a design with the thing it came from.
+  An item the reader can see in a listing
+  ("`sets.py` leaves out a few operators") is a keep.
+  C86 in `bruce_edit_db.md`.
+- **The two sides of a contrast, joined.**
+  "a suspended generator keeps its execution frame alive, and a later
+  call resumes it. Python discards a function's stack frame when the
+  function returns" became, in Bruce's hand (2026-11-15, chapter 45),
+  "a suspended generator keeps its execution frame alive, whereas an
+  ordinary function discards its stack frame when the function returns".
+  Join the two sides with "whereas" or "while",
+  give them subjects of one kind
+  (the two things contrasted, where the old second side had "Python"
+  as its subject and the function in a possessive),
+  and move or cut a clause that stands between them.
+  Keep a deliberate two-beat ("Failures never vanish. They only relocate.").
+  C10 in `bruce_edit_db.md`.

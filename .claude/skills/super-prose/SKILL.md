@@ -49,7 +49,10 @@ each pass hands the next one less to do.
    not "take", "get", or "receive" one ("the `await` expression
    takes that value" -> "evaluates to that result", C77), and a
    rewrite never swaps a taught verb or a noun already in the
-   sentence for a variation.
+   sentence for a variation. A feature does not "reach" a version
+   ("`yield from`, which reached Python 3.3 in 2012" -> "adopted in
+   Python 3.3 (2012)", C87): grep the scope for
+   `reach(ed|es)? (Python|[0-9])`.
 2. `positive`: a negation that is an accident of phrasing turns around.
    A subject of "Nothing", "Nobody", or "No one" with a verb ("Nothing
    calls `throw()` on the first booking" -> "`list(book())` drives the
@@ -169,7 +172,19 @@ each pass hands the next one less to do.
    pointer that opens the paragraph after them goes in the same
    edit (pass 5, C82). Read each section's first sentence for a
    subject that is the chapter or its opening: it is the recap R19
-   cuts.
+   cuts. A sentence that says what a design keeps or leaves out of
+   its source ("PEP 255 kept the suspended frame and left out a
+   coroutine's ability to hand control to any other coroutine",
+   Bruce: "left out from where?") comes after a sentence that says
+   what the source can do, and gives the design a positive verb ("A
+   coroutine can hand control to any other coroutine. PEP 255's
+   generator keeps the coroutine's suspended frame and restricts the
+   transfer: each `yield` hands control back to the caller", C86).
+   Grep the scope for `left out`, `leaves? out`, `drops`, `omits`,
+   and `kept`. The two sides of a contrast are joined with "whereas"
+   or "while" and get subjects of one kind ("a suspended generator
+   keeps its execution frame alive, whereas an ordinary function
+   discards its stack frame when the function returns", C10).
 5. `antecedents`: every pointer with two candidates gets its noun.
    A link is a pointer too: when its target teaches a named
    construct, the link text starts on the name ("The bare `raise`
@@ -213,7 +228,21 @@ each pass hands the next one less to do.
    `^(That|This|These|Those) (difference|distinction|contrast|asymmetry|trade-off|gap|split|separation|overlap)`.
    After any paragraph is rewritten, cover it and reread the first
    sentence of the next paragraph: a pointer there was written
-   against the old text.
+   against the old text. After a paragraph is split, read the new
+   paragraph's first noun phrase for a "the" that points back across
+   the break ("The languages differ" under a list of four other
+   languages -> "Languages differ", R44). A kind noun with "the"
+   ("the PEP" in a section that cites four PEPs, "the listing", "the
+   function") passes when the sentence before it names the one
+   meant, and otherwise takes the name ("two years before the PEP"
+   -> "before PEP 255", R12). A part noun ("the body", "the loop",
+   "the frame") names its owner when the paragraph holds a second
+   thing with that part ("compile the body" -> "compile the
+   generator's body", beside a loop body, C50). A count of items
+   named far above names them, in the order of what the reader must
+   match them against ("types the three channels as `Generator<T,
+   TReturn, TNext>`" -> "types the yielded, returned, and sent
+   values as", C33).
 6. `ambiguity`: every sentence that counts, compares, coordinates,
    modifies, or limits keeps one reading. A list of what two things
    share ("has `send()`, `throw()`, and `close()`, as a generator
@@ -248,7 +277,16 @@ each pass hands the next one less to do.
    `\b(stop|start|end|run|close|open|resume|return|finish|move|change|fail)e?s? (and|or|then) \w+`
    and read each line; a first verb meant with no object ("the
    script runs and prints") and a set pair ("opens and closes a
-   file") stay.
+   file") stay. A bare "frame" in a passage with a generator's
+   execution frame and a call's stack frame says which kind it is
+   (Bruce: "clarify what kind of frame this paragraph references",
+   C45): grep the scope for `\bframes?\b`. A time word on a standing
+   fact ("after which the execution frame lives on the heap", when
+   it is there from the generator's creation) is C70's modifier in
+   time form: ask whether the statement was true before the event.
+   "The same X" said of a list ("PHP and Dart follow the same
+   design") is one claim for each member, so check each against its
+   reference and give a member that differs its own sentence (R63).
 7. `activate`: passives with a natural actor, nominalizations,
    metadiscourse, empty frames, tense drift (a relative-clause past
    in a sentence about standing behavior included: "the value that

@@ -723,8 +723,9 @@ identifier (`[CODE!]` adjacent, `[CODE]` further: "The next `next()`",
 tokens in one sentence (`[STEM~]` two inflections, "returns ...
 returned"; `[STEM=]` one form, "the generator ... the generator").
 Bruce flagged the shape in chapter 45 that day ("The next `next()`
-links that frame back", now "The call that resumes the generator
-links"), and the book-wide sweep read 1,311 candidates in 93 files and
+links that frame back", now "Resuming the generator links", his
+wording since 2026-11-15), and the book-wide sweep read 1,311
+candidates in 93 files and
 reworded 56, so a hit is a judgment, not a fault: the keeps are the
 topic noun named again (his antecedents rule prefers it to a pronoun),
 a deliberate parallel, a function whose name is the verb it performs

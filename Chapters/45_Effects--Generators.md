@@ -192,7 +192,7 @@ In `drive_by_hand.py`,
 `inspect.getgeneratorlocals()` shows the values of `name` and `town` that the generator keeps while it waits for the third answer.
 After the body returns,
 `inspect.getgeneratorstate()` reports `GEN_CLOSED` and `inspect.getgeneratorlocals()` reports `{}`.
-At `return`, Python discards the generator's [execution frame](05_Foundations--Functions.md#names-inside-a-function)
+At a `return`, Python discards the generator's [execution frame](05_Foundations--Functions.md#names-inside-a-function)
 and every local variable stored in it.
 The `yield` and the locals together are the generator's state.
 
@@ -2399,7 +2399,7 @@ Coroutines, he wrote, are "equal partners," each free to resume any other,
 while a generator returns control to its caller.
 
 PEP 342, written in 2005, kept PEP 255's restriction and added the send channel,
-which reached Python 2.5 in 2006.
+adopted in Python 2.5 (2006).
 The PEP calls coroutines "a natural way of expressing" simulations, games,
 and asynchronous I/O.
 Such programs need to pass a value or an exception into a generator at its suspension point,

@@ -17,8 +17,15 @@ chapter still builds, and removes the tag.
 git tag -l 'edit-start-*'
 ```
 
-- An argument names the chapter: use `edit-start-NN`; if it does not
-  exist, stop and say the pass was never opened, and offer
+- An argument names the chapter: use `edit-start-NN`. If it does not
+  exist, look for the chapter's last capture before stopping:
+  `git log -5 --format='%h %ad %s' -- bruce_edit_db.md`, and the
+  store's newest sightings, name it. When captures ran on this
+  chapter, the pass is real and was captured as it went (see "A pass
+  captured as it went" below): close it from the last capture commit,
+  using that commit wherever these steps say `edit-start-NN`, skip
+  Step 5, and say in the report that no tag existed. When no capture
+  names the chapter, stop and say the pass was never opened, and offer
   `/bruce-edit-capture NN` on his recent commits instead.
 - No argument and one tag: use it, and say which chapter it is.
 - No argument and several tags: ask which chapter, listing them.
@@ -183,6 +190,34 @@ docstring has the mechanics). While the tag still exists:
    gates each chapter with `tip verify-ch` and commits one chapter
    per commit. Read the deletions it lists, repair any seam
    yourself, and report the commits so Bruce reviews the diff.
+
+## A pass captured as it went
+
+Chapter 45's pass (2026-10-21 to 2026-11-15, 499 commits) had no tag
+at its close and no fault-review page. Each commit that repaired a
+flagged sentence wrote its own store entry, with a grep of both trees
+for the shape's other sites, and periodic captures read the commits
+in between (`74b9165d` is one). For such a pass Steps 3 and 3b become:
+
+1. The range is the last capture commit to `HEAD`. Read each commit's
+   message and word diff; the messages carry the reasons.
+2. Bruce's own words are in the session transcripts,
+   `~/.claude/projects/C--git-ThinkingInPython/*.jsonl`. His typed
+   messages (entries with `"type":"user"` and `"promptSource":"typed"`)
+   give the quote for each sighting, and a new wording that appears in
+   no `Edit` call's `new_string` is his hand. Quote him from there;
+   never infer provenance from a commit message alone.
+3. Write the store directly: sightings, new candidates, and a
+   `**Promotion.** Proposed` line on a candidate that gains a second
+   chapter. Promotions stay proposed for Bruce's call.
+4. File each lesson in its `Home` the same day: the skill's Accrued
+   section and the matching pass in `super-prose`. Check that a
+   `Home` the store names holds the entry; C50's did not until
+   this close.
+5. For each new candidate, grep both trees for the shape, apply the
+   sibling sites in the chapter being closed, and record the count in
+   the entry's Scale line. No pairs go into `edit_pairs.json` and
+   `tip edit-patterns` does not run.
 
 ## Step 4: verify and commit
 

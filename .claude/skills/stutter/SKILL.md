@@ -15,6 +15,10 @@ sit side by side, the font is the only thing separating them, and read
 aloud the phrase stutters.
 The fix was "The call that resumes the generator links that frame back
 into the call stack", which also covers `send()` and `throw()`.
+Bruce shortened it by hand on 2026-11-15 to "Resuming the generator
+links that frame back into the call stack": a gerund for the action,
+which also drops the first of the fix's two "call"s.
+Read a repair for the echo it brings in.
 The scan he asked for next found two more in the chapter.
 "`close()` returns the value the generator returned while handling
 `GeneratorExit`, so the driver prints `closed`, and the call returns"
@@ -152,9 +156,11 @@ When the test is close, keep.
 
 The repair uses words the passage already has.
 
-- Replace one occurrence with the thing's role or the noun the
-  sentence is about ("The next `next()`" became "The call that resumes
-  the generator"; `close()` "returns" became "hands the driver").
+- Replace one occurrence with the thing's role, the noun the sentence
+  is about, or a gerund for the action ("The next `next()`" became
+  "The call that resumes the generator" and then, in Bruce's hand,
+  "Resuming the generator"; `close()` "returns" became "hands the
+  driver").
 - Give each occurrence its own clause when one verb carries two
   subjects.
 - Delete the occurrence the sentence does not need ("the skipped side

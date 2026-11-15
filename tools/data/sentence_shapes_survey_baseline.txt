@@ -579,7 +579,7 @@ Chapters/44_Effects--Effect_Management.md	[SAME] CODE produces the same result f
 Chapters/44_Effects--Effect_Management.md	[SAME] Flix expresses the same design with different notation.
 Chapters/44_Effects--Effect_Management.md	[TWO] An AI can start using that language as soon as it works, while people take years to adopt a new language.
 Chapters/44_Effects--Effect_Management.md	[TWO] Python demonstrates that this tracking can work, and hard-codes it to a single Effect, asynchrony, rather than letting you declare your own.
-Chapters/45_Effects--Generators.md	[ADD] A function that the generator calls runs in a frame of its own and cannot suspend the generator's frame, so a helper that makes a request must be a generator too. | after: A CODE suspends one frame, the frame of the function that contains the CODE.
+Chapters/45_Effects--Generators.md	[ADD] A function that the generator calls runs in a stack frame of its own and cannot suspend the generator's execution frame, so a helper that makes a request must be a generator too. | after: A CODE suspends one execution frame, the frame of the generator whose body contains the CODE.
 Chapters/45_Effects--Generators.md	[CAN] A class can supply CODE, the way CODE in Iterators supplies CODE:
 Chapters/45_Effects--Generators.md	[CAN] A generator can build its next request from the answer it receives:
 Chapters/45_Effects--Generators.md	[CAN] A generator's driver can do the first two.

@@ -357,3 +357,14 @@ and it becomes part of every future pass.
   under that name or the next sentence states it.
   In a walkthrough, read each sentence about a call's argument,
   default, or keyword against this test. C83 in `bruce_edit_db.md`.
+- **A feature that "reaches" a version.**
+  "`yield from`, which reached Python 3.3 in 2012" became, in Bruce's
+  hand (2026-11-15, chapter 45), "`yield from`, adopted in Python 3.3
+  (2012)".
+  "Reached" is a figure of travel with no actor,
+  the family of "ships" and "lands" on the don't-use list.
+  Write the adoption, or give the PEP the verb
+  ("PEP 492 added `async`/`await` to Python 3.5 in 2015").
+  Keep a value that reaches a number and execution that reaches a line.
+  Grep the scope for `reach(ed|es)? (Python|[0-9])`.
+  C87 in `bruce_edit_db.md`.

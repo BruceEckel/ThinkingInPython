@@ -552,7 +552,7 @@ ambiguity, not on pronouns.
 sighting from chapter 26 below is the point of the entry: a sweep that
 reads the others as "prefer the noun" will overshoot.
 
-**Sightings.** 18 (2 chapters)
+**Sightings.** 34 (5 chapters)
 - `26_Patterns--Factory` 2026-08-31 (`40323f50`), was Claude-written,
   six: "It covers only the first level of inheritance" ->
   "`__subclasses__()` covers only the first level of inheritance"; "It
@@ -609,6 +609,36 @@ reads the others as "prefer the noun" will overshoot.
   driver need a method for this, when Python already has `raise`?" ->
   "Why does the driver need methods to raise exceptions inside the
   generator, when Python has a `raise` statement?"
+
+- `45_Effects--Generators` 2026-11-15, was Claude-written, nine sites
+  in The Suspended Frame and The Restriction Behind the Driver. Two
+  were Bruce's questions and seven came from the antecedents pass he
+  then asked for on each subsection (`4944b211`, `22617a24`,
+  `86298ad0`, `46841ec0`).
+  - Bruce: 'is "it" the helper or the generator': "The helper is still
+    a generator, and the generator that calls it delegates to it." ->
+    "The helper is still a generator. The calling generator delegates
+    to the helper." (C42 has the split.)
+  - Bruce: "it: await or yield from?": "`await` uses the
+    implementation of `yield from`, so the second restriction holds
+    for it." -> "holds for `await` too."
+  - A kind noun with "the" where the section names several of the
+    kind. The two subsections cite PEPs 255, 342, 380, and 492, so
+    "the PEP" has four candidates unless the sentence before it names
+    one: "The PEP cites" (opening a paragraph) -> "PEP 255 cites";
+    "two years before the PEP" -> "before PEP 255"; "kept that
+    restriction" (stated two paragraphs up) -> "kept PEP 255's
+    restriction"; "The PEP's answer is `yield from`" (opening a
+    paragraph after R29's break) -> "PEP 380's answer". Two kept the
+    pointer, each one sentence after "PEP 342": "The PEP calls
+    coroutines" and "The PEP's trampoline".
+  - "A generator cannot specify its driver, so you write it." -> "so
+    you write the driver."; "It describes a function by what it
+    requests and writes those requests into its return type." ->
+    "Stateless describes a function by the requests it makes and
+    writes those requests into the function's return type."; "In CLU a
+    `yield` calls the loop body, which returns to the iterator when it
+    finishes." -> "which runs to its end and returns to the iterator."
 
 **Home.** the `antecedents` skill, as a keep-when (its "zero ambiguous
 pointers, not zero pronouns" line). Not a separate sweep. Promoted
@@ -978,6 +1008,22 @@ separate sentences"):
   practical limit applies: every function here recurses once per level
   of tree" -> "One practical limit applies. Every function here recurses
   once per level of tree"
+- `45_Effects--Generators` 2026-11-15 (`8c183f7f`), the keep, made in
+  the other direction by Bruce's hand: "Go 1.23 reverses the protocol.
+  The loop body becomes a `yield` function that the iterator calls
+  once per value, so the iterator keeps its frame on the call stack
+  while the body runs." -> "Go 1.23 reverses the protocol: the loop
+  body becomes a `yield` function ...". A period became a colon.
+  "Reverses the protocol" announces a change and leaves its content
+  open, and the second sentence is that content, the "direct answer to
+  what the left side sets up" of the keep above. "Namely" fits after
+  the colon and "because" does not. Claude's sentence in the same
+  commit has the same form: "PEP 255's generator keeps the coroutine's
+  suspended frame and restricts the transfer: each `yield` hands
+  control back to the caller of `next()` or `send()`." A sweep that
+  splits at colons reads the left side first: an abstract verb whose
+  content the right side supplies keeps its colon, and two sentences
+  of that form can take one.
 
 **Home.** this file only; the 2026-09-12 sweep is recorded in project
 memory `colon-splice-audit-completed`. Promoted at Bruce's call
@@ -1375,6 +1421,22 @@ multiple primary concepts, and this makes it confusing."
   half, "the steps of one walkthrough". Both were narrowed that day.
   When a listing gains a statement, the sentence about it is placed by
   this rule, not by where the old paragraph happens to end.
+- `45_Effects--Generators` 2026-11-15, two breaks in the history
+  subsections. Bruce's hand (`8c183f7f`): the paragraph that opens
+  "Many languages now have generators." ran from which languages have
+  them into where each one keeps the suspended frame, and his break
+  went before "The languages differ in where the suspended frame
+  lives." Claude (`944eb10a`): the second restriction and PEP 380's
+  description of its consequence ran on into "The PEP's answer is
+  `yield from`", and the answer got a paragraph. Each new paragraph
+  then opened on a definite noun phrase whose referent sat across the
+  break. "The languages" pointed at JavaScript, TypeScript, PHP, and
+  Dart, and the paragraph it opens describes Python, C#, Kotlin, Ruby,
+  Go, and CLU, so it became "Languages differ" (R44). "The PEP's
+  answer" became "PEP 380's answer" (R12). The test's "a pronoun or
+  'This' that opens the new paragraph gets its noun" covers an article
+  too: after a break, read the new paragraph's first noun phrase for a
+  "the" that points back across it.
 
 **Sweep notes.** A seam whose next sentence carries "though", "also",
 "the same way", or a mid-sentence "it"/"one" still leans on the
@@ -1974,6 +2036,15 @@ phrases, eight generic ones lost the article in chapters 01, 11, 17, 21,
 - `21_Patterns--Design_Patterns` 2026-10-21 (93cb0163):
   "The programmers who arrive next learn it as syntax" -> "Programmers
   who arrive next learn it as syntax"
+- `45_Effects--Generators` 2026-11-15 (`46841ec0`), was Claude-written,
+  a generic plural with no restrictive clause: "The languages differ in
+  where the suspended frame lives." -> "Languages differ in where the
+  suspended frame lives." The sentence opens a paragraph, the paragraph
+  before it lists four languages, and "The" made the plural those four,
+  while the sentences below it describe six others. This is the test
+  read the other way: with the article the sentence is about a set the
+  text has set up, and that set is the wrong one. R29's 2026-11-15
+  sighting has the paragraph break that exposed it.
 
 **Home.** this file.
 
@@ -2127,6 +2198,23 @@ the rest of the chapter for similar issues"; 15 passages cut in
   a whole. Ask it before repairing a walkthrough: what does the
   paragraph tell the reader that the listing, a summary beside it, or
   an earlier chapter's walk of the same code does not?
+- `45_Effects--Generators` 2026-11-14 (`6570dd83`), a listing changed
+  so that a sentence could go, Claude's suggestion, Bruce: "do both".
+  Under `fibonacci_generator.py`: "The consumer stops when it has
+  enough values, whether or not the producer has more." -> deleted.
+  All four consumers in Three Ways to Write the Producer had read
+  every value, so no trace showed a consumer stopping, and the
+  sentence claimed a behavior the page did not have. Each loop
+  consumer gained `if total > 10: break`, and the callback's
+  `consume()` returns at once from then on. The four traces now differ
+  in one line, `computed 8`: last in the callback version, in the
+  first block of the list version, and absent from the class and
+  generator versions. The sentence that stayed, "The producer computes
+  a value only when the consumer loop asks for one", is the reason
+  that line is missing. When a sentence beside a listing claims a
+  behavior that no line of the trace shows, try the repair in the
+  listing first (listing-design's fourth question, a trace that shows
+  the chapter's subject). The sentence then falls to this rule.
 
 **Home.** CLAUDE.md (global, the "Prose beside a listing" bullet);
 deep-review (prose pass, "Restating"). Promoted on Bruce's ruling, the
@@ -3302,6 +3390,21 @@ so the read still applies test 6 by hand. One was test 7.
   same thing: "The weapon ranking is a cycle. ... The same cycle
   appears at the group level." -> "A second cycle appears at the
   group level."
+- `45_Effects--Generators` 2026-11-15 (`1ecfa4c4`), test 7 over a
+  list, was Claude-written, Bruce: "verify the Dart and PHP claim and
+  fix it": "PHP and Dart follow the same design, with delegation as
+  `yield from` and `yield*`." -> "PHP's `Generator` has `send()` and
+  `throw()`, with `yield from` for delegation. A Dart generator
+  produces values in one direction, through an `Iterator` that has
+  `moveNext()` and `current`, and delegates with `yield*`." "The same
+  design" was JavaScript's, with `send()`, `throw()`, and `close()`,
+  and it holds for PHP alone. A Dart generator has no send channel
+  (the PHP manual's `Generator` and the Dart API's `Iterator`, read
+  that day). Bruce had just added "respectively" by hand to pair the
+  two languages with the two keywords. Writing a sentence for each
+  language put each claim beside its reference. "The same X" said of
+  several things is one claim for each of them: check every member,
+  and give a member that differs a sentence of its own.
 
 **Home.** CLAUDE.md (the "same" bullet) | ambiguity (the comparison
 entry and Accrued shapes) | `[SAME]` (shape 5) and `[SAME+NEW]`
@@ -3446,8 +3549,8 @@ instances".
 **Keep when.** The two sentences are a deliberate two-beat ("Failures
 never vanish. They only relocate.").
 
-**Sightings.** 3 (additive), all `26_Patterns--Factory`, was
-Claude-written (same chapter, so not yet independent):
+**Sightings.** 4 (additive), 2 chapters. The first three are
+`26_Patterns--Factory`, was Claude-written:
 - 2026-08-31: "Where" in `40323f50`, corrected to "Whereas" in
   `d6144479`
 - 2026-08-31 (`2b18eed8`): "Compare `spawn()` with `make()` in
@@ -3459,6 +3562,27 @@ Claude-written (same chapter, so not yet independent):
 - 2026-09-12 (`a9731125`): "A closed set of names suits `Literal`; an
   open set, growing by subclassing, does not:" -> "A closed set of names
   suits `Literal`, while an open set does not:"
+- `45_Effects--Generators` 2026-11-15 (`8c183f7f`), Bruce's hand, the
+  second chapter: "The useful part is that a suspended generator keeps
+  its execution frame alive, and a later call resumes it. Python
+  discards a function's stack frame when the function returns." ->
+  "The useful part is that a suspended generator keeps its execution
+  frame alive, whereas an ordinary function discards its stack frame
+  when the function returns." His edit made two changes beyond the
+  connective. The second side took a subject of the first side's kind:
+  "an ordinary function discards", where "Python discards a function's
+  stack frame" had the contrasted thing in a possessive (C80 asks the
+  same of a contrast's two sentences). And the clause that stood
+  between the sides, "and a later call resumes it", went. The
+  paragraph's last sentence says it: "Resuming the generator links
+  that frame back into the call stack."
+
+**Promotion.** Proposed 2026-11-15: chapter 45 is the second chapter,
+and the sighting is Bruce's hand. Reconciled wording for the rule:
+join the two sides of a contrast with "whereas" or "while", give them
+subjects of one kind, and move or cut a clause that sits between them.
+
+**Home.** cohesion (Accrued patterns) | this file.
 
 ### C11. Cut "need(s) to" where the sentence describes rather than obliges
 
@@ -3747,15 +3871,33 @@ introduce them with a colon.
 **Keep when.** The count introduces the items in the same sentence, as
 "gives up three things that ... keeps:" does.
 
-**Sightings.** 2, one chapter (`30_Patterns--Observer`, 2026-10-11)
+**Sightings.** 3, 2 chapters. The first two are
+`30_Patterns--Observer`, 2026-10-11:
 - Bruce: "vague". "*Observer* removes one coupling and keeps another."
   -> "*Observer* decouples the thermometer from its responders and
   leaves the responders coupled to the thermometer."
 - "Of the two additions, only the telling moves out" -> the sentence
   names the two additions, the comparison and the announcement, and
   which one moves
+- `45_Effects--Generators` 2026-11-15 (`46841ec0`), was Claude-written,
+  the second chapter, from the antecedents pass Bruce asked for on The
+  Suspended Frame: "TypeScript types the three channels as
+  `Generator<T, TReturn, TNext>`." -> "TypeScript types the yielded,
+  returned, and sent values as `Generator<T, TReturn, TNext>`." The
+  chapter names its three channels 2,300 lines above, as yield, send,
+  and return. The type beside the count lists them in another order,
+  so the reader had to recall the three items and then match each one
+  to a parameter. The names now stand in the order of the parameters
+  beside them.
 
-**Home.** this file; a cousin of R9 (name the concrete thing).
+**Promotion.** Proposed 2026-11-15 on the second chapter. Reconciled
+wording for the rule: a count of items that are named somewhere else
+("the three channels", "of the two", "one X and another") names the
+items where the count appears, in the order of anything in the
+sentence the reader must match them against.
+
+**Home.** antecedents (Accrued patterns, the unnamed-items bullet) |
+this file; a cousin of R9 (name the concrete thing).
 
 ### C34. Lay out a compressed consequence as steps (additive)
 
@@ -3971,16 +4113,39 @@ narrower case: the two clauses are about different things.
 it"); a consequence, which takes "so"; a deliberate pairing of two
 parallel facts ("X is young, and Y is demanding").
 
-**Sightings.** 2, one chapter (approved as P6 on the chapter 44 page,
-2026-10-21)
+**Sightings.** 4, 3 chapters. The first two were approved as P6 on the
+chapter 44 page, 2026-10-21:
 - `44_Effects--Effect_Management` 2026-10-21 (the edit-start-44 pass, approved on the fault-review page):
   "Calling `greet()` builds a coroutine object, a description of work,
   and `ran` stays empty." -> "... a description of work. The body waits,
   so `ran` is still `[]`."
 - "Effect tracking will look obvious in hindsight, and future
   programmers will regard ..." -> two sentences
+- `31_Patterns--State_Machines` 2026-10-15, the pair that the global
+  CLAUDE.md bullet ("Split an 'and' that joins two clauses with
+  different subjects") and the straighten skill's Accrued patterns
+  both cite, recorded there at the time and not listed here until
+  now: "`action` defaults to a function that does nothing, and a state
+  with more to do supplies an `action` as the third constructor
+  argument" -> two sentences.
+- `45_Effects--Generators` 2026-11-15 (`4944b211`), was Claude-written,
+  Bruce: 'is "it" the helper or the generator': "The helper is still a
+  generator, and the generator that calls it delegates to it." -> "The
+  helper is still a generator. The calling generator delegates to the
+  helper." The first clause is about the helper and the second about
+  its caller, and the second clause's two pronouns had both nouns as
+  candidates (R12). The split gave the second clause a subject
+  position for "The calling generator" and room for the noun.
 
-**Home.** this file; the straighten skill if promoted.
+**Promotion.** Proposed 2026-11-15: three chapters, the latest at
+Bruce's question. The rule is already in force through CLAUDE.md and the
+straighten pass. Promotion here adds it to `/bruce-edit-apply`, whose
+sweep must use this entry's narrow test, since `[AND]` fires on the
+author's own rewrites.
+
+**Home.** CLAUDE.md (global, the "and" bullet) | straighten (Accrued
+patterns) | `[AND]` and `[AND+REL]` in `tools/sentence_shapes.py` |
+this file.
 
 ### C43. When the prose explains one of a listing's parallel parts, name each of them (additive)
 
@@ -4021,25 +4186,39 @@ loss is the whole point and nothing persists.
 
 ---
 
-### C45. A suspended generator or coroutine has no "frame"; say what it preserves
+### C45. A "frame" says which kind it is: a generator's execution frame, a call's stack frame
 
-**Test.** "Frame" (or "frames") stands for the saved state of a
-suspended generator, coroutine, or task, or counts the generators in a
-`yield from` chain. Readers take "frame" as a stack frame, which pops
-when its function returns, and a suspended generator's state lives on
-the generator object, off the call stack. Write what persists, "its
-position in the body and its local variables", or name the generator
-("the generator to which `both()` delegates", "every generator in the
-chain", "three generators rather than two").
+**Test.** A bare "frame" (or "frames") in a passage about generators,
+coroutines, or tasks. Chapter 5 defines the two terms. An *execution
+frame* is the object Python creates for a call, holding its local
+variables and its position in the body. A *stack frame* is that object
+while it is an entry on the call stack. A generator's execution frame
+is stored in the generator object and is linked into the call stack
+while the body runs, so a reader who meets "frame" alone takes it for
+a stack frame, which Python discards when its function returns. Write
+"execution frame" for the generator's and "stack frame" for one on the
+call stack wherever both kinds are in the passage. Where the sentence
+is about what a suspended generator preserves and the frame is not its
+subject, say that ("its position in the body and its local
+variables"), or name the generator ("every generator in the chain",
+"three generators rather than two"). A time word on where the frame
+is stored gets C70's probe: the execution frame is in the generator
+object from the generator's creation, so "after which the execution
+frame lives on the heap" reported a move that does not occur.
 
-**Keep when.** "Frame" means a call's stack frame (a traceback, a
-recursion depth, an `except` clause reading its own frame's locals), the
-frame object an API returns (`f_locals`, `sys._getframe()`), or a panel
-of a figure. This rule is a keep-when for C27: CPython's attribute is
-`gi_frame`, and the API's word misleads here.
+**Keep when.** "The frame" or "that frame" within a sentence of the
+full term, with one kind of frame in the passage ("links that frame
+back into the call stack"); the frame object an API returns
+(`f_locals`, `sys._getframe()`); a panel of a figure or a frame of an
+animation.
 
-**Sightings.** 1, Bruce's ruling 2026-10-23 ("we need to consider a
-different word than 'frame' because that suggests stack frame"), applied
+**Sightings.** 4 rounds. The first form of this entry (2026-10-23,
+'A suspended generator or coroutine has no "frame"; say what it
+preserves') took the word away from a suspended generator altogether.
+The book defined the two terms three days later, and since then the
+rule is to name the kind. Bruce's ruling 2026-10-23 ("we need to
+consider a different word than 'frame' because that suggests stack
+frame"), applied
 in `ce27e8ec` and `4cd0d107` to sixteen sites in chapters 19, 44, 45 and
 Solutions 45:
 - `45_Effects--Generators`: "A suspended generator holds its frame: the
@@ -4059,9 +4238,44 @@ Solutions 45:
 - `19_Techniques--Concurrency`: "A suspended task is a paused frame that
   runs no bytecode" -> "A suspended task runs no bytecode" (the sentence
   before already says the task saves its position)
+- 2026-10-26 (`bb31283d`, `d3ff6ba0`, `8161af83`), the two terms. About
+  thirty bare "frame"s in ten chapters and five Solutions files became
+  "stack frame" where the frame is on the call stack (tracebacks,
+  recursion limits, profilers, callers, `ContextVar` lookups) and
+  "execution frame" for a generator's. The definition went to chapter
+  5's Names Inside a Function, where locals are first explained, with
+  links from chapter 45 and Solutions 31.
+- `45_Effects--Generators` 2026-11-08 (`9c5f9e2f`), Bruce: "which
+  frame? stack frame?": "Python releases the frame at `return`, and
+  the locals with it." -> "At `return`, Python discards the
+  generator's [execution frame], the object that holds the body's
+  locals, and the locals go with it."
+- `45_Effects--Generators` 2026-11-15 (`944eb10a`), Bruce, on the
+  paragraph about the second restriction: "clarify what kind of frame
+  this paragraph references": "A `yield` suspends one frame, the frame
+  of the function that contains the `yield`. A function that the
+  generator calls runs in a frame of its own and cannot suspend the
+  generator's frame," -> "A `yield` suspends one execution frame, the
+  frame of the generator whose body contains the `yield`. A function
+  that the generator calls runs in a stack frame of its own and cannot
+  suspend the generator's execution frame,". Four bare "frame"s of two
+  kinds in two sentences. The one left bare follows its full term
+  inside the sentence.
+- The same day (`8c183f7f`, `d1f568e5`), Bruce's hand and then his
+  request, 'review "The Suspended Frame" subsection to make sure I
+  didn't make anything incorrect with my edits': "At a `yield`, Python
+  unlinks the generator's execution frame from the call stack, after
+  which the execution frame lives on the heap inside the generator
+  object, with its locals and position intact." -> "... from the call
+  stack. The execution frame lives on the heap inside the generator
+  object, so it stays there with its locals and position intact."
+  C70's third sighting has the probe.
 
-**Home.** this file only; the term is specific to generators and
-coroutines.
+**Promotion.** Proposed 2026-11-15: four rounds, two of them Bruce's
+questions, and the 2026-10-26 sweep applied the rule across the book.
+
+**Home.** ambiguity (Accrued shapes, and its head-noun grep for
+compound terms) | super-prose (pass 6) | this file.
 
 ---
 
@@ -4199,6 +4413,23 @@ illuminating", and on a heading, "'Body' is vague":
   `watch()`'s body after ..."
 - "The exception belongs at the point where the body stopped" (two
   generators paused) -> "where the innermost body stopped"
+
+2, the same chapter 2026-11-15 (`46841ec0`), was Claude-written, from
+the antecedents pass on The Suspended Frame, a paragraph with a
+generator's body and a loop's body:
+- "C# and Kotlin compile the body into a state-machine class" ->
+  "compile the generator's body into a state-machine class"
+- "so the iterator keeps its frame on the call stack while the body
+  runs" (one clause after "the loop body becomes a `yield` function")
+  -> "while the loop body runs"
+- The same subsection, Bruce's hand (`8c183f7f`), the owner of a
+  construct: "ES2015 made generators standard, with `yield*` for
+  `yield from`." -> "with `yield*` for Python's `yield from`
+  behavior." The paragraph is about JavaScript and sets a Python
+  keyword beside JavaScript's, and PHP, two sentences on, has a
+  `yield from` of its own. A construct set beside its counterpart in
+  another language takes the language's name, as a part takes its
+  owner's.
 
 **Home.** antecedents | this file.
 
@@ -4883,6 +5114,18 @@ here?":
   "All three approaches" to "way" and "ways", the section's noun
   since "you have three ways", and left this one.
 
+5, the same chapter 2026-11-15 (`944eb10a`), one noun for two things
+in adjacent sentences, in the paragraph Bruce asked about ("clarify
+what kind of frame this paragraph references"):
+- "the frame of the function that contains the `yield`. A function
+  that the generator calls runs in a frame of its own" -> "the frame
+  of the generator whose body contains the `yield`. A function that
+  the generator calls runs in a stack frame of its own". The first
+  "function" was the generator and the second an ordinary function it
+  calls, and the paragraph is about how the two differ. The chapter's
+  name for a function with a `yield` is "generator". C45 has the two
+  kinds of frame in the same pair.
+
 **Home.** antecedents (Accrued patterns) | super-prose (pass 5) | this
 file.
 
@@ -5040,6 +5283,28 @@ Claude-written, Bruce's question above:
   same. The sentence came from Claude's super-prose pass, which moved
   "that has no result yet" into a "when" clause to clear a watch-word
   hit and did not apply this test to the result.
+
+3, the same chapter 2026-11-15, a time word on a standing fact, in a
+sentence from Bruce's hand, found when he asked: 'review "The
+Suspended Frame" subsection to make sure I didn't make anything
+incorrect with my edits':
+- "At a `yield`, Python unlinks the generator's execution frame from
+  the call stack, after which the execution frame lives on the heap
+  inside the generator object, with its locals and position intact."
+  (`8c183f7f`) -> "... from the call stack. The execution frame lives
+  on the heap inside the generator object, so it stays there with its
+  locals and position intact." (`d1f568e5`)
+- "After which" is the narrowing modifier in time form. It says the
+  frame is on the heap from the `yield` on, and so that it was
+  somewhere else before. The frame is in the generator object from the
+  generator's creation. The `yield` changes its link to the call stack
+  and leaves it where it is. The standing fact took a sentence in the
+  present with no time word, and the event stayed with the `yield`.
+- His edit had joined two of Claude's sentences ("so the frame stops
+  being a stack frame. The execution frame lives on the heap ..."),
+  and the connective that joined them carried the new claim. A
+  sentence made by joining two true sentences is probed at the join.
+  The review he asked for changed this one sentence.
 
 **Home.** ambiguity (Accrued shapes) | super-prose (pass 6) | this
 file.
@@ -5756,6 +6021,117 @@ the tokenize() example or something else?"
   shape.
 
 **Home.** cohesion (candidate) | this file.
+
+### C86. A sentence that says what a design keeps or leaves out of its source first says what the source has
+
+**Test.** A sentence describes one thing as a cut-down form of another
+with a verb of keeping or removing ("kept X and left out Y", "drops",
+"omits", "without the"), and Y, the part removed, enters the passage
+as that verb's object, often as a possessive nominalization ("left out
+a coroutine's ability to hand control to any other coroutine"). The
+reader has not been told that the source can do Y, so one phrase
+gives the source's capability and its removal, and "left out" has
+nothing to subtract from. Bruce: "left out from where?" X has the
+same gap when the sentence does not say X is the source's ("kept the
+suspended frame", with nothing to say the frame is a coroutine's).
+Repair: state the source's capability in a sentence of its own, with
+the source as subject and "can" ("A coroutine can hand control to any
+other coroutine."). Then say what the design keeps, with its owner
+("keeps the coroutine's suspended frame"), and say what the design
+does where the source had the missing part, in a positive verb with
+the content after a colon ("restricts the transfer: each `yield`
+hands control back to the caller of `next()` or `send()`"). The
+design is the subject, in the present, where the old sentence had the
+document that proposed it and the past ("PEP 255 kept ... and left
+out" -> "PEP 255's generator keeps ... and restricts").
+
+**Keep when.** The passage has stated the source's capability within
+a few sentences, or the omitted thing is an item the reader can see
+in a listing or in the sentence ("`sets.py` leaves out a few
+operators", "the short form leaves out `run-one`").
+
+**Sightings.** 1, `45_Effects--Generators` 2026-11-15 (`8c183f7f`),
+was Claude-written, Bruce's question quoted above, on «and left out»:
+- "PEP 255 kept the suspended frame and left out a coroutine's ability
+  to hand control to any other coroutine. Each `yield` hands control
+  back to the caller of `next()` or `send()`." -> "A coroutine can
+  hand control to any other coroutine. PEP 255's generator keeps the
+  coroutine's suspended frame and restricts the transfer: each `yield`
+  hands control back to the caller of `next()` or `send()`."
+- Why the passes missed it: the sentence opens a subsection. The
+  nearest description of a coroutine is Conway's quotation 280 lines
+  above, in another subsection, and the paragraph before the sentence
+  is about CLU. The positive pass reads "left out" as a verb
+  that means "did not" and looks for a positive form of the clause,
+  with no test for whether the passage has stated the thing removed.
+  The cohesion pass reads old before new by subject, and the new fact
+  sat in an object. C18 tests a premise under "If", "Since", or
+  "Because", and this premise was a noun phrase.
+- Scale: `left out|leaves? out|leaving out` has about 65 lines in
+  both trees. Read as a list, each one names an item of a thing the
+  page shows (a parameter, a line, a `case`, a file path), which is
+  the keep above. No second sentence describes a design by what it
+  lacks of a source the passage has not described, so there is no
+  tool and no sweep.
+
+**Home.** cohesion (Accrued patterns) | super-prose (pass 4) | this
+file.
+
+### C87. A feature does not "reach" a version: the version adopts it, or a PEP adds it
+
+**Test.** "Reached" or "reaches" with a language feature as its
+subject and a release as its object ("`yield from`, which reached
+Python 3.3 in 2012"). The verb is a figure of travel, the family of
+"ships" and "lands" on the global CLAUDE.md's don't-use list, and it
+has no actor. Write the adoption: "adopted in Python 3.3 (2012)", or
+give the PEP the verb ("PEP 492 added `async`/`await` to Python 3.5
+in 2015").
+
+**Keep when.** A value reaches a number ("`counter` reaches 400"), or
+execution reaches a line.
+
+**Sightings.** 1, `45_Effects--Generators` 2026-11-15, Bruce's hand
+(his working-tree edit, committed with `4944b211`; no edit call in
+that session's transcript holds the new wording):
+- "PEP 380's answer is `yield from`, which reached Python 3.3 in
+  2012." -> "PEP 380's answer is `yield from`, adopted in Python 3.3
+  (2012)."
+- Scale: a grep of both trees for `reach(ed|es)? (Python|[0-9])` and
+  `which reached` found one more site, two paragraphs above his in
+  the same subsection: "added the send channel, which reached Python
+  2.5 in 2006." It took his form in the commit that closed the pass,
+  "added the send channel, adopted in Python 2.5 (2006)." The book has
+  no other site, so there is no tool.
+
+**Home.** literal (Accrued patterns) | the CLAUDE.md watch list,
+beside "ships" and "lands", if promoted | this file.
+
+### C88. A statement keyword that names one occurrence takes an article
+
+**Test.** A preposition and a bare statement keyword in a code span,
+standing for the moment the statement runs ("At `yield`, Python
+unlinks the generator's execution frame"). The book treats the
+keyword as a countable noun everywhere else ("a `yield`", "the
+`return`", "each `yield`"), and a code span has no article of its own
+to open a noun phrase, the gap that `tip pointers`' `[SUB]` rule
+reads for after a subordinator. Write the article: "At a `yield`".
+
+**Keep when.** The keyword is a verb ("the rule is to `await`"), or
+the span is a piece of the code being read aloud ("`Num(0)` after
+`return` is a constructor call").
+
+**Sightings.** 1, `45_Effects--Generators` 2026-11-15 (`8c183f7f`),
+Bruce's hand:
+- "At `yield`, Python unlinks the generator's execution frame from the
+  call stack" -> "At a `yield`, Python unlinks ..."
+- Scale: a grep of both trees for a preposition before a bare
+  `yield`, `return`, `raise`, `await`, `break`, or `continue` span
+  found one more site of the shape, in the same chapter, "At `return`,
+  Python discards the generator's execution frame", written by Claude
+  on 2026-11-08. It became "At a `return`" in the commit that closed
+  the pass. The other two hits are the keeps above.
+
+**Home.** this file.
 
 ## Retired
 
