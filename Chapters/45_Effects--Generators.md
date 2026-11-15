@@ -2408,13 +2408,14 @@ so that an abandoned generator runs its cleanup code.
 The PEP's trampoline combines the loop in `trampoline()` from `trap_generators_demo.py` with a scheduler like `task_runner()` in `task_runner_send.py`.
 
 A generator has a second restriction.
-A `yield` suspends one frame,
-the frame of the function that contains the `yield`.
-A function that the generator calls runs in a frame of its own and cannot suspend the generator's frame,
+A `yield` suspends one execution frame,
+the frame of the generator whose body contains the `yield`.
+A function that the generator calls runs in a stack frame of its own and cannot suspend the generator's execution frame,
 so a helper that makes a request must be a generator too.
 PEP 380 describes the consequence:
 "a piece of code containing a `yield` cannot be factored out and put into a separate function in the same way as other code."
-The PEP's answer is `yield from`, which reached Python 3.3 in 2012.
+
+PEP 380's answer is `yield from`, which reached Python 3.3 in 2012.
 The helper is still a generator,
 and the generator that calls it delegates to it.
 `yield from` relays each request out to the driver and each answer back in,
