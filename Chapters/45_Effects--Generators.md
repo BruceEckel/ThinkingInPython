@@ -2415,9 +2415,9 @@ so a helper that makes a request must be a generator too.
 PEP 380 describes the consequence:
 "a piece of code containing a `yield` cannot be factored out and put into a separate function in the same way as other code."
 
-PEP 380's answer is `yield from`, which reached Python 3.3 in 2012.
-The helper is still a generator,
-and the generator that calls it delegates to it.
+PEP 380's answer is `yield from`, adopted in Python 3.3 (2012).
+The helper is still a generator.
+The calling generator delegates to the helper.
 `yield from` relays each request out to the driver and each answer back in,
 and it evaluates to the helper's return value,
 so you can compose a conversation from parts that never refer to their driver.
