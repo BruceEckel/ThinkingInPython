@@ -2356,8 +2356,10 @@ In 2006, JavaScript 1.7 adopted Python-inspired generators with `send()`,
 ES2015 made generators standard,
 with `yield*` for Python's `yield from` behavior.
 TypeScript types the three channels as `Generator<T, TReturn, TNext>`.
-PHP and Dart follow the same design,
-with delegation as `yield from` and `yield*`, respectively.
+PHP's `Generator` has `send()` and `throw()`, with `yield from` for delegation.
+A Dart generator produces values in one direction,
+through an `Iterator` that has `moveNext()` and `current`,
+and delegates with `yield*`.
 
 The languages differ in where the suspended frame lives.
 Python keeps the execution frame on the heap.
