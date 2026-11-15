@@ -2426,7 +2426,7 @@ An event loop is one such driver.
 PEP 492 added `async`/`await` to Python 3.5 in 2015.
 The new syntax reuses the generator's implementation and marks a function as one the event loop resumes.
 `await` uses the implementation of `yield from`,
-so the second restriction holds for it.
+so the second restriction holds for `await` too.
 An `await` suspends the `async` function that contains it,
 so a caller that awaits that function suspends at its own `await` and must be `async` too.
 [The Driver You Already Use](#the-driver-you-already-use) states the result:
