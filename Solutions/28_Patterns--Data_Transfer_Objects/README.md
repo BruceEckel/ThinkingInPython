@@ -365,8 +365,7 @@ The checker cannot catch the mistake this exercise examines:
 swapping `mean` and `count`.
 The swapped unpacking type-checks cleanly and misnames both values,
 as the listing's `mean=2 count=3.0` output shows.
-With `Stats` you write `result.count`, which reads the field by name,
-whatever its position.
+With `Stats` you write `result.count`, which reads the field by name.
 A parameter annotated `Stats` also rejects a hand-built tuple in either order,
 because a `tuple[float, int]` is not a `Stats`.
 A position tells the type checker an element's type and tells a reader an index.

@@ -386,7 +386,7 @@ print(Counter.live_count())
 
 **Register each instance strongly.**
 A `dict` holds a strong reference to each value,
-so `_instances` alone keeps every `Counter` alive, whatever `counters` does.
+so `_instances` alone keeps every `Counter` alive.
 `pop()` removes the list's reference.
 The registry keeps its own,
 so the `Counter`'s reference count stays above zero and the `Counter` survives.

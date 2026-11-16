@@ -4655,14 +4655,62 @@ code that calls `next()`", "the value the generator returned", "the
 code that resumed it", "every resource its body opened" (a list of
 them follows); the concessives became "no matter what answers it
 receives", "from either driver" (the two options named), "when the
-questions arrive in any order". The other 59 sites stay NEW for their
-chapters' passes.
+questions arrive in any order". The book read of 2026-11-16 covered
+the 54 sites then standing and rewrote all 54, so the candidate has
+met every site in the book and kept none. The word's one remaining
+use is chapter 15's epigraph, a block quote.
 
 **Sightings.** 1, `45_Effects--Generators` 2026-11-04, was
 Claude-written (same day), Bruce's own edit, "the use of 'whatever'
 should be considered circumspect in general":
 - "so the exception carries one meaning, finish, whatever the driver's
   reason." -> "so the exception carries one meaning, finish."
+
+Book read 2026-11-16 (Bruce's "do the suggestions" on the read
+proposed that day; four Opus agents by Part, the session's own repair
+for each site written first, was Claude-written throughout): 54
+sites in 34 files, all rewritten, in four forms.
+- Cut, 10, where the sentence or its neighbor says the same: "a list
+  holding any type ... match the list's element type, whatever that
+  type is" -> "element type."; "picks the field by name, whatever its
+  position" -> "by name." (after "Unpacking assigns by position");
+  "unavoidably serial, whatever else runs on more cores" ->
+  "unavoidably serial."
+- A definite noun phrase for a free relative, 19: "whatever holds
+  `self.close` holds `Leaky` through it" -> "the registry holds
+  `Leaky` through `self.close`" (the passage names the holder);
+  "whatever code turns out to be hot" -> "the code that turns out to
+  be hot"; "the area of whatever it receives" -> "the shape it
+  receives"; "wraps whatever arrives" -> "wraps `other`"; "accepts
+  whatever a `cast()` asserts" -> "accepts the type a `cast()`
+  asserts, true or false".
+- The options named, 9: "whatever its base classes" -> "with or
+  without a `Drawable` base class" (and "with or without `WhatIWant`
+  among its bases", "with or without `Visitor` among its bases");
+  "whatever its first character" -> "with or without a leading
+  underscore"; "whatever runs underneath: a coroutine, a thread, or a
+  process" -> "whether a coroutine, a thread, or a process runs
+  underneath"; "whatever its kind" -> "file or directory".
+- The range or the independence stated, 16: "whatever the field
+  order" -> "in any field order"; "whatever `y` is" -> "for every
+  `y`"; "stays constant whatever the size of the source" -> "as the
+  source grows"; "whatever the two sides carry" -> "when both sides
+  carry a `str`" (the hard case the section opened with); "returns
+  the same string whatever `x` and `y` hold" -> "returns `"point"`
+  for every `Point`".
+One universal failed its test. Solutions 34 said `repr()` or `hash()`
+on a million-level tree "raises a `RecursionError` that reports a
+stack overflow, whatever the limit says". At the default limit both
+raise the ordinary "maximum recursion depth exceeded", and the stack
+overflow appears once the limit is raised (probed at 1,000 and at
+`10**9`), so the sentence now says "despite the raised limit". Three
+shapes to watch in a repair:
+a cut that leaves two sentences meeting on one clause ("stays what
+you last read. Because a deeply immutable value stays what you last
+read" took its phrase back as "no matter which code ran in
+between"), a noun that does not fit the verb ("undo the rows"), and
+a second "whether" directly after one. An exercise statement with
+the word was rewritten in its chapter, as in R54's and R58's sweeps.
 
 **Home.** CLAUDE.md watch list (Tier 2, "whatever") | this file.
 

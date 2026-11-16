@@ -249,7 +249,7 @@ Because a `NamedTuple` is a tuple, you can also unpack it.
 Unpacking assigns by position,
 so a caller can still swap the mean and the count.
 `count, mean = summarize([1.0, 5.0])` runs and passes the type checker.
-Reading `result.mean` picks the field by name, whatever its position.
+Reading `result.mean` picks the field by name.
 
 Unpacking sets a `NamedTuple` apart from a data class.
 If `Stats` is a `@dataclass`,

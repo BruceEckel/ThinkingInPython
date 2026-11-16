@@ -2272,7 +2272,7 @@ not a platform for building distributed systems.
 [Running Effects in Parallel](#running-effects-in-parallel)
 states the one restriction the type checker enforces on a forked function:
 it must arrive fully supplied.
-The checker accepts whatever error channel that function declares.
+The checker accepts any error channel that function declares.
 Two of `fork()`'s four overloads accept an Effect that still declares an error,
 and every one of the four returns a `Task` with no error type on it:
 
@@ -2382,7 +2382,8 @@ Use Stateless when a system is large enough that hidden Effects have caused a pr
 and when the team will declare every Effect at every boundary.
 Below that scale, use those three techniques, and treat Stateless as optional.
 
-Whatever you decide about the library, the habit survives it.
+Whether you adopt the library or use those three techniques,
+the habit survives the choice.
 Name each contact with the outside (the clock, the feed, the pool, the console)
 and bind it at the edge instead of calling it in the middle.
 `at()` and `crossing` and `controller()` are all that habit,

@@ -274,8 +274,30 @@ Since 2026-11-04 "whatever" is a Tier 2 watch word (candidate C56 in
 `bruce_edit_db.md`, Bruce: "should be considered circumspect in
 general"): a concessive "whatever the driver's reason" is a universal
 to test or a phrase to cut, and a free relative "whatever the caller
-supplies" is "the value the caller supplies"; its 66 sites stay NEW
-for the chapter passes.
+supplies" is "the value the caller supplies". The chapter 45 pass
+rewrote its seven sites that day. The 2026-11-16 read (four Opus
+agents by Part, brief in `build/whatever-2026-11-16/`, the session's
+own repair for each site written down before the reports came in)
+rewrote the 54 sites then standing and kept none: 10 phrases cut
+where the sentence said the same without them, 19 free relatives
+made a definite noun phrase ("the registry", "the code that turns out
+to be hot"), 9 concessives given their options ("with or without a
+`Drawable` base class", "file or directory"), and 16 given their
+range ("in any field order", "for every `y`"). One universal was
+wider than the facts: Solutions 34 said `repr()` on a million-level
+tree reports a stack overflow "whatever the limit says", and a probe
+showed the ordinary "maximum recursion depth exceeded" at the default
+limit, so the sentence now says "despite the raised limit". The
+agents' wording
+stands at 50 sites, and where the two reads differed theirs was
+usually the more specific, because they opened the listing for the
+name (`Drawable`, `"point"`, the occupant). The session changed
+four: a cut that left two sentences meeting on one clause, "undo the
+rows", a second "whether" in a row, and "sets into the next". No
+site is NEW and the baseline holds no "whatever" entry; six sites
+that two scoped accepts had recorded unread were read with the rest.
+The word's one remaining use is chapter 15's epigraph, a block
+quote the check skips.
 Since 2026-11-08 `however` is Tier 2 too (rule R58, Bruce: "unclear
 usage of 'however'" on chapter 45's "however many `next()` calls
 that takes"): the concessive sense reads first as the contrastive

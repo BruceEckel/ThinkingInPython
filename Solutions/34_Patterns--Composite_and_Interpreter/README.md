@@ -1126,7 +1126,7 @@ with expected(TypeError):
 Before the change, `"a" + x` produces `Add(Num("a"), Var("x"))`.
 Python tries `Var.__radd__("a")` first,
 because `str` handles `+` as sequence concatenation, which Python tries last.
-The old `__radd__()` accepts anything and wraps whatever arrives in a `Num`,
+The old `__radd__()` accepts anything and wraps `other` in a `Num`,
 so this `Num` holds a string.
 Every walker mishandles that `Num`.
 
@@ -1510,7 +1510,7 @@ A call from one Python function to another leaves the C stack at the same depth,
 so with the limit raised to `10**9`, `evaluate()` walks a million-level tree.
 Anything that recurses through C stops.
 `repr()` or `hash()` on that same tree raises a `RecursionError` that reports a stack overflow,
-whatever the limit says.
+despite the raised limit.
 Second, each pending level holds a stack frame, so memory grows with depth.
 Third, the limit is global,
 so a library that raises it changes the behavior of every other module in the process.
@@ -1672,7 +1672,7 @@ Because `disk_usage()` is an `@abstractmethod`,
 Python raises a `TypeError` when you instantiate a subclass that leaves it abstract.
 
 For a file system, use the open design.
-Which node types exist is a fact about the operating system and about whatever the next version adds,
+Which node types exist is a fact about the operating system and about the node types its next version adds,
 not a decision your code gets to make.
 Third-party node types are the normal case.
 

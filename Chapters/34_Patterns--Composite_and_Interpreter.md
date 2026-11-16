@@ -258,7 +258,7 @@ which makes `pathlib` look like a *Composite*.
 `pathlib` has the uniform interface.
 `name`, `exists()`, and `stat()` work on either kind of entry.
 `iterdir()` lists one directory and `rglob()` walks the whole tree.
-Both yield a `Path` for each entry, whatever its kind.
+Both yield a `Path` for each entry, file or directory.
 `pathlib` lacks the structure.
 A `Path` is an immutable value that names a location.
 The entries and the tree they form live in the operating system's filesystem.
@@ -806,7 +806,7 @@ Iteration skips the empty literal pieces,
 so `t"{a}{b}"` yields two `Interpolation` objects and no strings.
 When a walker needs the pieces to alternate,
 `template.strings` keeps the empty slots.
-The structure is data, and its meaning is whatever a function computes from it:
+The structure is data, and its meaning is the value a walker computes from it:
 
 ```python
 # template_query.py

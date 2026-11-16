@@ -130,7 +130,7 @@ Each freezes only its top level.
 The tuple `([1], 2)` always holds that same list.
 Anyone can still append to the list.
 A tuple of strings, immutable all the way down, stays what you last read,
-whatever code ran in between.
+no matter which code ran in between.
 Because a deeply immutable value stays what you last read,
 removing shared mutable state is the practical core of the functional style.
 

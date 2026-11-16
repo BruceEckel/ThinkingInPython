@@ -872,8 +872,7 @@ An unresolved call has the name `"?"`, which falls through every pattern,
 so `lookup()` answers `UNKNOWN`.
 
 `step()` is a pure function from one set of rows to the next.
-A declared row stays as written, whatever the function's body performs,
-so a caller's row includes the declaration.
+A declared row stays as written, so a caller's row includes the declaration.
 Every other function gets the union of what its calls perform.
 
 `infer()` is the loop.

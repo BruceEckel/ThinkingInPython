@@ -96,7 +96,7 @@ fun map(xs : list<a>, f : a -> e b) : e list<b>
 ```
 
 The `e` is an *Effect variable*.
-It says `map()` performs whatever `f` performs, for any `f`.
+It says `map()` performs the Effects `f` performs, for any `f`.
 That property is *Effect polymorphism*.
 
 A tracking system without Effect polymorphism must either forbid effectful callbacks or exempt them from tracking.

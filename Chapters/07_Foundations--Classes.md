@@ -131,7 +131,8 @@ You therefore inherit an implementation, to reuse the code from the base class.
 To name an interface,
 Python uses a [`Protocol`](08_Foundations--Static_Types.md#structural-typing-with-protocols),
 which lists the methods and attributes a function needs.
-A class matches a protocol by defining them, whatever it inherits.
+A class matches a protocol by defining them,
+with or without the protocol among its base classes.
 
 First import the base class the same way you import [any name from a module](06_Foundations--Modules_and_Packages.md#importing-names-with-from-and-as).
 Then, to inherit, list the base class in parentheses after the name of the inheriting class.

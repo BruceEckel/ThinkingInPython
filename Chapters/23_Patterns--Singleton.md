@@ -204,7 +204,7 @@ because the name is public.
 `settings()` returns a `Settings`,
 so the class appears in the module's public signature.
 A caller who annotates the result must write that name.
-A type outsiders must name is public, whatever its first character.
+A type outsiders must name is public, with or without a leading underscore.
 `_Settings` fits a type that stays inside the module.
 
 Two stronger-looking moves also leave the class reachable.
@@ -505,7 +505,7 @@ adds the `__setattr__()` that forwards assignments.
 `instance` is one declared field, so its annotation can say `__OnlyOne | None`.
 Python calls `__getattr__()` for every name it fails to find on the wrapper,
 an open set of names.
-The method's return type is whatever the inner object holds under each name,
+The method's return type is the type of the attribute the inner object holds under each name,
 so `Any` is the one annotation that fits every name and still leaves the result usable.
 Delegation gives up static knowledge to forward every name,
 as it does throughout [*Surrogate*](25_Patterns--Surrogate.md#forwarding-with-getattr).
@@ -633,7 +633,7 @@ The lookup through `self` finds the subclass's dict first.
 Martelli wrote `self._shared_state` instead of `Borg._shared_state` to allow that override.
 
 The cached factory resets through `cache_clear()`,
-while *Borg*'s `_shared_state` carries whatever one test leaves there into the next.
+while *Borg*'s `_shared_state` carries the attributes one test leaves there into the next.
 A pytest fixture that clears the dict before each test gives every test empty shared state:
 
 ```python

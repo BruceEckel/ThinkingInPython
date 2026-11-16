@@ -148,8 +148,7 @@ so the caretaker still holds a plain tuple it can index, unpack,
 or build from scratch.
 
 Wrapping the tuple in a one-field record makes `Memento` a class of its own at runtime.
-A parameter typed `tuple[str, ...]` still accepts any tuple of strings,
-whatever built it.
+A parameter typed `tuple[str, ...]` still accepts any tuple of strings.
 A parameter typed `Memento` accepts only a `Memento`,
 so the type checker reports a caretaker that passes some other tuple by mistake.
 Building a `Memento` takes an import of the class and a call to it,

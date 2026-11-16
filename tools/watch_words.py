@@ -49,8 +49,9 @@ that day rewrote all 45 sites. `whatever` joined Tier 2 on 2026-11-04
 a concessive "whatever the driver's reason" claims the outcome across
 every case, a universal to test or a phrase to cut, and a free relative
 "whatever the caller supplies" is R54's shape with a thing, "the value
-the caller supplies". Its 66 sites are read by the chapter passes, so
-they stay NEW until each is judged. `however` joined Tier 2 on
+the caller supplies". The 2026-11-16 read rewrote the 54 sites then
+standing and kept none, so the baseline holds no `whatever` entry.
+`however` joined Tier 2 on
 2026-11-08 (rule R58, Bruce: "unclear usage of 'however'" on "however
 many `next()` calls that takes"): the concessive sense ("however
 many", "however large `n` gets", "however the block finished") reads

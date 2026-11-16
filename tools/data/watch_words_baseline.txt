@@ -64,7 +64,6 @@ Chapters/07_Foundations--Classes.md	has no: the assignment in the constructor ra
 Chapters/07_Foundations--Classes.md	have no: its instances have no CODE to hold the cached value
 Chapters/07_Foundations--Classes.md	only: and add CODE only when users see the output
 Chapters/07_Foundations--Classes.md	want: When you override a method but still want the base-class version
-Chapters/07_Foundations--Classes.md	whatever: whatever it inherits
 Chapters/08_Foundations--Static_Types.md	enforces none of: Python enforces none of the hints
 Chapters/08_Foundations--Static_Types.md	even: Explain why the empty string now takes the other branch even though the type checker accepts either version
 Chapters/08_Foundations--Static_Types.md	even: even though CODE is a valid CODE
@@ -432,8 +431,6 @@ Chapters/34_Patterns--Composite_and_Interpreter.md	explicit: The alternative is 
 Chapters/34_Patterns--Composite_and_Interpreter.md	explicit: which walks the same tree with an explicit stack and no recursion
 Chapters/34_Patterns--Composite_and_Interpreter.md	have no: and CODE have no special methods of their own
 Chapters/34_Patterns--Composite_and_Interpreter.md	only: Rewrite it to emit only the parentheses that precedence requires
-Chapters/34_Patterns--Composite_and_Interpreter.md	whatever: and its meaning is whatever a function computes from it
-Chapters/34_Patterns--Composite_and_Interpreter.md	whatever: whatever its kind
 Chapters/34_Patterns--Composite_and_Interpreter.md	yields no: An empty directory has size 0 and yields no paths
 Chapters/35_Patterns--Flyweight.md	does it: and what does it catch that the CODE version did not
 Chapters/35_Patterns--Flyweight.md	only: Only identity proves sharing
@@ -849,9 +846,6 @@ Solutions/34_Patterns--Composite_and_Interpreter/README.md	is what: The left ope
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	offers no: after CODE declines and CODE offers no CODE to try
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	only: A child gets parentheses only when its own operator binds more loosely than what the parent needs
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	only: where CODE yields only file paths
-Solutions/34_Patterns--Composite_and_Interpreter/README.md	whatever: The old CODE accepts anything and wraps whatever arrives in a CODE
-Solutions/34_Patterns--Composite_and_Interpreter/README.md	whatever: Which node types exist is a fact about the operating system and about whatever the next version adds
-Solutions/34_Patterns--Composite_and_Interpreter/README.md	whatever: whatever the limit says
 Solutions/35_Patterns--Flyweight/README.md	has no: so the class still has no CODE
 Solutions/35_Patterns--Flyweight/README.md	only: but only after CODE has pooled the instance
 Solutions/35_Patterns--Flyweight/README.md	only: whose CODE turns CODE only when the cells share one CODE

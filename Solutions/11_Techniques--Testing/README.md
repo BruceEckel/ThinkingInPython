@@ -253,8 +253,7 @@ def test_never_negative_after_deposit(
 Code after a fixture's `yield` runs as teardown,
 once the test function that uses the fixture finishes,
 whether it passes or raises an exception.
-Whatever either test does to the account,
-the balance must be zero or more once the test body returns control to the fixture.
+For either test, the balance must be zero or more once the test body returns control to the fixture.
 
 **Share the check across tests.**
 Both tests get the same invariant check from one assertion in the fixture.

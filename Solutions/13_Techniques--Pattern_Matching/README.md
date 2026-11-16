@@ -95,8 +95,7 @@ leaving the "singleton" case unreachable.
 
 **Test the type alone.**
 `Point()` matches any `Point` instance.
-That suits `classify()`,
-which returns the same string whatever `x` and `y` hold.
+That suits `classify()`, which returns `"point"` for every `Point`.
 
 The string `"hi"` is a sequence of two characters,
 but a sequence pattern excludes `str`, so `classify()` returns "other" for it.

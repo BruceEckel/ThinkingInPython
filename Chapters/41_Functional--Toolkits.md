@@ -955,7 +955,7 @@ looks at the same idea from the perspective of memory and speed.
 
 Laziness matters most at scale.
 A generator pipeline can process a multi-gigabyte file or a live network stream one item at a time,
-so memory use stays constant whatever the size of the source.
+so memory use stays constant as the source grows.
 Stages chain together, passing one item at a time between them.
 A consumer that stops early, such as `any()` or `next()`,
 ends the upstream work at the same point.
@@ -1220,8 +1220,8 @@ A function that reads mutable state is impure, a one-line body included.
 
 The general version needs memory, where the circle method needs a round number.
 In the circle method, which pair sits where in round `r` follows from `r` alone.
-`group_rounds()` needs the `history` `Counter`, because it builds each group,
-whatever the size, from the students who have met its members least often in the earlier rounds.
+`group_rounds()` needs the `history` `Counter`,
+because it builds each group from the students who have met its members least often in the earlier rounds.
 To reach round `100`,
 `group_rounds()` therefore generates rounds `0` through `99` first.
 The circle method computes round `100` from its arithmetic alone.

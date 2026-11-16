@@ -328,7 +328,7 @@ while structural typing reports it before the program runs.
 
 Some statically typed languages make you declare up front that a class "is a" `Drawable` by inheriting from it.
 A *Protocol* describes a required shape.
-Any object with that shape qualifies, whatever its base classes:
+Any object with that shape qualifies, with or without a `Drawable` base class:
 
 ```python
 # protocols.py
@@ -496,12 +496,11 @@ uses `type Shape = Circle | Square` to define a closed set of alternatives that 
 ### Type Parameters
 
 Consider a function that returns the first element of a list holding any type.
-A useful annotation makes the return type match the list's element type,
-whatever that type is.
+A useful annotation makes the return type match the list's element type.
 
 `Any` loses that connection.
 `first_any()` accepts any list,
-but its return type is `Any` whatever the list holds:
+but its return type is `Any` for every element type:
 
 ```python
 # first_any.py

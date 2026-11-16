@@ -444,7 +444,7 @@ so the parameter declares what `accept()` needs instead of admitting anything.
 A `Protocol` matches on structure,
 so `Bee` matches `Visits` through the `visit()` it inherits from `Pollinator`.
 Any class with a compatible `visit()` satisfies `Visits`,
-whatever its base classes.
+with or without `Visitor` among its bases.
 
 The listing keeps the chapter's `Visitor`, `Bug`, `Pollinator`,
 and `Bee` as they are.

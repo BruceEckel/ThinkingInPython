@@ -878,7 +878,7 @@ Stage 1 does test types,
 with `isinstance(occupant, Robot)` and `isinstance(occupant, Teleport)`.
 Those tests are not the type switch that polymorphism removes.
 `GameBuilder` must tell the kinds of item apart, once.
-The movement code that runs afterward calls `interact()` on whatever item a room holds.
+The movement code that runs afterward calls `interact()` on the occupant of each room the robot enters.
 
 The `Robot` branch builds `Room(Empty())` rather than `Room(occupant)`.
 The robot is the one item that moves,
@@ -1478,7 +1478,7 @@ Try each exercise before opening its [solution](../Solutions/38_Patterns--Simula
     Explain why the factory finds your new item on its own,
     and what the factory does if you derive `Coin` from `Food` instead.
 5.  Send the robot to something other than the `!`.
-    `solve()` stops at whatever room holds an `EndGame`,
+    `solve()` stops at the room that holds an `EndGame`,
     the one goal it can express.
     Replace that `isinstance()` test with a `Callable[[Room], bool]` parameter,
     so the caller says what counts as arriving,

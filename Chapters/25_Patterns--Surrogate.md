@@ -470,8 +470,7 @@ and its section shows what `hasattr()` does with it.
 Two workarounds make `isinstance()` return `True`,
 and neither checks which methods the proxy supplies:
 
--   `Service.register(Proxy)` tells the ABC machinery to answer `True` for every `Proxy`,
-    whatever methods it has.
+-   `Service.register(Proxy)` tells the ABC machinery to answer `True` for every `Proxy`.
 -   A `__class__` property returning the implementation's class makes `isinstance()` test that class in place of `Proxy`.
 
 Both workarounds satisfy the runtime check.
@@ -808,8 +807,8 @@ def test_calls_reach_current_and_change_to_swaps() -> None:
 
 Every annotation in `state_surrogate.py` that carries the implementation is `Any`,
 which the book's typing guidance treats as a last resort.
-`__getattr__()` returns `Any` because it returns the attribute for any name the caller reads,
-whatever that attribute's type.
+`__getattr__()` returns `Any` because it returns an attribute of any type,
+for any name the caller reads.
 
 The `Any` on the parameters of `__init__()` and `change_to()` is a choice.
 `state_demo.py` still type-checks if both parameters carry `Behavior`.

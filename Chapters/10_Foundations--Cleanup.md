@@ -416,7 +416,7 @@ before `gc.collect()` runs.
 `gc.collect()` cannot reclaim `Leaky`, because `Leaky` is still reachable.
 `finalize()` keeps every callback in a registry, `self.close` among them.
 A bound method is a small object that stores its instance in its `__self__` attribute,
-so whatever holds `self.close` holds `Leaky` through it.
+so the registry holds `Leaky` through `self.close`.
 A lambda that uses `self`, such as `lambda: print(self.name, "closed")`,
 holds the object through its closure.
 

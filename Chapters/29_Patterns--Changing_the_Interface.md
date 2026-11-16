@@ -202,7 +202,7 @@ Building the adapter into `op()` adds the `WhatIHave` case and leaves the `WhatI
 All three approaches follow one Java habit.
 The adapter inherits from `WhatIWant` so that `op()` accepts it.
 Because `f()` is the one method `WhatIUse.op()` calls at runtime,
-any object with an `f()` works, whatever its base classes.
+any object with an `f()` works, with or without `WhatIWant` among its bases.
 A type checker still rejects an argument that is not a `WhatIWant`,
 so specify the requirement with a [`Protocol`](08_Foundations--Static_Types.md#structural-typing-with-protocols)
 that lists `f()`, not with a base class to inherit.

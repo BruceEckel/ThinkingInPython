@@ -322,7 +322,7 @@ A million lookups is the difference between instant and minutes.
 
 ### Trusting a Measurement
 
-A single measurement includes whatever else the machine is doing.
+A single measurement includes the time the machine spends on other work.
 `timeit.repeat(f, number=100, repeat=5)` returns a list of five such totals.
 The smallest of them is the run with the least interference.
 Report `min(...)`, not the mean.
@@ -580,7 +580,7 @@ and hold everything else the same.
 Numba's [`@njit`](#jit-compilation-with-numba) is also a just-in-time compiler.
 The two compilers take opposite approaches.
 The CPython JIT works on your code as written,
-applies to whatever code turns out to be hot, and speeds it up by percentages.
+applies to the code that turns out to be hot, and speeds it up by percentages.
 `@njit` applies only to numeric functions, requires a decorator,
 pauses to compile on the first call, and speeds code up by multiples.
 Neither one changes a quadratic algorithm's growth rate.

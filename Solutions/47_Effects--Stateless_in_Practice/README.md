@@ -1756,7 +1756,7 @@ Removing `outcome()`'s return annotation makes the error disappear.
 `ty` infers no return type from the body.
 `reveal_type(outcome)` reports `-> Unknown`,
 and `Unknown` is compatible with every type,
-so the type checker accepts whatever the function returns.
+so the type checker accepts every value the function returns.
 Pyright does infer the union from the body,
 so under Pyright the function changes its type every time `research()`'s error set changes.
 

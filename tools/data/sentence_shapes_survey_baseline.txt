@@ -133,6 +133,7 @@ Chapters/11_Techniques--Testing.md	[ADD] CODE, also in CODE, builds a mock from 
 Chapters/11_Techniques--Testing.md	[CAN] A CODE mark can carry several names, followed by a list of tuples, one tuple per case:
 Chapters/11_Techniques--Testing.md	[CAN] It records every call it receives, so a test can check the call as well as what the call returned.
 Chapters/11_Techniques--Testing.md	[CAUS] makes test depend: A network call is slow, it fails whenever the service or the connection does, and it makes the test depend on data someone else controls.
+Chapters/11_Techniques--Testing.md	[CAUS] makes test gives: Python 3.15 makes UTF-8 the default encoding for CODE, CODE, and CODE in every locale, so a test that writes and reads text gives the same result on every machine.
 Chapters/11_Techniques--Testing.md	[HEAD] statement: That statement binds CODE in CODE's own namespace, so CODE is the name the call site reads and the name to patch.
 Chapters/11_Techniques--Testing.md	[SAME+NEW] logic: When the same logic should run against several inputs, write one test and mark it with CODE, as CODE does.
 Chapters/11_Techniques--Testing.md	[SAME] Applying 5% five times produces CODE, so the same assertion written with CODE against CODE fails.
@@ -160,7 +161,6 @@ Chapters/13_Techniques--Pattern_Matching.md	[CAN] The guard runs after the patte
 Chapters/13_Techniques--Pattern_Matching.md	[CAUS] lets implementation decide: For a pattern that fails partway, the language reference lets each implementation decide whether the captures made before the failure stay bound.
 Chapters/13_Techniques--Pattern_Matching.md	[HEAD] union: If you add a type to the union without its CODE, the type checker reports an error at CODE.
 Chapters/13_Techniques--Pattern_Matching.md	[HEAD] union: Then CODE on that union.
-Chapters/13_Techniques--Pattern_Matching.md	[SAME] A keyword pattern matches the same attribute whatever the field order.
 Chapters/13_Techniques--Pattern_Matching.md	[SAME] The compiler enforces the same-names rule.
 Chapters/14_Techniques--Decorators.md	[ADD] A class decorator can also return a replacement class, just as a function decorator returns a replacement function. | after: CODE exists for the side effect of recording the class.
 Chapters/14_Techniques--Decorators.md	[ADD] Each call also makes an extra Python-level function call per layer, the call to that layer's wrapper, before the real body runs. | after: A traceback through a decorated function shows a CODE stack frame for each layer, on top of the stack frames for the caller and the original body.
@@ -603,7 +603,7 @@ Chapters/41_Functional--Toolkits.md	[SAME] Where the iterables come from a loop,
 Chapters/41_Functional--Toolkits.md	[TWO] Recursion is a better choice if the problem branches rather than repeats, as CODE shows.
 Chapters/42_Functional--Error_Handling.md	[ADD] A CODE-returning function can raise an exception as well, and both Python and the type checker accept the CODE. | after: If the function raises an exception instead, the return type does not specify that outcome.
 Chapters/42_Functional--Error_Handling.md	[ADD] CODE narrows CODE to CODE too. | after: Typeshed declares CODE on CODE's base class, CODE.
-Chapters/42_Functional--Error_Handling.md	[ADD] For CODE, CODE and CODE would fail too. | after: In CODE, the three steps take their inputs from CODE and CODE rather than from an earlier step's answer, so stopping at the first CODE discards whatever the later steps would have found.
+Chapters/42_Functional--Error_Handling.md	[ADD] For CODE, CODE and CODE would fail too. | after: In CODE, the three steps take their inputs from CODE and CODE rather than from an earlier step's answer, so stopping at the first CODE discards the errors the later steps would have found.
 Chapters/42_Functional--Error_Handling.md	[ADD] The type checker also forces a caller to check for the failure before reading the answer. | after: Failure appears in the return type, so a reviewer sees it without reading the body.
 Chapters/42_Functional--Error_Handling.md	[CAN] A CODE-returning function can raise an exception as well, and both Python and the type checker accept the CODE.
 Chapters/42_Functional--Error_Handling.md	[CAN] A library can supply CODE for you.
@@ -706,7 +706,7 @@ Chapters/47_Effects--Stateless_in_Practice.md	[HEAD] checker: A CODE call with t
 Chapters/47_Effects--Stateless_in_Practice.md	[HEAD] checker: A generator's send type is all the checker knows about a bare CODE, and an Effect's send type is CODE.
 Chapters/47_Effects--Stateless_in_Practice.md	[HEAD] checker: If you change CODE to some undeclared exception, the checker reports an error at that CODE, because the yielded type falls outside the declared channel.
 Chapters/47_Effects--Stateless_in_Practice.md	[HEAD] checker: If you decorate a function that still declares a CODE, the checker rejects it, listing the overloads it failed to match.
-Chapters/47_Effects--Stateless_in_Practice.md	[HEAD] checker: The checker accepts whatever error channel that function declares.
+Chapters/47_Effects--Stateless_in_Practice.md	[HEAD] checker: The checker accepts any error channel that function declares.
 Chapters/47_Effects--Stateless_in_Practice.md	[HEAD] checker: The order of the handlers changes what the checker reports.
 Chapters/47_Effects--Stateless_in_Practice.md	[SAME+NEW] code: CODE draws from the source CODE hands it, so the second run prints a different trace from the same code.
 Chapters/47_Effects--Stateless_in_Practice.md	[SAME+NEW] function: A production handler that returns CODE runs the same function.
@@ -923,7 +923,7 @@ Solutions/26_Patterns--Factory/README.md	[SAME] The decorated form gains the sam
 Solutions/27_Patterns--Function_Objects/README.md	[CAN] A finder can have more than one way to fail, and each failing CODE states its own reason.
 Solutions/27_Patterns--Function_Objects/README.md	[CAUS] make command remember: Describe that type with a CODE, and make each command remember what it did so it can reverse it.
 Solutions/27_Patterns--Function_Objects/README.md	[SAME+NEW] code: The fine finder runs the same code with a tolerance of CODE and matches the true root to six places.
-Solutions/28_Patterns--Data_Transfer_Objects/README.md	[ADD] A parameter annotated CODE also rejects a hand-built tuple in either order, because a CODE is not a CODE. | after: With CODE you write CODE, which reads the field by name, whatever its position.
+Solutions/28_Patterns--Data_Transfer_Objects/README.md	[ADD] A parameter annotated CODE also rejects a hand-built tuple in either order, because a CODE is not a CODE. | after: With CODE you write CODE, which reads the field by name.
 Solutions/28_Patterns--Data_Transfer_Objects/README.md	[ADD] The call sites also lose attribute access. | after: CODE now writes CODE where it wrote CODE, so a reader of the call site must open CODE to learn which number is which.
 Solutions/28_Patterns--Data_Transfer_Objects/README.md	[ADD] The type checker reports the assignment too, as CODE shows for CODE. | after: If you assign a longer list to the field, as in CODE, Python raises an CODE with the message CODE.
 Solutions/28_Patterns--Data_Transfer_Objects/README.md	[ADD] The wider annotation also lets CODE type-check, so a tuple of the wrong length gets past the type checker. | after: CODE takes a tuple of any length, so CODE reports CODE for the two-element annotation, citing the Liskov Substitution Principle.
@@ -955,7 +955,6 @@ Solutions/31_Patterns--State_Machines/README.md	[CAUS] makes caller read: The en
 Solutions/31_Patterns--State_Machines/README.md	[HEAD] key: A Vending Machine explains that the engine looks up CODE as the key, so an instance of a subclass of an input type finds the rules filed under the subclass and passes over the base class's rules.
 Solutions/31_Patterns--State_Machines/README.md	[SAME] Where exercise 1's CODE swaps in a whole CODE object through CODE, this machine reaches the same moods by returning the next member from a transition function.
 Solutions/32_Patterns--Multiple_Dispatching/README.md	[ADD] A subclass of one weapon can also override one combination there and inherit the rest, where the grid matches types exactly and needs a row and a column for the subclass. | after: Its CODE methods receive the competing objects, so a weapon whose result depends on its state fits there, while this grid needs exercise 9's callable cells.
-Solutions/32_Patterns--Multiple_Dispatching/README.md	[ADD] Whatever CODE reads, CODE reads too, from the same two objects. | after: A cell holding a function answers that reason.
 Solutions/32_Patterns--Multiple_Dispatching/README.md	[CAN] Every weapon loses to two others, so no group can count on winning.
 Solutions/32_Patterns--Multiple_Dispatching/README.md	[CAUS] makes change checks: The solution makes its change in CODE, so its listing checks the change with CODE printing CODE, the reversed duel printing CODE, and a CODE with no rows raising a CODE.
 Solutions/32_Patterns--Multiple_Dispatching/README.md	[CAUS] needs tally passes: A caller that needs the tally passes its own CODE.

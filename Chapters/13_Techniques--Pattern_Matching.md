@@ -325,7 +325,7 @@ A positional pattern can also check a subset of fields.
 the first name in `__match_args__`.
 `Point(_, 0)` puts the wildcard in `x`'s position to check `y` alone.
 Naming the attribute is clearer.
-A keyword pattern matches the same attribute whatever the field order.
+A keyword pattern matches its attribute in any field order.
 Reordering the fields rewrites `__match_args__`,
 so every positional pattern silently starts matching a different field.
 
@@ -663,7 +663,8 @@ If one `Signal` member lacked a `case`,
 which breaks its `-> str` annotation.
 In a function that returns `None`, reaching the end matches the declared type,
 so the type checker accepts a missing `case` there.
-`assert_never()` catches a missing `case` whatever the function returns.
+`assert_never()` catches a missing `case` in a function with any return type,
+including `None`.
 It also reports the error inside the `match`, at the `assert_never()` call,
 instead of at the function's return type.
 

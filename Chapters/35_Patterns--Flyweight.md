@@ -231,7 +231,7 @@ The narrowing proves what a [`cast()`](08_Foundations--Static_Types.md#typing-de
 asserts.
 Prefer a guard that lets the type checker narrow.
 Keep `cast()` for the cases where no guard exists,
-because the type checker accepts whatever a `cast()` asserts.
+because the type checker accepts the type a `cast()` asserts, true or false.
 
 The test file confirms that:
 

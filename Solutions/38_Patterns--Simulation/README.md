@@ -942,7 +942,7 @@ a different design, a detail, or an equivalent alternative.
 ## 5. Sending the robot somewhere other than the `!`
 
 > Send the robot to something other than the `!`.
-> `solve()` stops at whatever room holds an `EndGame`,
+> `solve()` stops at the room that holds an `EndGame`,
 > the one goal it can express.
 > Replace that `isinstance()` test with a `Callable[[Room], bool]` parameter,
 > so the caller says what counts as arriving,
@@ -1385,9 +1385,9 @@ print(plate.render(width=40, height=20))
 
 The nodal lines are straight because the new field is a product of one function of `x` and one function of `y`.
 The product vanishes when either factor does.
-For `m = 2`, `sin(mπx)` is zero at `x = 0, 1/2, 1`, whatever `y` is.
+For `m = 2`, `sin(mπx)` is zero at `x = 0, 1/2, 1` for every `y`.
 Those three zeros give vertical lines.
-For `n = 3`, `sin(nπy)` is zero at `y = 0, 1/3, 2/3, 1`, whatever `x` is,
+For `n = 3`, `sin(nπy)` is zero at `y = 0, 1/3, 2/3, 1` for every `x`,
 giving horizontal lines.
 Every nodal point lies on one of those seven lines.
 The interior lines number `m - 1` vertical and `n - 1` horizontal,

@@ -376,7 +376,7 @@ A test that calls `funded()` fails with `Fixture "funded" called directly`.
 
 Each test gets its own freshly built `funded` account,
 so every test starts from a balance of 100,
-whatever earlier tests did to their accounts.
+including the tests that run after `test_withdraw_reduces_balance()` withdraws 40.
 
 If a fixture needs cleanup,
 it can `yield` the value and run teardown code after the `yield`.
@@ -626,7 +626,7 @@ def load(name: str) -> str:
 ```
 
 Python 3.15 makes UTF-8 the default encoding for `open()`, `Path.read_text()`,
-and `Path.write_text()`, whatever the system locale,
+and `Path.write_text()` in every locale,
 so a test that writes and reads text gives the same result on every machine.
 `storage.py` still passes `encoding="utf-8"` for code that must also run on Python 3.14 and earlier,
 where the locale decides the encoding.
@@ -743,7 +743,7 @@ while the test hands it `Random(0)`.
 The randomness is now an input, not a hidden dependency.
 This technique is *dependency injection*:
 the caller hands the function its dependencies.
-The function works with whatever the caller supplies.
+The function works with the `random.Random` the caller supplies.
 
 The `4` in `test_dice_rng.py` is what `Random(0)` produces first.
 Its match with the stubbed value in `test_dice.py` is a coincidence.

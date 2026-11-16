@@ -975,7 +975,7 @@ so the group cancels it during that sleep and its task ends cancelled.
 **Cancel what is still running.**
 The original `FETCHES` has both `e` and `f` cancelled because both are still sleeping when `c` and `d` fail.
 The group cannot cancel a task that has returned,
-and it cannot unprint `e: fetched` or undo whatever a real `fetch()` wrote to a database before it returned.
+and it cannot unprint `e: fetched` or undo the writes a real `fetch()` makes to a database before it returns.
 Structured concurrency guarantees that every task has ended when the `async with` block exits.
 Every effect a task had before the failure stays in place.
 

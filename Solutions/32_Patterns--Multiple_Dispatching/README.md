@@ -1209,7 +1209,7 @@ Project(seed=1).meet(4)
 Exercise 7 uses single dispatch, not double.
 `a.interact(b)` resolves on `a`'s type alone.
 Each `interact()` interpolates `other` into its message the same way,
-whatever `other`'s type.
+for a `Dwarf`, an `Elf`, or a `Troll`.
 The design becomes double dispatch when `interact()`'s behavior must vary by `other`'s type too.
 Exercise 8 adds that dependence.
 
@@ -1868,7 +1868,7 @@ a rock that calls `compete()` still loses to wet paper.
 The chapter gives two reasons for preferring the double-dispatch version.
 The first is behavior that reads the object's own state.
 A cell holding a function answers that reason.
-Whatever `Paper.eval_rock()` reads, `rock_vs_paper()` reads too,
+`rock_vs_paper()` reads the state that `Paper.eval_rock()` reads,
 from the same two objects.
 
 The second reason survives:

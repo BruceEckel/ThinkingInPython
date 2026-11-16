@@ -102,7 +102,7 @@ here `int` and `str`.
 If a successful answer is also a string,
 `case str(error)` matches it and reports it as an error.
 You need a tag that says "success" or "failure,"
-whatever types the answer and the error have.
+independent of the types of the answer and the error.
 
 ## A Result Type
 
@@ -110,7 +110,7 @@ Defining success and failure as types puts them in the signature.
 `Ok` wraps an answer, `Err` wraps an error,
 and `Result` is the union of the two.
 The value's class is now the tag that tells the two cases apart,
-so the union stays unambiguous whatever the two sides carry.
+so the union stays unambiguous when both sides carry a `str`.
 Other languages call this a *tagged* or *discriminated* union.
 `Result` is useful beyond this chapter,
 so it lives in `utils/` and any chapter can import it:
@@ -527,7 +527,7 @@ Short-circuiting is right for a dependent chain,
 where each step needs the previous step's answer,
 as in `composing_with_bind.py` above.
 In `combining.py`, the three steps take their inputs from `i` and `j` rather than from an earlier step's answer,
-so stopping at the first `Err` discards whatever the later steps would have found.
+so stopping at the first `Err` discards the errors the later steps would have found.
 For `(1, 2)`, `func_b(2)` and `func_c(3)` would fail too.
 The result reports `func_a(1)` alone (see exercise 3).
 The exception in `exceptions_lose_data.py` does the same.

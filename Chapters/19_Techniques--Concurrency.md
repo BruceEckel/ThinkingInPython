@@ -1395,8 +1395,7 @@ or lower `CORE_MULTIPLIER` to stop the sweep at the core count instead of past i
 That shape is *Amdahl's Law*.
 Every parallel job carries some part that stays serial.
 Building each chunk, pickling it across the process boundary,
-and reassembling the results are unavoidably serial,
-whatever else runs on more cores.
+and reassembling the results are unavoidably serial.
 If that serial part is a fraction *s* of the total work,
 the best any number of cores can do is:
 
@@ -2239,8 +2238,8 @@ Wrapping that hand-off in an `async def` lets `TaskGroup` hold it alongside the 
 All three start together, and the block exits once all three finish,
 so the printed `[10, 20, 30]` holds one result from each backend.
 The event loop does the job it has done all chapter.
-It schedules awaitables, whatever runs underneath: a coroutine, a thread,
-or a process.
+It schedules awaitables, whether a coroutine, a thread,
+or a process runs underneath.
 
 An `Executor` and `asyncio` give their result-that-arrives-later the same name,
 and the shared name invites one specific mistake.

@@ -432,8 +432,7 @@ print(f"the wider gap buffers more: {far > near}")
 
 The buffer grows in proportion to `k`.
 `tee()` buffers every item the leading branch consumes until the trailing branch catches up,
-so a gap of `k` items is a buffer of `k` items,
-whatever the length of the stream.
+so a gap of `k` items is a buffer of `k` items, on a stream of any length.
 The two measurements in `tee.py` are this rule at its limits.
 Draining one branch first stretches the gap to the whole stream.
 Lockstep consumption shrinks it to a single item.

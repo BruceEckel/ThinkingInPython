@@ -435,7 +435,7 @@ usually out of the parts that change often and into one part you can find.
 ### The Edge Python Deletes
 
 One more diagram explains why so many of the pattern chapters subtract code as they go.
-Take a caller, a function `area()` that needs the area of whatever it receives,
+Take a caller, a function `area()` that needs the area of the shape it receives,
 and write the same dependence three ways.
 
 ![One dependence written three ways](_images/coupling_edges)
