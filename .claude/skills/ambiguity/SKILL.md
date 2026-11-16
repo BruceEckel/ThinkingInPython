@@ -357,7 +357,7 @@ Shapes Bruce flags that the catalog above did not name, dated, with the sentence
   ordinary function it calls; the chapter's noun for the first is
   "generator" (C67).
   Grep the scope for `\bframes?\b` and read each one that has neither
-  "execution" nor "stack" before it. C45 in `bruce_edit_db.md`.
+  "execution" nor "stack" before it. R68 in `bruce_edit_db.md`.
 - 2026-11-15, chapter 45: a time word on a standing fact.
   "Python unlinks the generator's execution frame from the call
   stack, after which the execution frame lives on the heap inside the

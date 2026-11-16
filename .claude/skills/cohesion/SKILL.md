@@ -417,4 +417,4 @@ and it becomes part of every future pass.
   as its subject and the function in a possessive),
   and move or cut a clause that stands between them.
   Keep a deliberate two-beat ("Failures never vanish. They only relocate.").
-  C10 in `bruce_edit_db.md`.
+  R65 in `bruce_edit_db.md`.

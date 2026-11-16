@@ -245,7 +245,7 @@ and it becomes part of every future pass.
   `Generator<T, TReturn, TNext>`" -> "types the yielded, returned,
   and sent values as `Generator<T, TReturn, TNext>`" (2026-11-15,
   chapter 45, whose list of the channels sits 2,300 lines up, in
-  another order). C33 in `bruce_edit_db.md`.
+  another order). R66 in `bruce_edit_db.md`.
   "Each" as a bare subject is the same pointer (Bruce, 2026-11-13,
   chapter 45: "'each' vague"): "a producer computes a series of
   values, a consumer uses them one at a time, and each is simplest to

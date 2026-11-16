@@ -184,7 +184,7 @@ each pass hands the next one less to do.
    and `kept`. The two sides of a contrast are joined with "whereas"
    or "while" and get subjects of one kind ("a suspended generator
    keeps its execution frame alive, whereas an ordinary function
-   discards its stack frame when the function returns", C10).
+   discards its stack frame when the function returns", R65).
 5. `antecedents`: every pointer with two candidates gets its noun.
    A link is a pointer too: when its target teaches a named
    construct, the link text starts on the name ("The bare `raise`
@@ -242,7 +242,7 @@ each pass hands the next one less to do.
    named far above names them, in the order of what the reader must
    match them against ("types the three channels as `Generator<T,
    TReturn, TNext>`" -> "types the yielded, returned, and sent
-   values as", C33).
+   values as", R66).
 6. `ambiguity`: every sentence that counts, compares, coordinates,
    modifies, or limits keeps one reading. A list of what two things
    share ("has `send()`, `throw()`, and `close()`, as a generator
@@ -280,7 +280,7 @@ each pass hands the next one less to do.
    file") stay. A bare "frame" in a passage with a generator's
    execution frame and a call's stack frame says which kind it is
    (Bruce: "clarify what kind of frame this paragraph references",
-   C45): grep the scope for `\bframes?\b`. A time word on a standing
+   R68): grep the scope for `\bframes?\b`. A time word on a standing
    fact ("after which the execution frame lives on the heap", when
    it is there from the generator's creation) is C70's modifier in
    time form: ask whether the statement was true before the event.

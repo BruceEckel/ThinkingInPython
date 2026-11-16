@@ -330,6 +330,19 @@ before/after pair, and it becomes part of every future pass.
   Keep the "and" when the clauses share a subject or are two steps of
   one action ("`run()` prints the message and then calls `action`").
   The same rule is in the global `CLAUDE.md` under Writing style.
+  A split also gives the second clause a subject position for its
+  noun: "The helper is still a generator, and the generator that calls
+  it delegates to it" (Bruce, 2026-11-15, chapter 45: 'is "it" the
+  helper or the generator') became "The helper is still a generator.
+  The calling generator delegates to the helper."
+  When the two clauses are the short sides of a contrast, the
+  connective can replace the "and" in place of a period: "whereas",
+  with subjects of one kind on both sides (R65, the cohesion pass).
+  R67 in `bruce_edit_db.md`. `[AND]` in
+  `tip sentence-shapes ARGS=--survey` lists the wider shape, and the
+  author's own rewrites fire it, so read each hit with the test above
+  (the two clauses are about different things, and neither explains
+  the other) and never split on the list alone.
 - **A colon standing in for a conjunction** (2026-10-15).
   "Python supplies `self` only when the lookup finds the function on
   the class: a function stored there is a descriptor, and reading it

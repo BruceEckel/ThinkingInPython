@@ -618,7 +618,7 @@ reads the others as "prefer the noun" will overshoot.
   - Bruce: 'is "it" the helper or the generator': "The helper is still
     a generator, and the generator that calls it delegates to it." ->
     "The helper is still a generator. The calling generator delegates
-    to the helper." (C42 has the split.)
+    to the helper." (R67 has the split.)
   - Bruce: "it: await or yield from?": "`await` uses the
     implementation of `yield from`, so the second restriction holds
     for it." -> "holds for `await` too."
@@ -3499,6 +3499,235 @@ from a hedged event.
 `tools/data/sentence_shapes_survey_baseline.txt` since 2026-11-09);
 the `activate` skill's Accrued patterns; this file.
 
+### R65. Join the two sides of a contrast with "whereas" or "while", and give them subjects of one kind
+
+**Test.** Two adjacent sentences, or two halves of a semicolon, with
+the same frame and opposite predicates and no connective ("A factory
+takes information telling it what to build. A generator object does the
+opposite:"; "In `registry.py` the table holds classes. In
+`prototype_registry.py` the table holds instances."). Join them:
+"Whereas a factory ..., a generator object does the opposite:"; "that
+table holds classes ..., while `prototype_registry.py`'s holds
+instances". The two sides take subjects of one kind, two things or
+two roles: "a suspended generator keeps ..., whereas an ordinary
+function discards ...", where the earlier second side had the
+contrasted thing in a possessive ("Python discards a function's
+stack frame"). A clause that stands between the two sides moves
+after them or goes. R67's substitution test finds the same
+sentences from the other direction: an "and" where "whereas" fits
+is a contrast.
+
+**Keep when.** The two sentences are a deliberate two-beat ("Failures
+never vanish. They only relocate."). No sighting yet has two sides
+that each carry a modifier of their own. R51 (one picture per clause)
+would keep those as two sentences with parallel subjects; that is
+Claude's reading, 2026-11-15, until a sighting decides it.
+
+**Sightings.** 4 (additive), 2 chapters. Promoted by Bruce 2026-11-15
+on the second chapter (his "do the suggestions", the first of which
+was this promotion); was C10. The first three are
+`26_Patterns--Factory`, was Claude-written:
+- 2026-08-31: "Where" in `40323f50`, corrected to "Whereas" in
+  `d6144479`
+- 2026-08-31 (`2b18eed8`): "Compare `spawn()` with `make()` in
+  `registry.py`. In `registry.py` the table holds classes and calls a
+  constructor. In `prototype_registry.py` the table holds instances and
+  copies them." -> "Compare `spawn()` with `make()` in `registry.py`:
+  that table holds classes and calls a constructor, while
+  `prototype_registry.py`'s holds instances and copies them."
+- 2026-09-12 (`a9731125`): "A closed set of names suits `Literal`; an
+  open set, growing by subclassing, does not:" -> "A closed set of names
+  suits `Literal`, while an open set does not:"
+- `45_Effects--Generators` 2026-11-15 (`8c183f7f`), Bruce's hand, the
+  second chapter: "The useful part is that a suspended generator keeps
+  its execution frame alive, and a later call resumes it. Python
+  discards a function's stack frame when the function returns." ->
+  "The useful part is that a suspended generator keeps its execution
+  frame alive, whereas an ordinary function discards its stack frame
+  when the function returns." His edit made two changes beyond the
+  connective. The second side took a subject of the first side's kind:
+  "an ordinary function discards", where "Python discards a function's
+  stack frame" had the contrasted thing in a possessive (C80 asks the
+  same of a contrast's two sentences). And the clause that stood
+  between the sides, "and a later call resumes it", went. The
+  paragraph's last sentence says it: "Resuming the generator links
+  that frame back into the call stack."
+
+**Home.** cohesion (Accrued patterns) | super-prose (pass 4) | this
+file.
+
+### R66. A count of items named somewhere else names the items where the count appears
+
+**Test.** A sentence says "one X and another", "of the two", "the three
+channels", or "three things" and names the items only in a later
+sentence, far above, or not at all, so the reader has to find them.
+Name them in the same sentence, or introduce them with a colon. Where
+the sentence sets the items beside something the reader must match
+them against, a type's parameters or a listing's lines, the names
+stand in that order.
+
+**Keep when.** The count introduces the items in the same sentence, as
+"gives up three things that ... keeps:" does.
+
+**Sightings.** 3, 2 chapters. Promoted by Bruce 2026-11-15 on the
+second chapter (his "do the suggestions"); was C33. The first two are
+`30_Patterns--Observer`, 2026-10-11:
+- Bruce: "vague". "*Observer* removes one coupling and keeps another."
+  -> "*Observer* decouples the thermometer from its responders and
+  leaves the responders coupled to the thermometer."
+- "Of the two additions, only the telling moves out" -> the sentence
+  names the two additions, the comparison and the announcement, and
+  which one moves
+- `45_Effects--Generators` 2026-11-15 (`46841ec0`), was Claude-written,
+  the second chapter, from the antecedents pass Bruce asked for on The
+  Suspended Frame: "TypeScript types the three channels as
+  `Generator<T, TReturn, TNext>`." -> "TypeScript types the yielded,
+  returned, and sent values as `Generator<T, TReturn, TNext>`." The
+  chapter names its three channels 2,300 lines above, as yield, send,
+  and return. The type beside the count lists them in another order,
+  so the reader had to recall the three items and then match each one
+  to a parameter. The names now stand in the order of the parameters
+  beside them.
+
+**Home.** antecedents (Accrued patterns, the unnamed-items bullet) |
+super-prose (pass 5) | this file; a cousin of R9 (name the concrete
+thing).
+
+### R67. An "and" joining two clauses with different subjects, where neither explains the other, becomes two sentences
+
+**Test.** A main-clause "and" whose two clauses have different subjects,
+and the second is neither a consequence of the first (then it takes
+"so") nor a parallel action by the same actor. `tools/sentence_shapes.py`
+lists the wider shape under `ARGS=--survey` as `[AND]`, and its
+calibration found the author's own rewrites fire it, so this is the
+narrower case: the two clauses are about different things. A
+`/bruce-edit-apply` sweep reads the `[AND]` list with this test and
+never splits a sentence on the list alone.
+
+**Keep when.** Two actions by one actor ("reads the file and prints
+it"); a consequence, which takes "so"; a deliberate pairing of two
+parallel facts ("X is young, and Y is demanding").
+
+**Sightings.** 4, 3 chapters. Promoted by Bruce 2026-11-15 (his "do
+the suggestions"); was C42. The global CLAUDE.md bullet and the
+straighten pass had the rule in force before that, and the promotion
+adds it to `/bruce-edit-apply`. The first two were approved as P6 on
+the chapter 44 page, 2026-10-21:
+- `44_Effects--Effect_Management` 2026-10-21 (the edit-start-44 pass, approved on the fault-review page):
+  "Calling `greet()` builds a coroutine object, a description of work,
+  and `ran` stays empty." -> "... a description of work. The body waits,
+  so `ran` is still `[]`."
+- "Effect tracking will look obvious in hindsight, and future
+  programmers will regard ..." -> two sentences
+- `31_Patterns--State_Machines` 2026-10-15, the pair that the global
+  CLAUDE.md bullet ("Split an 'and' that joins two clauses with
+  different subjects") and the straighten skill's Accrued patterns
+  both cite, recorded there at the time and not listed here until
+  now: "`action` defaults to a function that does nothing, and a state
+  with more to do supplies an `action` as the third constructor
+  argument" -> two sentences.
+- `45_Effects--Generators` 2026-11-15 (`4944b211`), was Claude-written,
+  Bruce: 'is "it" the helper or the generator': "The helper is still a
+  generator, and the generator that calls it delegates to it." -> "The
+  helper is still a generator. The calling generator delegates to the
+  helper." The first clause is about the helper and the second about
+  its caller, and the second clause's two pronouns had both nouns as
+  candidates (R12). The split gave the second clause a subject
+  position for "The calling generator" and room for the noun.
+
+**Home.** CLAUDE.md (global, the "and" bullet) | straighten (Accrued
+patterns) | `[AND]` and `[AND+REL]` in `tools/sentence_shapes.py` |
+this file.
+
+### R68. A "frame" says which kind it is: a generator's execution frame, a call's stack frame
+
+**Test.** A bare "frame" (or "frames") in a passage about generators,
+coroutines, or tasks. Chapter 5 defines the two terms. An *execution
+frame* is the object Python creates for a call, holding its local
+variables and its position in the body. A *stack frame* is that object
+while it is an entry on the call stack. A generator's execution frame
+is stored in the generator object and is linked into the call stack
+while the body runs, so a reader who meets "frame" alone takes it for
+a stack frame, which Python discards when its function returns. Write
+"execution frame" for the generator's and "stack frame" for one on the
+call stack wherever both kinds are in the passage. Where the sentence
+is about what a suspended generator preserves and the frame is not its
+subject, say that ("its position in the body and its local
+variables"), or name the generator ("every generator in the chain",
+"three generators rather than two"). A time word on where the frame
+is stored gets C70's probe: the execution frame is in the generator
+object from the generator's creation, so "after which the execution
+frame lives on the heap" reported a move that does not occur.
+
+**Keep when.** "The frame" or "that frame" within a sentence of the
+full term, with one kind of frame in the passage ("links that frame
+back into the call stack"); the frame object an API returns
+(`f_locals`, `sys._getframe()`); a panel of a figure or a frame of an
+animation.
+
+**Sightings.** 4 rounds. Promoted by Bruce 2026-11-15 (his "do the
+suggestions"); was C45. The first form of this entry (2026-10-23,
+'A suspended generator or coroutine has no "frame"; say what it
+preserves') took the word away from a suspended generator altogether.
+The book defined the two terms three days later, and since then the
+rule is to name the kind. Bruce's ruling 2026-10-23 ("we need to
+consider a different word than 'frame' because that suggests stack
+frame"), applied
+in `ce27e8ec` and `4cd0d107` to sixteen sites in chapters 19, 44, 45 and
+Solutions 45:
+- `45_Effects--Generators`: "A suspended generator holds its frame: the
+  position in the body and every local variable. ... The frame holds
+  them, and the frame is the generator's state." -> "A suspended
+  generator preserves two things: its position in the body and every
+  local variable. The generator object stores both, so they outlive each
+  `next()` or `send()` call that resumes the generator. ... The position
+  and the locals together are the generator's state."
+- `45_Effects--Generators`: "`drive()` receives a request that `ask()`
+  yielded two frames down" -> "that `ask()` yielded inside
+  `interview()`"; "`close()` unwinds every frame in the chain." ->
+  "`close()` ends every generator in the chain."
+- `44_Effects--Effect_Management`: "nothing can copy a generator's paused
+  frame" -> "nothing can copy a paused generator's position and local
+  variables"
+- `19_Techniques--Concurrency`: "A suspended task is a paused frame that
+  runs no bytecode" -> "A suspended task runs no bytecode" (the sentence
+  before already says the task saves its position)
+- 2026-10-26 (`bb31283d`, `d3ff6ba0`, `8161af83`), the two terms. About
+  thirty bare "frame"s in ten chapters and five Solutions files became
+  "stack frame" where the frame is on the call stack (tracebacks,
+  recursion limits, profilers, callers, `ContextVar` lookups) and
+  "execution frame" for a generator's. The definition went to chapter
+  5's Names Inside a Function, where locals are first explained, with
+  links from chapter 45 and Solutions 31.
+- `45_Effects--Generators` 2026-11-08 (`9c5f9e2f`), Bruce: "which
+  frame? stack frame?": "Python releases the frame at `return`, and
+  the locals with it." -> "At `return`, Python discards the
+  generator's [execution frame], the object that holds the body's
+  locals, and the locals go with it."
+- `45_Effects--Generators` 2026-11-15 (`944eb10a`), Bruce, on the
+  paragraph about the second restriction: "clarify what kind of frame
+  this paragraph references": "A `yield` suspends one frame, the frame
+  of the function that contains the `yield`. A function that the
+  generator calls runs in a frame of its own and cannot suspend the
+  generator's frame," -> "A `yield` suspends one execution frame, the
+  frame of the generator whose body contains the `yield`. A function
+  that the generator calls runs in a stack frame of its own and cannot
+  suspend the generator's execution frame,". Four bare "frame"s of two
+  kinds in two sentences. The one left bare follows its full term
+  inside the sentence.
+- The same day (`8c183f7f`, `d1f568e5`), Bruce's hand and then his
+  request, 'review "The Suspended Frame" subsection to make sure I
+  didn't make anything incorrect with my edits': "At a `yield`, Python
+  unlinks the generator's execution frame from the call stack, after
+  which the execution frame lives on the heap inside the generator
+  object, with its locals and position intact." -> "... from the call
+  stack. The execution frame lives on the heap inside the generator
+  object, so it stays there with its locals and position intact."
+  C70's third sighting has the probe.
+
+**Home.** ambiguity (Accrued shapes, and its head-noun grep for
+compound terms) | super-prose (pass 6) | this file.
+
 ## Candidates
 
 One sighting each. Logged, not applied. A second sighting in a different
@@ -3534,55 +3763,6 @@ it would be padding.
 (`40323f50`), was Claude-written:
 - "Nesting the classes inside `factory()` looks stronger and is worse"
   -> "looks like stronger enforcement and is worse"
-
-### C10. Join a two-part contrast with "Whereas" or "while"
-
-**Test.** Two adjacent sentences, or two halves of a semicolon, with
-the same frame and opposite predicates and no connective ("A factory
-takes information telling it what to build. A generator object does the
-opposite:"; "In `registry.py` the table holds classes. In
-`prototype_registry.py` the table holds instances."). Join them:
-"Whereas a factory ..., a generator object does the opposite:"; "that
-table holds classes ..., while `prototype_registry.py`'s holds
-instances".
-
-**Keep when.** The two sentences are a deliberate two-beat ("Failures
-never vanish. They only relocate.").
-
-**Sightings.** 4 (additive), 2 chapters. The first three are
-`26_Patterns--Factory`, was Claude-written:
-- 2026-08-31: "Where" in `40323f50`, corrected to "Whereas" in
-  `d6144479`
-- 2026-08-31 (`2b18eed8`): "Compare `spawn()` with `make()` in
-  `registry.py`. In `registry.py` the table holds classes and calls a
-  constructor. In `prototype_registry.py` the table holds instances and
-  copies them." -> "Compare `spawn()` with `make()` in `registry.py`:
-  that table holds classes and calls a constructor, while
-  `prototype_registry.py`'s holds instances and copies them."
-- 2026-09-12 (`a9731125`): "A closed set of names suits `Literal`; an
-  open set, growing by subclassing, does not:" -> "A closed set of names
-  suits `Literal`, while an open set does not:"
-- `45_Effects--Generators` 2026-11-15 (`8c183f7f`), Bruce's hand, the
-  second chapter: "The useful part is that a suspended generator keeps
-  its execution frame alive, and a later call resumes it. Python
-  discards a function's stack frame when the function returns." ->
-  "The useful part is that a suspended generator keeps its execution
-  frame alive, whereas an ordinary function discards its stack frame
-  when the function returns." His edit made two changes beyond the
-  connective. The second side took a subject of the first side's kind:
-  "an ordinary function discards", where "Python discards a function's
-  stack frame" had the contrasted thing in a possessive (C80 asks the
-  same of a contrast's two sentences). And the clause that stood
-  between the sides, "and a later call resumes it", went. The
-  paragraph's last sentence says it: "Resuming the generator links
-  that frame back into the call stack."
-
-**Promotion.** Proposed 2026-11-15: chapter 45 is the second chapter,
-and the sighting is Bruce's hand. Reconciled wording for the rule:
-join the two sides of a contrast with "whereas" or "while", give them
-subjects of one kind, and move or cut a clause that sits between them.
-
-**Home.** cohesion (Accrued patterns) | this file.
 
 ### C11. Cut "need(s) to" where the sentence describes rather than obliges
 
@@ -3861,44 +4041,6 @@ which error the reader sees.
 
 **Home.** this file.
 
-### C33. A sentence that counts names the items
-
-**Test.** A sentence says "one X and another", "of the two", or "three
-things" and names the items only in a later sentence or not at all, so
-the reader has to find them. Name them in the same sentence, or
-introduce them with a colon.
-
-**Keep when.** The count introduces the items in the same sentence, as
-"gives up three things that ... keeps:" does.
-
-**Sightings.** 3, 2 chapters. The first two are
-`30_Patterns--Observer`, 2026-10-11:
-- Bruce: "vague". "*Observer* removes one coupling and keeps another."
-  -> "*Observer* decouples the thermometer from its responders and
-  leaves the responders coupled to the thermometer."
-- "Of the two additions, only the telling moves out" -> the sentence
-  names the two additions, the comparison and the announcement, and
-  which one moves
-- `45_Effects--Generators` 2026-11-15 (`46841ec0`), was Claude-written,
-  the second chapter, from the antecedents pass Bruce asked for on The
-  Suspended Frame: "TypeScript types the three channels as
-  `Generator<T, TReturn, TNext>`." -> "TypeScript types the yielded,
-  returned, and sent values as `Generator<T, TReturn, TNext>`." The
-  chapter names its three channels 2,300 lines above, as yield, send,
-  and return. The type beside the count lists them in another order,
-  so the reader had to recall the three items and then match each one
-  to a parameter. The names now stand in the order of the parameters
-  beside them.
-
-**Promotion.** Proposed 2026-11-15 on the second chapter. Reconciled
-wording for the rule: a count of items that are named somewhere else
-("the three channels", "of the two", "one X and another") names the
-items where the count appears, in the order of anything in the
-sentence the reader must match them against.
-
-**Home.** antecedents (Accrued patterns, the unnamed-items bullet) |
-this file; a cousin of R9 (name the concrete thing).
-
 ### C34. Lay out a compressed consequence as steps (additive)
 
 **Test.** A sentence carries a situation, what it would require, and
@@ -4100,53 +4242,6 @@ the clause out to its own sentence; the colon now follows the noun.
 
 **Home.** this file.
 
-### C42. An "and" joining two clauses with different subjects, where neither explains the other, becomes two sentences
-
-**Test.** A main-clause "and" whose two clauses have different subjects,
-and the second is neither a consequence of the first (then it takes
-"so") nor a parallel action by the same actor. `tools/sentence_shapes.py`
-lists the wider shape under `ARGS=--survey` as `[AND]`, and its
-calibration found the author's own rewrites fire it, so this is the
-narrower case: the two clauses are about different things.
-
-**Keep when.** Two actions by one actor ("reads the file and prints
-it"); a consequence, which takes "so"; a deliberate pairing of two
-parallel facts ("X is young, and Y is demanding").
-
-**Sightings.** 4, 3 chapters. The first two were approved as P6 on the
-chapter 44 page, 2026-10-21:
-- `44_Effects--Effect_Management` 2026-10-21 (the edit-start-44 pass, approved on the fault-review page):
-  "Calling `greet()` builds a coroutine object, a description of work,
-  and `ran` stays empty." -> "... a description of work. The body waits,
-  so `ran` is still `[]`."
-- "Effect tracking will look obvious in hindsight, and future
-  programmers will regard ..." -> two sentences
-- `31_Patterns--State_Machines` 2026-10-15, the pair that the global
-  CLAUDE.md bullet ("Split an 'and' that joins two clauses with
-  different subjects") and the straighten skill's Accrued patterns
-  both cite, recorded there at the time and not listed here until
-  now: "`action` defaults to a function that does nothing, and a state
-  with more to do supplies an `action` as the third constructor
-  argument" -> two sentences.
-- `45_Effects--Generators` 2026-11-15 (`4944b211`), was Claude-written,
-  Bruce: 'is "it" the helper or the generator': "The helper is still a
-  generator, and the generator that calls it delegates to it." -> "The
-  helper is still a generator. The calling generator delegates to the
-  helper." The first clause is about the helper and the second about
-  its caller, and the second clause's two pronouns had both nouns as
-  candidates (R12). The split gave the second clause a subject
-  position for "The calling generator" and room for the noun.
-
-**Promotion.** Proposed 2026-11-15: three chapters, the latest at
-Bruce's question. The rule is already in force through CLAUDE.md and the
-straighten pass. Promotion here adds it to `/bruce-edit-apply`, whose
-sweep must use this entry's narrow test, since `[AND]` fires on the
-author's own rewrites.
-
-**Home.** CLAUDE.md (global, the "and" bullet) | straighten (Accrued
-patterns) | `[AND]` and `[AND+REL]` in `tools/sentence_shapes.py` |
-this file.
-
 ### C43. When the prose explains one of a listing's parallel parts, name each of them (additive)
 
 **Test.** The prose says what one member of a parallel pair in the
@@ -4186,99 +4281,6 @@ loss is the whole point and nothing persists.
 
 ---
 
-### C45. A "frame" says which kind it is: a generator's execution frame, a call's stack frame
-
-**Test.** A bare "frame" (or "frames") in a passage about generators,
-coroutines, or tasks. Chapter 5 defines the two terms. An *execution
-frame* is the object Python creates for a call, holding its local
-variables and its position in the body. A *stack frame* is that object
-while it is an entry on the call stack. A generator's execution frame
-is stored in the generator object and is linked into the call stack
-while the body runs, so a reader who meets "frame" alone takes it for
-a stack frame, which Python discards when its function returns. Write
-"execution frame" for the generator's and "stack frame" for one on the
-call stack wherever both kinds are in the passage. Where the sentence
-is about what a suspended generator preserves and the frame is not its
-subject, say that ("its position in the body and its local
-variables"), or name the generator ("every generator in the chain",
-"three generators rather than two"). A time word on where the frame
-is stored gets C70's probe: the execution frame is in the generator
-object from the generator's creation, so "after which the execution
-frame lives on the heap" reported a move that does not occur.
-
-**Keep when.** "The frame" or "that frame" within a sentence of the
-full term, with one kind of frame in the passage ("links that frame
-back into the call stack"); the frame object an API returns
-(`f_locals`, `sys._getframe()`); a panel of a figure or a frame of an
-animation.
-
-**Sightings.** 4 rounds. The first form of this entry (2026-10-23,
-'A suspended generator or coroutine has no "frame"; say what it
-preserves') took the word away from a suspended generator altogether.
-The book defined the two terms three days later, and since then the
-rule is to name the kind. Bruce's ruling 2026-10-23 ("we need to
-consider a different word than 'frame' because that suggests stack
-frame"), applied
-in `ce27e8ec` and `4cd0d107` to sixteen sites in chapters 19, 44, 45 and
-Solutions 45:
-- `45_Effects--Generators`: "A suspended generator holds its frame: the
-  position in the body and every local variable. ... The frame holds
-  them, and the frame is the generator's state." -> "A suspended
-  generator preserves two things: its position in the body and every
-  local variable. The generator object stores both, so they outlive each
-  `next()` or `send()` call that resumes the generator. ... The position
-  and the locals together are the generator's state."
-- `45_Effects--Generators`: "`drive()` receives a request that `ask()`
-  yielded two frames down" -> "that `ask()` yielded inside
-  `interview()`"; "`close()` unwinds every frame in the chain." ->
-  "`close()` ends every generator in the chain."
-- `44_Effects--Effect_Management`: "nothing can copy a generator's paused
-  frame" -> "nothing can copy a paused generator's position and local
-  variables"
-- `19_Techniques--Concurrency`: "A suspended task is a paused frame that
-  runs no bytecode" -> "A suspended task runs no bytecode" (the sentence
-  before already says the task saves its position)
-- 2026-10-26 (`bb31283d`, `d3ff6ba0`, `8161af83`), the two terms. About
-  thirty bare "frame"s in ten chapters and five Solutions files became
-  "stack frame" where the frame is on the call stack (tracebacks,
-  recursion limits, profilers, callers, `ContextVar` lookups) and
-  "execution frame" for a generator's. The definition went to chapter
-  5's Names Inside a Function, where locals are first explained, with
-  links from chapter 45 and Solutions 31.
-- `45_Effects--Generators` 2026-11-08 (`9c5f9e2f`), Bruce: "which
-  frame? stack frame?": "Python releases the frame at `return`, and
-  the locals with it." -> "At `return`, Python discards the
-  generator's [execution frame], the object that holds the body's
-  locals, and the locals go with it."
-- `45_Effects--Generators` 2026-11-15 (`944eb10a`), Bruce, on the
-  paragraph about the second restriction: "clarify what kind of frame
-  this paragraph references": "A `yield` suspends one frame, the frame
-  of the function that contains the `yield`. A function that the
-  generator calls runs in a frame of its own and cannot suspend the
-  generator's frame," -> "A `yield` suspends one execution frame, the
-  frame of the generator whose body contains the `yield`. A function
-  that the generator calls runs in a stack frame of its own and cannot
-  suspend the generator's execution frame,". Four bare "frame"s of two
-  kinds in two sentences. The one left bare follows its full term
-  inside the sentence.
-- The same day (`8c183f7f`, `d1f568e5`), Bruce's hand and then his
-  request, 'review "The Suspended Frame" subsection to make sure I
-  didn't make anything incorrect with my edits': "At a `yield`, Python
-  unlinks the generator's execution frame from the call stack, after
-  which the execution frame lives on the heap inside the generator
-  object, with its locals and position intact." -> "... from the call
-  stack. The execution frame lives on the heap inside the generator
-  object, so it stays there with its locals and position intact."
-  C70's third sighting has the probe.
-
-**Promotion.** Proposed 2026-11-15: four rounds, two of them Bruce's
-questions, and the 2026-10-26 sweep applied the rule across the book.
-
-**Home.** ambiguity (Accrued shapes, and its head-noun grep for
-compound terms) | super-prose (pass 6) | this file.
-
----
-
 ### C46. State that survives a suspension or a call boundary is "preserved", not "held"
 
 **Test.** "holds" (or "keeps") has state as its object, and the
@@ -4294,7 +4296,7 @@ table holds classes", "a record holds its fields").
 Bruce chose the word ("or 'preserves'", over "retains") and confirmed it
 ("preserves says it better"):
 - "A suspended generator holds its frame:" -> "A suspended generator
-  preserves its frame:" (later "preserves two things:", see C45)
+  preserves its frame:" (later "preserves two things:", see R68)
 
 **Home.** this file only.
 
@@ -5123,7 +5125,7 @@ what kind of frame this paragraph references"):
   the generator calls runs in a stack frame of its own". The first
   "function" was the generator and the second an ordinary function it
   calls, and the paragraph is about how the two differ. The chapter's
-  name for a function with a `yield` is "generator". C45 has the two
+  name for a function with a `yield` is "generator". R68 has the two
   kinds of frame in the same pair.
 
 **Home.** antecedents (Accrued patterns) | super-prose (pass 5) | this
@@ -5838,7 +5840,7 @@ Claude-written, Bruce: "'each' and 'its' seem odd here":
   The general cause is a repair that changes a sentence's subject and
   leaves the rest of the sentence as it was written for the old one.
 - `tip sentence-shapes ARGS=--survey` lists the new sentence under
-  `[AND]`. It is a pairing of two parallel facts (C42's keep), and
+  `[AND]`. It is a pairing of two parallel facts (R67's keep), and
   "so is" needs the first clause beside it.
 
 **Home.** antecedents (Accrued patterns) | super-prose (pass 5) | this
