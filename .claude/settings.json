@@ -20,6 +20,16 @@
             "timeout": 10
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "bash",
+            "command": "uv run --no-sync python -m tools.uncaptured_edits; true",
+            "timeout": 15
+          }
+        ]
       }
     ]
   }

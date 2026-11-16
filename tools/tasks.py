@@ -433,6 +433,19 @@ def prose(v: Vars) -> None:
     py("tools.internal_names")
 
 
+@task("List prose edits no session has learned from yet (report-only)")
+def uncaptured(v: Vars) -> None:
+    """List prose commits with no Co-Authored-By trailer since the last
+    commit that touched bruce_edit_db.md, and uncommitted prose changes.
+    Prints nothing when there are none. The SessionStart hook in
+    .claude/settings.json runs the same module. After reading the listed
+    commits and filing their lessons, `tip uncaptured ARGS=--mark`
+    records HEAD in tools/data/edits_read_through.txt, the marker the
+    next run counts from.
+    """
+    py("tools.uncaptured_edits", *v.words("ARGS"))
+
+
 @task("Report new clauses ending on a stranded preposition "
       "(report-only; accept with `tip stranded-accept`)")
 def stranded(v: Vars) -> None:

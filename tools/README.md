@@ -1795,6 +1795,17 @@ tip expletives ARGS=--calibrate   # edit pairs, examples, and Vale's ThereIs
 tip expletives-accept CH=31       # baseline the judged keeps
 ```
 
+## uncaptured_edits.py
+
+Prints a short notice of prose edits nobody has learned from yet:
+commits with no `Co-Authored-By:` trailer since the commit named in
+`tools/data/edits_read_through.txt` (or, without that file, the last
+commit that touched `bruce_edit_db.md`), plus uncommitted prose changes, with open
+`edit-start-NN` passes noted. A second `SessionStart` hook runs it;
+`tip uncaptured` runs it by hand, and `tip uncaptured ARGS=--mark`
+rewrites the marker file with HEAD after the listed commits are read. It prints nothing when there is
+nothing to report.
+
 ## pointer_words.py
 
 A survey for the `antecedents` skill, outside `tip prose`, with no

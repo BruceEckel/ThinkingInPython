@@ -1,0 +1,5 @@
+# Prose edits read through the commit below: every trailer-less
+# prose commit up to and including it has been read.
+# `tip uncaptured ARGS=--mark` rewrites it after the session has
+# read the listed commits. See tools/uncaptured_edits.py.
+3ebeb6944419a2779cd98fc89f53da233f99b5f0

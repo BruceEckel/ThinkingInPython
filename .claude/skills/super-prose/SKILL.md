@@ -601,6 +601,11 @@ tree, in a commit of his, or in a chapter editor round), a sentence
 he flags, pastes, or asks a question about, and a rewrite or a sweep
 he asks for, with the repairs the session makes inside it. Who typed
 the change does not matter (2026-09-28).
+The `SessionStart` notice (`uv run tip uncaptured`) lists the commits
+he made by hand and the prose files with uncommitted changes that no
+session has read. After reading them and filing their lessons, run
+`uv run tip uncaptured ARGS=--mark` and commit
+`tools/data/edits_read_through.txt` with the lessons.
 
 For each one, in the same turn as the edit:
 

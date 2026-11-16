@@ -195,6 +195,19 @@ lives in this file and that skill because project memory is kept per
 machine: he first gave it on his laptop, and it had not reached this
 checkout.
 
+A session notices his hand edits through a second `SessionStart` hook
+(since 2026-11-16). `tools/uncaptured_edits.py` (`tip uncaptured`)
+lists the prose commits that carry no `Co-Authored-By:` trailer since
+the commit named in `tools/data/edits_read_through.txt`, and the prose
+files with uncommitted changes, with open passes noted beside them. It
+prints nothing when there is nothing to read. Read each listed diff
+and file its lessons, then run `uv run tip uncaptured ARGS=--mark` and
+commit the marker file with them. The marker is a file because the
+first design, which counted from the last commit that touched
+`bruce_edit_db.md`, hid any hand commit made before a session filed a
+lesson for something else. Without the file the tool falls back to
+that count.
+
 `/bruce-edit-capture` (`.claude/skills/bruce-edit-capture/SKILL.md`) reads the
 before/after diff of an editing pass on a chapter, whoever made each edit
 (Bruce's rule since 2026-09-28: a pass is judged by whether the chapter got
