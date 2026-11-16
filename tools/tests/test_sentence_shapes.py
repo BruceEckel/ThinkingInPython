@@ -496,3 +496,88 @@ def test_an_edit_to_the_sentence_before_retires_an_add_entry(
     assert main([str(path), "--survey-accept"],
                 recorded_parser) == 0
     assert "added 1, dropped 1 stale" in capsys.readouterr().out
+
+
+IMP_P = "Remove `frozen=True` and the pattern fails."
+PRT_P = ("A generator yields a request and waits while the driver "
+         "carries the request out.")
+SAME_P = ("The same directory reaches pytest through `pythonpath` in "
+          "`pyproject.toml`.")
+
+
+def two_rule_file(tmp_path: Path, *paragraphs: str) -> Path:
+    path = tmp_path / "a.md"
+    path.write_text("\n\n".join(paragraphs) + "\n", encoding="utf-8")
+    return path
+
+
+def test_survey_rule_option_prints_only_that_rules_hits(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(sentence_shapes, "BASELINE", tmp_path / "base.txt")
+    path = two_rule_file(tmp_path, IMP_P, SAME_P)
+    assert main([str(path), "--survey", "--rule", "same+new"],
+                recorded_parser) == 0
+    out = capsys.readouterr().out
+    assert "[SAME+NEW] directory:" in out
+    assert "[SAME] " not in out and "[IMP]" not in out
+    assert "1 survey, 0 judged" in out and "0 new, 0 accepted" in out
+
+
+def test_survey_accept_rule_leaves_other_rules_alone(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str],
+) -> None:
+    path = two_rule_file(tmp_path, SAME_P)
+    shown = sentence_shapes.display(path)
+    stale_other = sentence_shapes.key(shown, "[CAN] A call can reset.")
+    stale_same = sentence_shapes.key(shown, "[SAME] An old sentence.")
+    survey = sentence_shapes.SURVEY_BASELINE
+    parse_check_write = sentence_shapes.parse_check.write_baseline
+    parse_check_write({stale_other, stale_same}, survey,
+                      sentence_shapes.SURVEY_HEADER)
+    assert main([str(path), "--survey-accept", "--rule", "[same]"],
+                recorded_parser) == 0
+    assert "added 1, dropped 1" in capsys.readouterr().out
+    entries = sentence_shapes.load_baseline(survey)
+    assert stale_other in entries and stale_same not in entries
+    assert sum(e.split("\t", 1)[1].startswith("[SAME] ")
+               for e in entries) == 1
+    assert not any("[SAME+NEW]" in e for e in entries)
+    assert main([str(path), "--survey"], recorded_parser) == 0
+    out = capsys.readouterr().out
+    assert "[SAME+NEW] directory:" in out
+    assert "1 survey, 1 judged" in out
+
+
+def test_accept_rule_leaves_other_rules_alone(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(sentence_shapes, "BASELINE", tmp_path / "base.txt")
+    path = two_rule_file(tmp_path, IMP_P, PRT_P)
+    shown = sentence_shapes.display(path)
+    other = sentence_shapes.key(shown, "[PAIR] Gone sentence.")
+    gone = sentence_shapes.key(shown, "[IMP] Gone sentence.")
+    sentence_shapes.write_baseline({other, gone})
+    assert main([str(path), "--accept", "--rule", "IMP"],
+                recorded_parser) == 0
+    assert "added 1, dropped 1" in capsys.readouterr().out
+    entries = sentence_shapes.load_baseline()
+    assert other in entries and gone not in entries
+    assert sum("[IMP] " in e for e in entries) == 1
+    assert not any("[PRT]" in e for e in entries)
+    assert main([str(path), "--rule", "PRT"], recorded_parser) == 0
+    out = capsys.readouterr().out
+    assert "[PRT]" in out and "[IMP]" not in out
+    assert "1 new, 0 accepted" in out and "stale" not in out
+
+
+def test_unknown_rule_is_an_argparse_error(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str],
+) -> None:
+    path = two_rule_file(tmp_path, IMP_P)
+    with pytest.raises(SystemExit) as raised:
+        main([str(path), "--rule", "NOPE"], recorded_parser)
+    assert raised.value.code == 2
+    assert "valid rules:" in capsys.readouterr().err

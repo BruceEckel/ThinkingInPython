@@ -587,7 +587,10 @@ set after a reread of its standing hits under the rule's tests as
 they are that day, never on the strength of an older sweep. The
 accept takes in
 every unjudged hit in the chapter and its Solutions file, so a pass
-over one section reads the rest of that list before accepting. An
+over one section reads the rest of that list before accepting, or
+records one rule at a time with `ARGS="--survey-accept --rule HEAD"`
+(since 2026-11-16), which leaves the other rules' unjudged hits for
+their own read. An
 entry is keyed by its sentence, and an `[ADD]` entry by its sentence
 and the one before it. For the other rules an edit to the passage
 above a kept sentence leaves the entry in place, and
@@ -847,6 +850,18 @@ lists every hit.
 2026-10-23): it adds and drops entries for that chapter and its
 Solutions file and leaves every other file's entries alone, so one
 chapter's accept never takes in another chapter's unread hits.
+Within a chapter, two options narrow a run to what was read (since
+2026-11-16). `tip watch-words-accept CH=NN ARGS="--only could"` adds
+and drops the entries of that flagged word and leaves every other
+entry as it was, and `tip sentence-shapes-accept CH=NN ARGS="--rule
+PRT"` does the same for one rule, as does `ARGS="--survey-accept
+--rule HEAD"` for the survey list. Both options are repeatable, and
+both narrow the report the same way, so `tip watch-words
+ARGS="--only could"` lists one word's sites. A phrase takes quotes
+inside the value, `ARGS='--only "has no"'`; `tip` keeps a quoted part
+of any `NAME=value` as one word since that day. Twice that week a
+script had to strip unread hits out of a baseline after an accept,
+which is what the options replace.
 `tip internal-names-accept` reads code, not prose, and takes no `CH=`.
 A baseline entry is keyed by the sentence, so an edit to a line that
 holds an accepted keep re-keys it: the check then prints the sentence

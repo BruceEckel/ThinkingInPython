@@ -45,6 +45,7 @@ import difflib
 import inspect
 import os
 import re
+import shlex
 import subprocess
 import sys
 import textwrap
@@ -81,8 +82,21 @@ class Vars:
 
     def words(self, name: str) -> list[str]:
         """The value split on whitespace, as make splits `$(CH)`, so
-        `CH="25 28"` passes two arguments."""
-        return self.get(name).split()
+        `CH="25 28"` passes two arguments.
+
+        A quoted part stays one word (since 2026-11-16), so
+        `ARGS='--only "has no"'` passes `--only` and `has no`: half
+        the watch words are phrases. A backslash is an ordinary
+        character, as in a Windows path, and a value with an unmatched
+        quote (`don't`) splits on whitespace as before.
+        """
+        value = self.get(name)
+        if '"' not in value and "'" not in value:
+            return value.split()
+        try:
+            return shlex.split(value.replace("\\", "\\\\"))
+        except ValueError:
+            return value.split()
 
 
 @dataclass

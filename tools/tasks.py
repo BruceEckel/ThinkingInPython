@@ -592,6 +592,9 @@ def sentence_shapes(v: Vars) -> None:
     so the run prints only new ones; ARGS=--all lists every default
     hit, and ARGS=--calibrate runs every rule over
     tools/data/edit_pairs.json and the built-in examples.
+    ARGS="--rule NAME" (repeatable, any case, brackets optional)
+    restricts the run to one rule's hits, its stale entries, and its
+    counts, so ARGS="--survey --rule HEAD" reports only [HEAD].
     """
     py("tools.sentence_shapes", *prose_files(v), *v.words("ARGS"))
 
@@ -599,7 +602,15 @@ def sentence_shapes(v: Vars) -> None:
 @task("Add new sentence-shape hits to the baseline and drop stale "
       "entries", secondary=True)
 def sentence_shapes_accept(v: Vars) -> None:
-    py("tools.sentence_shapes", "--accept", *prose_files(v))
+    """Add the NEW default-rule hits of CH= (and its Solutions file) to
+    tools/data/sentence_shapes_baseline.txt and drop the stale entries.
+    ARGS="--rule NAME" restricts the accept to that rule: its NEW hits
+    are added, its stale entries dropped, and every other entry stays
+    as it was. For the survey baseline, run `tip sentence-shapes` with
+    ARGS="--survey-accept --rule NAME".
+    """
+    py("tools.sentence_shapes", "--accept", *prose_files(v),
+       *v.words("ARGS"))
 
 
 @task("Report new passive clauses (report-only; accept with "
@@ -771,6 +782,9 @@ def watch_words(v: Vars) -> None:
     prints only with ARGS=--all or ARGS="--tier 1". CH= picks one chapter; hits judged keeps live in
     tools/data/watch_words_baseline.txt; ARGS=--all lists every hit,
     ARGS="--tier 3" only Tier 3, ARGS=--fail exits 1 on a new Tier 3 hit.
+    ARGS="--only WORD" (repeatable, case-insensitive) restricts the run
+    to the hits, stale entries, and counts of that flagged word. A
+    phrase takes quotes inside the value: ARGS='--only "has no"'.
     """
     py("tools.watch_words", *prose_files(v), *v.words("ARGS"))
 
@@ -778,7 +792,16 @@ def watch_words(v: Vars) -> None:
 @task("Add new watch-word hits to the baseline and drop stale "
       "entries", secondary=True)
 def watch_words_accept(v: Vars) -> None:
-    py("tools.watch_words", "--accept", *prose_files(v))
+    """Add the NEW Tier 2 and 3 hits of CH= (and its Solutions file) to
+    tools/data/watch_words_baseline.txt and drop the stale entries.
+    ARGS="--only WORD" restricts the accept to that flagged word: its
+    NEW hits are added, its stale entries dropped, and every other
+    entry stays as it was, so unread hits of other words are not taken
+    in. A phrase takes quotes inside the value:
+    ARGS='--only "has no"'.
+    """
+    py("tools.watch_words", "--accept", *prose_files(v),
+       *v.words("ARGS"))
 
 
 @task("Report new prose that points at a listing line by position or "

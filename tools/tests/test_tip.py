@@ -45,6 +45,19 @@ def test_vars_read_unset_as_empty_and_split_like_make() -> None:
     assert v.get("CH") == "25 28"
 
 
+def test_vars_words_keep_a_quoted_part_whole() -> None:
+    v = Vars({
+        "ARGS": '--only "has no" --only could',
+        "ONE": "--only 'is how'",
+        "WIN": r'--file "C:\git\x y" C:\tmp',
+        "ODD": "--msg don't",
+    })
+    assert v.words("ARGS") == ["--only", "has no", "--only", "could"]
+    assert v.words("ONE") == ["--only", "is how"]
+    assert v.words("WIN") == ["--file", r"C:\git\x y", r"C:\tmp"]
+    assert v.words("ODD") == ["--msg", "don't"]
+
+
 def _registry(log: list[str]) -> Registry:
     reg = Registry()
     reg.section("S")

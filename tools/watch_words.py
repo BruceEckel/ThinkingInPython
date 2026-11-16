@@ -158,6 +158,15 @@ given paths compares against those files' entries alone, and `--accept`
 with paths adds and drops entries for those files and keeps
 every other file's entries.
 
+`--only WORD` (since 2026-11-16, repeatable, case-insensitive) restricts
+the whole run to hits whose flagged word is WORD, the field a hit prints
+between its tier tag and the colon (`whatever`, `has no`). The report
+prints, lists as `stale`, and counts only those words, and
+`--accept --only WORD` adds the NEW hits of those words and drops their
+stale entries while every other baseline entry stays as it was, so an
+accept never takes in the unread hits of another word. `--changed`
+applies the same filter.
+
 `--changed` (since 2026-11-13) reads only the clauses on lines that
 differ from HEAD in the working tree and exits 1 on any NEW Tier 2 or
 3 hit among them. `tip verify-ch` runs it on the chapter and its
@@ -176,6 +185,7 @@ after the chapter's other NEW hits are read.
     uv run python -m tools.watch_words --tier 1 # advisory Tier 1
     uv run python -m tools.watch_words --accept # judged keeps
     uv run python -m tools.watch_words --changed PATH
+    uv run python -m tools.watch_words --accept --only whatever PATH
     uv run tip watch-words CH=30
     uv run tip watch-words-accept
 """
@@ -564,7 +574,17 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--changed", action="store_true",
                     help="read only clauses on lines that differ from "
                          "HEAD, and exit 1 on any NEW Tier 2 or 3 hit")
+    ap.add_argument("--only", action="append", default=[],
+                    metavar="WORD",
+                    help="restrict the run to hits of this flagged "
+                         "word (repeatable, case-insensitive): the "
+                         "report, the stale list, and --accept")
     args = ap.parse_args(argv)
+    only = {" ".join(w.lower().split()) for w in args.only}
+
+    def wanted(word: str) -> bool:
+        return not only or word in only
+
     if args.accept and args.tier in (2, 3):
         ap.error("--accept covers Tiers 2 and 3; give no --tier, "
                  "or --tier 1")
@@ -576,6 +596,7 @@ def main(argv: list[str] | None = None) -> int:
         (display(p), line, tier, word, clause)
         for path in paths
         for p, line, tier, word, clause in find(Document.parse(path))
+        if wanted(word)
     )
     if args.changed:
         fresh: set[tuple[str, str]] = set()
@@ -596,7 +617,9 @@ def main(argv: list[str] | None = None) -> int:
         print(f"{len(hits)} new on changed lines")
         return 1 if hits else 0
     baseline = load_baseline(BASELINE)
-    scope = {e for e in baseline if e.split("\t", 1)[0] in shown_paths}
+    scope = {e for e in baseline
+             if e.split("\t", 1)[0] in shown_paths
+             and wanted(e.split("\t", 1)[1].split(": ", 1)[0].lower())}
     current = {key(s, w, c) for s, _, _, w, c in found}
     stale = sorted(scope - current)
     if args.accept:

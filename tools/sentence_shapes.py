@@ -295,7 +295,13 @@ reread all of them to find one written since, so the rules in
 survey, J judged`; `--survey --all` prints the judged ones too, marked
 `judged`; and `--survey-accept` adds the unjudged hits after a human
 read and drops stale entries, for the given files alone like
-`--accept`. An entry is keyed by its sentence (an `[ADD]` entry by its
+`--accept`. `--rule NAME` (since 2026-11-16, repeatable; any case,
+brackets optional, an unknown name is an error that lists the valid
+ones) restricts the whole run to hits of that rule: the report, the
+stale list, both summary counts, and the two accepts, which then add and
+drop only that rule's entries and leave every other entry as it was, so
+an accept never takes in the unread hits of another rule.
+An entry is keyed by its sentence (an `[ADD]` entry by its
 sentence and the one before it), so for the other rules an edit to the
 passage above a kept sentence leaves the entry in place: reread a kept
 sentence when the text above it changes.
@@ -488,8 +494,11 @@ or introduces a list whose items hold relative clauses.
     uv run tip sentence-shapes CH=31
     uv run tip sentence-shapes-accept
     uv run tip sentence-shapes CH=31 ARGS=--survey-accept
+    uv run tip sentence-shapes CH=31 ARGS="--survey --rule HEAD"
+    uv run tip sentence-shapes-accept CH=31 ARGS="--rule PRT"
 """
 
+import argparse
 import re
 from collections import Counter
 from collections.abc import Iterator, Mapping, Sequence
@@ -1886,6 +1895,21 @@ def rule_of(message: str) -> str:
     return message[1:message.index("]")]
 
 
+def label_of(message: str) -> str:
+    """`rule_of()`, or "" for a message with no leading `[RULE]`."""
+    return rule_of(message) if "]" in message else ""
+
+
+def rule_name(text: str) -> str:
+    """A `--rule` value as a rule label: any case, brackets optional."""
+    name = text.strip().removeprefix("[").removesuffix("]").upper()
+    if name not in ALL_RULES:
+        raise argparse.ArgumentTypeError(
+            f"unknown rule {text!r}; valid rules: "
+            + ", ".join(ALL_RULES))
+    return name
+
+
 def load_baseline(path: Path | None = None) -> set[str]:
     """The accepted keys, without comments or blank lines."""
     return parse_check.load_baseline(path or BASELINE)
@@ -1928,10 +1952,20 @@ def main(argv: list[str] | None = None, parser: Parser = parse) -> int:
                            "to their own baseline and drop stale entries",
         calibrate_help="run the rules over tools/data/edit_pairs.json "
                        "and the built-in examples")
+    ap.add_argument("--rule", action="append", default=[],
+                    type=rule_name, metavar="NAME",
+                    help="restrict the run to hits of this rule "
+                         "(repeatable; one of " + ", ".join(ALL_RULES)
+                         + "): the report, the stale list, the counts, "
+                         "and --accept and --survey-accept")
     args = parse_args(ap, argv)
     if args.calibrate:
         return run_calibrate("sentence_shapes", calibrate, parser)
+    chosen = set(args.rule)
+    keep = ((lambda message: label_of(message) in chosen)
+            if chosen else None)
     return run("sentence_shapes", args, lambda docs: find(docs, parser),
+               keep=keep,
                baseline=BASELINE, header=HEADER,
                is_survey=lambda message: rule_of(message) in SURVEY_RULES,
                survey_baseline=SURVEY_BASELINE, survey_header=SURVEY_HEADER,

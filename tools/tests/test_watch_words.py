@@ -318,3 +318,63 @@ def test_accept_tier_1_accepts_only_tier_1(book: Path) -> None:
 def test_accept_refuses_tier_3(book: Path) -> None:
     with pytest.raises(SystemExit):
         main(["--accept", "--tier", "3"])
+
+
+TWO_WORDS = f"{CLAUSE}. The value is already set.\n"
+ALREADY = "The value is already set"
+
+
+def test_only_reports_one_words_hits(
+    book: Path, capsys: pytest.CaptureFixture[str],
+) -> None:
+    book.write_text(TWO_WORDS, encoding="utf-8")
+    write_baseline({entry(book, "The tool is already set", "already"),
+                    entry(book, "The tool ships")}, baseline_of(book))
+    assert main([str(book), "--only", "ships"]) == 0
+    out = capsys.readouterr().out
+    assert "[T3] ships" in out and "already set" not in out.replace(
+        "The tool is already set", "")
+    assert "1 new (1 T3, 0 T2), 0 accepted, 1 stale" in out
+    assert "stale    Chapters/a.md: ships:" in out
+    assert "already: " not in out
+
+
+def test_only_accept_leaves_other_words_alone(book: Path) -> None:
+    book.write_text(TWO_WORDS, encoding="utf-8")
+    other = entry(book, "The tool is already set", "already")
+    gone = entry(book, "The tool ships")
+    write_baseline({other, gone}, baseline_of(book))
+    assert main(["--accept", "--only", "ships"]) == 0
+    assert load_baseline(baseline_of(book)) == {entry(book), other}
+    assert main(["--accept", "--only", "already"]) == 0
+    assert load_baseline(baseline_of(book)) == {
+        entry(book), entry(book, ALREADY, "already")}
+
+
+def test_only_accept_does_not_take_in_unread_words(book: Path) -> None:
+    book.write_text(TWO_WORDS, encoding="utf-8")
+    assert main(["--accept", "--only", "ships"]) == 0
+    assert load_baseline(baseline_of(book)) == {entry(book)}
+    assert main([]) == 0
+
+
+def test_two_only_options_cover_both_words(
+    book: Path, capsys: pytest.CaptureFixture[str],
+) -> None:
+    book.write_text(TWO_WORDS, encoding="utf-8")
+    assert main([str(book), "--only", "ships", "--only", "already"]) == 0
+    assert "2 new (1 T3, 1 T2), 0 accepted" in capsys.readouterr().out
+    assert main(["--accept", "--only", "ships", "--only", "already"]) == 0
+    assert load_baseline(baseline_of(book)) == {
+        entry(book), entry(book, ALREADY, "already")}
+
+
+def test_only_is_case_insensitive_and_takes_a_phrase(
+    book: Path, capsys: pytest.CaptureFixture[str],
+) -> None:
+    book.write_text("It has no slots. The library ships.\n",
+                    encoding="utf-8")
+    assert main([str(book), "--only", "HAS NO"]) == 0
+    out = capsys.readouterr().out
+    assert "[T2] has no" in out and "ships" not in out
+    assert "1 new (0 T3, 1 T2), 0 accepted" in out

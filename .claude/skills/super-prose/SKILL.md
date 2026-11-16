@@ -457,7 +457,11 @@ Bruce's "we" and his em-dashes stay.
    it. Then record the keeps with `ARGS=--survey-accept` on each. The
    accept takes in every unjudged hit in the chapter and its Solutions
    file, so a pass over one section reads the hits outside its
-   section before accepting.
+   section before accepting, or records one rule at a time with
+   `ARGS="--survey-accept --rule NAME"`. The watch-words accept
+   narrows the same way: `tip watch-words-accept CH=NN ARGS="--only
+   could"`, with a phrase quoted inside the value
+   (`ARGS='--only "has no"'`).
 4. Read `git diff Chapters/`: a changed `#:` marker means an edit
    strayed into code.
 5. Commit the chapter and any baseline files together, one commit,

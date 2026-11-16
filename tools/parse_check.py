@@ -197,13 +197,17 @@ def write_baseline(entries: set[str], path: Path, header: str) -> None:
 
 def apply_baseline(
     found: list[Entry], baseline: set[str], shown_paths: set[str],
+    keep: Callable[[str], bool] | None = None,
 ) -> tuple[list[Entry], list[str]]:
     """(the NEW rows, the stale entries) for rows from `shown_paths`.
 
     A stale entry is a baseline entry for one of the files the run read
-    that matches no row any more.
+    that matches no row any more. With `keep`, a predicate on a
+    message, an entry whose message fails it is outside the run: never
+    stale.
     """
-    scope = {e for e in baseline if e.split("\t", 1)[0] in shown_paths}
+    scope = {e for e in baseline if e.split("\t", 1)[0] in shown_paths
+             and (keep is None or keep(e.split("\t", 1)[1]))}
     current = {key(shown, text) for shown, _, text in found}
     new = [(s, n, t) for s, n, t in found if key(s, t) not in baseline]
     return new, sorted(scope - current)
@@ -341,7 +345,8 @@ def run(name: str, args: argparse.Namespace,
         survey_last: bool = False,
         survey_baseline: Path | None = None,
         survey_header: str = "",
-        is_judged: Callable[[str], bool] | None = None) -> int:
+        is_judged: Callable[[str], bool] | None = None,
+        keep: Callable[[str], bool] | None = None) -> int:
     """A baselined check's default run; the exit code.
 
     `find_docs` is the check's finder with its parser (and any extra
@@ -349,7 +354,10 @@ def run(name: str, args: argparse.Namespace,
     hits; those print under `--survey` only, apart from the baseline.
     With `survey_baseline`, the survey rows that satisfy `is_judged`
     (all of them when it is None) are judged against that file, and
-    `--survey-accept` writes it with `survey_header`.
+    `--survey-accept` writes it with `survey_header`. With `keep`, a
+    predicate on a hit's message, the run covers only the hits it
+    accepts and only the baseline entries whose message it accepts;
+    every other entry is never stale, never dropped, never counted.
     """
     paths = prose_paths(args)
     shown_paths = {display(p) for p in paths}
@@ -359,11 +367,12 @@ def run(name: str, args: argparse.Namespace,
         report_unavailable(name, exc)
         return 0
     everything = sorted(
-        {(display(f.path), f.line, f.message) for f in findings})
+        {(display(f.path), f.line, f.message) for f in findings
+         if keep is None or keep(f.message)})
     survey = [h for h in everything if is_survey and is_survey(h[2])]
     found = [h for h in everything if not (is_survey and is_survey(h[2]))]
     accepted = load_baseline(baseline)
-    new, stale = apply_baseline(found, accepted, shown_paths)
+    new, stale = apply_baseline(found, accepted, shown_paths, keep)
     survey_judged: set[str] | None = None
     survey_stale: list[str] = []
     if survey_baseline is not None:
@@ -371,7 +380,7 @@ def run(name: str, args: argparse.Namespace,
         judgeable = [h for h in survey if is_judged is None
                      or is_judged(h[2])]
         unjudged, survey_stale = apply_baseline(
-            judgeable, survey_judged, shown_paths)
+            judgeable, survey_judged, shown_paths, keep)
         if getattr(args, "survey_accept", False):
             added = {key(s, t) for s, _, t in unjudged}
             write_baseline((survey_judged - set(survey_stale)) | added,
