@@ -328,12 +328,13 @@ Solutions/45_Effects--Generators/README.md	[PAST] stopped: The interview stopped
 Solutions/45_Effects--Generators/README.md	[PAST] told: The type checker told you more.
 Solutions/45_Effects--Generators/README.md	[PAST] wrote: you wrote the full sequence of lines before running the modified CODE, and it matches the run line for line, including which sends print two lines and what CODE prints.
 Solutions/46_Effects--Stateless/README.md	[PAST-HEADING] declared: 2. An undeclared need, declared
-Solutions/46_Effects--Stateless/README.md	[PAST] answered: At runtime the handler answered three requests across the two calls, two for CODE and one for CODE, although CODE annotates its parameter CODE.
+Solutions/46_Effects--Stateless/README.md	[PAST] answered: At runtime the handler answered three requests across the two CODE calls, two for CODE and one for CODE, although CODE annotates its parameter CODE.
 Solutions/46_Effects--Stateless/README.md	[PAST] applied: That split between the table and the body is the chapter's split between an Effect and its environment, applied to a test.
-Solutions/46_Effects--Stateless/README.md	[PAST] described: Its signature described a different function.
-Solutions/46_Effects--Stateless/README.md	[PAST] did: ** CODE did the right thing all along.
+Solutions/46_Effects--Stateless/README.md	[PAST] described: Its signature described a pure function.
 Solutions/46_Effects--Stateless/README.md	[PAST] put: Two of the six orderings put CODE first and send the greeting to the screen.
 Solutions/46_Effects--Stateless/README.md	[PAST] read: ** CODE at strength CODE exceeds the robotic nailer's force of CODE, so both its rows read CODE.
+Solutions/46_Effects--Stateless/README.md	[PAST] was: That CODE was the body's only yield expression, so without it CODE returns CODE where its annotation declares a CODE.
+Solutions/46_Effects--Stateless/README.md	[PAST] was: The body of CODE was correct before the fix.
 Solutions/47_Effects--Stateless_in_Practice/README.md	[PAST] read: Give the Ability fields for the range, and read them off the request in the handler.
 Solutions/47_Effects--Stateless_in_Practice/README.md	[PAST] started: your handler, started at CODE with a one-second step, makes the chapter's CODE return CODE for the entry CODE.
 Solutions/47_Effects--Stateless_in_Practice/README.md	[PAST] widened: CODE's error parameter, widened to include CODE.

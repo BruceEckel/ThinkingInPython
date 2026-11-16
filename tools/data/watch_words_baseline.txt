@@ -920,10 +920,8 @@ Solutions/45_Effects--Generators/README.md	holds no: The machine holds no CODE a
 Solutions/45_Effects--Generators/README.md	only: A generator's return value arrives only on its CODE
 Solutions/45_Effects--Generators/README.md	only: put inside the CODE only the call whose CODE you mean to interpret
 Solutions/45_Effects--Generators/README.md	want: So annotate a local whenever you want the checker to verify the type of the call that produces its value
-Solutions/46_Effects--Stateless/README.md	already: which CODE reads as "already returned
-Solutions/46_Effects--Stateless/README.md	could: so a caller could hand it to CODE with no environment
-Solutions/46_Effects--Stateless/README.md	has no: a call to CODE has no terminal from which to read
-Solutions/46_Effects--Stateless/README.md	has none: CODE has none
+Solutions/46_Effects--Stateless/README.md	could: a caller could hand CODE to CODE with no environment
+Solutions/46_Effects--Stateless/README.md	has no: and a call to CODE in that run has no terminal from which to read
 Solutions/46_Effects--Stateless/README.md	names the role: Each wrapper names the role this instance fills
 Solutions/46_Effects--Stateless/README.md	never: so the body never yields its CODE request
 Solutions/46_Effects--Stateless/README.md	nothing runs: Nothing Runs Yet shows that calling a generator function builds an Effect without running its body

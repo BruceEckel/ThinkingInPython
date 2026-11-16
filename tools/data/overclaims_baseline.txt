@@ -1359,22 +1359,20 @@ Solutions/45_Effects--Generators/README.md	[BOUND] The runtime output shows a co
 Solutions/45_Effects--Generators/README.md	[BOUND] Write the printed lines before you run the script, and note which sends produce one line and which produce two
 Solutions/45_Effects--Generators/README.md	[BOUND] you wrote the full sequence of lines before running the modified CODE, and it matches the run line for line, including which sends print two lines and what CODE prints
 Solutions/46_Effects--Stateless/README.md	[BOUND] A caller needing a bare CODE has one case left to handle
-Solutions/46_Effects--Stateless/README.md	[BOUND] At runtime the handler answered three requests across the two calls, two for CODE and one for CODE, although CODE annotates its parameter CODE
 Solutions/46_Effects--Stateless/README.md	[BOUND] CODE declares two requirements and leaves the instances to CODE, so every combination of instances is a valid environment for it
-Solutions/46_Effects--Stateless/README.md	[BOUND] CODE passes, and three names (one with a positive score, one with a negative score, one missing from CODE) print one line and raise a CODE and a CODE out of CODE
-Solutions/46_Effects--Stateless/README.md	[BOUND] CODE reads the Ability from the declared type of its argument, so CODE alone builds a handler for CODE rather than the CODE that CODE requests
 Solutions/46_Effects--Stateless/README.md	[BOUND] Following the type checker until the program builds means one edit
+Solutions/46_Effects--Stateless/README.md	[BOUND] For a name with a positive score the program prints one line, for a name with a negative score CODE raises a CODE, and for a name missing from CODE it raises a CODE
 Solutions/46_Effects--Stateless/README.md	[BOUND] Now every caller has two options, the same two CODE's callers have
 Solutions/46_Effects--Stateless/README.md	[BOUND] One Effect, Many Environments shows CODE running CODE against a table of materials and nailers
 Solutions/46_Effects--Stateless/README.md	[BOUND] Pass its instance to CODE once for each protocol, in one call, run the Effect, and assert on the recorder's two lists
 Solutions/46_Effects--Stateless/README.md	[BOUND] The difference between the two cases is whether anything later uses the dropped value
-Solutions/46_Effects--Stateless/README.md	[BOUND] The discarded CODE ends at its statement, so the type checker evaluates that statement alone and accepts it
+Solutions/46_Effects--Stateless/README.md	[BOUND] The discarded CODE is a complete statement, so the type checker checks that statement alone and accepts it
 Solutions/46_Effects--Stateless/README.md	[BOUND] The fix renames CODE to CODE, gives each method its own CODE, CODE and CODE, and splits CODE into one Effect per CODE
-Solutions/46_Effects--Stateless/README.md	[BOUND] The fix splits the one structural check that all three objects match
+Solutions/46_Effects--Stateless/README.md	[BOUND] The fix replaces the one CODE that every implementation satisfies with two
 Solutions/46_Effects--Stateless/README.md	[BOUND] The requirement appears in the signature of every function between the one that uses the CODE and the one that supplies it
-Solutions/46_Effects--Stateless/README.md	[BOUND] Then check whether the type checker can tell two classes apart when they share one method name
+Solutions/46_Effects--Stateless/README.md	[BOUND] Then check whether the type checker can distinguish two classes that share one method name
 Solutions/46_Effects--Stateless/README.md	[BOUND] Those two are the only options, so the dependency stays visible
-Solutions/46_Effects--Stateless/README.md	[BOUND] Two CODEs that share one method name describe one shape under two names
+Solutions/46_Effects--Stateless/README.md	[BOUND] Two CODEs that share one method name describe one structure under two names
 Solutions/46_Effects--Stateless/README.md	[BOUND] With a third implementation added to CODE, the three implementations have six orderings, and one rule predicts them all
 Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] **Leave the Effect alone
 Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] Add a source class with the same two methods and place it in the tuple that CODE receives

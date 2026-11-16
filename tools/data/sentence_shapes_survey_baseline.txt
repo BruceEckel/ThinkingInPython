@@ -609,6 +609,7 @@ Chapters/46_Effects--Stateless.md	[CAN] Only a subclass can replace it.
 Chapters/46_Effects--Stateless.md	[CAN] This Effect needs a CODE, can fail with a CODE, and produces CODE.
 Chapters/46_Effects--Stateless.md	[CAUS] makes kinds provide: Over the whole run, CODE makes both kinds of request, so CODE must provide a CODE and a CODE.
 Chapters/46_Effects--Stateless.md	[CAUS] needs CODE upcast: An interface needs the CODE upcast more than a base class does.
+Chapters/46_Effects--Stateless.md	[HEAD] loop: Building and tearing down that loop takes time, even for an Effect with no CODE in it.
 Chapters/46_Effects--Stateless.md	[SAME+NEW] mistake: CODE resolves at runtime by scanning its arguments, so the same mistake produces a program that runs and hands each request to the instance that comes first in the argument list.
 Chapters/46_Effects--Stateless.md	[SAME] ZIO allows the same mistake for the same reason.
 Chapters/46_Effects--Stateless.md	[TWO] A ZIO or Effect-TS value is an immutable description that you can interpret as often as you like, so the combinators in those libraries are operations on that value.
@@ -941,16 +942,14 @@ Solutions/45_Effects--Generators/README.md	[HEAD] checker: With bare CODE on bot
 Solutions/45_Effects--Generators/README.md	[HEAD] expression: For CODE it infers the expression's own type, CODE, and no declared type contradicts that inference.
 Solutions/45_Effects--Generators/README.md	[HEAD] step: **The step calls its action.
 Solutions/45_Effects--Generators/README.md	[SAME+NEW] observation: *GoF Design Patterns* makes the same observation about an iterator that the client advances over a recursive structure such as a *Composite*: the iterator "has to store a path" through the structure "to keep track of the current object."
-Solutions/46_Effects--Stateless/README.md	[ADD] In that version the handler answers the CODE request too, as it answers every CODE, and hands that request a CODE. | after: If you return CODE in place of CODE, CODE still prints its greeting, but CODE fails with CODE.
-Solutions/46_Effects--Stateless/README.md	[CAN] CODE is the same driver in coroutine form, so the running loop can await it.
-Solutions/46_Effects--Stateless/README.md	[CAN] The revealed type and CODE's type both carry CODE in the yield channel, so neither can yield a failure to its caller.
+Solutions/46_Effects--Stateless/README.md	[ADD] In that version the handler answers the CODE request too, as it answers every CODE, and its answer is a CODE. | after: If you return CODE in place of CODE, CODE still prints its greeting, but CODE fails with CODE.
 Solutions/46_Effects--Stateless/README.md	[CAUS] makes CODE print: your handler, wrapped with CODE, makes CODE's CODE print its greeting, and an Effect that also requests a second Ability runs to completion, with a CODE in the handler showing it answered both requests.
-Solutions/46_Effects--Stateless/README.md	[SAME+NEW] arguments: So CODE decorates the function, calls it once per attempt, and hands back a function that takes the same arguments.
 Solutions/46_Effects--Stateless/README.md	[SAME+NEW] call: Supplying a real CODE is the same call with CODE in place of CODE, and the session reads:
 Solutions/46_Effects--Stateless/README.md	[SAME+NEW] choice: A caller can supply a CODE, which ends the requirement, or declare CODE in its own return type, which puts the same choice to its callers.
+Solutions/46_Effects--Stateless/README.md	[SAME+NEW] function: ** CODE is the same function, character for character, with either object supplied.
 Solutions/46_Effects--Stateless/README.md	[SAME+NEW] reasoning: The same reasoning explains CODE and CODE.
 Solutions/46_Effects--Stateless/README.md	[SAME+NEW] work: Retrying means running the same work more than once.
-Solutions/46_Effects--Stateless/README.md	[SAME] At runtime the wrapper returns the same CODE object.
+Solutions/46_Effects--Stateless/README.md	[TWO] So CODE gives the same result for a spent Effect as for one that succeeds and returns CODE.
 Solutions/47_Effects--Stateless_in_Practice/README.md	[CAN] A caller that takes a CODE can no longer assemble a mismatched set by accident, because it receives a whole cast, with the actors chosen inside it.
 Solutions/47_Effects--Stateless_in_Practice/README.md	[CAN] A handler still chooses the moment, and it can choose 23:59:59, but both strings then carry that moment.
 Solutions/47_Effects--Stateless_in_Practice/README.md	[CAN] CODE builds an ordinary function from an CODE to a CODE, so a test can call that function with an CODE and check which CODE it returns.
