@@ -904,7 +904,7 @@ which is `Effect[Need[Feed], Unavailable, str]`.
 
 `research.py` keeps the request and the failure in separate functions for two reasons.
 A function that receives everything it uses as arguments is easier to test on its own,
-and the split keeps the Ability requests in one place.
+and the separation keeps the Ability requests in one place.
 Either shape type-checks, and either puts `Unavailable` in the error channel.
 
 Two feeds and an encyclopedia implement the two Protocols,

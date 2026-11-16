@@ -783,7 +783,7 @@ Chapters/46_Effects--Stateless.md	[BOUND] Two details in CODE matter
 Chapters/46_Effects--Stateless.md	[BOUND] Two implementations sharing one method name stay ambiguous under both CODEs, so say what the technique does and does not prevent
 Chapters/46_Effects--Stateless.md	[BOUND] Varying the environment there again changes the table row alone
 Chapters/46_Effects--Stateless.md	[BOUND] ZIO reports two implementations of one requirement as a compile-time error naming both candidates, because its CODE resolves the dependency graph during compilation
-Chapters/47_Effects--Stateless_in_Practice.md	[BOUND] A function that receives everything it uses as arguments is easier to test on its own, and the split keeps the Ability requests in one place
+Chapters/47_Effects--Stateless_in_Practice.md	[BOUND] A function that receives everything it uses as arguments is easier to test on its own, and the separation keeps the Ability requests in one place
 Chapters/47_Effects--Stateless_in_Practice.md	[BOUND] A test that runs at nine in the morning reads the clock twice on the same date and passes, so the only evidence is a bug report saying the log file is occasionally short by a few lines
 Chapters/47_Effects--Stateless_in_Practice.md	[BOUND] Acquiring and releasing within one Effect works, since the block opens and closes between two CODE expressions in the same function
 Chapters/47_Effects--Stateless_in_Practice.md	[BOUND] An EMS adds one thing

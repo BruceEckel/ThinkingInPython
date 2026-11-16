@@ -932,7 +932,7 @@ The library needs these copies because it tracks Effects without the compiler's 
 A native system's standard library declares its Effects in its own signatures,
 written once, so no second copy exists.
 
-The description/execution split is an artifact of building the system as a library,
+The description/execution split is an artifact of building the Effect system as a library,
 rather than a feature of Effect Management.
 Native systems deliver tracking, interface separation,
 and delayed binding while the code runs eagerly,

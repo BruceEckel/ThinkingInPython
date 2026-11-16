@@ -205,6 +205,10 @@ each pass hands the next one less to do.
    "the loop" in a chapter full of `for` loops): for each compound
    term in the scope, grep for its head noun alone, and when one use
    of a word is changed for a clash, grep for its other uses.
+   `[HEAD]` in `tip sentence-shapes CH=NN ARGS=--survey` lists the
+   bare head nouns of terms the file rarely shortens ("so the channel
+   stays at `Async`" -> "so the Ability channel stays `Async`"); the
+   grep still finds a head the file mostly uses alone.
    A repair that names the items for a bare "each" gives two items a
    clause apiece ("The producer is simplest to write as a loop, and
    so is the consumer"), never the two names in front of the old
@@ -375,7 +379,9 @@ scope's line range:
   keep goes into the survey baseline with
   `tip sentence-shapes CH=NN ARGS=--survey-accept`; `activate` reads
   `[CAUS]`, a causative with the actor in object position, R61, judged
-  the same way)
+  the same way; `antecedents` reads `[HEAD]`, a compound term
+  shortened to its head noun, "the channel" beside "the Ability
+  channel" and "the error channel", R12, judged the same way)
 - `tip watch-words CH=NN` (for `ambiguity`: `however`, Tier 2 since
   2026-11-08, the concessive "however many" that reads first as a
   contrast and is a universal over a count or a manner, R58; the
@@ -444,7 +450,7 @@ Bruce's "we" and his em-dashes stay.
    word is unchanged is a re-keyed keep, accepted with the scoped
    `tip <check>-accept CH=NN`.
 3. The survey rules with a judged list, `[ADD]`, `[CAN]`, `[CAUS]`,
-   `[SAME]`, `[SAME+NEW]`, `[TWO]`, and `[LEAD]`: run
+   `[HEAD]`, `[SAME]`, `[SAME+NEW]`, `[TWO]`, and `[LEAD]`: run
    `tip sentence-shapes CH=NN ARGS=--survey` and
    `tip overclaims CH=NN ARGS=--survey` again. A kept sentence the
    pass edited prints as `survey` beside its `stale` entry, so reread

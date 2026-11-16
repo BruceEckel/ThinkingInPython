@@ -289,7 +289,7 @@ ahead of "both limits"), and a term stated only afterward. The other
 96 were keeps. Reprinted on every run, they would make a chapter pass
 reread all of them to find one written since, so the rules in
 `JUDGED_SURVEY_RULES` (`[ADD]`, `[CAN]`, `[CAUS]`, `[SAME]`,
-`[SAME+NEW]`, and `[TWO]`) share a baseline of their own,
+`[SAME+NEW]`, `[TWO]`, and `[HEAD]`) share a baseline of their own,
 `tools/data/sentence_shapes_survey_baseline.txt` (`SURVEY_BASELINE`).
 `--survey` prints the hits of those rules not in it and ends on `K
 survey, J judged`; `--survey --all` prints the judged ones too, marked
@@ -350,9 +350,56 @@ The repair gives the second verb its own sentence or clause, moves the
 relative clause to the end of its sentence, or replaces the clause
 with the name the listing gives the thing.
 
+`[HEAD]` (2026-11-15, from the author's "the event loop?" on a chapter
+45 sentence and a grep for "the channel" in chapter 46) is a compound
+term shortened to its head noun: "Here all three delegations request
+CODE, so the channel stays at CODE", in a file whose terms are "the
+Ability channel" and "the error channel". A term is a noun with a
+compound modifier directly before it (`term_modifier()`: "error
+channel", "type checker", "stack frame", and "CODE loop" for a
+"`for` loop") that the document uses at least `HEAD_TERM_MIN` times.
+A noun is a term head (`term_heads()`) when its terms have at least
+`HEAD_MIN_MENTIONS` mentions and those are at least `HEAD_SHARE` of
+the noun's mentions in the document. The document then rarely uses
+the noun alone, and a reader who meets it alone has to choose a term
+for it. The rule (`shortened_terms()`) fires on a singular mention of
+a term head with "the", "this", or "that" directly before it and no
+other modifier (`bare_head()`). Quiet by design: a mention the
+sentence identifies after the noun, with a preposition, a relative
+clause, an appositive, or a code span ("the frame of the generator
+whose body contains the CODE", "the clause for CODE", "the shape at
+CODE"); a mention of a noun its sentence has already introduced in
+another form ("If you give CODE a type that excludes zero, the
+type's CODE runs the check"); a plural, which
+names every term at once ("the three channels"); and an anchored
+mention, one with a compound of that head in its own sentence or the
+sentence before, when every compound of that head earlier in the
+paragraph has that one modifier ("the type checker still works,
+because the checker reads the answer type"). A noun the document
+mostly uses alone is never a term head, however many compounds it
+has: chapter 46 says "generator function" five times and "the
+function" far more often, and each "the function" there is a function
+the paragraph has named. The repair writes the full term ("so the
+Ability channel stays at CODE"). The message names the head:
+`[HEAD] channel: ...`. It is a survey rule because a head with one
+term leaves the reader no second candidate ("the checker" in a file
+whose one checker is the type checker), and the reader of the list
+decides whether the noun has a second sense in the chapter, as
+"loop" has in a chapter with an event loop and `for` loops. Rules
+R12 and R68 in `bruce_edit_db.md` have the tests. Its read hits are
+kept in the judged baseline described under `[SAME+NEW]` above. The
+first book-wide run had 160 hits in 50 files, 75 of them "the
+checker". The read of chapters 44 to 47 that day covered 24 hits and
+rewrote 4: "the channel" for the Ability channel, "the frame" beside
+"the C stack", "the system" in a chapter with a type system and an
+Effect system, and "the split" for a separation, in a chapter whose
+term is "the description/execution split". The 20 keeps, 15 of them
+"the checker", are in the baseline. Every other chapter's hits print
+as survey until its pass reads them.
+
 Five rules run by default, `RULES`: `[IMP]`, `[COLON+AND]`, `[PAIR]`,
-`[AND+REL]`, and `[PRT]`, judged against a baseline. Nine are survey rules, `SURVEY_RULES`: `[AND]`,
-plain `[COLON]`, `[ADD]`, `[TWO]`, `[CAN]`, `[SAME]`, `[SAME+NEW]`, `[CAUS]`, and `[REL+AND]`. The calibration shows why. `[AND]` fired on 7 before
+`[AND+REL]`, and `[PRT]`, judged against a baseline. Ten are survey rules, `SURVEY_RULES`: `[AND]`,
+plain `[COLON]`, `[ADD]`, `[TWO]`, `[CAN]`, `[SAME]`, `[SAME+NEW]`, `[CAUS]`, `[REL+AND]`, and `[HEAD]`. The calibration shows why. `[AND]` fired on 7 before
 only, 1 both, and 6 after only of the 72 rewritten pairs, so the
 author's own rewrites carry the shape: it is a judgment made per
 sentence in an editing pass, not a fault, and the whole book yields
@@ -384,7 +431,8 @@ parse-based checks.
 A hit prints as `path:line: [RULE] sentence`, the line holding the
 sentence's first character. A `[SAME+NEW]` hit puts the noun and a
 colon before the sentence, a `[CAUS]` hit the verb, object, and
-complement, and an `[ADD]` hit the previous sentence after ` | after: `.
+complement, a `[HEAD]` hit the head noun and a colon, and an `[ADD]`
+hit the previous sentence after ` | after: `.
 Every hit is read once by a human, and the
 ones judged keeps live in `tools/data/sentence_shapes_baseline.txt`, so
 a run prints only what is new. An entry is `path<TAB>[RULE] sentence`
@@ -427,7 +475,7 @@ or introduces a list whose items hold relative clauses.
     uv run python -m tools.sentence_shapes           # new hits
     uv run python -m tools.sentence_shapes --all     # every hit
     uv run python -m tools.sentence_shapes --accept  # judged keeps
-    uv run python -m tools.sentence_shapes --survey  # + AND, COLON, ADD, TWO, CAN, SAME, SAME+NEW, CAUS
+    uv run python -m tools.sentence_shapes --survey  # + AND, COLON, ADD, TWO, CAN, SAME, SAME+NEW, CAUS, REL+AND, HEAD
     uv run python -m tools.sentence_shapes --survey-accept  # keeps of the judged survey rules
     uv run python -m tools.sentence_shapes --calibrate
     uv run python -m tools.sentence_shapes Chapters/31_*.md
@@ -437,7 +485,8 @@ or introduces a list whose items hold relative clauses.
 """
 
 import re
-from collections.abc import Iterator, Sequence
+from collections import Counter
+from collections.abc import Iterator, Mapping, Sequence
 from pathlib import Path
 from typing import Final
 from tools import parse_check
@@ -490,12 +539,13 @@ SURVEY_BASELINE: Final = DATA_DIR / "sentence_shapes_survey_baseline.txt"
 SURVEY_HEADER: Final = (
     "# Survey hits a human read and judged keeps, for the survey rules\n"
     "# in JUDGED_SURVEY_RULES ([ADD], [CAN], [CAUS], [SAME], [SAME+NEW],\n"
-    "# [TWO]): the sentence passes its rule's test as it stands. An\n"
-    "# entry is not an exemption from the rule.\n"
+    "# [TWO], [HEAD]): the sentence passes its rule's test as it stands.\n"
+    "# An entry is not an exemption from the rule.\n"
     "# path<TAB>[RULE] sentence, with whitespace normalized and no\n"
     "# line number, so a reflow leaves an entry alone and an edit to\n"
     "# the sentence retires it. [SAME+NEW] puts the noun and a colon\n"
-    "# before the sentence, and [CAUS] the verb, object, and\n"
+    "# before the sentence, [HEAD] the head noun and a colon, and\n"
+    "# [CAUS] the verb, object, and\n"
     "# complement. [ADD] puts \" | after: \" and the sentence before it\n"
     "# after its own sentence, because the reading depends on both, so\n"
     "# an edit to either one retires the entry. For the other rules an\n"
@@ -529,10 +579,11 @@ SURVEY_RULES: Final = {
     "SAME+NEW": "a same on a noun the passage above has not used",
     "CAUS": "a causative verb that demotes the actor to its object",
     "REL+AND": "a relative clause's verb, a conjunction, and a verb",
+    "HEAD": "a compound term shortened to its head noun",
 }
 """Printed only under `--survey`; never in the default baseline."""
 JUDGED_SURVEY_RULES: Final = frozenset(
-    {"ADD", "CAN", "CAUS", "SAME", "SAME+NEW", "TWO"})
+    {"ADD", "CAN", "CAUS", "SAME", "SAME+NEW", "TWO", "HEAD"})
 """The survey rules whose read hits are kept in `SURVEY_BASELINE`."""
 ALL_RULES: Final = tuple(RULES) + tuple(SURVEY_RULES)
 REL_JOINERS: Final = frozenset({"and", "or", "but"})
@@ -663,6 +714,21 @@ PATH_PREPOSITIONS: Final = frozenset(
 ("leaves the amount up to you", "sends a request up to the event loop",
 "follow the traceback down to the call"), where the object stays
 before it."""
+HEAD_DETERMINERS: Final = frozenset({"the", "this", "that"})
+"""Words right before a head noun that make it a bare definite."""
+HEAD_TERM_MIN: Final = 2
+"""Uses of a (modifier, head) pair in a document that make it a term."""
+HEAD_MIN_MENTIONS: Final = 3
+"""Mentions of a head's terms that make the head a term head."""
+HEAD_SHARE: Final = 0.5
+"""The share of a head's mentions its terms must hold in the document."""
+HEAD_PREMODIFIERS: Final = frozenset(
+    {"compound", "amod", "nummod", "poss", "nmod"})
+"""Dependents before a head noun that make a mention more than bare."""
+HEAD_POSTMODIFIERS: Final = frozenset({"relcl", "acl", "appos"})
+"""Dependents after a head noun that identify it, so it is not bare."""
+HEAD_FOLLOWERS: Final = frozenset({"that", "which", "where", "whose", "of"})
+"""Words right after a head noun that attach its identification."""
 
 CALIBRATION_EXAMPLES: Final[tuple[tuple[str, str, bool], ...]] = (
     # (rule, text, should it fire)
@@ -764,6 +830,14 @@ CALIBRATION_EXAMPLES: Final[tuple[tuple[str, str, bool], ...]] = (
     ("REL+AND", "A generator that receives or returns values needs the full annotation.", False),
     ("REL+AND", "It checks the keys you specify and ignores the rest.", False),
     ("REL+AND", "A protocol also clarifies what the Liskov Substitution Principle does and does not guarantee.", False),
+    ("HEAD", "The Ability channel carries each request. The error channel carries each failure. A handler empties the Ability channel first and the error channel second. Here all three delegations request `Console`, so the channel stays at `Need[Console]`.", True),
+    ("HEAD", "The Ability channel carries each request. The error channel carries each failure. A handler empties the Ability channel first and the error channel second. Here all three delegations request `Console`, so the Ability channel stays at `Need[Console]`.", False),
+    ("HEAD", "The type checker reads the annotation. The type checker compares each call with the annotation. The type checker reports a diagnostic if the two disagree. The call still runs. At runtime the checker plays no part.", True),
+    ("HEAD", "The type checker reads the annotation. The type checker compares each call with the annotation. If the two disagree, the type checker reports a diagnostic that tells you which argument the checker rejected.", False),
+    ("HEAD", "A generator function returns a generator. A generator function runs no body code when you call it. A generator function keeps its locals between calls. A function has a name. A function has a body. A function has parameters. When the body ends, the function returns `None`.", False),
+    ("HEAD", "The execution frame holds the locals. The stack frame sits on the call stack. A `yield` suspends one execution frame. A `return` removes one stack frame. The frame of the generator stays in the generator object.", False),
+    ("HEAD", "The Ability channel carries each request. The error channel carries each failure. A handler empties the Ability channel first and the error channel second. If a function declares a channel of its own, the channel's type appears in the signature.", False),
+    ("HEAD", "The Moore shape runs its action on entry. The Mealy shape runs its action on a transition. The listing has the Moore shape at the top and the Mealy shape below it. Exercise 9 puts the shape at `[1]` into `proxy()`.", False),
 )
 """The style rules' own examples: (rule, text, should it fire)."""
 
@@ -1587,17 +1661,155 @@ def relative_then_verb(sentence: Sentence) -> bool:
     return False
 
 
+def head_noun(tok: Token) -> bool:
+    """Can this token head a term: a prose noun that modifies no other noun?"""
+    return (tok.pos == "NOUN" and tok.text.isalpha() and len(tok.text) > 2
+            and not tok.text.startswith("CODE") and tok.dep != "compound")
+
+
+def term_modifier(tok: Token, sentence: Sentence) -> str | None:
+    """The compound modifier directly before a head noun, or None.
+
+    "error" in "error channel", "type" in "type checker", and `CODE`
+    for a code span ("`for` loop").
+    """
+    if tok.i == 0:
+        return None
+    left = sentence.tokens[tok.i - 1]
+    if (left.head != tok.i or left.dep != "compound"
+            or left.pos not in ("NOUN", "PROPN")):
+        return None
+    return "CODE" if left.text.startswith("CODE") else left.text.lower()
+
+
+def term_heads(paragraphs: Sequence[Paragraph]) -> dict[str, frozenset[str]]:
+    """A document's term heads, each with its terms' modifiers.
+
+    A term is a (modifier, head) pair the document uses at least
+    `HEAD_TERM_MIN` times. A head is a term head when its terms have
+    at least `HEAD_MIN_MENTIONS` mentions and those are at least
+    `HEAD_SHARE` of the head's mentions, so the document rarely uses
+    the noun alone.
+    """
+    mentions: Counter[str] = Counter()
+    terms: Counter[tuple[str, str]] = Counter()
+    for paragraph in paragraphs:
+        if skipped(paragraph):
+            continue
+        for sentence in paragraph.sentences:
+            for tok in sentence.tokens:
+                if not head_noun(tok):
+                    continue
+                head = tok.lemma.lower()
+                mentions[head] += 1
+                modifier = term_modifier(tok, sentence)
+                if modifier is not None:
+                    terms[modifier, head] += 1
+    by_head: dict[str, dict[str, int]] = {}
+    for (modifier, head), count in terms.items():
+        if count >= HEAD_TERM_MIN:
+            by_head.setdefault(head, {})[modifier] = count
+    return {
+        head: frozenset(found)
+        for head, found in by_head.items()
+        if sum(found.values()) >= HEAD_MIN_MENTIONS
+        and sum(found.values()) >= HEAD_SHARE * mentions[head]
+    }
+
+
+def bare_head(tok: Token, sentence: Sentence) -> bool:
+    """Is this noun a bare definite singular: a determiner and no more?
+
+    "The", "this", or "that" directly before a singular noun with no
+    modifier before it and nothing after it that says which one: a
+    relative clause, an appositive, a preposition the parser hangs on
+    the noun, a code span, a `HEAD_FOLLOWERS` word, or a preposition
+    with a code span as its place ("the shape at `[1]`", which the
+    parser often hangs on the verb).
+    """
+    toks = sentence.tokens
+    if tok.tag != "NN" or tok.i == 0:
+        return False
+    left = toks[tok.i - 1]
+    if left.text.lower() not in HEAD_DETERMINERS or left.head != tok.i:
+        return False
+    kids = children(tok, sentence)
+    if any(c.dep in HEAD_PREMODIFIERS or c.dep in HEAD_POSTMODIFIERS
+           for c in kids):
+        return False
+    if any(c.dep == "prep" and c.i == tok.i + 1 for c in kids):
+        return False
+    after = toks[tok.i + 1] if tok.i + 1 < len(toks) else None
+    if after is None:
+        return True
+    if after.text.startswith("CODE") or after.text.lower() in HEAD_FOLLOWERS:
+        return False
+    place = toks[tok.i + 2] if tok.i + 2 < len(toks) else None
+    return not (after.pos == "ADP" and place is not None
+                and place.text.startswith("CODE"))
+
+
+def shortened_terms(paragraph: Paragraph,
+                    heads: Mapping[str, frozenset[str]]) -> dict[int, Token]:
+    """Sentence index to the first bare head noun that shortens a term.
+
+    A hit is a bare mention (`bare_head()`) of a term head in `heads`:
+    a singular noun with "the", "this", or "that" before it, no
+    modifier, and nothing after it that identifies it (a preposition,
+    a relative clause, an appositive, a code span). Quiet when the
+    mention is anchored: the compounds of that head in its own
+    sentence before it or in the previous sentence have one distinct
+    modifier between them, and every compound of that head earlier in
+    the paragraph has that same modifier. Quiet too when the sentence
+    has already introduced the noun in another form ("If you give
+    CODE a type that excludes zero, the type's CODE runs the check"),
+    since the bare mention then points at that one. A sentence is
+    reported once, for its first hit.
+    """
+    hits: dict[int, Token] = {}
+    seen: list[tuple[int, str, str]] = []
+    for index, sentence in enumerate(paragraph.sentences):
+        introduced: set[str] = set()
+        for tok in sentence.tokens:
+            if not head_noun(tok):
+                continue
+            head = tok.lemma.lower()
+            if head not in heads:
+                continue
+            modifier = term_modifier(tok, sentence)
+            if modifier is not None:
+                seen.append((index, modifier, head))
+                continue
+            if not bare_head(tok, sentence):
+                introduced.add(head)
+                continue
+            if index in hits or head in introduced:
+                continue
+            near = {m for i, m, h in seen if h == head and i >= index - 1}
+            passage = {m for _, m, h in seen if h == head}
+            if len(near) == 1 and len(passage) == 1:
+                continue
+            hits[index] = tok
+    return hits
+
+
 def shapes(paragraph: Paragraph, source: Sequence[str] = (),
+           heads: Mapping[str, frozenset[str]] | None = None,
            ) -> Iterator[tuple[str, Sentence]]:
     """(rule, sentence) for each hit in one paragraph.
 
     `source` is the document's lines, which `[SAME+NEW]` reads above
     the sentence; without it that rule sees the paragraph alone.
+    `heads` is the document's `term_heads()`, which `[HEAD]` reads;
+    without it the paragraph alone is its own document.
     """
     if skipped(paragraph):
         return
+    if heads is None:
+        heads = term_heads([paragraph])
+    shortened = shortened_terms(paragraph, heads)
     previous: Sentence | None = None
-    for sentence in paragraph.sentences:
+    for index, sentence in enumerate(paragraph.sentences):
         if split_particle(sentence):
             yield "PRT", sentence
         if previous is not None and additive_after_new_subject(
@@ -1624,6 +1836,8 @@ def shapes(paragraph: Paragraph, source: Sequence[str] = (),
             yield "CAUS", sentence
         if relative_then_verb(sentence):
             yield "REL+AND", sentence
+        if index in shortened:
+            yield "HEAD", sentence
     for sentence in colon_units(paragraph):
         label = colon_clause(sentence)
         if label:
@@ -1633,9 +1847,10 @@ def shapes(paragraph: Paragraph, source: Sequence[str] = (),
 def find(docs: list[Document], parser: Parser = parse) -> Iterator[Finding]:
     """A finding per rule per sentence, the message led by `[RULE]`."""
     for doc, paras in zip(docs, parsed(docs, parser), strict=True):
+        heads = term_heads(paras)
         for paragraph in paras:
             lines = paragraph.lines
-            for rule, sentence in shapes(paragraph, doc.lines):
+            for rule, sentence in shapes(paragraph, doc.lines, heads):
                 line = lines[min(sentence.start, len(lines) - 1)]
                 detail = ""
                 found = causative(sentence) if rule == "CAUS" else None
@@ -1645,6 +1860,11 @@ def find(docs: list[Document], parser: Parser = parse) -> Iterator[Finding]:
                         if rule == "SAME+NEW" else None)
                 if noun is not None:
                     detail = noun.text + ": "
+                if rule == "HEAD":
+                    shortened = shortened_terms(paragraph, heads)
+                    index = next(i for i, s in enumerate(paragraph.sentences)
+                                 if s is sentence)
+                    detail = shortened[index].lemma.lower() + ": "
                 tail = ""
                 if rule == "ADD":
                     index = next(i for i, s in enumerate(paragraph.sentences)
@@ -1696,10 +1916,10 @@ def main(argv: list[str] | None = None, parser: Parser = parse) -> int:
         __doc__, fail_help="exit 1 when any NEW sentence is found",
         survey_help="also print the survey rules, never counted as "
                     "new; a judged hit of [ADD], [CAN], [CAUS], [SAME], "
-                    "[SAME+NEW], or [TWO] prints only with --all",
+                    "[SAME+NEW], [TWO], or [HEAD] prints only with --all",
         survey_accept_help="add the unjudged hits of [ADD], [CAN], "
-                           "[CAUS], [SAME], [SAME+NEW], and [TWO] to "
-                           "their own baseline and drop stale entries",
+                           "[CAUS], [SAME], [SAME+NEW], [TWO], and [HEAD] "
+                           "to their own baseline and drop stale entries",
         calibrate_help="run the rules over tools/data/edit_pairs.json "
                        "and the built-in examples")
     args = parse_args(ap, argv)

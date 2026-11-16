@@ -611,6 +611,36 @@ which the listing's `g = outer()` already does, R47); C59 in
 keeps are a real coordination inside the clause ("one value that every
 instance reads and writes"). It has no judged list, so the nine keeps
 print on every survey run, and the `ambiguity` pass reads them.
+The tenth survey rule is `[HEAD]` (2026-11-15), a compound term
+shortened to its head noun: "Here all three delegations request
+`Async`, so the channel stays at `Async`", in a file whose terms are
+"the Ability channel" and "the error channel". The antecedents and
+ambiguity skills had told a pass to grep for each term's head noun,
+and a grep found chapter 46's six bare "the channel" sites that
+morning. A term is a noun with a compound modifier that the file uses
+at least twice, and a noun is a term head when its terms make up at
+least half of its mentions in the file, so the file rarely uses the
+noun alone. The rule fires on "the", "this", or "that" directly
+before a singular term head with no other modifier. It is quiet for a
+mention the sentence identifies after the noun ("the frame of the
+generator"), for a noun the sentence has already introduced ("a type
+that excludes zero, the type's `__post_init__()`"), and for a mention
+within a sentence of its full term when the paragraph has used one
+term of that head. The repair writes the full term. A noun the file
+mostly uses alone is never a term head, so chapter 45's "the loop"
+beside "the event loop" is outside the rule, and the ambiguity
+skill's grep still covers it. The first book-wide run had 160 hits in
+50 files, 75 of them "the checker", a keep wherever the file's one
+checker is the type checker. The read of chapters 44 to 47 that day
+rewrote 4 of 24: "the channel", "the frame" beside "the C stack",
+"the system" in a chapter with a type system and an Effect system,
+and "the split" for a separation in a chapter whose term is "the
+description/execution split". `[HEAD]` is the seventh rule in
+`JUDGED_SURVEY_RULES`: those four chapters' 20 keeps are in the
+survey baseline, and every other chapter's hits print as survey until
+its pass reads them. The session wrote the rule's spec from a
+prototype and a Sonnet agent built it (`shortened_terms()` in
+`tools/sentence_shapes.py`); rules R12 and R68 in `bruce_edit_db.md`.
 The fifth default rule is `[PRT]` (2026-11-04), a phrasal verb split
 around a noun-phrase object ("the driver carries the request out",
 Bruce: "general style: carries out the request"); the particle holds

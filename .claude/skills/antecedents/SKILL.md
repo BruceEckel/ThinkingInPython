@@ -35,6 +35,16 @@ named on the line,
 or a subordinator plus a demonstrative determiner on a code span that is a clause's subject
 ("Before that `send(2)` returns,", labeled `[SUB]`),
 which takes "the", "its", or the noun.
+`tip sentence-shapes CH=NN ARGS=--survey` adds `[HEAD]` (2026-11-15),
+a compound term shortened to its head noun:
+"so the channel stays at `Async`" in a file whose terms are
+"the Ability channel" and "the error channel".
+It lists a bare "the", "this", or "that" before a noun the file
+rarely uses outside its terms.
+Write the full term, and keep the short form where the file has one
+term of that head and no other sense of the noun
+("the checker" where the one checker is the type checker).
+A read keep goes into the survey baseline with `ARGS=--survey-accept`.
 A listed sentence is not a fault by itself.
 The test below decides.
 A count word is a pointer too ("the second run", "the first three runs"),

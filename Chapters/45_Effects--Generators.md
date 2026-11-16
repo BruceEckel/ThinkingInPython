@@ -2381,7 +2381,7 @@ so that a program needs a single stack.
 A coroutine can hand control to any other coroutine.
 PEP 255's generator keeps the coroutine's suspended frame and restricts the transfer:
 each `yield` hands control back to the caller of `next()` or `send()`.
-In 2001, handing control anywhere else meant preserving part of the C stack along with the frame,
+In 2001, handing control anywhere else meant preserving part of the C stack along with the execution frame,
 because CPython ran each Python call inside a nested call of its interpreter.
 Stackless Python allows such a transfer by keeping Python's state off the C stack.
 The PEP calls Stackless "a controversial rethinking of the Python core."

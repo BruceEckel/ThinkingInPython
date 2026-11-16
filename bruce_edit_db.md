@@ -642,7 +642,10 @@ reads the others as "prefer the noun" will overshoot.
 
 **Home.** the `antecedents` skill, as a keep-when (its "zero ambiguous
 pointers, not zero pronouns" line). Not a separate sweep. Promoted
-2026-09-15 on chapter 27's sightings (C6 -> R12).
+2026-09-15 on chapter 27's sightings (C6 -> R12). Since 2026-11-15
+`[HEAD]` in `tip sentence-shapes ARGS=--survey` lists one shape of
+it, a compound term shortened to its head noun ("the channel" beside
+"the Ability channel" and "the error channel").
 
 ### R13. Next to a cross-reference link, cut the sentence that restates the target's content
 
@@ -3726,7 +3729,10 @@ Solutions 45:
   C70's third sighting has the probe.
 
 **Home.** ambiguity (Accrued shapes, and its head-noun grep for
-compound terms) | super-prose (pass 6) | this file.
+compound terms) | super-prose (pass 6) | `[HEAD]` in
+`tools/sentence_shapes.py` since 2026-11-15, which lists a bare
+"the frame" where a file's "frame" mentions are mostly "execution
+frame" and "stack frame" | this file.
 
 ## Candidates
 
@@ -5128,8 +5134,9 @@ what kind of frame this paragraph references"):
   name for a function with a `yield` is "generator". R68 has the two
   kinds of frame in the same pair.
 
-**Home.** antecedents (Accrued patterns) | super-prose (pass 5) | this
-file.
+**Home.** antecedents (Accrued patterns) | super-prose (pass 5) |
+`[HEAD]` in `tools/sentence_shapes.py` since 2026-11-15, for sighting
+4's shape where the file rarely uses the head noun alone | this file.
 
 ### C68. A part the design lacks does not "disappear": say what holds its job
 

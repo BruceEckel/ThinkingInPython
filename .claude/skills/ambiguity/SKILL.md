@@ -61,6 +61,8 @@ most of the book's hits read one way.
   it sees the opener of an alternative, and the continuation shape below is read by hand.
 - `tip sentence-shapes CH=NN ARGS=--survey`: `[SAME]`, `[SAME+NEW]`, `[PAIR]`, `[TWO]`, `[AND+REL]`, and `[REL+AND]`.
   `[REL+AND]` (2026-11-11) is a relative clause that ends on its verb directly before a conjunction and a second verb; it has no judged list, so every hit prints.
+  `[HEAD]` (2026-11-15) is a compound term shortened to its head noun ("the channel" in a file whose terms are "the Ability channel" and "the error channel"); it prints the head (`[HEAD] channel: ...`) and is judged like `[SAME]`.
+  It fires only for a noun the file rarely uses outside its terms, so the head-noun grep in Accrued shapes (2026-11-13) still finds the rest, such as "the loop" in a chapter with an event loop and `for` loops.
   `[SAME+NEW]` (2026-11-09) is a "same" on a noun that no line in the 30 above uses, and it prints the noun (`[SAME+NEW] separation: ...`);
   ask "same as what?" and check that the passage called the thing by that noun.
   The survey prints only the `[SAME]`, `[SAME+NEW]`, and `[TWO]` hits not yet judged and ends on `K survey, J judged` (`[ADD]` is judged the same way; `[PAIR]` and `[AND+REL]` are default rules with the ordinary baseline).

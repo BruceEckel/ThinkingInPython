@@ -1,11 +1,12 @@
 # Survey hits a human read and judged keeps, for the survey rules
 # in JUDGED_SURVEY_RULES ([ADD], [CAN], [CAUS], [SAME], [SAME+NEW],
-# [TWO]): the sentence passes its rule's test as it stands. An
-# entry is not an exemption from the rule.
+# [TWO], [HEAD]): the sentence passes its rule's test as it stands.
+# An entry is not an exemption from the rule.
 # path<TAB>[RULE] sentence, with whitespace normalized and no
 # line number, so a reflow leaves an entry alone and an edit to
 # the sentence retires it. [SAME+NEW] puts the noun and a colon
-# before the sentence, and [CAUS] the verb, object, and
+# before the sentence, [HEAD] the head noun and a colon, and
+# [CAUS] the verb, object, and
 # complement. [ADD] puts " | after: " and the sentence before it
 # after its own sentence, because the reading depends on both, so
 # an edit to either one retires the entry. For the other rules an
@@ -574,6 +575,7 @@ Chapters/44_Effects--Effect_Management.md	[CAN] The function signature answers t
 Chapters/44_Effects--Effect_Management.md	[CAUS] lets rest propagate: But an CODE clause catches the exceptions it specifies and lets the rest propagate.
 Chapters/44_Effects--Effect_Management.md	[CAUS] lets rest propagate: Error Handling describes this limitation of CODE and the production fix, a version that catches the exception types you specify and lets the rest propagate.
 Chapters/44_Effects--Effect_Management.md	[CAUS] makes failure disappear: None of the three makes the failure disappear.
+Chapters/44_Effects--Effect_Management.md	[HEAD] system: It might fail and take down the system.
 Chapters/44_Effects--Effect_Management.md	[SAME+NEW] problem: Gradual typing faced the same problem, and took a decade.
 Chapters/44_Effects--Effect_Management.md	[SAME] CODE produces the same result for the same inputs, except when CODE is zero, where it raises an exception instead of returning a result.
 Chapters/44_Effects--Effect_Management.md	[SAME] Flix expresses the same design with different notation.
@@ -628,6 +630,12 @@ Chapters/47_Effects--Stateless_in_Practice.md	[CAUS] Need Dependencies shows: Th
 Chapters/47_Effects--Stateless_in_Practice.md	[CAUS] let CODE take: Retry what can change between attempts, and let CODE take out a deterministic failure before it reaches CODE.
 Chapters/47_Effects--Stateless_in_Practice.md	[CAUS] make version fail: Then make each version fail with an undeclared exception type and compare what the type checker reports for each.
 Chapters/47_Effects--Stateless_in_Practice.md	[CAUS] needs Concurrency describes: Processes re-import the module, so the driver needs the CODE guard Concurrency describes.
+Chapters/47_Effects--Stateless_in_Practice.md	[HEAD] checker: A CODE call with the CODE nested inside it is the same CODE error, so the checker catches the missing CODE in either form.
+Chapters/47_Effects--Stateless_in_Practice.md	[HEAD] checker: A generator's send type is all the checker knows about a bare CODE, and an Effect's send type is CODE.
+Chapters/47_Effects--Stateless_in_Practice.md	[HEAD] checker: If you change CODE to some undeclared exception, the checker reports an error at that CODE, because the yielded type falls outside the declared channel.
+Chapters/47_Effects--Stateless_in_Practice.md	[HEAD] checker: If you decorate a function that still declares a CODE, the checker rejects it, listing the overloads it failed to match.
+Chapters/47_Effects--Stateless_in_Practice.md	[HEAD] checker: The checker accepts whatever error channel that function declares.
+Chapters/47_Effects--Stateless_in_Practice.md	[HEAD] checker: The order of the handlers changes what the checker reports.
 Chapters/47_Effects--Stateless_in_Practice.md	[SAME+NEW] code: CODE draws from the source CODE hands it, so the second run prints a different trace from the same code.
 Chapters/47_Effects--Stateless_in_Practice.md	[SAME+NEW] function: A production handler that returns CODE runs the same function.
 Chapters/47_Effects--Stateless_in_Practice.md	[SAME+NEW] iteration: If you fork and wait inside a single loop, each CODE blocks on the task the same iteration just created, so the sleeps run one after another and take about five times as long.
@@ -917,12 +925,21 @@ Solutions/43_Functional--Confidence/README.md	[TWO] It therefore re-finds the fa
 Solutions/44_Effects--Effect_Management/README.md	[ADD] The third conversion, a CODE, applies to both exceptions as well. | after: CODE catches the CODE, and in CODE a restrictive type makes a zero CODE unconstructable.
 Solutions/44_Effects--Effect_Management/README.md	[CAUS] makes checker report: Deleting the CODE in front of the helper call makes the type checker report an error.
 Solutions/44_Effects--Effect_Management/README.md	[CAUS] makes result depend: The read makes the function's result depend on the global CODE rather than on its arguments.
+Solutions/44_Effects--Effect_Management/README.md	[HEAD] checker: The checker compares CODE with CODE where CODE receives the CODE as CODE, the one place the class meets the protocol.
 Solutions/44_Effects--Effect_Management/README.md	[SAME] A different loop runs the same awaits on a different schedule.
 Solutions/44_Effects--Effect_Management/README.md	[SAME] The same inputs then give the same answer.
 Solutions/45_Effects--Generators/README.md	[ADD] The runtime accepts it too. | after: The type checker accepts CODE as a declared CODE, because CODE has type CODE.
 Solutions/45_Effects--Generators/README.md	[CAN] The generator stays compact because the states form a line, so control flow can express the sequence.
 Solutions/45_Effects--Generators/README.md	[CAUS] Let position carry: **Let position carry the state.
 Solutions/45_Effects--Generators/README.md	[CAUS] want checker verify: So annotate a local whenever you want the checker to verify the type of the call that produces its value.
+Solutions/45_Effects--Generators/README.md	[HEAD] checker: At the call CODE, the checker matches CODE's CODE against CODE.
+Solutions/45_Effects--Generators/README.md	[HEAD] checker: CODE's annotation alone gives the checker a declared type to compare with the call's type.
+Solutions/45_Effects--Generators/README.md	[HEAD] checker: So annotate a local whenever you want the checker to verify the type of the call that produces its value.
+Solutions/45_Effects--Generators/README.md	[HEAD] checker: The checker solves CODE at each call from the argument types.
+Solutions/45_Effects--Generators/README.md	[HEAD] checker: The checker solves CODE from both arguments at once.
+Solutions/45_Effects--Generators/README.md	[HEAD] checker: With bare CODE on both channels, the checker accepts the swap.
+Solutions/45_Effects--Generators/README.md	[HEAD] expression: For CODE it infers the expression's own type, CODE, and no declared type contradicts that inference.
+Solutions/45_Effects--Generators/README.md	[HEAD] step: **The step calls its action.
 Solutions/45_Effects--Generators/README.md	[SAME+NEW] observation: *GoF Design Patterns* makes the same observation about an iterator that the client advances over a recursive structure such as a *Composite*: the iterator "has to store a path" through the structure "to keep track of the current object."
 Solutions/46_Effects--Stateless/README.md	[ADD] In that version the handler answers the CODE request too, as it answers every CODE, and hands that request a CODE. | after: If you return CODE in place of CODE, CODE still prints its greeting, but CODE fails with CODE.
 Solutions/46_Effects--Stateless/README.md	[CAN] CODE is the same driver in coroutine form, so the running loop can await it.
@@ -952,6 +969,9 @@ Solutions/47_Effects--Stateless_in_Practice/README.md	[CAUS] makes CODE return: 
 Solutions/47_Effects--Stateless_in_Practice/README.md	[CAUS] makes CODE return: your handler, started at CODE with a one-second step, makes the chapter's CODE return CODE for the entry CODE.
 Solutions/47_Effects--Stateless_in_Practice/README.md	[CAUS] makes check fail: Dropping the last price from the call makes that last check fail.
 Solutions/47_Effects--Stateless_in_Practice/README.md	[CAUS] makes error disappear: Removing CODE's return annotation makes the error disappear.
+Solutions/47_Effects--Stateless_in_Practice/README.md	[HEAD] checker: If you change CODE's CODE to CODE while its decorator still says CODE, the checker accepts the change.
+Solutions/47_Effects--Stateless_in_Practice/README.md	[HEAD] checker: In the annotation, a human writes down which failures this program expects, and the checker's job is to confirm that the Effect agrees.
+Solutions/47_Effects--Stateless_in_Practice/README.md	[HEAD] guard: Under the guard, the driver runs in the main process alone, so a worker loads CODE without running the driver.
 Solutions/47_Effects--Stateless_in_Practice/README.md	[SAME+NEW] character: ** CODE stays the same, character for character.
 Solutions/47_Effects--Stateless_in_Practice/README.md	[SAME+NEW] exercise: Making each version fail with an undeclared type shows the same asymmetry exercise 2 finds.
 Solutions/47_Effects--Stateless_in_Practice/README.md	[SAME+NEW] limit: The error side has the same limit:

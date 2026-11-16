@@ -134,6 +134,16 @@ SOURCES: Final[tuple[str, ...]] = (
     "A generator that receives or returns values needs the full annotation.",
     "It checks the keys you specify and ignores the rest.",
     "A protocol also clarifies what the Liskov Substitution Principle does and does not guarantee.",
+    "The Ability channel carries each request. The error channel carries each failure. A handler empties the Ability channel first and the error channel second. Here all three delegations request `Console`, so the channel stays at `Need[Console]`.",
+    "The Ability channel carries each request. The error channel carries each failure. A handler empties the Ability channel first and the error channel second. Here all three delegations request `Console`, so the Ability channel stays at `Need[Console]`.",
+    "The type checker reads the annotation. The type checker compares each call with the annotation. The type checker reports a diagnostic if the two disagree. The call still runs. At runtime the checker plays no part.",
+    "The type checker reads the annotation. The type checker compares each call with the annotation. If the two disagree, the type checker reports a diagnostic that tells you which argument the checker rejected.",
+    "A generator function returns a generator. A generator function runs no body code when you call it. A generator function keeps its locals between calls. A function has a name. A function has a body. A function has parameters. When the body ends, the function returns `None`.",
+    "The execution frame holds the locals. The stack frame sits on the call stack. A `yield` suspends one execution frame. A `return` removes one stack frame. The frame of the generator stays in the generator object.",
+    "The Ability channel carries each request. The error channel carries each failure. A handler empties the Ability channel first and the error channel second.",
+    "Here all three delegations request `Console`, so the channel stays at `Need[Console]`.",
+    "The Ability channel carries each request. The error channel carries each failure. A handler empties the Ability channel first and the error channel second. If a function declares a channel of its own, the channel's type appears in the signature.",
+    "The Moore shape runs its action on entry. The Mealy shape runs its action on a transition. The listing has the Moore shape at the top and the Mealy shape below it. Exercise 9 puts the shape at `[1]` into `proxy()`.",
 )
 """Markdown paragraphs; each is cleaned the way the checks clean it."""
 
