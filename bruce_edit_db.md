@@ -3621,6 +3621,15 @@ second chapter (his "do the suggestions"); was C33. The first two are
   so the reader had to recall the three items and then match each one
   to a parameter. The names now stand in the order of the parameters
   beside them.
+- `46_Effects--Stateless` 2026-11-16, was Claude-written, Bruce on
+  "An Effect yields both kinds of value": "weird". The two kinds were
+  the Abilities and the failures of the sentence before, which had
+  called neither one a value, so "both kinds of value" counted items
+  under a noun the passage had not given them. -> "An Effect yields
+  an Ability to ask for what it needs, and it yields an exception to
+  report a failure." Each item is named with what the yield is for,
+  and the sentence that names the two channels follows as its own
+  sentence, with the "so" that joined them gone.
 
 **Home.** antecedents (Accrued patterns, the unnamed-items bullet) |
 super-prose (pass 5) | this file; a cousin of R9 (name the concrete
@@ -4153,6 +4162,27 @@ proposed promotion, which is Bruce's call.
   stale data."
 - Bruce's hand: the `fields()` paragraph laid out runtime first, then
   the checker's view
+- `46_Effects--Stateless` 2026-11-16, three flags on one paragraph of
+  the chapter's opening within minutes ("Besides its result,": "awkward";
+  "go out on": "awkward"; "every generator has.": "awkward"). After
+  the second, the paragraph was read whole, as this entry says to:
+  "Besides its result, an Effect's type declares two things: the
+  dependencies the Effect needs and the ways it can fail. Both go out
+  on the yield channel that every generator has. [Stateless in
+  Practice] builds examples with both." -> "An Effect's type declares
+  three things: the dependencies the Effect needs, the ways it can
+  fail, and the result it produces. The Effect yields its requests for
+  dependencies and its failures, and it returns its result. [Stateless
+  in Practice] builds examples that combine dependencies and
+  failures." The paragraph was a description, with no "must" to walk,
+  and the same reading applied: say what the paragraph is for (what
+  the type declares, and how the generator carries each part), then
+  give each part its sentence and its verb. The opener is C91. "Go
+  out on the yield channel" is chapter 45's phrase for a channel's
+  direction, set against "comes back", and it stays there; here the
+  Effect had no verb, and "yields" and "returns" are the verbs the
+  reader was taught. "That every generator has" restated chapter 45
+  and went with the sentence.
 
 **Home.** straighten (Accrued patterns) | super-prose (pass 3) | this
 file; the deep-review skill (teaching) if promoted.
@@ -6289,7 +6319,7 @@ different word ("building one that holds 0").
 - The chapter's other site, the same day: "and frameworks such as
   FastAPI's `Depends` build on it" -> "use it".
 - Scale: a grep of both trees for `buil[dt]s? on|building on` finds
-  22 more sites in 16 files, unread under this test. Two repeat the
+  22 more sites in 15 files, unread under this test. Two repeat the
   flagged claim: chapter 44, "Stateless builds on generators, as
   TypeScript Effect's `function*` does", and chapter 45, "An Effect
   system builds on a generator rather than a full coroutine". The
@@ -6299,6 +6329,82 @@ different word ("building one that holds 0").
   builds on *State*").
 
 **Home.** `super-prose` pass 1 and the `literal` skill's Accrued
+patterns | this file.
+
+### C91. An opener that sets one member aside comes after the set: state the whole list in its order
+
+**Test.** A sentence opens on "Besides X,", "Apart from X,", or
+"In addition to X," and its main clause then counts or lists the
+other members of a set X belongs to ("Besides its result, an Effect's
+type declares two things:"). The reader holds the exception before
+the set exists. Two more tells, either one enough: the opener has a
+pronoun whose noun comes later ("its result", before "an Effect"),
+and the count leaves X out (two things, of the type's three). State
+the whole set in its own order, then say what holds for which
+members.
+
+**Keep when.** X is on the page already and the sentence turns to
+the rest ("Apart from that hazard, the builder class solves a
+problem Python does not have", after the paragraph that describes
+the hazard), or X
+is a single contrast with no set behind it.
+
+**Sightings.** 1, `46_Effects--Stateless` 2026-11-16, was
+Claude-written, Bruce on "Besides its result,": "awkward":
+- "Besides its result, an Effect's type declares two things: the
+  dependencies the Effect needs and the ways it can fail." -> "An
+  Effect's type declares three things: the dependencies the Effect
+  needs, the ways it can fail, and the result it produces." The order
+  is the order of `Effect[A, E, R]`, which the next section defines.
+- The chapter's other site, the same day: "Besides matching lookups,
+  the DI registration key sets the type for which an instance
+  answers" -> "The DI registration key matches lookups and sets the
+  type for which an instance answers". Its opener also read two ways,
+  lookups that match or the act of matching them.
+- Scale: a grep of both trees for a sentence that starts with
+  "Besides", "Apart from", "Aside from", "Beyond", or "In addition
+  to" finds 15 more sites in 14 files, unread under this test.
+  Chapter 45's "Apart from its return type, `trampoline()` has a
+  state's annotation" has the forward pronoun.
+
+**Home.** `super-prose` pass 3 and the `straighten` skill's Accrued
+patterns | this file.
+
+### C92. A "re-" verb claims an earlier time: write the plain verb until that time is on the page
+
+**Test.** "Reuses", "redefines", "restates", or another "re-" verb
+whose first occurrence the reader cannot name from the sentence and
+the one before it ("Stateless reuses the word Effect for the whole
+description a function returns", where the earlier use arrives in the
+next sentence). Ask "used before by whom, for what?" If the answer is
+not yet on the page, write the plain verb and let the sentence that
+holds the earlier use make the comparison. It is the activate skill's
+"again" pattern in a prefix: a word that implies a history where the
+sentence states a standing relation.
+
+**Keep when.** The first use is in the sentence or the one before
+(chapter 7's "You therefore inherit an implementation, to reuse the
+code from the base class", where the base class is the first user),
+and a "re-" verb that is the operation's name ("re-raises").
+
+**Sightings.** 1, `46_Effects--Stateless` 2026-11-16, was
+Claude-written, Bruce on "reuses": "reuses or uses?":
+- "Stateless reuses the word Effect for the whole description a
+  function returns." -> "Stateless uses the word Effect for the whole
+  description a function returns."
+- The sentence after it drew the next flag, "The Effects of [Effect
+  Management] are what that description declares" ("awkward"). The
+  possessive joined a noun to a chapter title that contains the same
+  word, so it read as the effects of managing effects, and the
+  sentence opened on the far term and ended on the near one. -> "That
+  description declares the Effects that [Effect Management] defines:
+  the function's Abilities in `A` and its failures in `E`." The
+  given term, "That description", now comes first, and the chapter
+  link has a verb.
+- Scale: 48 other uses of "reuse" in 32 files, unread under this
+  test.
+
+**Home.** `super-prose` pass 7 and the `activate` skill's Accrued
 patterns | this file.
 
 ## Retired

@@ -140,7 +140,23 @@ each pass hands the next one less to do.
    No tool lists the shape: grep the scope for `\bmust\b`,
    `\bcannot\b`, and `, so ` outside a listing walkthrough. A
    paragraph Bruce has flagged twice is read this way before a third
-   phrase is repaired.
+   phrase is repaired, a description as much as an argument: say
+   what the paragraph is for, then give each part its sentence and
+   its verb (chapter 46's opening drew "Besides its result,", "go
+   out on", and "every generator has." within minutes, and the
+   repair was the paragraph).
+   An opener that sets one member of a set aside ("Besides its
+   result, an Effect's type declares two things:", Bruce: "awkward")
+   makes the reader hold the exception before the set exists, often
+   with a pronoun whose noun comes later and a count that leaves the
+   member out. State the whole set in its own order, then say what
+   holds for which members ("An Effect's type declares three things:
+   the dependencies the Effect needs, the ways it can fail, and the
+   result it produces. The Effect yields its requests for
+   dependencies and its failures, and it returns its result", C91).
+   Grep the scope for
+   `^(Besides|Apart from|Aside from|Beyond|In addition to) `, and
+   keep an opener whose member the page has just described.
 4. `cohesion`: old before new, one topic string per paragraph, R29's
    one primary concept per paragraph. A sentence after a walkthrough
    that reports what a figure or flowchart in a cited source shows,
@@ -205,7 +221,15 @@ each pass hands the next one less to do.
    generator keeps the coroutine's suspended frame and restricts the
    transfer: each `yield` hands control back to the caller", C86).
    Grep the scope for `left out`, `leaves? out`, `drops`, `omits`,
-   and `kept`. The two sides of a contrast are joined with "whereas"
+   and `kept`. A sentence that opens on the far term and ends on the
+   near one turns around ("The Effects of [Effect Management] are
+   what that description declares", Bruce: "awkward" -> "That
+   description declares the Effects that [Effect Management]
+   defines"): the term the sentence before left in the reader's hands
+   comes first. A chapter link takes a verb there too, since a noun
+   joined by "of" to a title that holds the same word reads as
+   another phrase, the effects of managing effects. The two sides of
+   a contrast are joined with "whereas"
    or "while" and get subjects of one kind ("a suspended generator
    keeps its execution frame alive, whereas an ordinary function
    discards its stack frame when the function returns", R65).
@@ -285,7 +309,12 @@ each pass hands the next one less to do.
    named far above names them, in the order of what the reader must
    match them against ("types the three channels as `Generator<T,
    TReturn, TNext>`" -> "types the yielded, returned, and sent
-   values as", R66).
+   values as", R66). A count under a noun the passage never gave the
+   items is the same pointer ("An Effect yields both kinds of
+   value", Bruce: "weird", after a sentence that called neither the
+   Abilities nor the failures a value -> "An Effect yields an Ability
+   to ask for what it needs, and it yields an exception to report a
+   failure"): name each item with what it is for.
 6. `ambiguity`: every sentence that counts, compares, coordinates,
    modifies, or limits keeps one reading. A list of what two things
    share ("has `send()`, `throw()`, and `close()`, as a generator
@@ -368,7 +397,14 @@ each pass hands the next one less to do.
    listing's second run shows a state that stays" -> "At `[5]`,
    `run_all()` sends `Mouse.ESCAPES` to a machine in `Waiting`");
    grep the scope for `shows` and `demonstrates` with a run, a call,
-   or a listing as the subject.
+   or a listing as the subject. A "re-" verb claims an earlier time
+   ("Stateless reuses the word Effect for the whole description a
+   function returns", Bruce: "reuses or uses?"): when the reader
+   cannot name that earlier use from the sentence and the one before
+   it, write the plain verb, "uses", and let the sentence that holds
+   the earlier use make the comparison (C92; "again" for "still" is
+   the same word of history). Grep the scope for `\breus(e|es|ed)\b`
+   and `\bagain\b`.
 8. `bruce-edit-apply`: the Rules section of `bruce_edit_db.md`.
 9. `elements-of-style:writing-clearly-and-concisely`: Strunk's rules,
    mostly needless words and emphatic words at the end.

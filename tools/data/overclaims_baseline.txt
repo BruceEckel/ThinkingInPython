@@ -742,8 +742,8 @@ Chapters/46_Effects--Stateless.md	[BOUND] A channel empties in one of three ways
 Chapters/46_Effects--Stateless.md	[BOUND] A failure leaves the error channel in one of two ways
 Chapters/46_Effects--Stateless.md	[BOUND] A full EMS does three things, and the second is to separate each Effect's interface from its implementation
 Chapters/46_Effects--Stateless.md	[BOUND] A structural check matches on method names alone, so two supplied objects that both define CODE are indistinguishable
+Chapters/46_Effects--Stateless.md	[BOUND] An Effect's type declares three things
 Chapters/46_Effects--Stateless.md	[BOUND] Because the one CODE runs in the driver, neither CODE nor anything that calls it needs CODE
-Chapters/46_Effects--Stateless.md	[BOUND] Besides its result, an Effect's type declares two things
 Chapters/46_Effects--Stateless.md	[BOUND] Both instances need CODE, since each is a CODE by structure alone
 Chapters/46_Effects--Stateless.md	[BOUND] CODE accepts an Effect whose yield channel has narrowed to those two, which is all that remains once you supply every other Ability
 Chapters/46_Effects--Stateless.md	[BOUND] CODE alone moves an error out of the error channel and into the result

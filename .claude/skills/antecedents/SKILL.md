@@ -411,6 +411,19 @@ and it becomes part of every future pass.
   After any split, read the new paragraph's first noun phrase for a
   "the", "that", or "these" that points back across the break.
   R29's 2026-11-15 sighting in `bruce_edit_db.md`.
+- **A count under a noun the passage never gave the items.**
+  "An Effect yields both kinds of value, so this chapter calls `A`
+  the *Ability channel* and `E` the *error channel*." (Bruce,
+  2026-11-16, chapter 46: "weird")
+  The two kinds were the Abilities and the failures of the sentence
+  before, and nothing had called either one a value.
+  It is the unnamed-items pointer with a category on top.
+  Name each item with what it is for, and let the next claim stand as
+  its own sentence: "An Effect yields an Ability to ask for what it
+  needs, and it yields an exception to report a failure. This chapter
+  calls `A` the *Ability channel* and `E` the *error channel*."
+  Grep the scope for `\bboth (kinds|sorts|types|halves|sides) of\b`.
+  R66 in `bruce_edit_db.md`.
 - **A free relative leaves unnamed a thing the passage can name.**
   "A bound method ... stores its instance in its `__self__`
   attribute, so whatever holds `self.close` holds `Leaky` through it"

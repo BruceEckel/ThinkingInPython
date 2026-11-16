@@ -418,6 +418,20 @@ that the categories above do not name yet. When he identifies a new one,
 add it here as a bullet with a before/after pair,
 and it becomes part of every future pass.
 
+- "Stateless reuses the word Effect for the whole description a
+  function returns" becomes "Stateless uses the word Effect ..."
+  (Bruce, 2026-11-16, chapter 46: "reuses or uses?").
+  A "re-" verb claims an earlier time, as "again" does in the next
+  entry. The earlier use of the word came one sentence later, so the
+  reader met a history with nothing in it yet.
+  Ask "used before by whom, for what?" with the sentence and the one
+  before it in view. When the page has no answer yet, write the plain
+  verb, and let the sentence that holds the earlier use make the
+  comparison.
+  Keep a first use in the same sentence ("inherit an implementation,
+  to reuse the code from the base class") and a verb that is the
+  operation's name ("re-raises").
+  C92 in `bruce_edit_db.md`.
 - "the count would be wrong again" becomes "the count would still be wrong".
   "Again" implies a history (wrong, fixed, wrong once more);
   "still" makes the logical claim, that the fix left the condition in place.

@@ -467,3 +467,33 @@ before/after pair, and it becomes part of every future pass.
   After a second flag on one paragraph, stop repairing phrases and
   read the paragraph as an argument.
   C34 in `bruce_edit_db.md`.
+  The same holds for a paragraph that describes (2026-11-16, chapter
+  46): "Besides its result, an Effect's type declares two things: the
+  dependencies the Effect needs and the ways it can fail. Both go out
+  on the yield channel that every generator has." drew three flags
+  in a row, "Besides its result,", "go out on", and "every generator
+  has.", each one "awkward".
+  Say what the paragraph is for (what the type declares, and how the
+  generator carries each part), then give each part its sentence and
+  its verb: "An Effect's type declares three things: the dependencies
+  the Effect needs, the ways it can fail, and the result it produces.
+  The Effect yields its requests for dependencies and its failures,
+  and it returns its result."
+- **An opener that sets one member of a set aside.**
+  "Besides its result, an Effect's type declares two things:" (Bruce,
+  2026-11-16, chapter 46: "awkward")
+  The reader holds the exception before the set exists.
+  "Its" points forward to a noun that has not arrived, and "two
+  things" leaves out the member the opener named: the type declares
+  three.
+  State the whole set in its own order, here the order of
+  `Effect[A, E, R]`, then say what holds for which members.
+  The chapter's other site read two ways as well: "Besides matching
+  lookups, the DI registration key sets the type ..." (lookups that
+  match, or the act of matching them) became "The DI registration key
+  matches lookups and sets the type for which an instance answers".
+  Keep an opener whose member the page has just described ("Apart
+  from that hazard,", after the paragraph on the hazard).
+  Grep the scope for
+  `^(Besides|Apart from|Aside from|Beyond|In addition to) `.
+  C91 in `bruce_edit_db.md`.

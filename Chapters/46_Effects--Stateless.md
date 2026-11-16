@@ -25,11 +25,12 @@ and `yield from`, which composes generators and produces the inner generator's r
 Every Effect in this chapter is such a generator.
 Stateless supplies the vocabulary for the requests and the driver that answers them.
 
-Besides its result, an Effect's type declares two things:
-the dependencies the Effect needs and the ways it can fail.
-Both go out on the yield channel that every generator has.
+An Effect's type declares three things: the dependencies the Effect needs,
+the ways it can fail, and the result it produces.
+The Effect yields its requests for dependencies and its failures,
+and it returns its result.
 [Stateless in Practice](47_Effects--Stateless_in_Practice.md)
-builds examples with both.
+builds examples that combine dependencies and failures.
 
 My understanding of Effects came from work with Bill Frasure and James Ward as we created [Effect Oriented Programming](https://effectorientedprogramming.com/).
 Some of the examples in these two chapters derive from that book.
@@ -49,13 +50,13 @@ asks of an Effect signature:
 - `E` is its failure type.
 - `R` is what it produces.
 
-Stateless reuses the word Effect for the whole description a function returns.
-The Effects of [Effect Management](44_Effects--Effect_Management.md#what-is-an-effect)
-are what that description declares:
-its Abilities in `A` and its failures in `E`.
+Stateless uses the word Effect for the whole description a function returns.
+That description declares the Effects that [Effect Management](44_Effects--Effect_Management.md#what-is-an-effect)
+defines: the function's Abilities in `A` and its failures in `E`.
 
-An Effect yields both kinds of value,
-so this chapter calls `A` the *Ability channel* and `E` the *error channel*.
+An Effect yields an Ability to ask for what it needs,
+and it yields an exception to report a failure.
+This chapter calls `A` the *Ability channel* and `E` the *error channel*.
 
 For example:
 
@@ -1131,8 +1132,7 @@ so `get(Console)` never returns a subclass registered under its own name.
 By contrast, `supply()` takes bare instances and matches a request with `isinstance()`,
 so two instances that satisfy one `Need` are [ambiguous](#when-two-implementations-match).
 
-Besides matching lookups,
-the DI registration key sets the type for which an instance answers.
+The DI registration key matches lookups and sets the type for which an instance answers.
 A call such as `register(Console, Recorder())` binds an implementation to the type the caller requests,
 as `as_type(Console)` does for `supply()`.
 `supply()` [reads each Ability from its argument's static type](#supplying-an-interface),
