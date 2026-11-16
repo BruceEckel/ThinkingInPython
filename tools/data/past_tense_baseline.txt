@@ -204,6 +204,7 @@ Chapters/44_Effects--Effect_Management.md	[PAST] followed: A perfectly pure comp
 Chapters/44_Effects--Effect_Management.md	[PAST] introduced: Neither language infers the list from the functions a body calls, so an exception introduced three levels down means editing every signature above it.
 Chapters/44_Effects--Effect_Management.md	[PAST] read: To discover these behaviors, you trust documentation, read source, and observe failures.
 Chapters/44_Effects--Effect_Management.md	[PAST] reduced: C++11 reduced its version to a single bit: whether a function can throw an exception.
+Chapters/44_Effects--Effect_Management.md	[PAST] stopped: Programmers stopped auditing their imports for name collisions.
 Chapters/44_Effects--Effect_Management.md	[PAST] took: Gradual typing faced the same problem, and took a decade.
 Chapters/44_Effects--Effect_Management.md	[PAST] were: Collisions were often silent, producing hidden bugs, and third-party libraries made the problem worse.
 Chapters/45_Effects--Generators.md	[PAST] made: ES2015 made generators standard, with CODE for Python's CODE behavior.

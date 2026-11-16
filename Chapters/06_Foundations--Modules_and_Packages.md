@@ -593,7 +593,7 @@ An installed package whose code carries annotations says so with a marker:
 an empty file named `py.typed` in the package's directory.
 The marker tells the type checker of a program that imports the package to use those annotations,
 and it covers every subpackage beneath that directory.
-The typing specification also applies a stricter export rule to a marked package.
+The typing specification applies a stricter export rule to a marked package.
 A name that `__init__.py` imports from a submodule is private unless `__all__` lists it or the import repeats it,
 as in `from ._engine import total as total`.
 Pyright reports an import of such a private name.

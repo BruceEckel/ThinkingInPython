@@ -121,11 +121,9 @@ Chapters/12_Techniques--Data_Classes_as_Types.md	[BOUND] CODE turns off the gene
 Chapters/12_Techniques--Data_Classes_as_Types.md	[BOUND] CODE works only on data classes, but "same object, one field different" is what you do with any immutable value
 Chapters/12_Techniques--Data_Classes_as_Types.md	[BOUND] Creating one calls a constructor and reading it goes through attribute access, where a bare CODE or CODE needs neither
 Chapters/12_Techniques--Data_Classes_as_Types.md	[BOUND] Four small classes isolate that change, one step at a time
-Chapters/12_Techniques--Data_Classes_as_Types.md	[BOUND] It gains one thing, a check that the factory builds the type the annotation names
 Chapters/12_Techniques--Data_Classes_as_Types.md	[BOUND] No other code repeats the check, because it cannot fail
 Chapters/12_Techniques--Data_Classes_as_Types.md	[BOUND] The rule governs positional fields alone, so CODE on CODE avoids it by making CODE keyword-only
 Chapters/12_Techniques--Data_Classes_as_Types.md	[BOUND] The validation lives in one place, the constructor, so it is easy to change
-Chapters/12_Techniques--Data_Classes_as_Types.md	[BOUND] Then fix it two ways, with CODE and with CODE, and say which one the type checker can verify
 Chapters/13_Techniques--Pattern_Matching.md	[BOUND] Adding a third alternative of literals alone, CODE, fails with CODE
 Chapters/13_Techniques--Pattern_Matching.md	[BOUND] An alerting system sends a notification through one of three channels
 Chapters/13_Techniques--Pattern_Matching.md	[BOUND] Any name a later case leaves alone keeps the value an earlier, failed case bound
@@ -529,10 +527,10 @@ Chapters/32_Patterns--Multiple_Dispatching.md	[BOUND] With the CODE override alo
 Chapters/32_Patterns--Multiple_Dispatching.md	[BOUND] Write a helper that wraps a constant CODE in a callable, so the seven unchanged cells stay one line each
 Chapters/32_Patterns--Multiple_Dispatching.md	[BOUND] Writing out the table as data puts all nine answers in one place
 Chapters/33_Patterns--Visitor.md	[BOUND] *Visitor*, the final pattern in *GoF Design Patterns*, requires one method on the primary class hierarchy, typically called CODE, which takes an object from a secondary hierarchy called CODE
+Chapters/33_Patterns--Visitor.md	[BOUND] CODE is unregistered, so it resolves to the same implementation CODE does, the one stored under CODE
 Chapters/33_Patterns--Visitor.md	[BOUND] CODE resolves one argument's type
 Chapters/33_Patterns--Visitor.md	[BOUND] Count the lines each change adds, and say which of the two changes CODE makes shorter
 Chapters/33_Patterns--Visitor.md	[BOUND] If you delete the override, every flower resolves to the same CODE, so the visitor's type alone decides which method runs
-Chapters/33_Patterns--Visitor.md	[BOUND] Nothing registers CODE, so CODE resolves to the same implementation CODE does, the one stored under CODE
 Chapters/33_Patterns--Visitor.md	[BOUND] The classic pattern overloads CODE once per flower type and keeps each operation's body in the visitor, so CODE is the one method the pattern adds to the primary hierarchy
 Chapters/33_Patterns--Visitor.md	[BOUND] The flower's type is the one thing left for runtime to resolve
 Chapters/33_Patterns--Visitor.md	[BOUND] The two operations, CODE and CODE, are new, each added independently of the other
@@ -1190,7 +1188,7 @@ Solutions/32_Patterns--Multiple_Dispatching/README.md	[BOUND] Across the four cl
 Solutions/32_Patterns--Multiple_Dispatching/README.md	[BOUND] Across two hundred seeds, each of the three kinds wins CODE at least once, so the outcome depends on the random draws each round, as it does in a real rock-paper-scissors tournament
 Solutions/32_Patterns--Multiple_Dispatching/README.md	[BOUND] Adding a class changes the dictionary and leaves every method alone, so CODE stays as it is
 Solutions/32_Patterns--Multiple_Dispatching/README.md	[BOUND] CODE reads as it does in CODE, where four method definitions per class stand behind it
-Solutions/32_Patterns--Multiple_Dispatching/README.md	[BOUND] CODE reports an CODE in each cell, since a cell's parameters are CODEs and CODE alone defines CODE
+Solutions/32_Patterns--Multiple_Dispatching/README.md	[BOUND] CODE reports a CODE in each cell, since a cell's parameters are CODEs and CODE alone defines CODE
 Solutions/32_Patterns--Multiple_Dispatching/README.md	[BOUND] CODE resolves on CODE's type alone
 Solutions/32_Patterns--Multiple_Dispatching/README.md	[BOUND] Exercise 10 collects the same 36 answers in one place
 Solutions/32_Patterns--Multiple_Dispatching/README.md	[BOUND] Exercise 8's version keeps the two advantages the chapter gives the method version

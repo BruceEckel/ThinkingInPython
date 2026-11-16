@@ -918,7 +918,8 @@ Each `Fixed()` calls `dict()` and gets an empty index of its own.
 **Give the field the wrong factory.**
 `WrongFactory` declares a `dict[str, Month]` and builds a `list`.
 `@dataclass` accepts the class, and `WrongFactory().index` is `[]`.
-The program fails later, at the first statement that uses the index as a dict.
+If a later statement reads `index["January"]`,
+Python raises a `TypeError` at that statement.
 The type checker compares the type the factory builds with the annotation.
 It reports `no-matching-overload` on the `field()` call,
 before the program runs.

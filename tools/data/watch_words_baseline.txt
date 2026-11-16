@@ -56,7 +56,6 @@ Chapters/06_Foundations--Modules_and_Packages.md	only: The submodule becomes an 
 Chapters/06_Foundations--Modules_and_Packages.md	only: When the cycle exists only in annotations
 Chapters/06_Foundations--Modules_and_Packages.md	only: a keyword only inside an CODE statement
 Chapters/06_Foundations--Modules_and_Packages.md	only: defers only the imports you marked CODE
-Chapters/06_Foundations--Modules_and_Packages.md	only: only flags the directory as a package.^[The name CODE often confuses people
 Chapters/06_Foundations--Modules_and_Packages.md	only: the way CODE is a keyword only inside a CODE statement
 Chapters/07_Foundations--Classes.md	defines no: If a derived class defines no constructor
 Chapters/07_Foundations--Classes.md	has no: A method defined without CODE has no parameter to receive the reference
@@ -117,7 +116,6 @@ Chapters/12_Techniques--Data_Classes_as_Types.md	only: Passing CODE to CODE make
 Chapters/12_Techniques--Data_Classes_as_Types.md	only: and those members are the only values the type has
 Chapters/12_Techniques--Data_Classes_as_Types.md	only: so only the postcondition appears here
 Chapters/12_Techniques--Data_Classes_as_Types.md	takes no: so it accepts any callable that takes no arguments
-Chapters/12_Techniques--Data_Classes_as_Types.md	want: Subscript the factory when you want that agreement checked
 Chapters/13_Techniques--Pattern_Matching.md	cost: Every channel also has a rough cost to send a message
 Chapters/13_Techniques--Pattern_Matching.md	could: CODE could reach its end and return CODE
 Chapters/13_Techniques--Pattern_Matching.md	defines no: because CODE defines no CODE
@@ -161,7 +159,6 @@ Chapters/16_Techniques--Comprehensions.md	already: CODE and CODE are a better ch
 Chapters/16_Techniques--Comprehensions.md	builds no: The CODE loop prints the same values and builds no list
 Chapters/16_Techniques--Comprehensions.md	has no: Python has no tuple comprehension
 Chapters/16_Techniques--Comprehensions.md	having no: The CODE depends on the enclosing scope having no CODE
-Chapters/16_Techniques--Comprehensions.md	only: especially if you consume the result only once
 Chapters/16_Techniques--Comprehensions.md	only: write a list comprehension that finds the string elements made only of digits (CODE)
 Chapters/16_Techniques--Comprehensions.md	paying: paying attention to which value wins for the key CODE
 Chapters/16_Techniques--Comprehensions.md	want: A glob pattern says what you want
@@ -255,7 +252,6 @@ Chapters/19_Techniques--Concurrency.md	never: its body never runs
 Chapters/19_Techniques--Concurrency.md	offers no: Python still offers no safe way to cancel a running thread
 Chapters/19_Techniques--Concurrency.md	only: "concurrency is not parallelism" (I'm hoping he meant to say "concurrency is not **only** parallelism").[^concurrency-def] As this chapter shows
 Chapters/19_Techniques--Concurrency.md	only: **More cores speed up only the parallel fraction of the work
-Chapters/19_Techniques--Concurrency.md	only: A CPU-bound task cannot overlap if only a single core is available
 Chapters/19_Techniques--Concurrency.md	only: An CODE is legal only inside an CODE
 Chapters/19_Techniques--Concurrency.md	only: Awaiting CODE suspends only the current task and hands control to the event loop
 Chapters/19_Techniques--Concurrency.md	only: Before 3.14 the guard was a Windows and macOS concern only
@@ -710,7 +706,6 @@ Solutions/11_Techniques--Testing/README.md	only: An injected test depends only o
 Solutions/11_Techniques--Testing/README.md	only: If you test only a positive balance
 Solutions/12_Techniques--Data_Classes_as_Types/README.md	itself: A CODE Cannot Validate Itself shows the same failure in its third test
 Solutions/12_Techniques--Data_Classes_as_Types/README.md	only: If you keep only the CODE check
-Solutions/12_Techniques--Data_Classes_as_Types/README.md	want: Subscript the factory when you want the checker to confirm the agreement
 Solutions/14_Techniques--Decorators/README.md	cost: Wrapping the two extras in the other order changes the description and leaves the cost alone
 Solutions/14_Techniques--Decorators/README.md	cost: and a cost equal to the espresso's price plus both extras' prices
 Solutions/14_Techniques--Decorators/README.md	has no: That instance has no CODE

@@ -11,7 +11,6 @@
 Chapters/01_Introduction.md	[COLON+AND] The next chapter introduces the design-patterns movement, and the question I keep asking through the rest of the part: what problem are you solving, and does the language already do the pattern's job?
 Chapters/04_Foundations--Control_Flow.md	[AND+REL] There the CODE matches, the inner CODE (CODE) skips the CODE, and the outer CODE (CODE) runs right after.
 Chapters/11_Techniques--Testing.md	[PRT] Choose CODE when passing the parameter down changes more code than the test is worth.
-Chapters/12_Techniques--Data_Classes_as_Types.md	[AND+REL] CODE accepts it, the linter (CODE) accepts it, and the declaration says CODE, so every reader expects a dict.
 Chapters/12_Techniques--Data_Classes_as_Types.md	[IMP] Every method that changes it must re-validate, and a method can leave the object in an illegal state between steps:
 Chapters/13_Techniques--Pattern_Matching.md	[PRT] This book's CODE configuration turns N806 off for CODE, since the capture is the mistake the listing exists to show.
 Chapters/15_Techniques--Context_Managers.md	[PRT] Code written for those versions leaves the decorator off and puts a CODE inside the generator around its body, which works on every version.
