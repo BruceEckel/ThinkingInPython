@@ -6222,6 +6222,85 @@ Bruce's hand:
 
 **Home.** this file.
 
+### C89. A check is not the act it checks: the checker verifies, and the act keeps its actor
+
+**Test.** A sentence equates a check, a test, or a verification with
+the property or the act it checks ("Those two checks are the Effect
+tracking and delayed binding of a full EMS"), or credits the checker
+with the act ("the type checker performs both"). Put the checker in
+front of the act's own verb: "the type checker binds the dependency".
+When that sentence is false, the original said it. Give the check
+"enforces", "verifies", or "reports", and give the act its actor and
+its verb in the same passage.
+
+**Keep when.** The check is the whole of the thing: a test that is
+the specification, a property that consists of a type check. A
+checker that performs what the sentence names ("type inference, which
+the type checker performs on every run").
+
+**Sightings.** 1, `46_Effects--Stateless` 2026-11-16, was
+Claude-written (`ac16ccdf`, 2026-09-25), Bruce on the chapter's
+opening: "Does the type checker perform delayed binding?"
+- "Those two checks are the Effect tracking and delayed binding of a
+  full EMS. In Stateless, the type checker performs both." -> "Those
+  two checks enforce the Effect tracking and the delayed binding of a
+  full EMS. You declare each Effect, and you supply each dependency
+  later. The type checker verifies both."
+- The facts: chapter 44 defines delayed binding as "A caller or
+  context supplies the implementation at some point after the
+  function's definition". In Stateless the caller does that with
+  `supply()`, and `run()` takes an `Effect[Async, Exception, R]`, so
+  the type checker reports an Effect that still carries a `Need` (an
+  `invalid-argument-type` on the `run()` call in `unsupplied.py`).
+- A second fault rode on the first: "both" had two pairs to point
+  at, the two checks and the two parts of an EMS (R66's shape). The
+  repair's "both" follows a sentence with two verbs, declare and
+  supply.
+- Why the passes missed it: each claim check asks whether the
+  outcome holds, and both checks do fail in the type checker. No
+  pass asked who performs the act the check is named after. C73 asks
+  that question of a statement in a listing; this is the same
+  question asked of a tool.
+- Scale: a grep of both trees for `checks? (is|are) the` and for
+  `checker (performs|does|provides|supplies|binds)` found no other
+  site. Appendix A's "type inference, which the type checker performs
+  on every run" is the keep above.
+
+**Home.** `super-prose` pass 1 and the `literal` skill's Accrued
+patterns | this file.
+
+### C90. "Builds on" names no relation: say implements with, extends, or assumes
+
+**Test.** "X builds on Y", "built on", "building on", with a library,
+a listing, a design, or a chapter as X. The phrase is a figure of
+construction and leaves the relation for the reader to work out. Ask
+which relation the passage means, and write its verb. A library and
+its mechanism: "implements ... with", "uses". A listing or a class
+that adds to an earlier one: "extends", "adds ... to". A chapter or a
+section that needs an earlier one: "uses", "assumes".
+
+**Keep when.** None seen yet. The verb "build" with an object is a
+different word ("building one that holds 0").
+
+**Sightings.** 1, `46_Effects--Stateless` 2026-11-16, Bruce:
+"'builds on' is awkward; 'implemented using' or something like that":
+- "Stateless builds on generators." -> "Stateless implements Effects
+  with generators."
+- The chapter's other site, the same day: "and frameworks such as
+  FastAPI's `Depends` build on it" -> "use it".
+- Scale: a grep of both trees for `buil[dt]s? on|building on` finds
+  22 more sites in 16 files, unread under this test. Two repeat the
+  flagged claim: chapter 44, "Stateless builds on generators, as
+  TypeScript Effect's `function*` does", and chapter 45, "An Effect
+  system builds on a generator rather than a full coroutine". The
+  others are a library on a library ("`ProcessPoolExecutor` builds on
+  `multiprocessing`"), a chapter on a chapter ("[Decorators] builds
+  on that forwarding"), and a pattern on a pattern ("*State Machine*
+  builds on *State*").
+
+**Home.** `super-prose` pass 1 and the `literal` skill's Accrued
+patterns | this file.
+
 ## Retired
 
 Rejected by Bruce, or promoted and later withdrawn. Never propose these

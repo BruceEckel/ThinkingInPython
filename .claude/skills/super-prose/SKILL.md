@@ -56,7 +56,27 @@ each pass hands the next one less to do.
    sentence for a variation. A feature does not "reach" a version
    ("`yield from`, which reached Python 3.3 in 2012" -> "adopted in
    Python 3.3 (2012)", C87): grep the scope for
-   `reach(ed|es)? (Python|[0-9])`.
+   `reach(ed|es)? (Python|[0-9])`. A check is not the act it checks
+   ("Those two checks are the Effect tracking and delayed binding of
+   a full EMS. In Stateless, the type checker performs both", Bruce:
+   "Does the type checker perform delayed binding?"). Put the checker
+   in front of the act's verb ("the type checker binds the
+   dependency"); when that sentence is false, the check "enforces" or
+   "verifies" and the act gets its own actor ("Those two checks
+   enforce the Effect tracking and the delayed binding of a full EMS.
+   You declare each Effect, and you supply each dependency later. The
+   type checker verifies both", C89). Grep the scope for
+   `checks? (is|are) the` and
+   `checker (performs|does|provides|supplies|binds)`. "Builds on"
+   names no relation ("Stateless builds on generators", Bruce:
+   "'builds on' is awkward; 'implemented using' or something like
+   that"): say which one it is. A library and its mechanism take
+   "implements ... with" or "uses" ("Stateless implements Effects
+   with generators"; "frameworks such as FastAPI's `Depends` use
+   it"), a listing that adds to an earlier one "extends" it, and a
+   chapter that needs an earlier one "assumes" or "uses" what that
+   chapter taught (C90). Grep the scope for
+   `buil[dt]s? on|building on`.
 2. `positive`: a negation that is an accident of phrasing turns around.
    A subject of "Nothing", "Nobody", or "No one" with a verb ("Nothing
    calls `throw()` on the first booking" -> "`list(book())` drives the

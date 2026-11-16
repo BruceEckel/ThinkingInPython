@@ -368,3 +368,43 @@ and it becomes part of every future pass.
   Keep a value that reaches a number and execution that reaches a line.
   Grep the scope for `reach(ed|es)? (Python|[0-9])`.
   C87 in `bruce_edit_db.md`.
+- **A check equated with the act it checks.**
+  "If you forget to declare a dependency, the check fails. If you
+  forget to supply one, the check fails. Those two checks are the
+  Effect tracking and delayed binding of a full EMS. In Stateless,
+  the type checker performs both." (Bruce, 2026-11-16, chapter 46:
+  "Does the type checker perform delayed binding?")
+  It does not. A caller binds a dependency by supplying it, and the
+  type checker reports a dependency left unsupplied.
+  "Are" made a check the same thing as the act it checks, and "both"
+  then handed the act to the checker.
+  The sentence passes every claim check that asks whether the outcome
+  holds, since both checks do fail in the type checker.
+  Put the checker in front of the act's own verb ("the type checker
+  binds the dependency"). When that sentence is false, give the check
+  "enforces" or "verifies", and give the act its actor in the same
+  passage: "Those two checks enforce the Effect tracking and the
+  delayed binding of a full EMS. You declare each Effect, and you
+  supply each dependency later. The type checker verifies both."
+  Keep an identity that holds: a test that is the specification, a
+  type check that is the whole of a property.
+  Grep the scope for `checks? (is|are) the` and
+  `checker (performs|does|provides|supplies|binds)`.
+  C89 in `bruce_edit_db.md`.
+- **"Builds on".**
+  "Stateless builds on generators." (Bruce, 2026-11-16, chapter 46:
+  "'builds on' is awkward; 'implemented using' or something like
+  that")
+  The phrase is a figure of construction, and it leaves the relation
+  to the reader: implemented with, extends, requires, runs on.
+  Name the relation with the verb for it.
+  A library and its mechanism: "Stateless implements Effects with
+  generators"; "frameworks such as FastAPI's `Depends` use it".
+  A listing that adds to an earlier one "extends" it or "adds" the
+  new part to it.
+  A chapter that needs an earlier one "uses" or "assumes" what that
+  chapter taught.
+  Keep the literal sense, a thing constructed on another ("building
+  one that holds 0" is a different verb, to build).
+  Grep the scope for `buil[dt]s? on|building on`.
+  C90 in `bruce_edit_db.md`.

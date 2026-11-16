@@ -1,22 +1,23 @@
 # Stateless
 
-> The easiest things to forget about a function are what it needs from outside and how it can fail.
-> Stateless writes both into the function's type,
-> and the type checker verifies every caller against them.
+> [Effect Management](44_Effects--Effect_Management.md#library-effect-management)
+> introduced library Effect systems.
+> The [Stateless](https://github.com/suned/stateless) library
+> implements an Effect Management System (EMS).
 
-[Effect Management](44_Effects--Effect_Management.md#library-effect-management)
-introduces library Effect systems.
-[Stateless](https://github.com/suned/stateless)
-implements an Effect Management System (EMS).
+The easiest things to forget about a function are its Effects:
+how it affects its environment, what it needs from its environment,
+and how it can fail.
+Stateless writes the Effects into the function's type.
 
-Stateless encodes an Effect's dependencies and failures into the return type of a function.
-A type checker then verifies that every caller either handles each Effect or declares it in its own signature.
+The type checker verifies that every caller either handles each Effect or declares it in its own signature.
 If you forget to declare a dependency, the check fails.
 If you forget to supply one, the check fails.
-Those two checks are the Effect tracking and delayed binding of a full EMS.
-In Stateless, the type checker performs both.
+Those two checks enforce the Effect tracking and the delayed binding of a full EMS.
+You declare each Effect, and you supply each dependency later.
+The type checker verifies both.
 
-Stateless builds on generators.
+Stateless implements Effects with generators.
 [Generators](45_Effects--Generators.md)
 covers the three-parameter `Generator` annotation,
 a driver that answers a generator's requests one `send()` at a time,
@@ -1167,7 +1168,7 @@ rather than declaring one, so the type checker does not validate the dependency.
 the usual alternative to injection:
 a body reads the container with `get(Console)`.
 Constructor injection is the stronger, more common shape of DI,
-and frameworks such as FastAPI's `Depends` build on it.
+and frameworks such as FastAPI's `Depends` use it.
 Constructor injection answers the complaint that the type checker does not validate the dependency.
 The dependency arrives as a parameter,
 so a static type checker validates every call that supplies one.
