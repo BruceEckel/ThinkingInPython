@@ -1049,7 +1049,7 @@ Comparing `"five"` with `1` raises a `TypeError`,
 so if the range check runs first,
 a `str` ends in that `TypeError` instead of a `TypeFailure`.
 
-**Feed values the checker refuses.**
+**Feed values the type checker refuses.**
 The type checker rejects `5.5` and `"five"` as arguments before the program runs.
 The `# type: ignore` silences that report so the listing can show what the constructor does with each value at runtime.
 

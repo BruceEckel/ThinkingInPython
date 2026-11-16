@@ -640,6 +640,36 @@ reads the others as "prefer the noun" will overshoot.
     `yield` calls the loop body, which returns to the iterator when it
     finishes." -> "which runs to its end and returns to the iterator."
 
+- Book `[HEAD]` read 2026-11-16, the 136 hits outside chapters 44 to
+  47 (four Opus agents by Part, the session reading every hit beside
+  them): ten sentences, each in a passage with a second thing of the
+  kind in play.
+  - Chapter 19, a `for` loop and the event loop a paragraph apart:
+    "so the loop after the block can read each outcome" -> "so the
+    loop over `tasks.items()` can read each outcome" (two `for` loops
+    follow the block); "The loop runs every timer due at one instant"
+    -> "The event loop runs".
+  - A listing with several kinds of block: Solutions 19, "when the
+    block exits" -> "when the `async with` block exits" (beside `try`
+    and `except*`; "the group's block" would have met the listing's
+    `except* ValueError as group`), and "A `TaskGroup` guarantees
+    ... when the block exits" -> "when its block exits", two
+    paragraphs after "the `except` block".
+  - "The checker" with a second checker: appendix A beside the
+    hypothetical tool ("outside the checker" -> "outside the type
+    checker"; "one more object the checker ignores" -> "the type
+    checker ignores"), and a Solutions 12 step label under a listing
+    that defines `check()`.
+  - Chapter 16, "inlines the test and the expression" -> "the output
+    expression"; chapter 8, "the comment gives the diagnostic" three
+    words after "`# type: ignore`" -> "the `# ty:` comment".
+  - Solutions 30, "In that form" -> "With `Broadcasting`": the file's
+    term is "the load-time form", and the sentence is false of it.
+  The 125 keeps are this entry's keep-when at work: 56 "the checker"
+  where the one checker is the type checker, a full term in the
+  sentence before, a paragraph about one of the file's terms, a
+  listing with one such construct.
+
 **Home.** the `antecedents` skill, as a keep-when (its "zero ambiguous
 pointers, not zero pronouns" line). Not a separate sweep. Promoted
 2026-09-15 on chapter 27's sightings (C6 -> R12). Since 2026-11-15

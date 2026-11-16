@@ -84,7 +84,7 @@ print(list(map(lambda e: e ** 2,  # type: ignore
 ```
 
 The `map()`/`filter()` form calls a `lambda` on every element and is harder to read.
-The comprehension inlines the test and the expression,
+The comprehension inlines the test and the output expression,
 and its brackets show at a glance that it produces a list.
 `map()` and `filter()` are a better choice when the function they apply already has a name:
 `map(str.strip, lines)` rather than `[line.strip() for line in lines]`.

@@ -394,8 +394,14 @@ rewrote 4: "the channel" for the Ability channel, "the frame" beside
 "the C stack", "the system" in a chapter with a type system and an
 Effect system, and "the split" for a separation, in a chapter whose
 term is "the description/execution split". The 20 keeps, 15 of them
-"the checker", are in the baseline. Every other chapter's hits print
-as survey until its pass reads them.
+"the checker", went into the baseline. The other 136 hits were read
+on 2026-11-16: 9 rewritten, 2 made quiet by a neighboring repair, and
+125 kept, 56 of them "the checker". A rewrite's second candidate was
+seldom another of the file's terms. It was a second sense of the noun
+in the passage: a listing's `for` loop a paragraph from the event
+loop, three kinds of block in one listing, a `check()` function or a
+hypothetical tool beside the type checker. So a chapter pass sees
+only a sentence written or edited since.
 
 Five rules run by default, `RULES`: `[IMP]`, `[COLON+AND]`, `[PAIR]`,
 `[AND+REL]`, and `[PRT]`, judged against a baseline. Ten are survey rules, `SURVEY_RULES`: `[AND]`,

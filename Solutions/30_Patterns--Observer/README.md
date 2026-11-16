@@ -1962,7 +1962,7 @@ comes from storing the list at module level rather than from the decorator.
 keeps registration by decorator and moves the list onto each instance.
 `Broadcasting` is a base class whose `respond()` method is a decorator,
 so `@thermometer.respond` appends a function to that thermometer's own list and returns the function unchanged.
-In that form, `room` and `oven` each announce to their own responders.
+With `Broadcasting`, `room` and `oven` each announce to their own responders.
 A test creates its own thermometer and registers against it,
 so each test has a registry of its own too.
 The import problem stays.

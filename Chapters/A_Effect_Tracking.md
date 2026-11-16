@@ -288,7 +288,7 @@ The tool therefore belongs inside the checker.
 Of the three checkers this book names,
 mypy alone has a plugin interface at this writing.
 That rules out `ty` and Pyright as hosts for the tool.
-A tool that runs outside the checker has two choices.
+A tool that runs outside the type checker has two choices.
 It can repeat the checker's inference,
 or it can check the calls it resolves and treat the others as unknown.
 
@@ -307,7 +307,7 @@ def each[T](
 The row of `each()` is the row of `action`, and that row differs at every call.
 Koka writes such a row with the Effect variable `e`.
 Python's type variables cannot help,
-because a type variable placed inside metadata is one more object the checker ignores.
+because a type variable placed inside metadata is one more object the type checker ignores.
 The tool would require its own notation,
 something like `performs(RowOf("action"))`,
 and its own solver for that notation.

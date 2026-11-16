@@ -45,6 +45,18 @@ Write the full term, and keep the short form where the file has one
 term of that head and no other sense of the noun
 ("the checker" where the one checker is the type checker).
 A read keep goes into the survey baseline with `ARGS=--survey-accept`.
+The book-wide read (2026-11-16) rewrote 9 of 136 hits,
+and the second candidate was seldom another of the file's terms.
+It was a second sense of the noun in the passage:
+a listing's `for` loop a paragraph from the event loop,
+a `check()` function beside the type checker,
+`# type: ignore` three words before "the comment" that meant the `# ty:` comment,
+three kinds of block in one listing.
+Read the listing for the second thing before keeping a hit.
+Name a loop by what it iterates ("the loop over `tasks.items()`"),
+since "the `for` loop" fails `tip positional` when the listing has several.
+Check the listing's variable names before writing an owner:
+"the group's block" sat under `except* ValueError as group`, and became "the `async with` block".
 A listed sentence is not a fault by itself.
 The test below decides.
 A count word is a pointer too ("the second run", "the first three runs"),

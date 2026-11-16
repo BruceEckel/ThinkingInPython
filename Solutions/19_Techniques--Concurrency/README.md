@@ -976,7 +976,7 @@ so the group cancels it during that sleep and its task ends cancelled.
 The original `FETCHES` has both `e` and `f` cancelled because both are still sleeping when `c` and `d` fail.
 The group cannot cancel a task that has returned,
 and it cannot unprint `e: fetched` or undo whatever a real `fetch()` wrote to a database before it returned.
-Structured concurrency guarantees that every task has ended when the block exits.
+Structured concurrency guarantees that every task has ended when the `async with` block exits.
 Every effect a task had before the failure stays in place.
 
 When the tasks write to a database instead of sleeping,
@@ -1088,7 +1088,7 @@ they run to completion in the background with no code awaiting their results.
 `return_exceptions=True` and `TaskGroup` exist to address those two faults:
 the discarded results and the siblings left running.
 `return_exceptions=True` keeps every outcome, so partial success stays visible.
-A `TaskGroup` guarantees that every task has ended when the block exits.
+A `TaskGroup` guarantees that every task has ended when its block exits.
 Bare `gather()` gives you neither.
 
 Before you move on, name what separates your attempt from this one:

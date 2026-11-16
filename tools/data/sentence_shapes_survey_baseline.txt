@@ -47,6 +47,11 @@ Chapters/04_Foundations--Control_Flow.md	[CAN] A file that exists at the CODE ca
 Chapters/04_Foundations--Control_Flow.md	[CAN] CODE begins the index at one, the usual count in output that people read, so a loop body can print the index as it comes.
 Chapters/04_Foundations--Control_Flow.md	[CAN] It resembles a C CODE, but a pattern can test a value's structure and bind its parts to names:
 Chapters/04_Foundations--Control_Flow.md	[CAN] The test and the operation can disagree.
+Chapters/04_Foundations--Control_Flow.md	[HEAD] block: As control leaves the block, CODE calls CODE, which performs the cleanup.
+Chapters/04_Foundations--Control_Flow.md	[HEAD] block: CODE calls CODE at the top of the block.
+Chapters/04_Foundations--Control_Flow.md	[HEAD] block: The object that CODE manages supplies the cleanup, which runs every time the block exits.
+Chapters/04_Foundations--Control_Flow.md	[HEAD] clause: CODE and CODE derive from CODE rather than CODE, so they propagate past that clause and stop the program.
+Chapters/04_Foundations--Control_Flow.md	[HEAD] statement: CODE and CODE are *soft keywords*: they are keywords only in this statement, so existing code that uses CODE as a variable name still runs.
 Chapters/04_Foundations--Control_Flow.md	[SAME] The loop CODE has the same shape.
 Chapters/05_Foundations--Functions.md	[ADD] A CODE parameter also begins the keyword-only parameters. | after: You must pass every parameter after it by name.
 Chapters/05_Foundations--Functions.md	[ADD] Because CODE tests CODE against CODE, a caller can also pass CODE as a real default. | after: With the CODE sentinel, CODE tells the two cases apart.
@@ -90,6 +95,10 @@ Chapters/08_Foundations--Static_Types.md	[CAUS] let checker infer: You can write
 Chapters/08_Foundations--Static_Types.md	[CAUS] makes CODE optional: CODE makes CODE optional, so CODE reads it with CODE and a default.
 Chapters/08_Foundations--Static_Types.md	[CAUS] makes CODE reject: Declaring CODE makes CODE reject CODE with CODE.
 Chapters/08_Foundations--Static_Types.md	[CAUS] makes checker report: CODE on a name makes the type checker report an accidental reassignment.
+Chapters/08_Foundations--Static_Types.md	[HEAD] checker: The CODE narrows CODE to CODE, and the checker keeps that narrowing through the CODE, because the checker does not track which attributes CODE assigns.
+Chapters/08_Foundations--Static_Types.md	[HEAD] checker: The CODE shows that CODE was CODE by the time CODE ran, while the checker still treated it as a CODE.
+Chapters/08_Foundations--Static_Types.md	[HEAD] checker: Where Pyright or mypy disagrees with CODE on a listing, the text says so and names the checker, because a verdict on a hard case is a fact about one checker, not about Python.
+Chapters/08_Foundations--Static_Types.md	[HEAD] declaration: With that declaration, the function accepts arguments that a CODE parameter rejects.
 Chapters/08_Foundations--Static_Types.md	[SAME] A default matters most for a class whose type parameter is usually the same type.
 Chapters/08_Foundations--Static_Types.md	[TWO] Python 3.5 (2015) introduced *type hints* (PEP 484), which look like the type declarations of statically typed languages.
 Chapters/08_Foundations--Static_Types.md	[TWO] The alias also documents the allowed values in one place, instead of scattering the literal list across every function that accepts a CODE.
@@ -97,6 +106,17 @@ Chapters/09_Foundations--Class_Attributes.md	[ADD] CODE reports CODE too, by fal
 Chapters/09_Foundations--Class_Attributes.md	[ADD] Pyright accepts the read too. | after: It checks the declaration's type and ignores which code runs first.
 Chapters/09_Foundations--Class_Attributes.md	[ADD] The type checker also accepts the line, since CODE is a correct call on a CODE. | after: CODE leaves CODE's dictionary empty, so CODE reads the same list and holds the apple too.
 Chapters/09_Foundations--Class_Attributes.md	[CAN] Slots can replace that instance dictionary.
+Chapters/09_Foundations--Class_Attributes.md	[HEAD] attribute: An annotation states the type, and CODE adds where the attribute belongs.
+Chapters/09_Foundations--Class_Attributes.md	[HEAD] attribute: If you delete it, the type checker still infers CODE correctly from CODE, because the checker gives the attribute the type of the parameter assigned to it.
+Chapters/09_Foundations--Class_Attributes.md	[HEAD] attribute: It never checks whether some method sets the attribute, so it accepts every read of CODE.
+Chapters/09_Foundations--Class_Attributes.md	[HEAD] attribute: The assignment creates the attribute.
+Chapters/09_Foundations--Class_Attributes.md	[HEAD] attribute: The type checker takes the annotation as the attribute's declaration.
+Chapters/09_Foundations--Class_Attributes.md	[HEAD] attribute: The type checker then treats the attribute as class-wide, and rejects the instance assignment that shadows it:
+Chapters/09_Foundations--Class_Attributes.md	[HEAD] attribute: Treat the base declaration as documentation that a checker reads, not as a guarantee that the attribute exists.
+Chapters/09_Foundations--Class_Attributes.md	[HEAD] call: A CODE that writes CODE forks the same way, because CODE is the class that received the call.
+Chapters/09_Foundations--Class_Attributes.md	[HEAD] checker: It reports CODE when a subclass writes CODE, since the checker compares the value with the declared CODE.
+Chapters/09_Foundations--Class_Attributes.md	[HEAD] checker: One mistake passes the checker.
+Chapters/09_Foundations--Class_Attributes.md	[HEAD] checker: The checker accepts CODE as written, because it trusts the declaration that CODE exists.
 Chapters/09_Foundations--Class_Attributes.md	[SAME] The assignment creates CODE on CODE alone, the same shadowing CODE demonstrates in CODE.
 Chapters/09_Foundations--Class_Attributes.md	[SAME] Writing the same increment through CODE forks the counter when the base class has subclasses, the same way CODE forks CODE:
 Chapters/09_Foundations--Class_Attributes.md	[TWO] Write the increment through the literal class name, as CODE does, whenever a CODE must count across every subclass rather than fork one counter per subclass.
@@ -113,12 +133,12 @@ Chapters/11_Techniques--Testing.md	[ADD] CODE, also in CODE, builds a mock from 
 Chapters/11_Techniques--Testing.md	[CAN] A CODE mark can carry several names, followed by a list of tuples, one tuple per case:
 Chapters/11_Techniques--Testing.md	[CAN] It records every call it receives, so a test can check the call as well as what the call returned.
 Chapters/11_Techniques--Testing.md	[CAUS] makes test depend: A network call is slow, it fails whenever the service or the connection does, and it makes the test depend on data someone else controls.
+Chapters/11_Techniques--Testing.md	[HEAD] statement: That statement binds CODE in CODE's own namespace, so CODE is the name the call site reads and the name to patch.
 Chapters/11_Techniques--Testing.md	[SAME+NEW] logic: When the same logic should run against several inputs, write one test and mark it with CODE, as CODE does.
 Chapters/11_Techniques--Testing.md	[SAME] Applying 5% five times produces CODE, so the same assertion written with CODE against CODE fails.
 Chapters/11_Techniques--Testing.md	[SAME] The same approach isolates a database, a message queue, or any other service.
 Chapters/11_Techniques--Testing.md	[SAME] Then write the same test with a hand-written stub in place of the CODE.
 Chapters/11_Techniques--Testing.md	[TWO] Keep session fixtures to immutable values, like CODE, or to a resource with its own reset, and leave anything a test mutates at the default per-test scope.
-Chapters/12_Techniques--Data_Classes_as_Types.md	[ADD] A subscripted generic is callable too, so CODE is legal and produces an empty dict. | after: Calling CODE builds an empty list.
 Chapters/12_Techniques--Data_Classes_as_Types.md	[ADD] For clarity, CODE also excludes CODE from these reports. | after: CODE calls CODE with CODE, so each report lists which of CODE, CODE, CODE, and CODE differ from CODE's versions.
 Chapters/12_Techniques--Data_Classes_as_Types.md	[ADD] State Machines mixes its CODE data class into CODE this way, so each CODE member is also a CODE with CODE and CODE fields. | after: CODE passes the assigned value to the mix-in's CODE, unpacking a tuple into separate arguments, so CODE builds each member the way a constructor call builds an ordinary instance.
 Chapters/12_Techniques--Data_Classes_as_Types.md	[CAN] A handler can read CODE and CODE rather than parsing them from the exception text.
@@ -130,7 +150,6 @@ Chapters/12_Techniques--Data_Classes_as_Types.md	[CAUS] Make CODE work: Make COD
 Chapters/12_Techniques--Data_Classes_as_Types.md	[CAUS] Making Classes Work: This material comes from my PyCon 2022 talk, Making Data Classes Work for You.
 Chapters/12_Techniques--Data_Classes_as_Types.md	[CAUS] make type guarantee: The principle is the same: make the type guarantee its own values.
 Chapters/12_Techniques--Data_Classes_as_Types.md	[CAUS] makes instances unhashable: CODE sets CODE to CODE instead, which makes the instances unhashable.
-Chapters/12_Techniques--Data_Classes_as_Types.md	[CAUS] want agreement checked: Subscript the factory when you want that agreement checked.
 Chapters/12_Techniques--Data_Classes_as_Types.md	[SAME+NEW] call: The same call works from outside the class, so CODE stops an accidental assignment, not a caller determined to change the value.
 Chapters/12_Techniques--Data_Classes_as_Types.md	[SAME] A frozen data class equals another instance of its own class, while a CODE equals any tuple holding the same values.
 Chapters/12_Techniques--Data_Classes_as_Types.md	[SAME] The same call works from outside the class, so CODE stops an accidental assignment, not a caller determined to change the value.
@@ -139,6 +158,8 @@ Chapters/13_Techniques--Pattern_Matching.md	[CAN] A starred name can appear anyw
 Chapters/13_Techniques--Pattern_Matching.md	[CAN] No C-style CODE can express this case:
 Chapters/13_Techniques--Pattern_Matching.md	[CAN] The guard runs after the pattern matches, so it can use the names the pattern bound.
 Chapters/13_Techniques--Pattern_Matching.md	[CAUS] lets implementation decide: For a pattern that fails partway, the language reference lets each implementation decide whether the captures made before the failure stay bound.
+Chapters/13_Techniques--Pattern_Matching.md	[HEAD] union: If you add a type to the union without its CODE, the type checker reports an error at CODE.
+Chapters/13_Techniques--Pattern_Matching.md	[HEAD] union: Then CODE on that union.
 Chapters/13_Techniques--Pattern_Matching.md	[SAME] A keyword pattern matches the same attribute whatever the field order.
 Chapters/13_Techniques--Pattern_Matching.md	[SAME] The compiler enforces the same-names rule.
 Chapters/14_Techniques--Decorators.md	[ADD] A class decorator can also return a replacement class, just as a function decorator returns a replacement function. | after: CODE exists for the side effect of recording the class.
@@ -170,7 +191,8 @@ Chapters/15_Techniques--Context_Managers.md	[CAN] Cleanup can fail.
 Chapters/15_Techniques--Context_Managers.md	[CAUS] lets exception propagate: CODE lets every exception propagate, because its tuple of types to match is empty.
 Chapters/15_Techniques--Context_Managers.md	[CAUS] lets manager work: CODE lets a context manager also work as a decorator, as CODE shows.
 Chapters/15_Techniques--Context_Managers.md	[CAUS] want block suppress: An CODE that catches everything also catches CODE and CODE, so name the types you expect unless you want the block to suppress every exception.
-Chapters/15_Techniques--Context_Managers.md	[SAME+NEW] object: Three tests check what the lease guarantees: the item leaves the pool and comes back, it also comes back when the block raises an exception, and the pool hands out the same object rather than a new one:
+Chapters/15_Techniques--Context_Managers.md	[HEAD] statement: The statement stops at the failing manager, before Python evaluates the managers listed after it.
+Chapters/15_Techniques--Context_Managers.md	[SAME+NEW] object: Three tests check what the lease guarantees: the lease takes an item from the pool and returns it, the lease also returns the item when the block raises an exception, and the pool hands out the same object rather than a new one:
 Chapters/15_Techniques--Context_Managers.md	[SAME] A CODE nested inside another CODE on the same instance saves a second directory.
 Chapters/15_Techniques--Context_Managers.md	[TWO] In CODE, change CODE to CODE, then raise a CODE instead of dividing by zero, and confirm that CODE catches and prints it too.
 Chapters/16_Techniques--Comprehensions.md	[ADD] CODE also stops when it finds a match. | after: Because each consumer takes the values as the generator produces them, memory holds one value at a time.
@@ -181,6 +203,7 @@ Chapters/16_Techniques--Comprehensions.md	[CAN] The CODE clause's target can unp
 Chapters/16_Techniques--Comprehensions.md	[CAUS] lets comprehension accumulate: It lets a comprehension accumulate a value without a separate loop.
 Chapters/16_Techniques--Comprehensions.md	[CAUS] make CODE append: In CODE, make CODE append each argument it receives to a list, then add a second comprehension that produces the same cubes without the walrus.
 Chapters/16_Techniques--Comprehensions.md	[CAUS] make mismatch raise: Pass CODE to make a length mismatch raise a CODE instead of silently truncating.
+Chapters/16_Techniques--Comprehensions.md	[HEAD] expression: It can nest more CODE and CODE clauses, or sit inside another call, but each addition makes the expression harder to read.
 Chapters/16_Techniques--Comprehensions.md	[SAME+NEW] syntax: A *generator expression* uses the same syntax with parentheses instead of brackets, and produces its values one at a time, on demand:
 Chapters/16_Techniques--Comprehensions.md	[SAME] CODE looks like a shorter start on the same matrix.
 Chapters/16_Techniques--Comprehensions.md	[TWO] In CODE, change the comprehension to put CODE on the diagonal instead of CODE, without adding a second pass over the result.
@@ -202,6 +225,18 @@ Chapters/17_Techniques--Metaprogramming.md	[CAUS] makes class refuse: CODE build
 Chapters/17_Techniques--Metaprogramming.md	[CAUS] makes instances callable: Setting CODE from a decorator makes instances callable.
 Chapters/17_Techniques--Metaprogramming.md	[CAUS] making CODE walk: CODE builds each CODE subclass, turning every class-body assignment into a member and making CODE walk them.
 Chapters/17_Techniques--Metaprogramming.md	[CAUS] making interpreter refuse: Older literature claims that making the interpreter refuse subclassing requires a metaclass.
+Chapters/17_Techniques--Metaprogramming.md	[HEAD] checker: CODE makes the checker report an abstract instantiation, and separately makes the runtime refuse one.
+Chapters/17_Techniques--Metaprogramming.md	[HEAD] checker: For a class-building decorator of your own, the checker's rules come from what you declare.
+Chapters/17_Techniques--Metaprogramming.md	[HEAD] checker: For the standard library, the checker's authors wrote those rules into the checker.
+Chapters/17_Techniques--Metaprogramming.md	[HEAD] checker: If you declare a field without a default after one with a default, the checker reports that field before anything runs, while the interpreter raises its own CODE at class creation.
+Chapters/17_Techniques--Metaprogramming.md	[HEAD] checker: In the fourth family, a library enforces the checker's types at runtime.
+Chapters/17_Techniques--Metaprogramming.md	[HEAD] checker: Now the runtime and the checker agree.
+Chapters/17_Techniques--Metaprogramming.md	[HEAD] checker: The checker cannot represent a class built any other way, because it neither imports nor executes your code.
+Chapters/17_Techniques--Metaprogramming.md	[HEAD] checker: The checker learns about a class from two sources alone: the constructs it recognizes and emulates, and what you declare.
+Chapters/17_Techniques--Metaprogramming.md	[HEAD] checker: The checker synthesizes CODE from the field declarations, as it does for CODE.
+Chapters/17_Techniques--Metaprogramming.md	[HEAD] checker: The checker takes that statement on trust.
+Chapters/17_Techniques--Metaprogramming.md	[HEAD] checker: Where does the checker get its rules for CODE?
+Chapters/17_Techniques--Metaprogramming.md	[HEAD] statement: Without validation, that statement breaks out of the CODE block and runs anything.
 Chapters/17_Techniques--Metaprogramming.md	[SAME+NEW] mistake: The static half of the check is ruff's report of the same mistake.
 Chapters/17_Techniques--Metaprogramming.md	[SAME] Explain why no class decorator can achieve the same thing.
 Chapters/17_Techniques--Metaprogramming.md	[TWO] From then on, every read and write routes through the descriptor instead of going to the instance's CODE.
@@ -230,6 +265,8 @@ Chapters/18_Techniques--Performance.md	[CAN] With millions of objects, per-objec
 Chapters/18_Techniques--Performance.md	[CAUS] let engine arrange: That whole-array expression is the declarative style Confidence examines: describe the whole-array result and let the engine arrange the steps.
 Chapters/18_Techniques--Performance.md	[CAUS] let measurement justify: That is a micro-optimization, so let a measurement justify it:
 Chapters/18_Techniques--Performance.md	[CAUS] letting views go: Release every view before resizing the buffer it reads, either with CODE or by letting the views go out of scope.
+Chapters/18_Techniques--Performance.md	[HEAD] point: CODE holds the bytes still allocated at that point, and CODE holds the most the block allocated at once.
+Chapters/18_Techniques--Performance.md	[HEAD] point: Past that point the process fails outright, with CODE or an OS kill.
 Chapters/18_Techniques--Performance.md	[SAME+NEW] file: The interpreter runs the same file and executes its busiest paths as machine code.
 Chapters/18_Techniques--Performance.md	[SAME+NEW] floats: CODE compares an CODE against a CODE of the same floats.
 Chapters/18_Techniques--Performance.md	[SAME+NEW] immutability: CODE removes that CODE, so pairing it with CODE gives you the same immutability in a fraction of the space.
@@ -267,6 +304,11 @@ Chapters/19_Techniques--Concurrency.md	[CAUS] Make group wait: Make a group of t
 Chapters/19_Techniques--Concurrency.md	[CAUS] force task give: No way to force a task to give up what it holds
 Chapters/19_Techniques--Concurrency.md	[CAUS] makes concurrency look: This chapter makes concurrency look (somewhat) easy because it has touched only the surface of shared mutable state problems.
 Chapters/19_Techniques--Concurrency.md	[CAUS] need tricks work: Engineers no longer need tricks to work around the threading system.
+Chapters/19_Techniques--Concurrency.md	[HEAD] boundary: Arguments and results cross that boundary by copying.
+Chapters/19_Techniques--Concurrency.md	[HEAD] loop: ** CODE freezes every task on the loop, not just the calling task.
+Chapters/19_Techniques--Concurrency.md	[HEAD] loop: CODE, CODE, and the Event Loop claims that a real request "asks the loop to watch a socket for the reply."
+Chapters/19_Techniques--Concurrency.md	[HEAD] loop: The tempting fix is a lock inside the loop:
+Chapters/19_Techniques--Concurrency.md	[HEAD] loop: When the timer expires, the loop resumes that task where it suspended, just after the CODE.
 Chapters/19_Techniques--Concurrency.md	[SAME+NEW] deadline: A CODE nested inside its CODE block falls under the same deadline:
 Chapters/19_Techniques--Concurrency.md	[SAME+NEW] problem: Testing meets the same problem with its CODE and CODE parameters, and solves it by injection.
 Chapters/19_Techniques--Concurrency.md	[SAME+NEW] work: Every number is present, so the output looks right until you notice the same work ran eight times.
@@ -289,6 +331,10 @@ Chapters/20_Patterns--Rethinking_Objects.md	[CAUS] let code live: They let code 
 Chapters/20_Patterns--Rethinking_Objects.md	[CAUS] make CODE obey: In CODE, make CODE obey the Liskov Substitution Principle without removing the limit: keep the base contract that CODE always succeeds, and expose "full" some other way.
 Chapters/20_Patterns--Rethinking_Objects.md	[CAUS] make immutability go: Who, then, must make immutability go all the way down?
 Chapters/20_Patterns--Rethinking_Objects.md	[CAUS] makes checker report: A distinct type per concept makes the type checker report this mismatch.
+Chapters/20_Patterns--Rethinking_Objects.md	[HEAD] checker: CODE and CODE are different types to the checker.
+Chapters/20_Patterns--Rethinking_Objects.md	[HEAD] checker: The checker treats them as interchangeable:
+Chapters/20_Patterns--Rethinking_Objects.md	[HEAD] class: Now the internals are safe, but the class needs private fields, getters, and defensive copies, all to stop other code from changing your data.
+Chapters/20_Patterns--Rethinking_Objects.md	[HEAD] class: When you fetch it from the class instead of from an instance, CODE is an ordinary function, and the call passes CODE as the first argument.
 Chapters/20_Patterns--Rethinking_Objects.md	[SAME] The getter returns a reference to the same list the underscore hides, not a view or a snapshot of it.
 Chapters/20_Patterns--Rethinking_Objects.md	[SAME] The same independence hides membership.
 Chapters/20_Patterns--Rethinking_Objects.md	[TWO] A method must also behave the way callers expect: return a description rather than raise an exception, finish rather than block, describe the object rather than change it.
@@ -330,6 +376,8 @@ Chapters/23_Patterns--Singleton.md	[CAN] Concurrent first calls can each run the
 Chapters/23_Patterns--Singleton.md	[CAN] Each caller can end up holding a different object.
 Chapters/23_Patterns--Singleton.md	[CAN] What does the change give up, and which failure from Tests, Threads, and Locks can no longer occur?
 Chapters/23_Patterns--Singleton.md	[CAUS] want objects sharing: If you want many objects sharing one set of state, use *Borg*, but only when something needs those objects to be class instances: an existing class-based interface, an CODE check, or subclassing.
+Chapters/23_Patterns--Singleton.md	[HEAD] decorator: The decorator and metaclass forms work, but they are more machinery than the problem usually justifies.
+Chapters/23_Patterns--Singleton.md	[HEAD] decorator: The decorator weakens static checking as well.
 Chapters/23_Patterns--Singleton.md	[SAME] After decoration, CODE is CODE, so the same parentheses run CODE.
 Chapters/23_Patterns--Singleton.md	[SAME] CODE gives your module its own name for the same CODE object named by CODE.
 Chapters/23_Patterns--Singleton.md	[SAME] Rethinking Objects shows the same limit for data: a read-only property over an underscore-named field still hands the caller a mutable reference.
@@ -339,6 +387,7 @@ Chapters/24_Patterns--Template_Method.md	[ADD] The decorator also works on a sin
 Chapters/24_Patterns--Template_Method.md	[CAN] Your own code can read it.
 Chapters/24_Patterns--Template_Method.md	[CAUS] makes checker reject: CODE on CODE makes the type checker reject any subclass that overrides it:
 Chapters/24_Patterns--Template_Method.md	[CAUS] want override fail: If you want an override to fail at runtime, the CODE technique also works with methods.
+Chapters/24_Patterns--Template_Method.md	[HEAD] checker: If you leave CODE off the misspelled method, the checker accepts it as a new method, because under the typing rules a subclass can add any method.
 Chapters/24_Patterns--Template_Method.md	[SAME+NEW] choice: You make the same choice between a class and a function when you write a *Strategy*.
 Chapters/25_Patterns--Surrogate.md	[ADD] That annotation also limits the surrogate to implementations of one Protocol, but the generic surrogate exists to accept any implementation. | after: The checker then verifies every implementation that reaches either method.
 Chapters/25_Patterns--Surrogate.md	[ADD] That function bypasses CODE, so a proxy that supplies every method through CODE also fails the CODE check: | after: Since Python 3.12, the check against a CODE CODE uses CODE, which reads the class and instance dictionaries instead of running attribute lookup.
@@ -352,6 +401,12 @@ Chapters/25_Patterns--Surrogate.md	[CAUS] lets checker verify: It also lets the 
 Chapters/25_Patterns--Surrogate.md	[CAUS] make CODE return: Two workarounds make CODE return CODE, and neither checks which methods the proxy supplies:
 Chapters/25_Patterns--Surrogate.md	[CAUS] makes CODE test: A CODE property returning the implementation's class makes CODE test that class in place of CODE.
 Chapters/25_Patterns--Surrogate.md	[CAUS] makes checker accept: In CODE, CODE passes the type checker as written, because a declared CODE makes the type checker accept assignment to any attribute name.
+Chapters/25_Patterns--Surrogate.md	[HEAD] checker: A misspelled CODE passes the checker the same way, and fails at runtime with the implementation's CODE.
+Chapters/25_Patterns--Surrogate.md	[HEAD] checker: Because CODE resolves CODE and returns CODE, the checker accepts any call on CODE.
+Chapters/25_Patterns--Surrogate.md	[HEAD] checker: If CODE declares CODE, the checker rejects CODE, because CODE supplies CODE through CODE.
+Chapters/25_Patterns--Surrogate.md	[HEAD] checker: The checker cannot verify a method that CODE supplies.
+Chapters/25_Patterns--Surrogate.md	[HEAD] checker: The checker then verifies every implementation that reaches either method.
+Chapters/25_Patterns--Surrogate.md	[HEAD] checker: With explicit forwarding, as in CODE, CODE reaches a declared method with a declared return type, and the checker verifies the call.
 Chapters/25_Patterns--Surrogate.md	[SAME+NEW] data: Its CODE returns a second list over the same data and increments a reference count.
 Chapters/25_Patterns--Surrogate.md	[SAME] The same CODE forwarding then reaches the other implementation.
 Chapters/25_Patterns--Surrogate.md	[SAME] The same few lines serve lazy initialization (a virtual proxy), access checks (a protection proxy), or call tracking (a smart reference), over any object.
@@ -390,6 +445,9 @@ Chapters/28_Patterns--Data_Transfer_Objects.md	[ADD] Tuples and dictionaries can
 Chapters/28_Patterns--Data_Transfer_Objects.md	[CAN] A function that computes two results can return them in a CODE:
 Chapters/28_Patterns--Data_Transfer_Objects.md	[CAN] Tuples and dictionaries can carry them too, but both rely on indexing.
 Chapters/28_Patterns--Data_Transfer_Objects.md	[CAUS] requires consumer keep: A tuple requires the consumer to keep track of numerical order.
+Chapters/28_Patterns--Data_Transfer_Objects.md	[HEAD] class: A CODE inherits its equality from CODE, which compares elements by position and ignores the class.
+Chapters/28_Patterns--Data_Transfer_Objects.md	[HEAD] class: A subclass that declares no CODE gives each instance a CODE, and with it the ability to grow attributes beyond the ones the class declares.
+Chapters/28_Patterns--Data_Transfer_Objects.md	[HEAD] class: Instead of annotating every variable that holds a CODE, you can move that CODE into the class.
 Chapters/28_Patterns--Data_Transfer_Objects.md	[SAME] Any tuple-shaped value with the same contents compares equal, including a different CODE class with the same shape:
 Chapters/29_Patterns--Changing_the_Interface.md	[ADD] CODE also changes the parameter's type, from CODE to CODE. | after: The rename is the smaller of the two changes.
 Chapters/29_Patterns--Changing_the_Interface.md	[CAN] An *Abstract Factory* can work with a *Façade* to create the subsystem's objects without specifying their concrete classes.
@@ -419,10 +477,12 @@ Chapters/30_Patterns--Observer.md	[CAUS] make CODE advance: Change the rule for 
 Chapters/30_Patterns--Observer.md	[CAUS] makes checker reject: The CODE CODE alias makes the type checker reject a synchronous function as a responder.
 Chapters/30_Patterns--Observer.md	[CAUS] makes claim match: CODE makes the checker's claim match the runtime CODE.
 Chapters/30_Patterns--Observer.md	[CAUS] makes observer depend: Reading from the subject makes each observer depend on the subject's interface.
+Chapters/30_Patterns--Observer.md	[HEAD] checker: CODE makes the checker's claim match the runtime CODE.
+Chapters/30_Patterns--Observer.md	[HEAD] checker: The checker accepts CODE because CODE fits that parameter.
 Chapters/30_Patterns--Observer.md	[SAME] A second lambda with the same text is a different object, so CODE raises a CODE.
 Chapters/30_Patterns--Observer.md	[SAME] CODE loops over the tuple directly, since the tuple holds the same responders for the whole loop.
 Chapters/30_Patterns--Observer.md	[SAME] Cells with the same CODE share a color.
-Chapters/30_Patterns--Observer.md	[SAME] The same misspelling on a CODE produces an CODE error.
+Chapters/30_Patterns--Observer.md	[SAME] The same misspelling on a CODE produces a CODE error.
 Chapters/30_Patterns--Observer.md	[TWO] A weak reference lets Python collect its target, so Python collects the bound method as soon as CODE returns, and that leaves the weak reference dead.
 Chapters/30_Patterns--Observer.md	[TWO] Concurrency means each responder finishes as soon as its own wait ends, so the faster responder prints first.
 Chapters/30_Patterns--Observer.md	[TWO] Connect a second view to CODE's CODE: one that prints a bar of asterisks as long as the count, beside the CODE that prints the number.
@@ -438,9 +498,12 @@ Chapters/32_Patterns--Multiple_Dispatching.md	[CAN] A table cell can hold a func
 Chapters/32_Patterns--Multiple_Dispatching.md	[CAN] Code that combines several interacting types can end up with a type test for every combination.
 Chapters/32_Patterns--Multiple_Dispatching.md	[CAN] Typeshed can do that because it gives CODE a type that inherits from CODE.
 Chapters/32_Patterns--Multiple_Dispatching.md	[CAUS] make cells read: Then give CODE a CODE attribute and make the CODE and CODE cells read it.
+Chapters/32_Patterns--Multiple_Dispatching.md	[HEAD] version: Build that version.
 Chapters/32_Patterns--Multiple_Dispatching.md	[SAME] CODE matches the CODE pattern, though the table lookup in CODE raises a CODE for the same subclass.
 Chapters/32_Patterns--Multiple_Dispatching.md	[TWO] Use the method version when the behavior for a combination belongs to the class rather than to the pairing: when it reads the object's own state, or when a subclass should be able to override one combination and inherit the rest.
 Chapters/33_Patterns--Visitor.md	[CAN] To keep the operations in its own methods, a Python visitor can build the method name from the element's class, as CODE does.
+Chapters/33_Patterns--Visitor.md	[HEAD] checker: Both the runtime and the checker accept the CODE call on that subclass, so a forgotten registration quietly returns the default's CODE string.
+Chapters/33_Patterns--Visitor.md	[HEAD] table: When both types must resolve together at runtime, use the table from *Multiple Dispatching*, keyed by a tuple of types.
 Chapters/33_Patterns--Visitor.md	[SAME+NEW] conclusion: Pattern Refactoring draws the same conclusion from its CODE example.
 Chapters/33_Patterns--Visitor.md	[SAME] Pattern Refactoring draws the same conclusion from its CODE example.
 Chapters/34_Patterns--Composite_and_Interpreter.md	[ADD] A walker that needs the pieces at every level must therefore also recurse into any value that is a CODE. | after: Nesting, not CODE, produces a CODE-valued interpolation.
@@ -469,6 +532,7 @@ Chapters/35_Patterns--Flyweight.md	[CAN] Two threads asking for the same new col
 Chapters/35_Patterns--Flyweight.md	[CAN] Two uses of one value can then hold two objects, and an CODE comparison between them answers CODE.
 Chapters/35_Patterns--Flyweight.md	[CAUS] let language hold: If you know the set as you write the program, use an CODE and let the language hold the pool.
 Chapters/35_Patterns--Flyweight.md	[CAUS] needs position takes: An operation that needs the position takes it as an argument.
+Chapters/35_Patterns--Flyweight.md	[HEAD] version: In that version the lookup table behind CODE keeps the tuples as its keys, so CODE raises a CODE.
 Chapters/36_Patterns--Memento.md	[CAN] Holders can share an immutable state instead of copying it.
 Chapters/36_Patterns--Memento.md	[CAN] Old and new versions can then read each other's messages by design.
 Chapters/36_Patterns--Memento.md	[CAN] The class can drift between the save and the load.
@@ -497,6 +561,8 @@ Chapters/38_Patterns--Simulation.md	[CAN] The less each agent's rule uses, the m
 Chapters/38_Patterns--Simulation.md	[CAN] The robot can now move, and CODE replays a string of CODE/CODE/CODE/CODE characters.
 Chapters/38_Patterns--Simulation.md	[CAUS] letting CODE return: Replace that CODE test with a CODE parameter, so the caller says what counts as arriving, and leave the rest of the search as it is, beyond letting CODE return CODE when the search runs out of rooms.
 Chapters/38_Patterns--Simulation.md	[CAUS] makes CODE makes: It makes the same CODE calls CODE makes, so it works in rooms and the moves between them rather than in grid coordinates.
+Chapters/38_Patterns--Simulation.md	[HEAD] check: If you remove the check, the build still stops, at the unpacking CODE.
+Chapters/38_Patterns--Simulation.md	[HEAD] letter: The CODE that unpacking raises says how many values it expected and leaves you to find the letter.
 Chapters/38_Patterns--Simulation.md	[SAME] The rats avoid the same kind of cycle with a CODE.
 Chapters/38_Patterns--Simulation.md	[SAME] The same model drives a graphical view.
 Chapters/38_Patterns--Simulation.md	[TWO] CODE adds a room to CODE when the room enters the queue, rather than when it leaves, so each room enters the queue once.
@@ -525,6 +591,7 @@ Chapters/41_Functional--Toolkits.md	[CAN] CODE shares one unlocked buffer betwee
 Chapters/41_Functional--Toolkits.md	[CAN] More than one branch can reach the same subproblem, and a plain recursive function recomputes it every time.
 Chapters/41_Functional--Toolkits.md	[CAUS] allows one make: Compare the two versions for length, and name the mistakes the loop version allows that the recursive one cannot make.
 Chapters/41_Functional--Toolkits.md	[CAUS] needs item return: On an empty iterable CODE raises CODE, because it needs an item or a starting value to return.
+Chapters/41_Functional--Toolkits.md	[HEAD] method: CODE returns a descriptor, which binds CODE automatically when you access the method on an instance.
 Chapters/41_Functional--Toolkits.md	[SAME+NEW] answer: CODE gives the same answer from two parallel iterables, one per parameter.
 Chapters/41_Functional--Toolkits.md	[SAME+NEW] choice: CODE under CODE offers the same choice.
 Chapters/41_Functional--Toolkits.md	[SAME+NEW] data: Splits one iterable into several independent iterators over the same data, so two consumers can each walk it once without collecting it into a list first.
@@ -547,6 +614,10 @@ Chapters/42_Functional--Error_Handling.md	[CAN] No handler above that clause cat
 Chapters/42_Functional--Error_Handling.md	[CAUS] forces caller check: The type checker also forces a caller to check for the failure before reading the answer.
 Chapters/42_Functional--Error_Handling.md	[CAUS] lets rest propagate: A production version takes the exception types to catch as an argument and lets the rest propagate.
 Chapters/42_Functional--Error_Handling.md	[CAUS] makes caller tell: The type checker makes a caller tell the two apart.
+Chapters/42_Functional--Error_Handling.md	[HEAD] checker: A statement that calls the function and discards the CODE passes the checker.
+Chapters/42_Functional--Error_Handling.md	[HEAD] checker: The CODE parameter forwards the wrapped function's whole parameter list to CODE, so CODE type-checks and the checker rejects CODE.
+Chapters/42_Functional--Error_Handling.md	[HEAD] checker: The checker compares a declared return type with the value of each CODE statement, so a function that always raises an exception satisfies any return type.
+Chapters/42_Functional--Error_Handling.md	[HEAD] clause: Python deletes CODE when that clause ends, whereas CODE at the start of this chapter keeps every result in a list.
 Chapters/42_Functional--Error_Handling.md	[SAME+NEW] value: Reading the CODE field returns the same value.
 Chapters/42_Functional--Error_Handling.md	[SAME] Reading the CODE field returns the same value.
 Chapters/42_Functional--Error_Handling.md	[SAME] This chapter does the same for errors.
@@ -653,6 +724,11 @@ Chapters/A_Effect_Tracking.md	[CAN] CODE can carry the row, so PEP 593 can give 
 Chapters/A_Effect_Tracking.md	[CAN] Each tool can therefore put its own object in the list, and every other tool ignores it.
 Chapters/A_Effect_Tracking.md	[CAN] No metadata can supply the handler half.
 Chapters/A_Effect_Tracking.md	[CAN] The tool can run in three places.
+Chapters/A_Effect_Tracking.md	[HEAD] block: Inside that block the tool would remove CODE from the row.
+Chapters/A_Effect_Tracking.md	[HEAD] checker: That appendix's closing section lists the cases where the checker passes over a call or misreads it as pure, so the row looks complete.
+Chapters/A_Effect_Tracking.md	[HEAD] checker: That checker reports CODE for a call it cannot resolve.
+Chapters/A_Effect_Tracking.md	[HEAD] checker: You declare the row there, and the checker verifies the propagation by checking every CODE in the body against it.
+Chapters/A_Effect_Tracking.md	[HEAD] half: Stateless in Practice shows the limit Python puts on that half.
 Chapters/A_Effect_Tracking.md	[SAME+NEW] limit: Effect Management finds the same limit in Stateless.
 Chapters/A_Effect_Tracking.md	[SAME] A validation library may put its own objects in the same CODE.
 Chapters/A_Effect_Tracking.md	[SAME] Effect Management finds the same limit in Stateless.
@@ -672,6 +748,8 @@ Solutions/03_Foundations--Containers/README.md	[CAN] your file prints CODE and t
 Solutions/03_Foundations--Containers/README.md	[CAN] your file, with no CODE import, prints CODE and CODE, matching CODE's CODE; CODE prints CODE; and you can say how your container differs from a CODE after that read.
 Solutions/03_Foundations--Containers/README.md	[CAUS] makes CODE depend: Letting the right operand win makes CODE on dictionaries depend on operand order.
 Solutions/03_Foundations--Containers/README.md	[CAUS] makes CODE finishes: At a handful of items the constant-factor overhead of a CODE makes the two times nearly equal, though by CODE the CODE finishes several times faster.
+Solutions/03_Foundations--Containers/README.md	[HEAD] list: At large CODE the list's quadratic term dominates, so the list falls further behind the CODE as CODE grows.
+Solutions/03_Foundations--Containers/README.md	[HEAD] list: The same error appears in the other direction, as CODE, when the list is shorter than the target list.
 Solutions/03_Foundations--Containers/README.md	[SAME+NEW] arguments: ** CODE takes the same arguments CODE does: an iterable of two-item pairs, keyword arguments, or another mapping.
 Solutions/03_Foundations--Containers/README.md	[SAME+NEW] constructor: CODE feeds the same constructor from two parallel sequences, as CODE.
 Solutions/03_Foundations--Containers/README.md	[SAME] If you index instead, writing CODE, the program prints the same CODE.
@@ -682,6 +760,7 @@ Solutions/04_Foundations--Control_Flow/README.md	[SAME+NEW] element: At position
 Solutions/04_Foundations--Control_Flow/README.md	[SAME+NEW] one: The prediction is the "direct cause" line, the same one CODE produces.
 Solutions/04_Foundations--Control_Flow/README.md	[SAME] Called at the top level, outside any CODE, the same call ends in a traceback whose last line is CODE.
 Solutions/05_Foundations--Functions/README.md	[CAUS] lets CODE collect: The CODE also lets CODE collect a keyword called CODE, so CODE stores a fact called CODE.
+Solutions/05_Foundations--Functions/README.md	[HEAD] body: Put CODE there, ahead of CODE, and test it in the body.
 Solutions/05_Foundations--Functions/README.md	[SAME+NEW] distinction: The built-in CODE makes the same distinction.
 Solutions/05_Foundations--Functions/README.md	[SAME+NEW] list: Each call keeps appending to the same list.
 Solutions/05_Foundations--Functions/README.md	[SAME+NEW] parameter: ** CODE fills CODE by position, and the keyword CODE names the same parameter, so CODE gets two values.
@@ -699,10 +778,16 @@ Solutions/07_Foundations--Classes/README.md	[SAME] Python runs a base-class meth
 Solutions/08_Foundations--Static_Types/README.md	[ADD] A reader looks for the value there too. | after: The definition is therefore the one place to put a value into the constant.
 Solutions/08_Foundations--Static_Types/README.md	[ADD] The alias also keeps the message short and puts the allowed set in one place to change. | after: The diagnostic names the alias rather than the union behind it, so you follow CODE to its CODE statement to find the four permitted strings.
 Solutions/08_Foundations--Static_Types/README.md	[ADD] The call also fails at run time with an CODE, because CODE calls CODE. | after: If you name CODE's method CODE, as the chapter's CODE does, CODE rejects CODE with an CODE, reporting that protocol member CODE is not defined on type CODE.
-Solutions/08_Foundations--Static_Types/README.md	[ADD] The call also fails at run time with an CODE, because CODE has set the attribute to CODE. | after: CODE then reports an CODE on CODE.
+Solutions/08_Foundations--Static_Types/README.md	[ADD] The call also fails at run time with an CODE, because CODE has set the attribute to CODE. | after: CODE then reports CODE on CODE.
 Solutions/08_Foundations--Static_Types/README.md	[ADD] The call also fails at run time with an CODE. | after: If you keep the CODE call, CODE reports CODE, since a tuple has no CODE.
 Solutions/08_Foundations--Static_Types/README.md	[CAUS] makes check report: Calling CODE on CODE inside the CODE instead makes the check report CODE.
 Solutions/08_Foundations--Static_Types/README.md	[CAUS] makes check report: Renaming CODE's method to CODE, as CODE names its method, makes the check report CODE on that call.
+Solutions/08_Foundations--Static_Types/README.md	[HEAD] checker: A truthiness test narrows the same way, so the checker accepts it.
+Solutions/08_Foundations--Static_Types/README.md	[HEAD] checker: Narrowing shows the checker keeping a narrowing of CODE although CODE can change that attribute.
+Solutions/08_Foundations--Static_Types/README.md	[HEAD] checker: The checker accepts any operation on an CODE value, so every expression built on that value passes.
+Solutions/08_Foundations--Static_Types/README.md	[HEAD] checker: The checker therefore accepts CODE on the result.
+Solutions/08_Foundations--Static_Types/README.md	[HEAD] checker: Use CODE from CODE on CODE with and without the default, and compare what the checker reports.
+Solutions/08_Foundations--Static_Types/README.md	[HEAD] checker: Variance shows the checker refusing a CODE where the parameter requires a CODE.
 Solutions/08_Foundations--Static_Types/README.md	[SAME+NEW] answer: The same answer applies: test for the condition you mean.
 Solutions/08_Foundations--Static_Types/README.md	[SAME+NEW] argument: A CODE parameter refuses the same argument because CODE is invariant.
 Solutions/08_Foundations--Static_Types/README.md	[SAME] A CODE parameter refuses the same argument because CODE is invariant.
@@ -710,6 +795,12 @@ Solutions/08_Foundations--Static_Types/README.md	[SAME] So give a default to a c
 Solutions/08_Foundations--Static_Types/README.md	[SAME] The same answer applies: test for the condition you mean.
 Solutions/09_Foundations--Class_Attributes/README.md	[CAUS] makes CODE report: Removing the CODE makes CODE report CODE on CODE.
 Solutions/09_Foundations--Class_Attributes/README.md	[CAUS] makes CODE report: Restoring CODE on CODE makes CODE report CODE on the CODE line.
+Solutions/09_Foundations--Class_Attributes/README.md	[HEAD] attribute: **Create the attribute from outside.
+Solutions/09_Foundations--Class_Attributes/README.md	[HEAD] attribute: **Declare the attribute without creating it.
+Solutions/09_Foundations--Class_Attributes/README.md	[HEAD] attribute: A bare annotation is safe when the code that assigns the attribute runs before any code that reads it.
+Solutions/09_Foundations--Class_Attributes/README.md	[HEAD] attribute: An assignment creates the attribute, so CODE on the instance shows what exists.
+Solutions/09_Foundations--Class_Attributes/README.md	[HEAD] checker: **Read the checker's report.
+Solutions/09_Foundations--Class_Attributes/README.md	[HEAD] checker: The fix names the class on the left of CODE, and removing the CODE shows what the checker reports about the write.
 Solutions/09_Foundations--Class_Attributes/README.md	[SAME+NEW] code: When one shared table is the intent, as in a registry of subclasses, the same code is correct.
 Solutions/10_Foundations--Cleanup/README.md	[ADD] The collector then also runs on its own schedule, triggered by allocation counts, so an automatic pass can in principle reclaim the cycle at any allocation after CODE returns. | after: ** Removing the CODE/CODE pair takes away the guarantee about when the finalizers run.
 Solutions/10_Foundations--Cleanup/README.md	[CAUS] Let collector run: **Let the collector run on its own.
@@ -723,11 +814,13 @@ Solutions/11_Techniques--Testing/README.md	[CAUS] makes test fail: Renaming CODE
 Solutions/11_Techniques--Testing/README.md	[TWO] ** CODE still passes, because it hands the dependency in instead of naming it, and CODE calls the fetcher it receives.
 Solutions/12_Techniques--Data_Classes_as_Types/README.md	[CAN] The CODE silences that report so the listing can show what the constructor does with each value at runtime.
 Solutions/12_Techniques--Data_Classes_as_Types/README.md	[CAUS] Let types validate: **Let the field types validate.
-Solutions/12_Techniques--Data_Classes_as_Types/README.md	[CAUS] makes CODE report: Changing the subscripted factory to CODE makes CODE report CODE; swapping the bare CODE for CODE passes the check.
-Solutions/12_Techniques--Data_Classes_as_Types/README.md	[CAUS] want checker confirm: Subscript the factory when you want the checker to confirm the agreement.
 Solutions/12_Techniques--Data_Classes_as_Types/README.md	[SAME] A CODE Cannot Validate Itself shows the same failure in its third test.
 Solutions/12_Techniques--Data_Classes_as_Types/README.md	[TWO] That gap is worse than no check, because the type now looks like it guarantees its values.
 Solutions/13_Techniques--Pattern_Matching/README.md	[CAN] The value position in a mapping pattern holds a pattern, so it can hold another mapping pattern, as Patterns Nest shows.
+Solutions/13_Techniques--Pattern_Matching/README.md	[HEAD] checker: If you add CODE to the union and run CODE before adding either CODE, the checker reports two diagnostics, one per function that matches on the union:
+Solutions/13_Techniques--Pattern_Matching/README.md	[HEAD] pattern: For the first fix, put the constant in a namespace so the pattern is a dotted name.
+Solutions/13_Techniques--Pattern_Matching/README.md	[HEAD] pattern: The pattern matches CODE as it matches any value, and binds that value to a local named CODE inside CODE.
+Solutions/13_Techniques--Pattern_Matching/README.md	[HEAD] pattern: When "singleton" must mean a CODE alone, wrap the pattern in a class pattern.
 Solutions/14_Techniques--Decorators/README.md	[CAN] A class decorator that returns the class it received can observe and record.
 Solutions/14_Techniques--Decorators/README.md	[CAN] CODE returns its argument the same way, so the two decorators can do the same kinds of work.
 Solutions/14_Techniques--Decorators/README.md	[CAUS] Make attempt unguarded: **Make the last attempt unguarded.
@@ -743,6 +836,7 @@ Solutions/16_Techniques--Comprehensions/README.md	[TWO] The later CODE leaves CO
 Solutions/17_Techniques--Metaprogramming/README.md	[CAUS] Need Metaclass requires: Python calls CODE on the metaclass before any class object exists, so the solution keeps the decorator, as When You Still Need a Metaclass requires.
 Solutions/17_Techniques--Metaprogramming/README.md	[CAUS] lets checker accept: With no class to name as the type of CODE, the annotation uses CODE, which lets the type checker accept CODE.
 Solutions/17_Techniques--Metaprogramming/README.md	[CAUS] makes CODE print: with the check removed, your payload makes CODE print the injected statement's output, with no CODE, before the final lookup fails with a CODE.
+Solutions/17_Techniques--Metaprogramming/README.md	[HEAD] header: The static diagnostic tells you which two bases collided and why, at the moment you type the header, before Python first imports the module.
 Solutions/17_Techniques--Metaprogramming/README.md	[SAME+NEW] limit: The CODE line shows the same limit for the namespace.
 Solutions/17_Techniques--Metaprogramming/README.md	[SAME+NEW] lines: If you write it, the script prints the same lines, but CODE reports CODE.
 Solutions/17_Techniques--Metaprogramming/README.md	[SAME] If you write it, the script prints the same lines, but CODE reports CODE.
@@ -758,6 +852,9 @@ Solutions/18_Techniques--Performance/README.md	[TWO] CPython stops applying it a
 Solutions/18_Techniques--Performance/README.md	[TWO] You can give three reasons the two runs differ by about as much as run-to-run noise.
 Solutions/19_Techniques--Concurrency/README.md	[CAN] The order in which the six jobs enter the queue can therefore vary, but CODE orders its items by comparing the tuples.
 Solutions/19_Techniques--Concurrency/README.md	[CAUS] Let task finish: **Let one task finish first.
+Solutions/19_Techniques--Concurrency/README.md	[HEAD] line: At runtime the line raises a CODE before any price comes back:
+Solutions/19_Techniques--Concurrency/README.md	[HEAD] line: CODE rejects the line before anything runs:
+Solutions/19_Techniques--Concurrency/README.md	[HEAD] point: CODE is unbound at that point, so the line raises an CODE right after the CODE line.
 Solutions/19_Techniques--Concurrency/README.md	[SAME+NEW] end: A free-threaded build reaches the same end by removing the GIL instead of multiplying it, so its ordinary threads run on several processors at once.
 Solutions/19_Techniques--Concurrency/README.md	[SAME+NEW] mistake: CODE checks for a matching acquire, so a release without one raises CODE A semaphore's count can climb past its starting value, so the same mistake lifts the count to two and silently admits a second holder.
 Solutions/19_Techniques--Concurrency/README.md	[SAME] A run with CODE prints the same six lines in the same order.
@@ -769,6 +866,10 @@ Solutions/20_Patterns--Rethinking_Objects/README.md	[CAUS] allows answers weaken
 Solutions/20_Patterns--Rethinking_Objects/README.md	[CAUS] make immutability go: The author of each class must make immutability go all the way down, one field at a time, because CODE freezes a single level.
 Solutions/20_Patterns--Rethinking_Objects/README.md	[CAUS] make immutability go: You can also name who must make immutability go all the way down, and how many levels CODE freezes.
 Solutions/20_Patterns--Rethinking_Objects/README.md	[CAUS] make types distinct: The two CODE declarations make the two return types distinct, so the type checker now rejects a weight where CODE declares a price.
+Solutions/20_Patterns--Rethinking_Objects/README.md	[HEAD] checker: CODE requires CODE, the type with no values, so the checker reports the mismatch.
+Solutions/20_Patterns--Rethinking_Objects/README.md	[HEAD] checker: Remove your new CODE and read the type the checker reports for the argument of CODE.
+Solutions/20_Patterns--Rethinking_Objects/README.md	[HEAD] checker: The checker reports a forgotten case before the program runs.
+Solutions/20_Patterns--Rethinking_Objects/README.md	[HEAD] checker: With that case commented out, the checker reports CODE at CODE, with the inferred type CODE.
 Solutions/20_Patterns--Rethinking_Objects/README.md	[SAME+NEW] steps: The same steps on your CODE version print CODE.
 Solutions/20_Patterns--Rethinking_Objects/README.md	[SAME] The same steps on your CODE version print CODE.
 Solutions/21_Patterns--Design_Patterns/README.md	[SAME+NEW] function: When the same function appears in three consecutive commits, the history shows the axis for you.
@@ -782,6 +883,11 @@ Solutions/23_Patterns--Singleton/README.md	[ADD] The chapter's CODE takes the lo
 Solutions/23_Patterns--Singleton/README.md	[CAN] In the chapter's version, two threads racing the first construction can each see the CODE sentinel and each build an inner object.
 Solutions/23_Patterns--Singleton/README.md	[CAUS] makes Python call: You can say what CODE returns and why that makes Python call CODE on every construction.
 Solutions/23_Patterns--Singleton/README.md	[CAUS] makes point declares: Martelli makes the same point in the article the chapter links: a subclass that needs state of its own declares it.
+Solutions/23_Patterns--Singleton/README.md	[HEAD] body: **Order only the body.
+Solutions/23_Patterns--Singleton/README.md	[HEAD] body: A call to CODE takes three steps: CODE looks for a stored result, on a miss the body runs, and CODE stores what the body returns.
+Solutions/23_Patterns--Singleton/README.md	[HEAD] body: Compare the order of the three steps in a cached call, the lookup, the body, and the store, with where the lock sits.
+Solutions/23_Patterns--Singleton/README.md	[HEAD] body: Each thread that missed then waits for the lock and runs the body in turn.
+Solutions/23_Patterns--Singleton/README.md	[HEAD] body: The lock sits inside the body, so it orders only the second step.
 Solutions/23_Patterns--Singleton/README.md	[SAME+NEW] dict: CODE creates a second name for the same dict in your module's namespace.
 Solutions/23_Patterns--Singleton/README.md	[SAME+NEW] failure: When You Want a Class, Cache the Instance shows the same failure with CODE, so the solution keeps CODE's signature empty and sets the size in its body.
 Solutions/23_Patterns--Singleton/README.md	[SAME+NEW] point: Martelli makes the same point in the article the chapter links: a subclass that needs state of its own declares it.
@@ -797,6 +903,8 @@ Solutions/24_Patterns--Template_Method/README.md	[CAN] The base class can declar
 Solutions/24_Patterns--Template_Method/README.md	[CAN] To declare that a subclass must supply the step, the base class can inherit from CODE and mark CODE with CODE.
 Solutions/24_Patterns--Template_Method/README.md	[CAUS] lets subclass be: The empty CODE lets a subclass that carries data be a record, as Rethinking Objects explains.
 Solutions/24_Patterns--Template_Method/README.md	[CAUS] makes checker report: You can name a base-class change that makes the type checker report one subclass, and say why the type checker accepts the other.
+Solutions/24_Patterns--Template_Method/README.md	[HEAD] class: The type checker accepts the class too.
+Solutions/24_Patterns--Template_Method/README.md	[HEAD] list: For the type checker to catch CODE, the base class must state which exceptions a step may raise, and the checker must compare every override with that list.
 Solutions/24_Patterns--Template_Method/README.md	[SAME+NEW] completes: Under your narrowed check the same class completes, while a subclass defining CODE still fails with CODE.
 Solutions/24_Patterns--Template_Method/README.md	[SAME+NEW] rule: *Singleton* applies the same rule in its eager creation: construction finishes before any code uses the object.
 Solutions/24_Patterns--Template_Method/README.md	[SAME] *Singleton* applies the same rule in its eager creation: construction finishes before any code uses the object.
@@ -808,6 +916,8 @@ Solutions/25_Patterns--Surrogate/README.md	[CAUS] makes surrogate accepts: CODE 
 Solutions/25_Patterns--Surrogate/README.md	[SAME+NEW] design: GoF's image proxy is the same design.
 Solutions/26_Patterns--Factory/README.md	[CAUS] let CODE append: If you put the check in CODE and let CODE append freely, the call CODE succeeds, so the demo's CODE raises an CODE ("no exception raised").
 Solutions/26_Patterns--Factory/README.md	[CAUS] makes CODE report: Keying the table on the decorated function's CODE makes CODE report CODE.
+Solutions/26_Patterns--Factory/README.md	[HEAD] call: If you call CODE without CODE, the call builds a generator and discards it, so its body never runs.
+Solutions/26_Patterns--Factory/README.md	[HEAD] call: The new CODE in CODE works when you call CODE, but the original demo never makes that call.
 Solutions/26_Patterns--Factory/README.md	[SAME] The chapter's CODE relies on the same timing.
 Solutions/26_Patterns--Factory/README.md	[SAME] The decorated form gains the same openness the registries gain.
 Solutions/27_Patterns--Function_Objects/README.md	[CAN] A finder can have more than one way to fail, and each failing CODE states its own reason.
@@ -818,6 +928,8 @@ Solutions/28_Patterns--Data_Transfer_Objects/README.md	[ADD] The call sites also
 Solutions/28_Patterns--Data_Transfer_Objects/README.md	[ADD] The type checker reports the assignment too, as CODE shows for CODE. | after: If you assign a longer list to the field, as in CODE, Python raises an CODE with the message CODE.
 Solutions/28_Patterns--Data_Transfer_Objects/README.md	[ADD] The wider annotation also lets CODE type-check, so a tuple of the wrong length gets past the type checker. | after: CODE takes a tuple of any length, so CODE reports CODE for the two-element annotation, citing the Liskov Substitution Principle.
 Solutions/28_Patterns--Data_Transfer_Objects/README.md	[CAN] The swapped CODE still type-checks and prints CODE, and you can name two mistakes the checker still reports.
+Solutions/28_Patterns--Data_Transfer_Objects/README.md	[HEAD] checker: The checker cannot catch the mistake this exercise examines: swapping CODE and CODE.
+Solutions/28_Patterns--Data_Transfer_Objects/README.md	[HEAD] checker: The swapped CODE still type-checks and prints CODE, and you can name two mistakes the checker still reports.
 Solutions/28_Patterns--Data_Transfer_Objects/README.md	[SAME+NEW] value: CODE becomes CODE, the same value labeled by its position instead of its meaning.
 Solutions/28_Patterns--Data_Transfer_Objects/README.md	[SAME+NEW] values: A CODE is a tuple with labels, so it works with any code that expects a tuple and compares equal to any tuple holding the same values.
 Solutions/28_Patterns--Data_Transfer_Objects/README.md	[SAME] CODE becomes CODE, the same value labeled by its position instead of its meaning.
@@ -827,7 +939,6 @@ Solutions/29_Patterns--Changing_the_Interface/README.md	[CAUS] makes Python call
 Solutions/29_Patterns--Changing_the_Interface/README.md	[SAME+NEW] decorator: The same decorator accepts a class.
 Solutions/29_Patterns--Changing_the_Interface/README.md	[SAME] The same decorator accepts a class.
 Solutions/30_Patterns--Observer/README.md	[ADD] A first responder that raises CODE also ends up in the group, with the second value still recorded. | after: Removing CODE fails it, since a bare CODE escapes CODE.
-Solutions/30_Patterns--Observer/README.md	[ADD] A test creates its own thermometer and registers against it, so each test has a registry of its own too. | after: In that form, CODE and CODE each announce to their own responders.
 Solutions/30_Patterns--Observer/README.md	[ADD] CODE is also the value type in CODE's CODE tuple, CODE. | after: A subclass whose fields have different types declares CODE, and its responders narrow the value after checking the name.
 Solutions/30_Patterns--Observer/README.md	[ADD] The chapter's CODE also records each key in a CODE model, and a second view connects to CODE the same way. | after: This copy of CODE drives the CODE alone, since the exercise concerns views on the CODE.
 Solutions/30_Patterns--Observer/README.md	[ADD] The type checker then rejects CODE, and CODE as well, since CODE has no CODE. | after: If you remove the two CODE declarations, the declared return type is the union.
@@ -841,6 +952,7 @@ Solutions/31_Patterns--State_Machines/README.md	[CAN] Make the inputs a CODE, so
 Solutions/31_Patterns--State_Machines/README.md	[CAUS] Let mood pick: **Let each mood pick its successor.
 Solutions/31_Patterns--State_Machines/README.md	[CAUS] let condition read: Put a guarded rule for the heavy load ahead of an unconditional rule, and let the condition read the load from the machine.
 Solutions/31_Patterns--State_Machines/README.md	[CAUS] makes caller read: The enum design makes the states visible and nameable: a caller can read CODE, print it, and compare it with CODE.
+Solutions/31_Patterns--State_Machines/README.md	[HEAD] key: A Vending Machine explains that the engine looks up CODE as the key, so an instance of a subclass of an input type finds the rules filed under the subclass and passes over the base class's rules.
 Solutions/31_Patterns--State_Machines/README.md	[SAME] Where exercise 1's CODE swaps in a whole CODE object through CODE, this machine reaches the same moods by returning the next member from a transition function.
 Solutions/32_Patterns--Multiple_Dispatching/README.md	[ADD] A subclass of one weapon can also override one combination there and inherit the rest, where the grid matches types exactly and needs a row and a column for the subclass. | after: Its CODE methods receive the competing objects, so a weapon whose result depends on its state fits there, while this grid needs exercise 9's callable cells.
 Solutions/32_Patterns--Multiple_Dispatching/README.md	[ADD] Whatever CODE reads, CODE reads too, from the same two objects. | after: A cell holding a function answers that reason.
@@ -854,6 +966,9 @@ Solutions/33_Patterns--Visitor/README.md	[ADD] Because CODE works from any modul
 Solutions/33_Patterns--Visitor/README.md	[CAN] The CODE comment suppresses the checker's report on the CODE call so the listing can show the runtime failure.
 Solutions/33_Patterns--Visitor/README.md	[CAN] You lose the visitor as an object that a variable can hold and a caller can pass to another function.
 Solutions/33_Patterns--Visitor/README.md	[CAUS] lets program choose: A CODE keyed by operation name lets a program choose an operation at runtime, as a CODE hierarchy does, without the classes.
+Solutions/33_Patterns--Visitor/README.md	[HEAD] checker: The CODE call then passes the checker, since CODE is a CODE.
+Solutions/33_Patterns--Visitor/README.md	[HEAD] checker: The CODE comment suppresses the checker's report on the CODE call so the listing can show the runtime failure.
+Solutions/33_Patterns--Visitor/README.md	[HEAD] checker: Under the chapter's CODE version, the checker accepts the same call.
 Solutions/33_Patterns--Visitor/README.md	[SAME] Under the chapter's CODE version, the checker accepts the same call.
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	[ADD] Both functions also return normally on a tree holding CODE, a link to its root. | after: CODE passes on your file, and deleting the CODE case from either CODE or CODE brings back a CODE at that function's CODE.
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	[ADD] CODE replaces the two quote characters, CODE and CODE, as well, because its CODE argument defaults to CODE. | after: ** CODE does the replacing, so the exercise comes down to where CODE calls it: on the interpolated values.
@@ -870,6 +985,7 @@ Solutions/35_Patterns--Flyweight/README.md	[CAN] The bug depends on that assignm
 Solutions/35_Patterns--Flyweight/README.md	[CAUS] Let enum hold: **Let the enum hold the pool.
 Solutions/35_Patterns--Flyweight/README.md	[CAUS] make CODE hold: For a *Flyweight*, the duplicate is a bug, because the pattern exists to make CODE hold.
 Solutions/35_Patterns--Flyweight/README.md	[CAUS] makes parse validate: Data Classes as Types makes the same *parse, don't validate* move with CODE.
+Solutions/35_Patterns--Flyweight/README.md	[HEAD] function: ** CODE looks up the key, misses, calls the function, and stores the result.
 Solutions/35_Patterns--Flyweight/README.md	[SAME+NEW] condition: An CODE works under the same condition.
 Solutions/35_Patterns--Flyweight/README.md	[SAME] A direct CODE call makes the same bypass in the chapter.
 Solutions/35_Patterns--Flyweight/README.md	[SAME] An CODE works under the same condition.
@@ -900,6 +1016,9 @@ Solutions/38_Patterns--Simulation/README.md	[CAUS] makes counts agree: on the se
 Solutions/38_Patterns--Simulation/README.md	[SAME] Agitation reads CODE from the start, the same number a perfectly settled plate reports, so the summary statistic cannot tell "finished" from "never started."
 Solutions/38_Patterns--Simulation/README.md	[TWO] The subtraction comes from the physics the chapter's formula approximates, a real plate with free edges rather than a membrane clamped all around its rim.
 Solutions/40_Functional--Foundations/README.md	[CAUS] makes checker reject: That split is the chapter's point: CODE makes the checker reject a rebinding of the name, and the value's own type makes it reject a change to the contents.
+Solutions/40_Functional--Foundations/README.md	[HEAD] checker: For the checker to reject the append, the value's own type must be immutable:
+Solutions/40_Functional--Foundations/README.md	[HEAD] checker: In the scope that assigns the list, the checker narrows the name to the list's own type, so the append still passes.
+Solutions/40_Functional--Foundations/README.md	[HEAD] checker: That split is the chapter's point: CODE makes the checker reject a rebinding of the name, and the value's own type makes it reject a change to the contents.
 Solutions/40_Functional--Foundations/README.md	[SAME+NEW] point: The chapter makes the same point about CODE.
 Solutions/40_Functional--Foundations/README.md	[SAME] Applying the CODE filter first reports the same reading.
 Solutions/40_Functional--Foundations/README.md	[SAME] CODE must keep pointing at the same list forever.
@@ -907,6 +1026,7 @@ Solutions/40_Functional--Foundations/README.md	[SAME] The chapter makes the same
 Solutions/41_Functional--Toolkits/README.md	[ADD] The CODE version also lets a caller pass CODE, which seeds itself from the operating system, and get schedules that differ on every run. | after: The CODE version serves both callers: the first can share one CODE between its two calls, and the second can pass in the program-wide stream.
 Solutions/41_Functional--Toolkits/README.md	[CAN] The CODE version serves both callers: the first can share one CODE between its two calls, and the second can pass in the program-wide stream.
 Solutions/41_Functional--Toolkits/README.md	[CAUS] makes version leaves: You can also name at least two choices the loop makes that the recursive version leaves to its CODE loop and the call stack.
+Solutions/41_Functional--Toolkits/README.md	[HEAD] version: In that version the stack and the argument are one list, so every CODE removes an element from the caller's list.
 Solutions/41_Functional--Toolkits/README.md	[SAME+NEW] problem: ** CODE reports the same problem before the program runs.
 Solutions/41_Functional--Toolkits/README.md	[SAME] ** CODE reports the same problem before the program runs.
 Solutions/41_Functional--Toolkits/README.md	[SAME] On the list passed through CODE, the same diagnostic names the literal's inferred type.

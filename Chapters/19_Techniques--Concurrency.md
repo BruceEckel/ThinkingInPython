@@ -577,7 +577,7 @@ asyncio.run(main())
 `tg.create_task()` schedules a task immediately,
 so all six are in flight together.
 
-The `tasks` dict holds the task objects so the loop after the block can read each outcome.
+The `tasks` dict holds the task objects so the loop over `tasks.items()` can read each outcome.
 The `TaskGroup` holds its own strong reference to each task until that task finishes.
 Those references matter because the event loop keeps only weak references to its tasks.
 A task that loses its last strong reference can silently disappear mid-execution.
@@ -591,7 +591,7 @@ so both stop before their `fetched` print.
 
 The shared deadline puts both failures in one *exception group*,
 a container for simultaneous failures.
-The loop runs every timer due at one instant in the same turn,
+The event loop runs every timer due at one instant in the same turn,
 so `c` and `d` both raise their exceptions before the group's own callback runs and starts cancelling.
 If `fetch()` called `asyncio.sleep(0.03)` instead of `sleep_until()`,
 the two calls would set their timers a few microseconds apart,

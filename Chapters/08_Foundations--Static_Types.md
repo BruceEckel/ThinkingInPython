@@ -156,7 +156,7 @@ Listings in this book use a shorthand for a diagnostic.
 A neighboring `# ty:` comment summarizes what the type checker reports for a line.
 For a line that fails the check,
 commented out or suppressed with `# type: ignore`,
-the comment gives the diagnostic.
+the `# ty:` comment gives the diagnostic.
 For a `reveal_type()` call, the comment gives the type the call produces.
 `reveal_type()`, imported from `typing`,
 marks an expression whose inferred type you want to see,

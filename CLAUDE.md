@@ -636,9 +636,24 @@ rewrote 4 of 24: "the channel", "the frame" beside "the C stack",
 "the system" in a chapter with a type system and an Effect system,
 and "the split" for a separation in a chapter whose term is "the
 description/execution split". `[HEAD]` is the seventh rule in
-`JUDGED_SURVEY_RULES`: those four chapters' 20 keeps are in the
-survey baseline, and every other chapter's hits print as survey until
-its pass reads them. The session wrote the rule's spec from a
+`JUDGED_SURVEY_RULES`: those four chapters' 20 keeps went into the
+survey baseline that day. The other 136 hits were read on 2026-11-16
+(four Opus agents by Part, brief in `build/head-2026-11-16/`, with
+the session reading every hit beside them and deciding the seven the
+agents marked unsure): 9 rewritten, 2 made quiet by a neighboring
+repair, and 125 kept, 56 of them "the checker", so a chapter pass
+sees only a sentence written or edited since. A rewrite's second
+candidate was seldom another of the file's terms. It was a second
+sense of the noun in the passage: chapter 19's "the loop" for a `for`
+loop one paragraph and for the event loop the next, "the block" under
+a listing with `try`, `async with`, and `except*` blocks, "the
+checker" in appendix A beside the tool and in a Solutions 12 exercise
+whose listing defines `check()`. Solutions 30's "In that form" was
+false of the file's own term, "the load-time form". The two reads
+agreed on one rewrite. Five of the agents' six were hits the
+session's own read had kept, and the session's four were three hits
+the agents marked unsure and one sentence off the list that an agent
+reported. The session wrote the rule's spec from a
 prototype and a Sonnet agent built it (`shortened_terms()` in
 `tools/sentence_shapes.py`); rules R12 and R68 in `bruce_edit_db.md`.
 The fifth default rule is `[PRT]` (2026-11-04), a phrasal verb split

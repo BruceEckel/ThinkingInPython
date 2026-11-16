@@ -837,7 +837,7 @@ Chapters/A_Effect_Tracking.md	[BOUND] A function has two places for annotations,
 Chapters/A_Effect_Tracking.md	[BOUND] A function with no parameters, such as CODE, has one place to hold the row
 Chapters/A_Effect_Tracking.md	[BOUND] A function's Effects come from two sources
 Chapters/A_Effect_Tracking.md	[BOUND] A system that tracks Effects needs three things
-Chapters/A_Effect_Tracking.md	[BOUND] A tool that runs outside the checker has two choices
+Chapters/A_Effect_Tracking.md	[BOUND] A tool that runs outside the type checker has two choices
 Chapters/A_Effect_Tracking.md	[BOUND] CODE carries two pieces of metadata, a string and a CODE object
 Chapters/A_Effect_Tracking.md	[BOUND] CODE is a label here, an empty class, so CODE stays the one implementation CODE can run
 Chapters/A_Effect_Tracking.md	[BOUND] CODE reads each declaration alone, so it returns the empty row CODE declares
