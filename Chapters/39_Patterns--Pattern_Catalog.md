@@ -21,7 +21,7 @@ One overlapping pair is [*State*](25_Patterns--Surrogate.md#state)
 and [*State Machine*](31_Patterns--State_Machines.md).
 *State* changes an object's behavior when its internal state changes.
 The client chooses each new state.
-*State Machine* builds on *State* and drives an object through a known set of states in response to inputs.
+*State Machine* extends *State* and drives an object through a known set of states in response to inputs.
 The client supplies the inputs.
 The machine chooses each next state.
 
@@ -148,7 +148,7 @@ A *Reactor* calls a handler when a source is ready,
 and the handler then performs the read or write.
 A *Proactor* starts the read or write and calls the handler once the operation has finished.
 On Windows, asyncio's default event loop is a *Proactor*, `ProactorEventLoop`,
-built on the operating system's I/O completion ports.
+which uses the operating system's I/O completion ports.
 
 ## Architectural (POSA)
 

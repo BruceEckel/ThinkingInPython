@@ -407,7 +407,7 @@ with no `self`.
 The output column shows that the lambdas print the same four lines as `MyApp`.
 
 Both the *Template Method* and the function version have an anchored algorithm and varying steps.
-If the steps share state, build on each other, or come as a coherent group,
+If the steps share state, depend on each other, or come as a coherent group,
 the subclass is clearer.
 If each step is independent,
 passing functions takes fewer lines and replaces the class hierarchy with one function.

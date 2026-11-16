@@ -784,7 +784,7 @@ Solutions/08_Foundations--Static_Types/README.md	[CAUS] makes check report: Call
 Solutions/08_Foundations--Static_Types/README.md	[CAUS] makes check report: Renaming CODE's method to CODE, as CODE names its method, makes the check report CODE on that call.
 Solutions/08_Foundations--Static_Types/README.md	[HEAD] checker: A truthiness test narrows the same way, so the checker accepts it.
 Solutions/08_Foundations--Static_Types/README.md	[HEAD] checker: Narrowing shows the checker keeping a narrowing of CODE although CODE can change that attribute.
-Solutions/08_Foundations--Static_Types/README.md	[HEAD] checker: The checker accepts any operation on an CODE value, so every expression built on that value passes.
+Solutions/08_Foundations--Static_Types/README.md	[HEAD] checker: The checker accepts any operation on an CODE value, so every expression that uses that value passes.
 Solutions/08_Foundations--Static_Types/README.md	[HEAD] checker: The checker therefore accepts CODE on the result.
 Solutions/08_Foundations--Static_Types/README.md	[HEAD] checker: Use CODE from CODE on CODE with and without the default, and compare what the checker reports.
 Solutions/08_Foundations--Static_Types/README.md	[HEAD] checker: Variance shows the checker refusing a CODE where the parameter requires a CODE.

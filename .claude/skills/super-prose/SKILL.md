@@ -74,9 +74,13 @@ each pass hands the next one less to do.
    "implements ... with" or "uses" ("Stateless implements Effects
    with generators"; "frameworks such as FastAPI's `Depends` use
    it"), a listing that adds to an earlier one "extends" it, and a
-   chapter that needs an earlier one "assumes" or "uses" what that
-   chapter taught (C90). Grep the scope for
-   `buil[dt]s? on|building on`.
+   chapter that needs an earlier one "depends on" or "uses" what that
+   chapter taught (C90; the book read that day rewrote all 24 other
+   sites and kept none, so a hit is a sentence written since). Grep
+   the scope for `buil[dt]s? on|building on`. When the repair is a
+   relative clause that parts the subject from its verb ("every
+   singleton that keeps its state in a module depends"), use the
+   chapter's own term ("the module form of a singleton").
 2. `positive`: a negation that is an accident of phrasing turns around.
    A subject of "Nothing", "Nobody", or "No one" with a verb ("Nothing
    calls `throw()` on the first booking" -> "`list(book())` drives the
@@ -163,7 +167,12 @@ each pass hands the next one less to do.
    dependencies and its failures, and it returns its result", C91).
    Grep the scope for
    `^(Besides|Apart from|Aside from|Beyond|In addition to) `, and
-   keep an opener whose member the page has just described.
+   keep an opener whose member the page has just described ("Beyond
+   those three,", "Apart from that hazard,"; the book read that day
+   kept 8 of the 15 other openers for that reason and rewrote 7).
+   An exception to a universal goes behind the claim ("No syntax in
+   a Python class body allocates a per-object field, apart from
+   `__slots__`, which comes up below").
 4. `cohesion`: old before new, one topic string per paragraph, R29's
    one primary concept per paragraph. A sentence after a walkthrough
    that reports what a figure or flowchart in a cited source shows,
@@ -274,7 +283,7 @@ each pass hands the next one less to do.
    group`).
    A free relative leaves unnamed a thing the passage can name
    ("whatever holds `self.close` holds `Leaky` through it" -> "the
-   registry holds `Leaky` through `self.close`", C56; "whichever call
+   registry holds `Leaky` through `self.close`", R69; "whichever call
    resumed it" -> "the call that resumed it", R54): write the
    definite noun phrase, and the name when the passage has one
    ("wraps whatever arrives" -> "wraps `other`"). `tip watch-words`
@@ -366,7 +375,7 @@ each pass hands the next one less to do.
    "The same X" said of a list ("PHP and Dart follow the same
    design") is one claim for each member, so check each against its
    reference and give a member that differs its own sentence (R63).
-   A concessive "whatever" is a universal (C56; the 2026-11-16 read
+   A concessive "whatever" is a universal (R69; the 2026-11-16 read
    rewrote all 54 of the book's sites). Cut it when the sentence or
    its neighbor says the same ("picks the field by name, whatever its
    position", two sentences after "Unpacking assigns by position").
@@ -484,7 +493,7 @@ scope's line range:
   2026-11-08, the concessive "however many" that reads first as a
   contrast and is a universal over a count or a manner, R58; the
   contrastive "However," is skipped; `whatever`, Tier 2 since
-  2026-11-04, C56, whose concessive is `ambiguity`'s and whose free
+  2026-11-04, R69, whose concessive is `ambiguity`'s and whose free
   relative is `antecedents`', as `whichever` is, R54; every site in
   the book is rewritten, so a hit is a sentence written since;
   `ARGS="--only whatever"` lists one word's sites; `ARGS="--tier 1"`

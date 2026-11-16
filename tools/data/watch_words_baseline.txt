@@ -368,7 +368,6 @@ Chapters/26_Patterns--Factory.md	never: Code that calls through that interface n
 Chapters/26_Patterns--Factory.md	never: Run the program and confirm that CODE never yields CODE
 Chapters/26_Patterns--Factory.md	never: The classic failure is a plugin that "never registered
 Chapters/26_Patterns--Factory.md	only: An import written only to trigger registration never uses that name
-Chapters/26_Patterns--Factory.md	only: CODE is the only code that changes when you add a new type of CODE
 Chapters/26_Patterns--Factory.md	only: When the variant differs only in field values
 Chapters/26_Patterns--Factory.md	only: and the only method CODE and CODE override
 Chapters/27_Patterns--Function_Objects.md	carried none: A function pointer carried none

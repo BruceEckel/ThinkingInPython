@@ -45,7 +45,7 @@ thing out by a property, and the independence stated plainly ("no
 matter which", "in all four forms", the two options named) when the
 claim is that the outcome is the same across a choice; the book sweep
 that day rewrote all 45 sites. `whatever` joined Tier 2 on 2026-11-04
-(candidate C56, Bruce: "should be considered circumspect in general"):
+(rule R69, Bruce: "should be considered circumspect in general"):
 a concessive "whatever the driver's reason" claims the outcome across
 every case, a universal to test or a phrase to cut, and a free relative
 "whatever the caller supplies" is R54's shape with a thing, "the value

@@ -12,7 +12,7 @@ Chapters/01_Introduction.md	[PAST] came: Many of these chapters came from presen
 Chapters/01_Introduction.md	[PAST] generated: Claude first translated and integrated my own work into the book, and generated the first versions of new material.
 Chapters/01_Introduction.md	[PAST] made: Using Claude made me realize how many compromises I've made on books in the past.
 Chapters/01_Introduction.md	[PAST] provided: Claude provided excellent support, but did not replace my own work.
-Chapters/01_Introduction.md	[PAST] put: The last two put Effect tracking and generators to work with Stateless, a library that builds Effect tracking on generators and brings it to Python today.
+Chapters/01_Introduction.md	[PAST] put: The last two put Effect tracking and generators to work with Stateless, a library that implements Effect tracking with generators and brings it to Python today.
 Chapters/01_Introduction.md	[PAST] read: When a change breaks the code, read the traceback closely.
 Chapters/01_Introduction.md	[PAST] returned: Part IV, *Functional*, covers pure functions, the CODE and CODE toolkits, errors returned as values instead of raised exceptions, and a spectrum of confidence that runs from local reasoning up to machine-checked proof.
 Chapters/01_Introduction.md	[PAST] said: That said, it is still my work, derived from existing work, designed by me, checked and rewritten by me.

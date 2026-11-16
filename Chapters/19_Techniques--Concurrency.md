@@ -1284,7 +1284,7 @@ each worker's feeder thread blocks until a reader consumes its output,
 so the worker cannot exit, and `join()` deadlocks.
 Drain a queue carrying bulky data before joining.
 
-`ProcessPoolExecutor` builds on `multiprocessing`.
+`ProcessPoolExecutor` uses `multiprocessing` for its worker processes.
 It reuses a pool of workers instead of spawning one process per call,
 and returns results in input order by itself.
 It also shares its `submit()`/`map()`/`Future` interface with `ThreadPoolExecutor`,
@@ -1770,7 +1770,7 @@ The interpreters share the process's memory,
 but each keeps its own isolated objects.
 Arguments and results cross that boundary by copying.
 
-The pool builds on the `concurrent.interpreters` module
+The pool uses the `concurrent.interpreters` module
 ([PEP 734](https://peps.python.org/pep-0734/), added in 3.14),
 which gives you one interpreter at a time.
 `create()` starts an interpreter, `call()` and `exec()` run code in it,
@@ -2553,13 +2553,13 @@ is a small corner of the territory.
   not a supervisor waiting from outside for everything to finish.
 - **Message passing and channels:** Let concurrent units exchange data by sending values instead of sharing memory.
   Actor languages and CSP, below,
-  are two different disciplines built on this same idea.
+  are two different disciplines that apply this idea.
 - **Actor languages:** Give each unit of concurrency the shape of an actor,
   an isolated object that reacts only to messages sent to its mailbox,
   keeps its state private, and can spawn more actors.
   The most established production examples include Erlang,
   built at Ericsson for telephone switches.
-  Elixir is newer and built on Erlang's BEAM virtual machine.
+  Elixir is newer and runs on Erlang's BEAM virtual machine.
 - **Communicating Sequential Processes
   (CSP):** Independent processes that communicate only over shared channels,
   rather than an actor's private mailbox.

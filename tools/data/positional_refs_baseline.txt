@@ -150,7 +150,7 @@ Chapters/47_Effects--Stateless_in_Practice.md	third run	The error becomes `Retry
 Chapters/47_Effects--Stateless_in_Practice.md	third run	The third run counts them there, after the `match` narrows `outcome` from `str | RetryError` to the error.
 Chapters/47_Effects--Stateless_in_Practice.md	three attempts	The same schedule that governed three attempts now governs three repetitions of `save_user()`, and the tuple holds every result in order.
 Chapters/47_Effects--Stateless_in_Practice.md	three runs	Those three runs are claims about testability, so each one becomes a test.
-Chapters/47_Effects--Stateless_in_Practice.md	two runs	Apart from their lengths, the two runs differ only in the order of the tuple passed to `controller()`.
+Chapters/47_Effects--Stateless_in_Practice.md	two runs	The two runs differ in their lengths and in the order of the tuple passed to `controller()`.
 Chapters/B_An_Effect_Checker.md	second run	With the stub, `requests.get` is a declared function like any other, and the second run prints its row, `['Network']`.
 Chapters/B_An_Effect_Checker.md	second run	`fetch()` declares `Network` too, so the second run accepts `fetch()`.
 Chapters/B_An_Effect_Checker.md	the first assignment	If it kept the first assignment's type, `path.read_text()` would resolve to `builtins.str.read_text`.

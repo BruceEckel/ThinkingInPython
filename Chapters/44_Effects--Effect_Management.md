@@ -952,7 +952,8 @@ Libraries in this family include ZIO, Cats Effect, and Kyo in Scala,
 Polysemy and Effectful in Haskell, Effect in TypeScript,
 and Stateless in Python.
 
-Stateless builds on generators, as TypeScript Effect's `function*` does.
+Stateless implements Effects with generators,
+as Effect in TypeScript does with `function*`.
 A Python generator suspends a computation,
 hands control to whoever is driving it, and resumes with a value.
 That makes a suspended generator a continuation you can resume once or discard,

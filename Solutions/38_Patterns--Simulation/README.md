@@ -669,7 +669,7 @@ a different design, a detail, or an equivalent alternative.
 
 ## 4 and 5: the robot world
 
-Exercises 4 and 5 both build on the same `robot_explorer` world,
+Exercises 4 and 5 both use the same `robot_explorer` world,
 so one module holds that shared apparatus once.
 Each exercise imports it.
 

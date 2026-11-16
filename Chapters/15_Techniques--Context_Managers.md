@@ -1,6 +1,6 @@
 # Context Managers
 
-> Whatever you acquire must be released, on every path out,
+> Everything you acquire must be released, on every path out,
 > including the one an exception takes.
 > A context manager pairs acquisition with release so cleanup always runs.
 

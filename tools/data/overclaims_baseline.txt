@@ -361,6 +361,7 @@ Chapters/23_Patterns--Singleton.md	[BOUND] In CODE, remove the two lines of CODE
 Chapters/23_Patterns--Singleton.md	[BOUND] Its class blocks direct construction and hands out the sole instance through a class operation, CODE, which builds the object on the first call
 Chapters/23_Patterns--Singleton.md	[BOUND] One parameter turns "one singleton" into one singleton per argument value
 Chapters/23_Patterns--Singleton.md	[BOUND] Skipping one lock acquisition per call rarely justifies two details that must both stay right
+Chapters/23_Patterns--Singleton.md	[BOUND] The listing is CODE with two changes
 Chapters/23_Patterns--Singleton.md	[BOUND] The method's return type is the type of the attribute the inner object holds under each name, so CODE is the one annotation that fits every name and still leaves the result usable
 Chapters/23_Patterns--Singleton.md	[BOUND] The second underscore has one effect
 Chapters/23_Patterns--Singleton.md	[BOUND] The three calls in the listing therefore build three objects for one environment
@@ -391,7 +392,7 @@ Chapters/25_Patterns--Surrogate.md	[BOUND] The two calls to CODE print different
 Chapters/25_Patterns--Surrogate.md	[BOUND] When you write both sides, the single generic surrogate in CODE forwards to any implementation with one CODE and no base class
 Chapters/26_Patterns--Factory.md	[BOUND] *Builder* remains useful in Python when construction is a process rather than a single call
 Chapters/26_Patterns--Factory.md	[BOUND] A factory turns data, such as a name, into an object, so constructor calls stay in one place
-Chapters/26_Patterns--Factory.md	[BOUND] Apart from the new subclass, CODE is the only code that changes when you add a new type of CODE
+Chapters/26_Patterns--Factory.md	[BOUND] Adding a new type of CODE changes two places
 Chapters/26_Patterns--Factory.md	[BOUND] Because the static CODE method in CODE collects all the creation operations in one place, that method is the only existing code you change when you add a shape
 Chapters/26_Patterns--Factory.md	[BOUND] CODE and CODE are parallel hierarchies, and each concrete factory declares one method per hierarchy
 Chapters/26_Patterns--Factory.md	[BOUND] CODE is the factory method, and the only method CODE and CODE override
@@ -620,7 +621,7 @@ Chapters/40_Functional--Foundations.md	[BOUND] CODE mutates a name that it alone
 Chapters/40_Functional--Foundations.md	[BOUND] CODE takes the type of CODE from that declaration and checks the three calls against it
 Chapters/40_Functional--Foundations.md	[BOUND] Changing one field of a large tuple or record likewise means rebuilding the whole value, not patching one slot in place
 Chapters/40_Functional--Foundations.md	[BOUND] Contents-based equality, not mutability alone, makes a type unhashable
-Chapters/40_Functional--Foundations.md	[BOUND] Everything else in these chapters builds on purity
+Chapters/40_Functional--Foundations.md	[BOUND] Everything else in these chapters depends on purity
 Chapters/40_Functional--Foundations.md	[BOUND] For a function whose parameters are positional-only, position is the only way to bind an argument
 Chapters/40_Functional--Foundations.md	[BOUND] For such a value, keep a mutable structure private to one function, which then changes it in place with no other code reading it between changes
 Chapters/40_Functional--Foundations.md	[BOUND] Immutability offers two things a mutable value cannot
@@ -968,7 +969,6 @@ Solutions/14_Techniques--Decorators/README.md	[BOUND] with CODE above CODE, one 
 Solutions/15_Techniques--Context_Managers/README.md	[BOUND] **Suppress one exception type
 Solutions/15_Techniques--Context_Managers/README.md	[BOUND] A third nested CODE blocks forever in CODE, since the one thread that can return a connection is the thread waiting for it
 Solutions/15_Techniques--Context_Managers/README.md	[BOUND] Add another CODE with its own CODE name to the managers on the CODE line, grouping them in parentheses once they outgrow one line
-Solutions/15_Techniques--Context_Managers/README.md	[BOUND] Apart from the function's name, the CODE is the one difference between the two listings
 Solutions/15_Techniques--Context_Managers/README.md	[BOUND] CODE prints CODE, CODE, CODE, the CODE line, then CODE, CODE, CODE, and CODE prints CODE as its one line
 Solutions/15_Techniques--Context_Managers/README.md	[BOUND] If you return CODE without the CODE test, the demo prints the same two lines, because both of its blocks raise an exception
 Solutions/15_Techniques--Context_Managers/README.md	[BOUND] One call that reads the names from the command line replaces both calls to CODE

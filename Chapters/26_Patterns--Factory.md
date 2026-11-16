@@ -153,8 +153,8 @@ if __name__ == "__main__":
 ```
 
 Here the `factory()` argument is a string, but it can be any sort of data.
-Apart from the new subclass,
-`factory()` is the only code that changes when you add a new type of `Shape`.
+Adding a new type of `Shape` changes two places:
+the new subclass and `factory()`.
 
 `factory()` names `_Circle` and `_Square` above the point where the file defines either class.
 Python looks up a name in a function body when the function runs.

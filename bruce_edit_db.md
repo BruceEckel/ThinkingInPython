@@ -3773,6 +3773,98 @@ compound terms) | super-prose (pass 6) | `[HEAD]` in
 "the frame" where a file's "frame" mentions are mostly "execution
 frame" and "stack frame" | this file.
 
+### R69. "Whatever" names its thing, its options, or its range, or the phrase goes
+
+**Test.** The sentence has "whatever". Two shapes. The concessive
+("whatever the driver's reason", "whatever its base classes") claims
+the outcome holds across every case of something, which is either a
+universal the sentence has not earned (the overclaim shape, test it as
+`tip overclaims` would) or a set the sentence need not mention at all,
+in which case cut the phrase. The free relative ("whatever the caller
+supplies", "whatever holds `self.close`") is R54's shape with a thing
+instead of a choice: write the definite noun phrase ("the value the
+caller supplies", "the object that holds `self.close`"), or name the
+set when the independence is the claim ("any object with that shape").
+`tip watch-words` lists the word as Tier 2 (2026-11-04).
+The 2026-11-16 read settled the repairs, in order of preference.
+Cut the phrase when the sentence or its neighbor says the same. A
+free relative takes the definite noun phrase, and the name when the
+passage has one. A concessive names its options or its range, and
+"regardless of" and "no matter which" are the fallback. A universal
+is tested against the listing before it is restated.
+
+**Keep when.** None seen yet. The chapter 45 pass the same day read
+its seven sites and rewrote all seven: the free relatives became "the
+code that calls `next()`", "the value the generator returned", "the
+code that resumed it", "every resource its body opened" (a list of
+them follows); the concessives became "no matter what answers it
+receives", "from either driver" (the two options named), "when the
+questions arrive in any order". The book read of 2026-11-16 covered
+the 54 sites then standing and rewrote all 54, so the rule has met
+every site in the book and kept none. The last site, chapter 15's
+epigraph, became "Everything you acquire must be released" the same
+day.
+
+**Sightings.** 2 rounds, 36 files. Promoted by Bruce 2026-11-16 (his
+"do the suggestions" on the read proposed that day); was C56. The
+first, `45_Effects--Generators` 2026-11-04, was
+Claude-written (same day), Bruce's own edit, "the use of 'whatever'
+should be considered circumspect in general":
+- "so the exception carries one meaning, finish, whatever the driver's
+  reason." -> "so the exception carries one meaning, finish."
+
+Book read 2026-11-16 (Bruce's "do the suggestions" on the read
+proposed that day; four Opus agents by Part, the session's own repair
+for each site written first, was Claude-written throughout): 54
+sites in 34 files, all rewritten, in four forms.
+- Cut, 10, where the sentence or its neighbor says the same: "a list
+  holding any type ... match the list's element type, whatever that
+  type is" -> "element type."; "picks the field by name, whatever its
+  position" -> "by name." (after "Unpacking assigns by position");
+  "unavoidably serial, whatever else runs on more cores" ->
+  "unavoidably serial."
+- A definite noun phrase for a free relative, 19: "whatever holds
+  `self.close` holds `Leaky` through it" -> "the registry holds
+  `Leaky` through `self.close`" (the passage names the holder);
+  "whatever code turns out to be hot" -> "the code that turns out to
+  be hot"; "the area of whatever it receives" -> "the shape it
+  receives"; "wraps whatever arrives" -> "wraps `other`"; "accepts
+  whatever a `cast()` asserts" -> "accepts the type a `cast()`
+  asserts, true or false".
+- The options named, 9: "whatever its base classes" -> "with or
+  without a `Drawable` base class" (and "with or without `WhatIWant`
+  among its bases", "with or without `Visitor` among its bases");
+  "whatever its first character" -> "with or without a leading
+  underscore"; "whatever runs underneath: a coroutine, a thread, or a
+  process" -> "whether a coroutine, a thread, or a process runs
+  underneath"; "whatever its kind" -> "file or directory".
+- The range or the independence stated, 16: "whatever the field
+  order" -> "in any field order"; "whatever `y` is" -> "for every
+  `y`"; "stays constant whatever the size of the source" -> "as the
+  source grows"; "whatever the two sides carry" -> "when both sides
+  carry a `str`" (the hard case the section opened with); "returns
+  the same string whatever `x` and `y` hold" -> "returns `"point"`
+  for every `Point`".
+One universal failed its test. Solutions 34 said `repr()` or `hash()`
+on a million-level tree "raises a `RecursionError` that reports a
+stack overflow, whatever the limit says". At the default limit both
+raise the ordinary "maximum recursion depth exceeded", and the stack
+overflow appears once the limit is raised (probed at 1,000 and at
+`10**9`), so the sentence now says "despite the raised limit". Three
+shapes to watch in a repair:
+a cut that leaves two sentences meeting on one clause ("stays what
+you last read. Because a deeply immutable value stays what you last
+read" took its phrase back as "no matter which code ran in
+between"), a noun that does not fit the verb ("undo the rows"), and
+a second "whether" directly after one. An exercise statement with
+the word was rewritten in its chapter, as in R54's and R58's sweeps.
+
+**Home.** the global CLAUDE.md watch list (Tier 2, "whatever", with
+its paragraph, since 2026-11-16) | the project CLAUDE.md |
+`super-prose`
+pass 5 (the free relative) and pass 6 (the concessive), with the
+Accrued sections of the antecedents and ambiguity skills | this file.
+
 ## Candidates
 
 One sighting each. Logged, not applied. A second sighting in a different
@@ -4675,87 +4767,6 @@ session's `same_survey2.py` and is the shape a survey rule would use.
 **Home.** CLAUDE.md (a bullet before "Prefer the positive statement",
 2026-11-01) | `[SAME]` survey rule in `tools/sentence_shapes.py` (same
 day) | antecedents (a pointer word in disguise) | this file.
-
-### C56. Read every "whatever" with suspicion
-
-**Test.** The sentence has "whatever". Two shapes. The concessive
-("whatever the driver's reason", "whatever its base classes") claims
-the outcome holds across every case of something, which is either a
-universal the sentence has not earned (the overclaim shape, test it as
-`tip overclaims` would) or a set the sentence need not mention at all,
-in which case cut the phrase. The free relative ("whatever the caller
-supplies", "whatever holds `self.close`") is R54's shape with a thing
-instead of a choice: write the definite noun phrase ("the value the
-caller supplies", "the object that holds `self.close`"), or name the
-set when the independence is the claim ("any object with that shape").
-`tip watch-words` lists the word as Tier 2 (2026-11-04).
-
-**Keep when.** None seen yet. The chapter 45 pass the same day read
-its seven sites and rewrote all seven: the free relatives became "the
-code that calls `next()`", "the value the generator returned", "the
-code that resumed it", "every resource its body opened" (a list of
-them follows); the concessives became "no matter what answers it
-receives", "from either driver" (the two options named), "when the
-questions arrive in any order". The book read of 2026-11-16 covered
-the 54 sites then standing and rewrote all 54, so the candidate has
-met every site in the book and kept none. The word's one remaining
-use is chapter 15's epigraph, a block quote.
-
-**Sightings.** 1, `45_Effects--Generators` 2026-11-04, was
-Claude-written (same day), Bruce's own edit, "the use of 'whatever'
-should be considered circumspect in general":
-- "so the exception carries one meaning, finish, whatever the driver's
-  reason." -> "so the exception carries one meaning, finish."
-
-Book read 2026-11-16 (Bruce's "do the suggestions" on the read
-proposed that day; four Opus agents by Part, the session's own repair
-for each site written first, was Claude-written throughout): 54
-sites in 34 files, all rewritten, in four forms.
-- Cut, 10, where the sentence or its neighbor says the same: "a list
-  holding any type ... match the list's element type, whatever that
-  type is" -> "element type."; "picks the field by name, whatever its
-  position" -> "by name." (after "Unpacking assigns by position");
-  "unavoidably serial, whatever else runs on more cores" ->
-  "unavoidably serial."
-- A definite noun phrase for a free relative, 19: "whatever holds
-  `self.close` holds `Leaky` through it" -> "the registry holds
-  `Leaky` through `self.close`" (the passage names the holder);
-  "whatever code turns out to be hot" -> "the code that turns out to
-  be hot"; "the area of whatever it receives" -> "the shape it
-  receives"; "wraps whatever arrives" -> "wraps `other`"; "accepts
-  whatever a `cast()` asserts" -> "accepts the type a `cast()`
-  asserts, true or false".
-- The options named, 9: "whatever its base classes" -> "with or
-  without a `Drawable` base class" (and "with or without `WhatIWant`
-  among its bases", "with or without `Visitor` among its bases");
-  "whatever its first character" -> "with or without a leading
-  underscore"; "whatever runs underneath: a coroutine, a thread, or a
-  process" -> "whether a coroutine, a thread, or a process runs
-  underneath"; "whatever its kind" -> "file or directory".
-- The range or the independence stated, 16: "whatever the field
-  order" -> "in any field order"; "whatever `y` is" -> "for every
-  `y`"; "stays constant whatever the size of the source" -> "as the
-  source grows"; "whatever the two sides carry" -> "when both sides
-  carry a `str`" (the hard case the section opened with); "returns
-  the same string whatever `x` and `y` hold" -> "returns `"point"`
-  for every `Point`".
-One universal failed its test. Solutions 34 said `repr()` or `hash()`
-on a million-level tree "raises a `RecursionError` that reports a
-stack overflow, whatever the limit says". At the default limit both
-raise the ordinary "maximum recursion depth exceeded", and the stack
-overflow appears once the limit is raised (probed at 1,000 and at
-`10**9`), so the sentence now says "despite the raised limit". Three
-shapes to watch in a repair:
-a cut that leaves two sentences meeting on one clause ("stays what
-you last read. Because a deeply immutable value stays what you last
-read" took its phrase back as "no matter which code ran in
-between"), a noun that does not fit the verb ("undo the rows"), and
-a second "whether" directly after one. An exercise statement with
-the word was rewritten in its chapter, as in R54's and R58's sweeps.
-
-**Home.** CLAUDE.md watch list (Tier 2, "whatever") | `super-prose`
-pass 5 (the free relative) and pass 6 (the concessive), with the
-Accrued sections of the antecedents and ambiguity skills | this file.
 
 ### C57. A present perfect in a time clause is the simple present
 
@@ -6329,15 +6340,38 @@ different word ("building one that holds 0").
   with generators."
 - The chapter's other site, the same day: "and frameworks such as
   FastAPI's `Depends` build on it" -> "use it".
-- Scale: a grep of both trees for `buil[dt]s? on|building on` finds
-  22 more sites in 15 files, unread under this test. Two repeat the
-  flagged claim: chapter 44, "Stateless builds on generators, as
-  TypeScript Effect's `function*` does", and chapter 45, "An Effect
-  system builds on a generator rather than a full coroutine". The
-  others are a library on a library ("`ProcessPoolExecutor` builds on
-  `multiprocessing`"), a chapter on a chapter ("[Decorators] builds
-  on that forwarding"), and a pattern on a pattern ("*State Machine*
-  builds on *State*").
+- The book read, the same day (Bruce's "do the suggestions"): the 23
+  other sites in 15 files, and one split form, "a library that builds
+  Effect tracking on generators". All 24 rewritten, none kept. The
+  relation decided the verb:
+  - implemented with, or uses, 13: "Stateless builds on generators,
+    as TypeScript Effect's `function*` does" -> "Stateless implements
+    Effects with generators, as Effect in TypeScript does with
+    `function*`"; "`ProcessPoolExecutor` builds on `multiprocessing`"
+    -> "uses `multiprocessing` for its worker processes"; "An Effect
+    system builds on a generator" -> "uses a generator"; "A tool built
+    on the `Annotated` design" -> "that uses"; "every expression built
+    on that value" -> "that uses that value"; "built on the operating
+    system's I/O completion ports" -> "which uses".
+  - needs what an earlier part taught, 5: "later chapters build on
+    `ClassVar`" -> "use"; "The last two build on the chapters before
+    them" -> "depend on"; "Everything else in these chapters builds on
+    purity" -> "depends on"; "[Decorators] builds on that forwarding"
+    -> "uses".
+  - adds to, 3: "*State Machine* builds on *State*" -> "extends";
+    "[Rethinking Objects] builds on this" -> "develops that idea";
+    "override `report()` to build on `super().report()`" -> "so that
+    it calls `super().report()`".
+  - runs on, applies, or depends on, 3: "built on Erlang's BEAM
+    virtual machine" -> "runs on"; "two different disciplines built
+    on this same idea" -> "that apply this idea"; "If the steps ...
+    build on each other" -> "depend on each other".
+  One repair needed a second try. "Every singleton built on module
+  state" became "every singleton that keeps its state in a module",
+  which set a relative clause between the subject and its verb; the
+  chapter's own term fits: "the module form of a singleton".
+  Chapter 25's epigraph was a site too ("are both built on that
+  stand-in" -> "both use that stand-in").
 
 **Home.** `super-prose` pass 1 and the `literal` skill's Accrued
 patterns | this file.
@@ -6372,11 +6406,38 @@ Claude-written, Bruce on "Besides its result,": "awkward":
   answers" -> "The DI registration key matches lookups and sets the
   type for which an instance answers". Its opener also read two ways,
   lookups that match or the act of matching them.
-- Scale: a grep of both trees for a sentence that starts with
-  "Besides", "Apart from", "Aside from", "Beyond", or "In addition
-  to" finds 15 more sites in 14 files, unread under this test.
-  Chapter 45's "Apart from its return type, `trampoline()` has a
-  state's annotation" has the forward pronoun.
+- The book read, the same day (Bruce's "do the suggestions"): the 15
+  other openers in 14 files. Seven rewritten, eight kept.
+  - Rewritten, a forward pronoun: "Apart from its return type,
+    `trampoline()` has a state's annotation" -> "`trampoline()` has a
+    state's yield type and send type"; "Apart from their lengths, the
+    two runs differ only in the order of the tuple" -> "The two runs
+    differ in their lengths and in the order of the tuple"; "Beyond
+    how they read, a comprehension and `map()` return different
+    things" -> "A comprehension and `map()` read differently, and they
+    return different things"; "Apart from the line it prints, the
+    listing is `singleton_cached_race.py` plus the priming call" ->
+    "The listing is `singleton_cached_race.py` with two changes: the
+    priming call, and a `print()` of the count in place of the
+    comparison".
+  - Rewritten, a count that left the member out: "Apart from the new
+    subclass, `factory()` is the only code that changes" -> "Adding a
+    new type of `Shape` changes two places: the new subclass and
+    `factory()`"; "Apart from the function's name, the `finally` is
+    the one difference" -> "The two listings differ in the function's
+    name and in the `finally`".
+  - Rewritten, the exception moved behind its claim: "Apart from
+    `__slots__`, which comes up below, no syntax in a Python class
+    body allocates a per-object field" -> "No syntax ... allocates a
+    per-object field, apart from `__slots__`, which comes up below."
+  - Kept, eight, all the keep-when: the member is on the page and the
+    sentence turns to the rest ("Beyond those three, the output
+    holds", "Beyond that,", "Apart from that hazard,", "Apart from
+    `bind()`," four lines after "Ignore `bind()` for the moment",
+    "Besides a built-in like `tuple` or `str`,", "Apart from those
+    lines and the `pieces` and `bins` names they read,", "Beyond
+    `__iter__()`,"), and "Beyond the standard library," which is a
+    place, with no set behind it.
 
 **Home.** `super-prose` pass 3 and the `straighten` skill's Accrued
 patterns | this file.

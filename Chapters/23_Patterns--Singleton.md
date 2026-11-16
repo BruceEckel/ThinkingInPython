@@ -416,8 +416,8 @@ print(distinct_objects(settings))
 #: 1
 ```
 
-Apart from the line it prints,
-the listing is `singleton_cached_race.py` plus the priming call.
+The listing is `singleton_cached_race.py` with two changes: the priming call,
+and a `print()` of the count in place of the comparison.
 The priming call runs in the module body,
 so the call is safe for the same reason the module form is.
 The import system runs a module body once,

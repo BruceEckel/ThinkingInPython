@@ -524,7 +524,7 @@ The rest are here for your own designs.
     It describes what a caller needs from the object on the other side of a call,
     and leaves open what that object is.
     [Rethinking Objects](20_Patterns--Rethinking_Objects.md#protocols-generalize-composition-adapts)
-    builds on this.
+    develops that idea.
     [Stateless](46_Effects--Stateless.md#declaring-a-dependency)
     moves that description into a function's signature,
     where `Need` specifies what the function requires of its surroundings.

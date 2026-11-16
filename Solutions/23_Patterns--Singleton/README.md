@@ -421,7 +421,7 @@ To replace the shared dict, assign through the module.
 so every later read of `config.settings` returns the new dict.
 
 A name and the object it refers to are different things,
-and every singleton built on module state depends on that difference.
+and the module form of a singleton depends on that difference.
 Mutate through any name, rebind only through the module.
 
 Before you move on, name what separates your attempt from this one:

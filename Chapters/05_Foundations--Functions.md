@@ -465,7 +465,7 @@ a function can collect arguments beyond its named parameters and pass them on as
 it accepts any call and forwards it.
 `expect()` from `exceptions.py` has the same shape.
 It receives a function and the arguments for it, and makes the call.
-[Decorators](14_Techniques--Decorators.md) builds on that forwarding.
+[Decorators](14_Techniques--Decorators.md) uses that forwarding.
 
 A function is an [object like any other](40_Functional--Foundations.md#functions-as-first-class-objects),
 so you can pass `report` to `trace()` as an argument.

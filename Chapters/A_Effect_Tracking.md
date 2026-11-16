@@ -75,7 +75,7 @@ The open question is whether a tool can compute and check a row written in `Anno
 ## Why a Native System Tracks Best
 
 Native algebraic effect tracking has four properties.
-A tool built on the `Annotated` design must supply each one.
+A tool that uses the `Annotated` design must supply each one.
 The first four problems in [What a Checker for the Row Must Do](#what-a-checker-for-the-row-must-do)
 take them in the same order.
 

@@ -1624,7 +1624,7 @@ which bounces into the next state.
 `yield from` runs the current state,
 relaying each of its `yield`s up to `run_all()` and each `send()` back down.
 When the state returns, the loop takes the returned generator as the next state.
-Apart from its return type, `trampoline()` has a state's annotation,
+`trampoline()` has a state's yield type and send type,
 so `run_all()` drives it as it drives any generator.
 
 `[2]` primes the machine,
@@ -2433,11 +2433,11 @@ so a caller that awaits that function suspends at its own `await` and must be `a
 [The Driver You Already Use](#the-driver-you-already-use) states the result:
 every awaiting caller is `async` in turn.
 
-An Effect system builds on a generator rather than a full coroutine because of PEP 255's restriction.
+An Effect system uses a generator rather than a full coroutine because of PEP 255's restriction.
 A generator hands each request to the code that resumed it.
 That code is the driver you write.
 
-[Stateless](46_Effects--Stateless.md) builds on this chapter's three ideas:
+[Stateless](46_Effects--Stateless.md) uses this chapter's three ideas:
 the driver, the request and its answer, and `yield from`.
 Stateless describes a function by the requests it makes and writes those requests into the function's return type.
 

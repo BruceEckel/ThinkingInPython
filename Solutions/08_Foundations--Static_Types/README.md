@@ -246,7 +246,7 @@ a different design, a detail, or an equivalent alternative.
 
 [The `Self` Return Type](../../Chapters/08_Foundations--Static_Types.md#the-self-type)
 explains why `bump()` declares its return type as `Self` instead of a class name.
-Subclass `NamedTally`, override `report()` to build on `super().report()`,
+Subclass `NamedTally`, override `report()` so that it calls `super().report()`,
 and chain `bump()` twice before calling `report()` on the `LoudTally`.
 
 <details>
@@ -405,7 +405,7 @@ print(words.top().upper())
 Without the default, `ty` reports `Unknown` and accepts the file.
 An unsolved type parameter becomes `Unknown`.
 The checker accepts any operation on an `Unknown` value,
-so every expression built on that value passes.
+so every expression that uses that value passes.
 `words.top().upper()` passes either way.
 With the default removed, so does `words.top().no_such_method()`.
 With `= str` in place, `ty` reports `missing-attribute` on that call:

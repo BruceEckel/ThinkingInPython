@@ -409,5 +409,5 @@ Shapes Bruce flags that the catalog above did not name, dated, with the sentence
   recursion depth exceeded", and became "despite the raised limit".
   After a cut, read the sentence against the next one for a clause
   the two now share.
-  The read rewrote all 54 and kept none. C56 in `bruce_edit_db.md`;
+  The read rewrote all 54 and kept none. R69 in `bruce_edit_db.md`;
   the free relative is the `antecedents` skill's.

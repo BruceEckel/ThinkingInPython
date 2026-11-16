@@ -719,8 +719,7 @@ then propagation.
 
 In `no_finally.py` the block's `ValueError` propagates out of the generator at a `yield` with no `try` around it,
 so the `print()` after the `yield` does not run.
-Apart from the function's name,
-the `finally` is the one difference between the two listings.
+The two listings differ in the function's name and in the `finally`.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.

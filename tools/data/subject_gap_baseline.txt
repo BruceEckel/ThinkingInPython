@@ -65,6 +65,7 @@ Solutions/14_Techniques--Decorators/README.md	[advmod,cc,conj] prints .. appears
 Solutions/14_Techniques--Decorators/README.md	[relcl] function .. returns: under CODE, a function that raises an exception on its first two calls returns its result on the third.
 Solutions/15_Techniques--Context_Managers/README.md	[appos,prep] prints .. matching: your edited CODE prints CODE, CODE, CODE before the body line and CODE, CODE, CODE after it, matching the closing order you predicted before running it.
 Solutions/16_Techniques--Comprehensions/README.md	[appos,prep] prints .. passes: your version prints CODE through CODE, then a list of three usable values in place of CODE, and CODE passes on your file.
+Solutions/23_Patterns--Singleton/README.md	[cc,conj] name .. depends: A name and the object it refers to are different things, and the module form of a singleton depends on that difference.
 Solutions/23_Patterns--Singleton/README.md	[relcl] subclass .. gets: A subclass that binds its own CODE in its class body gets separate storage.
 Solutions/32_Patterns--Multiple_Dispatching/README.md	[advmod,dep,dobj] Count .. rows: Count the methods you wrote, then compare with the seven dictionary rows the table version needs.
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	[acl] type .. adds: a node type written below your existing classes, with none of them edited, adds its share to CODE for a directory that holds it, and CODE passes.

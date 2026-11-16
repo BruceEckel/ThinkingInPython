@@ -669,8 +669,7 @@ run(handle(battery_first)(run_load)(17, 4))
 
 `run_load()` draws from the source `plug()` hands it,
 so the second run prints a different trace from the same code.
-Apart from their lengths,
-the two runs differ only in the order of the tuple passed to `controller()`.
+The two runs differ in their lengths and in the order of the tuple passed to `controller()`.
 `controller()` sets the priority,
 the sources hold the thresholds and the outage schedule,
 and `run_load()` decides when to stop drawing from the source it holds.

@@ -19,8 +19,8 @@ that instance attribute *shadows* the class attribute.
 In C++ or Java, the language allocates storage for such a field in each object before the constructor runs,
 so a programmer from those languages expects per-object storage here too.
 A Python class attribute corresponds to a C++ or Java `static` field.
-Apart from `__slots__`, which comes up below,
-no syntax in a Python class body allocates a per-object field.
+No syntax in a Python class body allocates a per-object field,
+apart from `__slots__`, which comes up below.
 Assigning through `self` inside a method creates that storage,
 as `self.x = x` in a constructor does.
 

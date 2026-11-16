@@ -555,7 +555,7 @@ def test_independent_hierarchies_have_separate_registries(
 ```
 
 `__init_subclass__()` runs for every subclass definition Python executes.
-The registries built on it share two hazards with every self-registering design,
+The registries that use it share two hazards with every self-registering design,
 with or without `__init_subclass__()`.
 [Factory](26_Patterns--Factory.md#hazards-of-self-registration) covers both:
 a class in a module nobody imports stays out of the registry,

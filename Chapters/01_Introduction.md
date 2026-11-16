@@ -131,7 +131,7 @@ so Static Types is the chapter in Part I that every later chapter assumes you ha
 [Class Attributes](09_Foundations--Class_Attributes.md)
 and [Cleanup](10_Foundations--Cleanup.md)
 are the two others that a reader who knows Python should still read,
-since later chapters build on `ClassVar`, bare annotations, and weak references.
+since later chapters use `ClassVar`, bare annotations, and weak references.
 
 Part II, *Techniques*,
 covers the idioms and tools that give Python its character: testing,
@@ -164,9 +164,9 @@ One chapter surveys languages that track Effects in a function's type,
 and asks what Python could adopt.
 Another develops the full generator protocol.
 The last two put Effect tracking and generators to work with Stateless,
-a library that builds Effect tracking on generators and brings it to Python today.
+a library that implements Effect tracking with generators and brings it to Python today.
 Read these four chapters in order.
-The last two build on the chapters before them.
+The last two depend on the chapters before them.
 
 Two appendices follow.
 [Effect Tracking](A_Effect_Tracking.md)

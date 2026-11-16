@@ -1,7 +1,7 @@
 # Surrogate
 
 > The caller talks to one object, and a different object behind it does the work.
-> *Proxy* and *State* are both built on that stand-in,
+> *Proxy* and *State* both use that stand-in,
 > which this chapter calls a *Surrogate*.
 
 Both *Proxy* and *State* provide a surrogate class that changes what runs behind a call while the calling code stays the same.

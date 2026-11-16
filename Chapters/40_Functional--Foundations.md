@@ -48,7 +48,7 @@ such as printing, reading or writing a file or the network,
 or mutating something outside the function.
 A pure function has none.
 
-Everything else in these chapters builds on purity.
+Everything else in these chapters depends on purity.
 You can reason about a pure function the way you reason about an equation:
 
 ```python
@@ -418,7 +418,7 @@ explains.
 `sorted()`'s `key` has no comprehension equivalent,
 so it is a higher-order argument either way.
 
-Beyond how they read, a comprehension and `map()` return different things.
+A comprehension and `map()` read differently, and they return different things.
 The comprehension builds a finished list.
 `map()` returns an iterator that hands the next stage one value at a time.
 A [generator expression](16_Techniques--Comprehensions.md#generator-expressions)
@@ -722,7 +722,7 @@ after the filter.
 
 `pipeline.py` is ordinary Python,
 written so that each piece depends on its arguments alone.
-The chapters ahead build on that property.
+The chapters ahead use that property.
 
 ## Exercises
 

@@ -290,9 +290,9 @@ of judged keeps in `tools/data/` so only new hits print (since
 2026-10-03): `tip stranded` (`tools/stranded_prepositions.py`, a clause
 ending on a preposition whose object moved) and `tip watch-words`
 (`tools/watch_words.py`, the style guide's don't-use and avoid tiers).
-Since 2026-11-04 "whatever" is a Tier 2 watch word (candidate C56 in
-`bruce_edit_db.md`, Bruce: "should be considered circumspect in
-general"): a concessive "whatever the driver's reason" is a universal
+Since 2026-11-04 "whatever" is a Tier 2 watch word (rule R69 in
+`bruce_edit_db.md`, promoted 2026-11-16 from C56; Bruce: "should be
+considered circumspect in general"): a concessive "whatever the driver's reason" is a universal
 to test or a phrase to cut, and a free relative "whatever the caller
 supplies" is "the value the caller supplies". The chapter 45 pass
 rewrote its seven sites that day. The 2026-11-16 read (four Opus
@@ -316,8 +316,9 @@ four: a cut that left two sentences meeting on one clause, "undo the
 rows", a second "whether" in a row, and "sets into the next". No
 site is NEW and the baseline holds no "whatever" entry; six sites
 that two scoped accepts had recorded unread were read with the rest.
-The word's one remaining use is chapter 15's epigraph, a block
-quote the check skips.
+The last site was chapter 15's epigraph, a block quote the check
+skips, which became "Everything you acquire must be released" when
+the candidate was promoted that day.
 Since 2026-11-08 `however` is Tier 2 too (rule R58, Bruce: "unclear
 usage of 'however'" on chapter 45's "however many `next()` calls
 that takes"): the concessive sense reads first as the contrastive

@@ -438,5 +438,5 @@ and it becomes part of every future pass.
   hot", "the type a `cast()` asserts"), and the name when the passage
   or the listing has one ("the shape it receives", "wraps `other`").
   `tip watch-words CH=NN ARGS="--only whatever"` lists the sites.
-  C56 and R54 in `bruce_edit_db.md`; the concessive form is the
+  R69 and R54 in `bruce_edit_db.md`; the concessive form is the
   `ambiguity` skill's.
