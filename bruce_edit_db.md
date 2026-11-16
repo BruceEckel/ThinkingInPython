@@ -4604,10 +4604,21 @@ parallel-condition shape.
   `__getitem__()`" carries the contrast)
 - `19_Techniques--Concurrency`: "but not to the OS. Instead, control
   goes to the *event loop*" -> "Control goes to the *event loop*"
+- `46_Effects--Stateless` 2026-11-16, was Claude-written, Bruce on
+  "rather than how the body reads.": "awkward". The same tag with
+  "rather than" and a clause: "The annotation describes that returned
+  object rather than how the body reads." -> "The annotation
+  describes that returned object." The paragraph had made the
+  contrast three sentences up ("Python decides generator-function
+  status from the body alone"), so the deletion test passed. The tag
+  also set a noun phrase against a clause, and its "reads" is a
+  figure for what the body contains. Scale: 6 other "rather than
+  how/what/where ..." clauses in the book, unread.
 
 **Home.** CLAUDE.md (a bullet before "Prefer the positive statement",
-2026-11-01) | this file. Not a watch word: a bare scan would list 400
-"instead of"s, and the shape is a per-sentence judgment.
+2026-11-01) | `super-prose` pass 2 and the `positive` skill's Accrued
+patterns (since 2026-11-16) | this file. Not a watch word: a bare scan
+would list 400 "instead of"s, and the shape is a per-sentence judgment.
 
 ### C55. "same" with nothing to compare against is a pointer; write the pointer
 

@@ -227,3 +227,14 @@ before/after pair, and it becomes part of every future pass.
   "Each state's `while True` loop keeps the machine in that state."
   Keep "with no" for a property of the thing itself ("a function with no parameters", "`f()` with no arguments").
   `tip watch-words` skips a `no` after a preposition, so grep the scope for `with no`. C66 in `bruce_edit_db.md`.
+- **A trailing "rather than X" that restates a contrast the passage has made.**
+  "The annotation describes that returned object rather than how the body reads."
+  (Bruce, 2026-11-16, chapter 46: "awkward")
+  Three sentences up, the paragraph says "Python decides generator-function status from the body alone".
+  The tag tells the reader an alternative is excluded, as a trailing "instead" or "only" does,
+  and here the paragraph had already named it.
+  Delete the tag and reread: "The annotation describes that returned object."
+  The positive sentence is complete.
+  The tag also set a noun phrase against a clause, and "how the body reads" is a figure for what the body contains.
+  Keep "rather than" where it alone marks the substitution, and between two bare verb phrases ("return a description rather than raise an exception").
+  Grep the scope for `instead[.,:]` and `rather than (how|what|where|when|whether)`. C54 in `bruce_edit_db.md`.

@@ -108,7 +108,14 @@ each pass hands the next one less to do.
    the next state ... After any other input, the loop runs its
    `yield` again", C66). No tool lists it: grep the scope for
    `with no` and keep a property of the thing itself ("a function
-   with no parameters").
+   with no parameters"). A trailing "instead" or "rather than X"
+   gets the same deletion test as "only": when the passage has
+   already stated the alternative, the tag goes ("The annotation
+   describes that returned object rather than how the body reads",
+   Bruce: "awkward", three sentences after "Python decides
+   generator-function status from the body alone" -> "The annotation
+   describes that returned object", C54). Grep the scope for
+   `instead[.,:]` and `rather than (how|what|where|when|whether)`.
 3. `straighten`: a buried actor, a subject held open, an overloaded
    sentence, a colon or "and" carrying a second claim. A subject
    whose relative clause puts its object first sets two noun phrases

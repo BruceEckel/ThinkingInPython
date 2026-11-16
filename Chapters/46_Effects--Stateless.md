@@ -116,7 +116,7 @@ Python decides generator-function status from the body alone.
 A `yield` in the body makes a function a generator function.
 `double()` calls `success()` and returns the Effect that `success()` builds,
 the way an ordinary function returns a list.
-The annotation describes that returned object rather than how the body reads.
+The annotation describes that returned object.
 
 The Effect that `double()` returns implements the generator protocol,
 and `run()` drives any object that implements that protocol.
