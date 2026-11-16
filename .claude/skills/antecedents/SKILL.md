@@ -411,3 +411,19 @@ and it becomes part of every future pass.
   After any split, read the new paragraph's first noun phrase for a
   "the", "that", or "these" that points back across the break.
   R29's 2026-11-15 sighting in `bruce_edit_db.md`.
+- **A free relative leaves unnamed a thing the passage can name.**
+  "A bound method ... stores its instance in its `__self__`
+  attribute, so whatever holds `self.close` holds `Leaky` through it"
+  stood one sentence after "`finalize()` keeps every callback in a
+  registry", and became "so the registry holds `Leaky` through
+  `self.close`" (the "whatever" read, 2026-11-16; Bruce, 2026-11-04:
+  "the use of 'whatever' should be considered circumspect in
+  general").
+  "Whatever" and "whichever" before a clause pick a thing out by a
+  property and leave it unnamed.
+  Write the definite noun phrase ("the code that turns out to be
+  hot", "the type a `cast()` asserts"), and the name when the passage
+  or the listing has one ("the shape it receives", "wraps `other`").
+  `tip watch-words CH=NN ARGS="--only whatever"` lists the sites.
+  C56 and R54 in `bruce_edit_db.md`; the concessive form is the
+  `ambiguity` skill's.

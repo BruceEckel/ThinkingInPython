@@ -175,6 +175,26 @@ round of the `chapter-editor` skill.
 
 ## Learning from editing passes
 
+**Every edit is a lesson** (Bruce, 2026-11-16): "Whenever I make an
+edit in this book, or ask you to make an edit, you should learn from
+that edit and incorporate it into the appropriate place in
+super-prose." The rule holds in every session and needs no request.
+An edit is a change he typed, a sentence he flags, pastes, or asks a
+question about, and a rewrite or a sweep he asks for. In the same
+turn: name the fault in one line, write the lesson into the pass that
+owns it (its entry in the `super-prose` skill's "The order" and the
+Accrued section of the pass's own skill), record the sighting or the
+candidate in `bruce_edit_db.md`, grep both trees for sibling sites,
+commit the lesson with the edit, and say in the reply what was
+learned and where it went. A local edit (a fact corrected, a name
+changed) teaches nothing, and the reply says "local". An edit he is
+still typing inside an open pass is learned from when it settles; the
+`edit-start-NN` tag holds it until then. The steps are in the
+`super-prose` skill under "Every edit feeds this skill". The rule
+lives in this file and that skill because project memory is kept per
+machine: he first gave it on his laptop, and it had not reached this
+checkout.
+
 `/bruce-edit-capture` (`.claude/skills/bruce-edit-capture/SKILL.md`) reads the
 before/after diff of an editing pass on a chapter, whoever made each edit
 (Bruce's rule since 2026-09-28: a pass is judged by whether the chapter got

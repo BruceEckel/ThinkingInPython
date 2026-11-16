@@ -17,6 +17,15 @@ and writes the general ones into `bruce_edit_db.md` for
 The only file it writes is `bruce_edit_db.md`, and only after Bruce approves
 the entries. Applying anything to prose belongs to the other skill.
 
+Since 2026-11-16 a single edit is not held for this pass.
+Bruce's standing instruction is that every edit he makes or asks for
+is learned from in the same turn, and its lesson filed in the pass
+that owns it: the `super-prose` skill's "Every edit feeds this skill"
+has the steps.
+This skill stays the read of a whole pass's diff at `/edit-done`,
+where it finds what the edit-by-edit filing missed and proposes the
+promotions.
+
 The central risk is over-generalizing.
 One edit underdetermines its rule:
 "the class itself defines" becoming "the class defines" could mean

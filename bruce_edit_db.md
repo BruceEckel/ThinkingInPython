@@ -4712,7 +4712,9 @@ between"), a noun that does not fit the verb ("undo the rows"), and
 a second "whether" directly after one. An exercise statement with
 the word was rewritten in its chapter, as in R54's and R58's sweeps.
 
-**Home.** CLAUDE.md watch list (Tier 2, "whatever") | this file.
+**Home.** CLAUDE.md watch list (Tier 2, "whatever") | `super-prose`
+pass 5 (the free relative) and pass 6 (the concessive), with the
+Accrued sections of the antecedents and ambiguity skills | this file.
 
 ### C57. A present perfect in a time clause is the simple present
 

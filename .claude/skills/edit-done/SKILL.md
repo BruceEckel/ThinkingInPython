@@ -193,6 +193,13 @@ docstring has the mechanics). While the tag still exists:
 
 ## A pass captured as it went
 
+Since 2026-11-16 this is how every pass arrives here: Bruce's
+standing instruction is that each edit he makes or asks for is
+learned from in the same turn (the `super-prose` skill, "Every edit
+feeds this skill"), so the store and the skills already hold the
+lessons of the flagged sentences, and the close reads the edits in
+between.
+
 Chapter 45's pass (2026-10-21 to 2026-11-15, 499 commits) had no tag
 at its close and no fault-review page. Each commit that repaired a
 flagged sentence wrote its own store entry, with a grep of both trees

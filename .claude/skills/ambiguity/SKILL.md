@@ -390,3 +390,24 @@ Shapes Bruce flags that the catalog above did not name, dated, with the sentence
   member that differs a sentence of its own.
   Two lists paired by "respectively" or by order ("X and Y ... as A
   and B") get the same unpacking, one sentence for each pair.
+- 2026-11-16, the book's 54 "whatever" sites: a concessive "whatever"
+  is a universal the reader has to trust.
+  Bruce, 2026-11-04: "the use of 'whatever' should be considered
+  circumspect in general." His own edit cut the phrase ("carries one
+  meaning, finish, whatever the driver's reason" -> "finish.").
+  Cut it when the sentence or its neighbor says the same ("picks the
+  field by name, whatever its position", two sentences after
+  "Unpacking assigns by position").
+  Otherwise name the options ("with or without a leading underscore",
+  "file or directory", "whether a coroutine, a thread, or a process
+  runs underneath") or the range ("in any field order", "for every
+  `y`", "as the source grows"), with the listing's name where it has
+  one ("with or without a `Drawable` base class").
+  Test the universal before restating it. "`repr()` ... raises a
+  `RecursionError` that reports a stack overflow, whatever the limit
+  says" was false at the default limit, which raises "maximum
+  recursion depth exceeded", and became "despite the raised limit".
+  After a cut, read the sentence against the next one for a clause
+  the two now share.
+  The read rewrote all 54 and kept none. C56 in `bruce_edit_db.md`;
+  the free relative is the `antecedents` skill's.

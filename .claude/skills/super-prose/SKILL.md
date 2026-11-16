@@ -14,6 +14,10 @@ This form keeps the conversation's context (what Bruce has already
 ruled on, the listing just edited) and can scope to one section,
 which `tip rewrite` cannot.
 
+Each pass's entry below carries the lessons of the edits made so far.
+"Every edit feeds this skill", the last section, is the standing rule
+that puts the next lesson here.
+
 ## The order
 
 Load all eleven skills with the `Skill` tool before touching the
@@ -208,7 +212,22 @@ each pass hands the next one less to do.
    `[HEAD]` in `tip sentence-shapes CH=NN ARGS=--survey` lists the
    bare head nouns of terms the file rarely shortens ("so the channel
    stays at `Async`" -> "so the Ability channel stays `Async`"); the
-   grep still finds a head the file mostly uses alone.
+   grep still finds a head the file mostly uses alone. Before keeping
+   a `[HEAD]` hit, read the listing for a second thing of the kind:
+   the competitor is seldom another of the file's terms (a `for` loop
+   a paragraph from the event loop, a `check()` function beside the
+   type checker, three kinds of block in one listing; the 2026-11-16
+   read, R12). Name a loop by what it iterates ("the loop over
+   `tasks.items()`"), and check the listing's variable names before
+   writing an owner ("the group's block" under `except* ValueError as
+   group`).
+   A free relative leaves unnamed a thing the passage can name
+   ("whatever holds `self.close` holds `Leaky` through it" -> "the
+   registry holds `Leaky` through `self.close`", C56; "whichever call
+   resumed it" -> "the call that resumed it", R54): write the
+   definite noun phrase, and the name when the passage has one
+   ("wraps whatever arrives" -> "wraps `other`"). `tip watch-words`
+   lists both words.
    A repair that names the items for a bare "each" gives two items a
    clause apiece ("The producer is simplest to write as a loop, and
    so is the consumer"), never the two names in front of the old
@@ -291,6 +310,22 @@ each pass hands the next one less to do.
    "The same X" said of a list ("PHP and Dart follow the same
    design") is one claim for each member, so check each against its
    reference and give a member that differs its own sentence (R63).
+   A concessive "whatever" is a universal (C56; the 2026-11-16 read
+   rewrote all 54 of the book's sites). Cut it when the sentence or
+   its neighbor says the same ("picks the field by name, whatever its
+   position", two sentences after "Unpacking assigns by position").
+   Otherwise name its options ("whatever its first character" ->
+   "with or without a leading underscore"; "whatever its kind" ->
+   "file or directory") or its range ("in any field order", "for
+   every `y`"), with the name the listing gives ("whatever its base
+   classes" -> "with or without a `Drawable` base class"). Test the
+   universal before restating it: "raises a `RecursionError` that
+   reports a stack overflow, whatever the limit says" was false at
+   the default limit and became "despite the raised limit". After a
+   cut, read the sentence against the next one for a clause the two
+   now share ("stays what you last read. Because a deeply immutable
+   value stays what you last read" took its phrase back as "no matter
+   which code ran in between").
 7. `activate`: passives with a natural actor, nominalizations,
    metadiscourse, empty frames, tense drift (a relative-clause past
    in a sentence about standing behavior included: "the value that
@@ -385,8 +420,13 @@ scope's line range:
 - `tip watch-words CH=NN` (for `ambiguity`: `however`, Tier 2 since
   2026-11-08, the concessive "however many" that reads first as a
   contrast and is a universal over a count or a manner, R58; the
-  contrastive "However," is skipped; `ARGS="--tier 1"` adds the
-  negated subjects; for `literal`: `draws` with an exception or a
+  contrastive "However," is skipped; `whatever`, Tier 2 since
+  2026-11-04, C56, whose concessive is `ambiguity`'s and whose free
+  relative is `antecedents`', as `whichever` is, R54; every site in
+  the book is rewritten, so a hit is a sentence written since;
+  `ARGS="--only whatever"` lists one word's sites; `ARGS="--tier 1"`
+  adds the negated subjects; for `literal`: `draws` with an exception
+  or a
   diagnostic as its object, Tier 2 since 2026-11-09, "A `yield`
   inside a `finally` clause draws the same `RuntimeError`" -> "If a
   generator yields inside a `finally` clause, `close()` raises a
@@ -475,3 +515,64 @@ pairs for the figures replaced, the sentences split, the pointers
 named, the sentences cut and why, and the paragraphs split.
 Name the passes that found nothing.
 List the hits kept and baselined, with the reason each is the claim.
+
+## Every edit feeds this skill
+
+Bruce's standing instruction (2026-11-16): "Whenever I make an edit
+in this book, or ask you to make an edit, you should learn from that
+edit and incorporate it into the appropriate place in super-prose."
+It holds in every session, inside an editing pass or outside one, and
+it needs no request. The edit is the request.
+
+An edit is any of these: a change Bruce typed (seen in the working
+tree, in a commit of his, or in a chapter editor round), a sentence
+he flags, pastes, or asks a question about, and a rewrite or a sweep
+he asks for, with the repairs the session makes inside it. Who typed
+the change does not matter (2026-09-28).
+
+For each one, in the same turn as the edit:
+
+1. **Say what the before-text got wrong**, in one line that would
+   pick the fault out in another chapter. An edit that is local (a
+   fact corrected, a name changed, prose following a listing that
+   changed, a word that repeated a few lines up) teaches nothing
+   here: say "local" in the reply and stop.
+2. **Find the pass that owns the fault.** A figure or a vague
+   description is `literal`'s. A negation is `positive`'s. A subject
+   held open, or an "and" or a colon carrying a second claim, is
+   `straighten`'s. Order, a paragraph's topic, and a seam are
+   `cohesion`'s. A pointer or a stand-in noun is `antecedents`'. Two
+   readings are `ambiguity`'s. A passive, a tense, and a frame are
+   `activate`'s. A road not taken is `alternative`'s, and an echo is
+   `stutter`'s. A fault no pass owns goes to the pass whose test
+   comes closest, and the entry says so.
+3. **Write the lesson into that pass's entry in "The order"**: the
+   test, the before and the after in quotation marks, the store
+   number, and how a pass finds the shape (the survey tool that lists
+   it, or a grep). Add the dated entry, with Bruce's words when he
+   gave any, to the Accrued section of the pass's own `SKILL.md`. A
+   lesson about how the passes run (a check to make, a step out of
+   order) goes in the section of this file it changes.
+4. **Record it in `bruce_edit_db.md`**: a sighting on the rule or the
+   candidate it matches, or a new candidate stated as narrowly as the
+   one edit supports, with a `Home` that names the pass. A second
+   chapter earns a `**Promotion.** Proposed` line. Promoting is
+   Bruce's call.
+5. **Grep both trees for the shape.** Fix the sibling sites in the
+   chapter at hand, and give the count of the others in the store
+   entry.
+6. **Commit the lesson with the edit**, and say in the reply, in one
+   line, what was learned and where it went.
+
+Two limits. An edit Bruce is still typing inside an open pass is
+evidence the `edit-start-NN` tag already holds: learn from it when it
+settles (he commits it, flags it, asks about it, or closes the pass
+with `/edit-done`), and leave a sentence in motion alone. And one
+edit underdetermines its rule, so the narrow statement is the right
+one (the `bruce-edit-capture` skill has the reasons). A pass entry
+that fires on a tenth of a chapter's sentences was stated too
+broadly.
+
+This section is in the repository because project memory is kept per
+machine. Bruce first gave the instruction on his laptop, and it had
+not reached this checkout.
