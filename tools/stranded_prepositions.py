@@ -270,11 +270,17 @@ def load_baseline(path: Path | None = None) -> set[str]:
     }
 
 
-def write_baseline(entries: set[str], path: Path | None = None) -> None:
-    """The header plus the sorted entries, with LF line endings."""
+def write_baseline(entries: set[str], path: Path | None = None,
+                   header: str = HEADER) -> None:
+    """The header plus the sorted entries, with LF line endings.
+
+    A check that shares this writer passes its own `header`
+    (watch_words.py does), so each baseline file names the check
+    that wrote it and the task that rewrites it.
+    """
     path = path or BASELINE
     body = "".join(f"{entry}\n" for entry in sorted(entries))
-    path.write_text(HEADER + body, encoding="utf-8", newline="\n")
+    path.write_text(header + body, encoding="utf-8", newline="\n")
 
 
 def main(argv: list[str] | None = None) -> int:

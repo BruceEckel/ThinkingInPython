@@ -603,7 +603,8 @@ def main(argv: list[str] | None = None) -> int:
         added = {key(s, w, c) for s, _, t, w, c in found
                  if (t == 1) == (args.tier == 1)
                  and key(s, w, c) not in baseline}
-        write_baseline((baseline - set(stale)) | added, BASELINE)
+        write_baseline((baseline - set(stale)) | added, BASELINE,
+                       HEADER)
         print(f"Baseline: added {len(added)}, dropped {len(stale)} "
               f"stale, in {display(BASELINE)}")
         return 0

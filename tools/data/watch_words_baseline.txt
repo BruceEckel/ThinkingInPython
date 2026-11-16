@@ -1,12 +1,11 @@
-# Stranded-preposition hits a human read and judged false
-# positives: a particle after a noun object, an adverb, a clause
-# the splitter cut, an infinitive marker. An entry is not an
+# Watch-word hits a human read and judged a keep: a literal
+# sense, or a word that earns its place. An entry is not an
 # exemption from the rule.
-# path<TAB>clause, with the clause's whitespace normalized and no
-# line number, so a reflow leaves an entry alone and an edit to
-# the clause retires it. Rewritten by `tip stranded-accept`; read
-# the delta with `tip stranded` before accepting.
-# See tools/stranded_prepositions.py.
+# path<TAB>word: clause, with the clause's whitespace normalized
+# and no line number, so a reflow leaves an entry alone and an
+# edit to the clause retires it. Rewritten by
+# `tip watch-words-accept`; read the delta with `tip watch-words`
+# before accepting. See tools/watch_words.py.
 Chapters/01_Introduction.md	already: and does the language already do the pattern's job
 Chapters/01_Introduction.md	already: if they don't already
 Chapters/01_Introduction.md	already: this book asks whether the language already solves the problem

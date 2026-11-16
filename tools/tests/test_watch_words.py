@@ -8,7 +8,7 @@ from tools.stranded_prepositions import (
     load_baseline,
     write_baseline,
 )
-from tools.watch_words import find, key, main
+from tools.watch_words import HEADER, find, key, main
 
 def hits(text: str) -> list[tuple[int, int, str, str]]:
     doc = Document.from_text(text, Path("fixture.md"))
@@ -197,6 +197,16 @@ def test_accept_adds_new_and_drops_stale(book: Path) -> None:
     assert main(["--accept"]) == 0
     assert load_baseline(baseline_of(book)) == {entry(book)}
     assert main([]) == 0
+
+
+def test_accept_writes_its_own_header(book: Path) -> None:
+    """The writer is shared with stranded_prepositions.py, whose
+    header the baseline carried from its first commit until
+    2026-11-16."""
+    assert main(["--accept"]) == 0
+    text = baseline_of(book).read_text(encoding="utf-8")
+    assert text.startswith(HEADER)
+    assert "Stranded-preposition" not in text
 
 
 def test_accept_with_paths_touches_only_their_entries(
