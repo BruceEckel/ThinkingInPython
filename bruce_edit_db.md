@@ -5670,10 +5670,14 @@ Claude-written, Bruce: "??":
   "defines". The sentence also made the chapter the actor of a
   definition that `greeter.py` holds, and it opened a section about
   the library with a recap of the chapter's own class (R19).
+- The chapter's other site: "The failure the signature declares is
+  the one the caller sees." -> "The caller sees the failure that the
+  signature declares."
 - Scale: a grep of both trees for `(is|are) (the )?ones? ` and a noun
-  or a pronoun finds 17 other lines. Five have this shape ("Every
-  Effect you isolate is one your tests can control", "every method
-  that adds items is one it defines"), unread.
+  or a pronoun finds 17 other lines. Four more have this shape, in
+  chapters 06, 20, 21, and 44 ("Every Effect you isolate is one your
+  tests can control", "its exceptions are ones the caller expects
+  from the base"), unread.
 
 **Promotion.** Proposed: two chapters.
 

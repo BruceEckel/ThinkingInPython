@@ -1845,7 +1845,7 @@ def test_one_unhandled() -> None:
         run(one_unhandled("Bob"))
 ```
 
-The failure the signature declares is the one the caller sees.
+The caller sees the failure that the signature declares.
 A failure leaves the error channel in one of two ways:
 `catch()` moves it into the result, or `run()` raises it at the edge.
 
