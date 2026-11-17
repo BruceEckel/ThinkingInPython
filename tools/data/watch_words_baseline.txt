@@ -572,7 +572,6 @@ Chapters/46_Effects--Stateless.md	has no: CODE has no special status in Stateles
 Chapters/46_Effects--Stateless.md	has no: Stateless has no container
 Chapters/46_Effects--Stateless.md	has no: Stateless has no such registration
 Chapters/46_Effects--Stateless.md	has no: it has no values and is a subtype of every other type
-Chapters/46_Effects--Stateless.md	has no: so its Effect type has no dependency to declare
 Chapters/46_Effects--Stateless.md	is how: The difference is how many places you edit
 Chapters/46_Effects--Stateless.md	is what: CODE is what it produces
 Chapters/46_Effects--Stateless.md	is what: CODE is what the computation needs

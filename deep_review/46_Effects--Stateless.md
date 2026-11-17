@@ -106,6 +106,17 @@ Within sections, in chapter order.
   sentence.
 - Multiple Errors: a lead-in for the test listing.
 
+After this review was filed, at Bruce's request ("the example here is the
+trivial case of a pure function, and I don't think it gives enough context").
+
+- New section, One Effect at a Time, between The Simplest Effect and
+  Declaring a Dependency: three minimal listings with one Effect each,
+  `side_cause.py`, `side_effect.py`, and `failure.py`, under the new
+  subsections A Side Cause, A Side Effect, and A Failure. The Simplest
+  Effect now opens by saying `double()` is the trivial case, and its
+  closing bridge to Declaring a Dependency is gone. No existing anchor
+  changed.
+
 ## Blocks
 
 ### 1. Should `R` be called "the result channel"?

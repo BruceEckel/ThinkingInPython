@@ -320,6 +320,37 @@ do with this chapter so that it isn't so jumbled and confusing?"):
   and paragraphs, and its "reader's read" reports an order finding
   here.
 
+Accrued note from chapter 46, later the same day (Bruce on The
+Simplest Effect: "the example here is the trivial case of a pure
+function, and I don't think it gives enough context. What I'd like to
+do is add minimal examples which each do only one thing ... This way
+the reader can see each one in isolation"):
+
+- "Escalating difficulty" asks for the smallest thing that makes the
+  point, and four reviews took `double()`, an Effect with zero
+  Effects, for it. A concept's trivial case makes no point about the
+  concept. The test for a section's first listing: say what the
+  concept manages, then look for it in the listing's output. If a
+  plain function would print the same line (`42`), the listing is the
+  trivial case.
+- The trivial case can stay first. Its lead-in says it is the trivial
+  case, and one minimal listing follows for each kind of thing the
+  concept manages (a side cause, a side effect, a failure), each
+  doing one thing, before the sections that teach the machinery. This
+  is "Front-load the payoff" at the size of a section.
+- A minimal listing uses constructs its section has not taught
+  (`need()`, `supply()`, `@throws`). Give each construct one sentence
+  the listing supports, with the link to its section on the name
+  (R16), and no sentence that says a later section explains it (R7,
+  C21). Keep the listing to one definition: a dependency that the
+  standard library or the library provides (`random.Random`,
+  Stateless's `Console`) needs no class of its own.
+- Check each example for a second thing of the kind it isolates
+  before calling it minimal: a sentence that said a `Need` declares
+  "which of the two kinds" was false of a `Console` a function reads
+  and writes, and `tip overclaims` listed it.
+- C97 in `bruce_edit_db.md` has the sighting.
+
 Accrued notes from the chapters 18-38 review sweep:
 
 - "reach for" sits in `tools/data/banned_phrases.txt` and is an easy tic to

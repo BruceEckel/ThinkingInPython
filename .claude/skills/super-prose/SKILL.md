@@ -665,6 +665,13 @@ check that the page answers it before the paragraph ends:
   `plain_greet()`.)
 - The paragraphs under a listing: is each name's story in one place,
   in the listing's order? (The Simplest Effect.)
+- A section's first listing: does it show the concept at work, or the
+  trivial case, where the concept has nothing to manage? (`double()`,
+  an Effect with zero Effects, as the one example in The Simplest
+  Effect; Bruce: "I don't think it gives enough context". The test:
+  would a plain function print the same output? The repair says in the
+  listing's lead-in that it is the trivial case, then adds one minimal
+  listing per kind, each doing one thing, C97.)
 
 A question the page leaves open is a finding, under any rule or none.
 Fix it under the pass that owns it. When no pass does, say so in the

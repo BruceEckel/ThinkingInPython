@@ -84,7 +84,10 @@ A union with `Never` is therefore the same type as the union without `Never`.
 
 ## The Simplest Effect
 
-`success()` wraps a value in an Effect, and `run()` executes it:
+The simplest Effect is the trivial case:
+the Effect that a [pure function](40_Functional--Foundations.md#pure-functions)
+returns.
+`success()` wraps a value in such an Effect, and `run()` executes it:
 
 ```python
 # simplest_effect.py
@@ -148,10 +151,98 @@ so the first step ends the Effect and delivers `42`.
 `run()` drives any object that implements the generator protocol,
 and it gets a `SuccessEffect`'s result on that first step.
 
-`double()` takes everything it uses as its argument,
-so its Effect type has no dependency to declare.
-An Effect type declares one when a function uses an object created elsewhere,
-such as a console, a file, or a network connection.
+## One Effect at a Time
+
+[Effect Management](44_Effects--Effect_Management.md#what-is-an-effect)
+defines three kinds of Effect: a side cause, a side effect, and an exception.
+`double()` is the trivial case, with zero Effects to declare.
+Each of the next three functions has one Effect, a different kind in each.
+
+### A Side Cause
+
+Reading a random number is a side cause.
+`roll()` returns a number that a `random.Random` produces:
+
+```python
+# side_cause.py
+import random
+from stateless import Depend, Need, need, run, supply
+
+def roll() -> Depend[Need[random.Random], int]:
+    rng = yield from need(random.Random)
+    return rng.randint(1, 6)
+
+bound = supply(random.Random(47))(roll)
+print(run(bound()), run(bound()))
+#: 3 1
+```
+
+`roll()` uses an object created elsewhere,
+so the `random.Random` is a dependency.
+[`need(random.Random)`](#declaring-a-dependency) requests that object,
+and `Need[random.Random]` in the return type declares the request.
+[`supply()`](#supplying-the-dependency) wraps `roll()` in a new function,
+`bound`, that answers the request with an instance whose seed is `47`.
+
+The two `run(bound())` calls are identical, and they return different numbers.
+`roll()` takes its result from the `random.Random`,
+which produces a new number at each `randint()` call.
+The seed determines the sequence, so the program always prints `3 1`.
+
+### A Side Effect
+
+Writing to standard output is a side effect.
+`display()` writes its argument to standard output through a `Console`:
+
+```python
+# side_effect.py
+from stateless import Depend, Need, need, run, supply
+from stateless.console import Console
+
+def display(n: int) -> Depend[Need[Console], None]:
+    console = yield from need(Console)
+    console.print(n)
+
+bound = supply(Console())(display)
+run(bound(42))
+#: 42
+```
+
+The `print()` method of Stateless's `Console` class calls the built-in `print()`.
+`display()` declares its side effect in the form `roll()` uses for its side cause,
+a `Need` in the Ability channel.
+A `Need` declares that a function uses an object.
+The function's body reads from that object, as `roll()` does, or writes to it,
+as `display()` does.
+
+### A Failure
+
+The third kind of Effect is an exception.
+In `inverse()`, `1 / n` raises a `ZeroDivisionError` when `n` is zero:
+
+```python
+# failure.py
+from exceptions import expect
+from stateless import run, throws
+
+@throws(ZeroDivisionError)
+def inverse(n: int) -> float:
+    return 1 / n
+
+print(run(inverse(4)))
+#: 0.25
+expect(ZeroDivisionError, run, inverse(0))
+#: [ZeroDivisionError] division by zero
+```
+
+[`@throws(ZeroDivisionError)`](#declaring-a-failure-with-throws)
+declares that exception as a failure.
+The decorator changes the return type of `inverse()` from `float` to `Try[ZeroDivisionError, float]`,
+with `ZeroDivisionError` in the error channel.
+When the body raises a `ZeroDivisionError`,
+`@throws` catches the exception and yields it as the Effect's failure.
+The failure of `inverse(0)` reaches `run()`,
+which raises that failure as an ordinary exception.
 
 ## Declaring a Dependency
 

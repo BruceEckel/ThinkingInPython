@@ -6963,6 +6963,62 @@ different name so it isn't confused with the previous one":
 **Home.** this file; the listing-design skill if promoted; the
 reader's read in super-prose lists the question.
 
+### C97. A concept's first example is not its trivial case alone: say it is the trivial case, then show each kind at its smallest (listing, additive)
+
+**Test.** A section introduces a concept with one listing, and the
+listing is the concept's trivial case: an Effect with zero Effects
+(`double()` returning `Success[int]`). Say what the concept manages,
+then look for it in the listing's output. If a plain function would
+print the same line (`42`), the reader has seen the frame and nothing
+in it. Say in the listing's lead-in that it is the trivial case, and
+follow the section with one minimal listing for each kind of thing the
+concept manages, each doing one thing, before the sections that teach
+the machinery.
+
+**Keep when.** The trivial case opens a graded series in its own
+section (chapter 12's "`A` is the simplest case", chapter 45's "In the
+simplest case", each followed at once by the next case).
+
+**Sightings.** 1, `46_Effects--Stateless` 2026-11-17, Bruce on The
+Simplest Effect: "the example here is the trivial case of a pure
+function, and I don't think it gives enough context. What I'd like to
+do is add minimal examples which each do only one thing: one that has
+a single side cause, one that has a side effect, one that has an
+error. This way the reader can see each one in isolation. Also
+emphasize that the first example is the trivial case of a pure
+function":
+- "`success()` wraps a value in an Effect, and `run()` executes it:"
+  over `simplest_effect.py`, the one example before Declaring a
+  Dependency -> "The simplest Effect is the trivial case: the Effect
+  that a [pure function] returns." in front of that lead-in, and a
+  new section, One Effect at a Time, with `side_cause.py` (`roll()`
+  reads a number from a `Need[random.Random]`), `side_effect.py`
+  (`display()` writes to a `Need[Console]`), and `failure.py`
+  (`inverse()` under `@throws(ZeroDivisionError)`).
+- The bridge "`double()` takes everything it uses as its argument, so
+  its Effect type has no dependency to declare. ..." went. Its
+  definition, "uses an object created elsewhere", now sits under
+  `side_cause.py`, where the first dependency is.
+- How the three stay minimal: each dependency is a class a library
+  provides, so each listing holds one function. Each construct the
+  later sections teach (`need()`, `supply()`, `@throws`) gets one
+  sentence the listing supports, with the link on its name (R16), and
+  no sentence says a later section explains it (R7, C21).
+- The three kinds map onto two channels, and the listings show it: a
+  side cause and a side effect are each a `Need` in the Ability
+  channel, and the exception is in the error channel.
+- Why the reviews missed it: the deep-review skill's "Escalating
+  difficulty" asks for "the smallest thing that makes the point", and
+  four reviews and a reader's read took `double()` for it. The trivial
+  case makes no point about Effects: no request, no failure, and the
+  output a plain function prints.
+- Scale: no tool or grep lists the shape. The book's two other
+  "simplest case" sentences (chapters 12 and 45) are the Keep-when.
+
+**Home.** this file; the deep-review skill's teaching pass (accrued
+note, 2026-11-17), which owns a missing listing; the reader's read in
+super-prose lists the question; the listing-design skill if promoted.
+
 ## Retired
 
 Rejected by Bruce, or promoted and later withdrawn. Never propose these

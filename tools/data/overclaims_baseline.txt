@@ -758,6 +758,8 @@ Chapters/46_Effects--Stateless.md	[BOUND] CODE is the only extra call in that te
 Chapters/46_Effects--Stateless.md	[BOUND] CODE likewise leaves the body alone, but it specifies the exception types it lifts and puts them in the signature rather than in a returned wrapper
 Chapters/46_Effects--Stateless.md	[BOUND] CODE stores its values as CODEs, so looking up a name is the only step and CODE is the only failure
 Chapters/46_Effects--Stateless.md	[BOUND] CODE supplies two Abilities at one call site
+Chapters/46_Effects--Stateless.md	[BOUND] Each of the next three functions has one Effect, a different kind in each
+Chapters/46_Effects--Stateless.md	[BOUND] Effect Management defines three kinds of Effect
 Chapters/46_Effects--Stateless.md	[BOUND] Everything else is an Ability request
 Chapters/46_Effects--Stateless.md	[BOUND] Explain which of the two shapes CODE requires, and why it takes a schedule and returns a decorator of type CODE, rather than being an operation on an Effect
 Chapters/46_Effects--Stateless.md	[BOUND] If you advance the Effect one step with CODE, CODE returns the CODE as a value instead of raising it
