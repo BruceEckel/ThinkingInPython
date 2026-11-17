@@ -147,7 +147,10 @@ each pass hands the next one less to do.
    -> "the current state is an `Enum` member, which a *Memento* can
    store in a field"): read for a noun followed directly by "a" or
    "the" and a second noun, and name the things the stand-in nouns
-   ("value", "record", "object") point at.
+   ("value", "record", "object") point at. "One" is such a stand-in
+   ("The `Console` in `greeter.py` is one this chapter defines",
+   Bruce: "weird wording, confusing"): grep the scope for
+   `(is|are) (the )?ones? `.
    A paragraph that argues is walked as an argument: for each
    "must", "cannot", and "so", find the fact that licenses it on the
    page. A "must" with no reason becomes the fact and its cases
@@ -272,7 +275,12 @@ each pass hands the next one less to do.
    definition above did not lead the reader to expect gets its
    reason beside it ("why isn't it just `Console`?"), never a
    sentence that reads the form aloud (R47) or a link to a later
-   section (R7). A sentence that states a later section's point
+   section (R7). A pointer that says a later section "says why" or
+   "explains why" stands where the reason goes: write the reason in
+   a clause ("[Built-in Dependencies], below, says why", Bruce:
+   "very weird ... rather than forward linking" -> "to show that a
+   dependency is an ordinary class"), and grep the scope for
+   `(says|explains|shows) why`. A sentence that states a later section's point
    under a listing that cannot show it goes ("The work the Effect
    describes waits for a call to `run()`", Bruce: "awkward"; "A
    synchronous program calls it once, at the outermost edge",

@@ -176,8 +176,9 @@ def greet(name: str) -> Depend[Need[Console], None]:
 
 `greeter.py` lives in `utils/` because both this chapter and [Stateless in Practice](47_Effects--Stateless_in_Practice.md)
 import it.
-This chapter builds its own `Console` rather than using the one Stateless provides.
-[Built-in Dependencies](#builtin-dependencies), below, says why.
+`greeter.py` defines its own `Console`,
+rather than using the one Stateless provides,
+to show that a dependency is an ordinary class.
 
 Compare `greeter.py`'s `greet()` to the version that calls the built-in `print()`:
 
@@ -277,8 +278,8 @@ gets a small function of its own.
 
 ## Built-in Dependencies {#builtin-dependencies}
 
-The `Console` in `greeter.py` is one this chapter defines.
-Stateless also provides three dependencies of its own:
+Stateless provides three dependencies,
+one of them named `Console` like the class in `greeter.py`:
 
 - `Console` in `stateless.console`,
   whose `print_line()` and `read_line()` *accessors* call its `print()` and `input()` methods
@@ -297,8 +298,8 @@ It carries `@throws(FileNotFoundError, PermissionError)` on a function that alre
 so its type declares an Ability and two failures together.
 [The Error Channel](#the-error-channel) introduces that decorator.
 
-This chapter builds a `Console` of its own for illustration rather than using `stateless.console`.
-In your own code, first check what the library provides.
+Before you write a dependency class of your own,
+check what the library provides.
 
 ## Nothing Runs Yet
 

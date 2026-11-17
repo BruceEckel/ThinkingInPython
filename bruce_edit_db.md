@@ -323,6 +323,25 @@ its own ("The next listing shows the same trap in a generator").
   doesn't mention Need"): "[Nothing Runs Yet] explains why that
   request must be a value of its own." -> deleted, with the reason
   given in place (C79, sighting 3).
+- The same chapter and day, Bruce: "second sentence is very weird,
+  maybe just say something about teaching purposes or something brief
+  rather than forward linking which I thought we had a rule about":
+  "This chapter builds its own `Console` rather than using the one
+  Stateless provides. [Built-in Dependencies](#builtin-dependencies),
+  below, says why." -> "`greeter.py` defines its own `Console`,
+  rather than using the one Stateless provides, to show that a
+  dependency is an ordinary class."
+  A pointer that says a later section "says why" or "explains why"
+  stands where the reason goes. Write the reason in a clause. The
+  keep above ("the pointer carries a claim") does not cover it: the
+  claim was in the sentence before, and the pointer carried a
+  promise. Claude read this pair as a keep an hour before the flag,
+  for that reason. The target section's reason was two words, "for
+  illustration", in a sentence that restated the fact a third time;
+  that sentence went, and the section's opening recap with it (R19).
+  Grep the scope for `(says|explains|shows) why`. One other site in
+  the book: `41_Functional--Toolkits`, "[Recursion](#recursion)
+  explains why `fib()` keeps its recursive form."
 
 **Home.** activate (Accrued patterns), which already cuts metadiscourse;
 this sighting is the concrete pair for it. Promoted at Bruce's call
@@ -5639,6 +5658,24 @@ Claude-written, Bruce: "??":
   one is short and dense. `[REL+AND]` needs a conjunction after the
   clause. No rule reads a relative clause for the order of its own
   subject and object.
+
+2, `46_Effects--Stateless` 2026-11-17, the second chapter, Bruce on
+"is one this chapter defines": "weird wording, confusing":
+- "The `Console` in `greeter.py` is one this chapter defines.
+  Stateless also provides three dependencies of its own:" ->
+  "Stateless provides three dependencies, one of them named `Console`
+  like the class in `greeter.py`:"
+- The stand-in was "one", with a clause that puts "this chapter" in
+  front of its verb, so "one" and "this chapter" meet before
+  "defines". The sentence also made the chapter the actor of a
+  definition that `greeter.py` holds, and it opened a section about
+  the library with a recap of the chapter's own class (R19).
+- Scale: a grep of both trees for `(is|are) (the )?ones? ` and a noun
+  or a pronoun finds 17 other lines. Five have this shape ("Every
+  Effect you isolate is one your tests can control", "every method
+  that adds items is one it defines"), unread.
+
+**Promotion.** Proposed: two chapters.
 
 **Home.** straighten (Accrued patterns) | super-prose (pass 3) | this
 file.

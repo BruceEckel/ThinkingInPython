@@ -418,6 +418,13 @@ before/after pair, and it becomes part of every future pass.
   Keep a clause whose subject is a pronoun or one short code span with
   the verb right after it ("the value it sends").
   Grep the scope for `whose`. C69 in `bruce_edit_db.md`.
+  "One" is the same stand-in (Bruce, 2026-11-17, chapter 46: "weird
+  wording, confusing"): "The `Console` in `greeter.py` is one this
+  chapter defines" sets "one" and "this chapter" side by side before
+  "defines". Name the thing and give the sentence its real actor and
+  news: "Stateless provides three dependencies, one of them named
+  `Console` like the class in `greeter.py`".
+  Grep the scope for `(is|are) (the )?ones? `.
   The form with no pronoun, at the end of a sentence, the same day:
   "A *Memento* belongs to the enum designs, which keep the state in a
   value a record can hold" (Bruce: "awkward confusing").
