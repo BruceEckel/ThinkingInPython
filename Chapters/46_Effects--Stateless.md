@@ -97,22 +97,26 @@ print(run(double(21)))
 #: 42
 ```
 
+`Success` is the alias from the table.
 `Success[int]` says `double()` is pure.
 `double()` computes its result from its argument, and it cannot fail.
 
-`run()` is the Stateless library's driver,
-similar to [`drive()`](45_Effects--Generators.md#a-generator-is-a-description).
-`run()` primes the generator, drives it to completion, and returns the result.
-
-`success()` is a function that builds an Effect.
-`Success` is the alias from the table, the type of that Effect.
-
+`success()` is a function that builds an Effect of that type.
+It exists for yield-free functions like `double()`.
 `double()` contains no `yield`, so it is an ordinary function.
 Python decides generator-function status from the body alone.
 A `yield` in the body makes a function a generator function.
 `double()` calls `success()` and returns the Effect that `success()` builds,
 the way an ordinary function returns a list.
 The annotation describes that returned object.
+
+In a generator function, `return value` sets the Effect's `R`.
+`return success(value)` there produces a `Success[R]` where the signature expects an `R`,
+so the type checker rejects it.
+
+`run()` is the Stateless library's driver,
+similar to [`drive()`](45_Effects--Generators.md#a-generator-is-a-description).
+`run()` primes the Effect, drives it to completion, and returns the result.
 
 The Effect that `success()` builds is an instance of the library's `SuccessEffect` class:
 
@@ -143,11 +147,6 @@ Its `send()` raises `StopIteration` carrying `value`.
 so the first step ends the Effect and delivers `42`.
 `run()` drives any object that implements the generator protocol,
 and it gets a `SuccessEffect`'s result on that first step.
-
-`success()` exists for yield-free functions like `double()`.
-In a generator function, `return value` sets the Effect's `R`.
-`return success(value)` there produces a `Success[R]` where the signature expects an `R`,
-so the type checker rejects it.
 
 `double()` takes everything it uses as its argument,
 so its Effect type has no dependency to declare.

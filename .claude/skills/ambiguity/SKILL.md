@@ -411,3 +411,38 @@ Shapes Bruce flags that the catalog above did not name, dated, with the sentence
   the two now share.
   The read rewrote all 54 and kept none. R69 in `bruce_edit_db.md`;
   the free relative is the `antecedents` skill's.
+- 2026-11-17, chapter 46: a list of three, and the next sentence
+  speaks of two.
+  "This chapter calls `A` the *Ability channel* and `E` the *error
+  channel*", under a list of `A`, `E`, and `R` (Bruce: "does it not
+  mention the result channel?").
+  It is C75 with the list on the page: the reader counts the members
+  the sentence names against the list just given, and chapter 45 had
+  called all three parts of a generator channels.
+  Say what the left-out member does: "Both are parts of the Effect's
+  yield channel. The Effect returns its result, of type `R`, on its
+  return channel."
+  After every list or table in the scope, count the members the next
+  sentences speak of.
+- 2026-11-17, chapter 46: a claim set on one row of a table.
+  "In `Success`, `Never` stands in for both `A` and `E`", under a
+  table of `Success`, `Depend`, and `Try` (Bruce: "does 'Never' also
+  stand in with Depend and Try?").
+  "In `Success`" is C70's narrowing modifier, and the other cases are
+  the other rows.
+  The probe (`ty`: `Depend[A, R]` and `Effect[A, Never, R]` reveal as
+  one type) showed the claim holds for all three, so the table gained
+  a column with each alias's full signature and the sentence became
+  "`Never` stands in for each parameter an alias leaves out."
+  The same day, "A synchronous program calls it once" (Bruce: "why
+  are we introducing 'synchronous' here?") was the other outcome: the
+  asynchronous case differs and is taught 1,300 lines on, so the
+  sentence went to that section.
+- 2026-11-17, chapter 46: a comparison of two names that is false of
+  the things.
+  "`success()` and `Success` differ only in case" (Bruce: "not
+  really, one is callable and the other is a type").
+  Replace each code span with what it denotes and read the sentence
+  again. If it is false, make "the names" the subject, or cut it when
+  the next sentences already say what each thing is.
+  C93 in `bruce_edit_db.md`.

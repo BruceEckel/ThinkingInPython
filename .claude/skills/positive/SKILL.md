@@ -216,6 +216,10 @@ before/after pair, and it becomes part of every future pass.
   "`book()` creates every `undo` generator, and an `undo` body starts only at `[1]`" lost its "only" the same day,
   because the next sentence ("The successful run finishes without reaching `[1]`") carried the contrast.
   `tip watch-words CH=NN ARGS="--tier 1"` lists every `only`.
+  When the exclusion is the claim and the excluded thing is off the page, say where the whole comes from:
+  "`double()` depends on its argument alone, and it cannot fail" (Bruce, 2026-11-17, chapter 46: "don't we have a rule about 'alone'?")
+  explained "pure", and the paragraph had named no dependency for "alone" to exclude.
+  "`double()` computes its result from its argument" carries the exclusion in a positive verb.
 - **"X with no Y" for a thing that nothing handles.**
   "An input with no `case` leaves the state's `while` loop running, so the machine stays in that state"
   (Bruce, 2026-11-12: "'with no case' is negative and confusing").

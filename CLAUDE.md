@@ -336,7 +336,8 @@ Since 2026-11-16 `builds on` is Tier 2 (rule R70, promoted that day
 from C90; Bruce: "'builds on' is awkward; 'implemented using' or
 something like that"): the phrase leaves the relation to the reader,
 so the repair is the relation's verb ("Stateless implements Effects
-with generators", "extends", "depends on"). The read that day rewrote
+using generators", "extends", "depends on"; "using" is his word,
+2026-11-17, since "with" can attach to the noun before it). The read that day rewrote
 all 24 sites, so the baseline holds no entry and a hit is a sentence
 written since.
 Since 2026-11-08 `however` is Tier 2 too (rule R58, Bruce: "unclear

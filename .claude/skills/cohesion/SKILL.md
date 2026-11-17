@@ -418,3 +418,54 @@ and it becomes part of every future pass.
   and move or cut a clause that stands between them.
   Keep a deliberate two-beat ("Failures never vanish. They only relocate.").
   R65 in `bruce_edit_db.md`.
+- **A name first seen inside an example.**
+  Chapter 46 showed `Effect[Need[Console], KeyError, None]` as its
+  example of the three type parameters, before any sentence had said
+  what `Need` is (Bruce, 2026-11-17: "This is the first time we see
+  'Need' and it is unexpected"; "the reader will wonder 'why isn't
+  it just Console?'").
+  The sentence after the example read the annotation aloud ("The
+  first parameter is `Need[Console]` rather than `Console`") and left
+  the reason to a later section through a link.
+  Introduce the name in the sentence before the example, with what it
+  is, a link on the name to the section that teaches it, and the
+  reason for the form: "The Ability that asks for a dependency is
+  [`Need`](#declaring-a-dependency). ... `A` is the type of the
+  request, `Need[Console]`:".
+  For each code-span name in an example or a lead-in, find its first
+  mention in the chapter.
+  C79 in `bruce_edit_db.md`, sighting 3.
+- **A sentence that states a later section's point.**
+  "The work the Effect describes waits for a call to `run()`"
+  (Bruce, 2026-11-17, chapter 46: "awkward") and "A synchronous
+  program calls it once, at the outermost edge" (Bruce: "why are we
+  introducing 'synchronous' here?") stood under the chapter's first
+  listing.
+  Each previewed a section hundreds of lines on, and the listing
+  beside them showed neither: in `simplest_effect.py`, `n * 2` runs
+  when `double(21)` is called.
+  Ask what on the page supports the sentence. When the support is in
+  a later section, cut the sentence, and make any later sentence that
+  quotes it state the claim itself.
+  Grep the scope for a link whose text is a quotation, `\["`.
+  C21 in `bruce_edit_db.md`, sighting 2.
+- **A class the listing never shows.**
+  "`success()` returns a `SuccessEffect`" stood under a listing whose
+  only type is `Success[int]` (Bruce, 2026-11-17: "the code makes it
+  look like it returns a Success. Maybe we need a second example").
+  When the prose names a class or a method that the listing's own
+  annotation seems to contradict, add a listing that prints the
+  object and exercises the claim, and say why the annotation holds
+  (`SuccessEffect` inherits from `Generator`).
+  C31 in `bruce_edit_db.md`, sighting 4.
+- **Each name's facts in one paragraph, in the listing's order.**
+  Under `simplest_effect.py`, chapter 46's paragraphs ran
+  `Success[int]`, `run()`, `success()`, `double()`, `SuccessEffect`,
+  `success()` again, `double()` again (Bruce, 2026-11-17: "this whole
+  section seems to just be a jumble and doesn't have a good
+  pedagogical sequence").
+  List the paragraphs under a listing by the name each is about. A
+  name at two places in the list fails. Gather its sentences (what it
+  is, what it is for, how it works), and order the paragraphs as the
+  listing's lines show the names: signature, body, call.
+  C94 in `bruce_edit_db.md`.

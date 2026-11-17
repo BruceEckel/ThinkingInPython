@@ -174,6 +174,14 @@ the steps" is about `run()`).
   driver: something must call `next()` and `send()`." Bruce: "'calls
   for' ... confuses with the later 'call'". The idiom's word is the
   chapter's term (a call resumes a generator), so the idiom goes.
+- `46_Effects--Stateless` 2026-11-17 (`4a441c90`), in an edit of
+  Bruce's the same day: "The Effect yields its dependencies, its
+  failures, and its result." -> "The Effect yields its requests for
+  dependencies and its failures, and it returns its result." `yield`
+  is the mechanism in this chapter, and a result is returned. His
+  next two questions ("does it not mention the result channel?",
+  "why isn't it just 'Console'?") followed from the two words the
+  edit had dropped.
 
 **Home.** this file only. Promoted at Bruce's call (2026-08-29).
 
@@ -308,6 +316,13 @@ its own ("The next listing shows the same trap in a generator").
   Claude-written, a pointer to a later section: "[Telling the Wrappers
   Apart](#telling-the-wrappers-apart) sorts the four apart." -> deleted
   from the chapter opening
+- `46_Effects--Stateless` 2026-11-17 (`4a441c90`), two pointers to a
+  later place. Bruce's hand, the opening: "[Stateless in Practice]
+  builds examples that combine dependencies and failures." ->
+  deleted. And Bruce on the `Need[Console]` example ("the link
+  doesn't mention Need"): "[Nothing Runs Yet] explains why that
+  request must be a value of its own." -> deleted, with the reason
+  given in place (C79, sighting 3).
 
 **Home.** activate (Accrued patterns), which already cuts metadiscourse;
 this sighting is the concrete pair for it. Promoted at Bruce's call
@@ -3630,6 +3645,14 @@ second chapter (his "do the suggestions"); was C33. The first two are
   report a failure." Each item is named with what the yield is for,
   and the sentence that names the two channels follows as its own
   sentence, with the "so" that joined them gone.
+- `46_Effects--Stateless` 2026-11-17 (`4a441c90`), Bruce's hand:
+  "Some of the examples in these two chapters derive from that book."
+  -> "in this chapter and the next".
+- `47_Effects--Stateless_in_Practice`, the same commit: "establishes
+  the two channels an `Effect[A, E, R]` carries" -> "names two
+  channels in an `Effect[A, E, R]`: the Ability channel in `A` and
+  the error channel in `E`". The count stood beside a type with three
+  parameters (C75, sighting 2).
 
 **Home.** antecedents (Accrued patterns, the unnamed-items bullet) |
 super-prose (pass 5) | this file; a cousin of R9 (name the concrete
@@ -3865,13 +3888,13 @@ its paragraph, since 2026-11-16) | the project CLAUDE.md |
 pass 5 (the free relative) and pass 6 (the concessive), with the
 Accrued sections of the antecedents and ambiguity skills | this file.
 
-### R70. "Builds on" names no relation: say implements with, extends, or assumes
+### R70. "Builds on" names no relation: say implements using, extends, or assumes
 
 **Test.** "X builds on Y", "built on", "building on", with a library,
 a listing, a design, or a chapter as X. The phrase is a figure of
 construction and leaves the relation for the reader to work out. Ask
 which relation the passage means, and write its verb. A library and
-its mechanism: "implements ... with", "uses". A listing or a class
+its mechanism: "implements ... using", "uses". A listing or a class
 that adds to an earlier one: "extends", "adds ... to". A chapter or a
 section that needs an earlier one: "uses", "assumes".
 
@@ -3919,6 +3942,16 @@ files, which is the store's bar for a rule"); was C90. The first,
   chapter's own term fits: "the module form of a singleton".
   Chapter 25's epigraph was a site too ("are both built on that
   stand-in" -> "both use that stand-in").
+- `46_Effects--Stateless` 2026-11-17 (`4a441c90`), Bruce's hand on the
+  first sighting's repair: "Stateless implements Effects with
+  generators." -> "Stateless implements Effects using generators."
+  "With" after a noun can attach to the noun ("Effects with
+  generators"), and "using" attaches to the verb. It is also the word
+  he gave on the first day. The test above now says "using". Two
+  sites of the same sentence stand as they were: `01_Introduction`
+  ("implements Effect tracking with generators") and
+  `44_Effects--Effect_Management` ("Stateless implements Effects with
+  generators").
 
 **Home.** `super-prose` pass 1 and the `literal` skill's Accrued
 patterns | `tip watch-words` (Tier 2, "builds on", since the
@@ -4172,6 +4205,30 @@ Claude-written:
   *Strategy*'s function form gets the same fuller listing. ... and the
   list becomes an *event bus*.") -> deleted
 
+2, `46_Effects--Stateless` 2026-11-17 (`4a441c90`), the second
+chapter, the sentence-sized form, two sentences in The Simplest
+Effect and one in the opening:
+- Bruce: "awkward". "The work the Effect describes waits for a call to
+  `run()`." -> cut. It previewed Nothing Runs Yet under a listing
+  that does not show it: in `simplest_effect.py`, `n * 2` runs when
+  `double(21)` is called, before `run()`.
+- Bruce: "why are we introducing 'synchronous' here?" "A synchronous
+  program calls it once, at the outermost edge." -> cut. It previewed
+  Where to Call `run()`, which quoted it back ("That is the cost
+  behind [\"a synchronous program calls it once ...\"]") and now
+  states the rule itself: "Each `run()` call takes that time, so you
+  call `run()` once, at the outermost edge of a program."
+- Bruce's hand, the opening: "Stateless supplies the vocabulary for
+  the requests and the driver that answers them." -> cut.
+- The test, widened from the roadmap paragraph: a sentence that
+  states a later section's point where the listing beside it cannot
+  show it. Ask what on the page supports the sentence. If the support
+  is in a later section, the sentence goes, and a later sentence that
+  quotes it states the claim itself. Grep the scope for a link whose
+  text is a quotation, `\["`.
+
+**Promotion.** Proposed: two chapters.
+
 ### C23. Factor a property shared by two parallel sentences into one clause before them
 
 **Test.** Consecutive sentences about parallel items that each restate
@@ -4284,7 +4341,29 @@ it sits directly beside the sentence.
   `__init__(self, celsius: float)`"
 - Bruce's hand: "clears the canvas" -> "calls `canvas.delete(\"all\")`"
 
-**Home.** this file; the deep-review skill (teaching) if promoted.
+4, `46_Effects--Stateless` 2026-11-17 (`4a441c90`), the second
+chapter, the listing-sized form, Bruce: "that's surprising, the code
+makes it look like it returns a Success. Maybe we need a second
+example that expands this, showing the insides of SuccessEffect
+somehow":
+- "`success()` returns a `SuccessEffect`, a small class that
+  implements that protocol with its own `send()` and `throw()`
+  methods." stood under `simplest_effect.py`, whose only type is
+  `Success[int]`. -> a new listing, `success_effect.py`, prints the
+  object (`SuccessEffect(value=42)`), checks it against `Generator`,
+  and drives it one step. The prose says why the annotation holds:
+  `SuccessEffect` inherits from `Generator`.
+- The test: a sentence that names a class or a method the listing
+  beside it never shows, in a claim the listing's own annotation
+  seems to contradict. `tip positional ARGS=--survey` lists the shape
+  when the sentence opens on the name (`absent-subject`); this one
+  held the name after the verb.
+
+**Promotion.** Proposed: two chapters.
+
+**Home.** this file; the deep-review skill (teaching) if promoted;
+cohesion (Accrued patterns) and super-prose (pass 4) for the
+listing-sized form.
 
 ### C32. An untaken design alternative is conditional, and its downstream exception is cut
 
@@ -5172,6 +5251,24 @@ as the C61 repair, Bruce: "We can leave off the 'alone'":
   limiter, and keep the word only where the reader would otherwise
   assume the excluded case.
 
+2, `46_Effects--Stateless` 2026-11-17 (`4a441c90`), the second
+chapter, Bruce: "don't we have a rule about 'alone'?":
+- "`double()` depends on its argument alone, and it cannot fail." ->
+  "`double()` computes its result from its argument, and it cannot
+  fail."
+- The keep above let it stand: the exclusion is the claim, since the
+  sentence explains "pure". The alternative, a dependency from
+  outside the function, was not in the paragraph. Addition to the
+  test: when the exclusion is the claim and the alternative is off
+  the page, say where the whole thing comes from ("computes its
+  result from its argument"), which carries the exclusion in a
+  positive verb.
+- The chapter's eight other "alone" sites each passed: the excluded
+  item is in the same paragraph ("The parameter version then adds two
+  parameters ... This version changes the table row alone").
+
+**Promotion.** Proposed: two chapters.
+
 **Home.** positive (Accrued patterns) | super-prose (pass 2) | this
 file.
 
@@ -5421,6 +5518,19 @@ what kind of frame this paragraph references"):
   name for a function with a `yield` is "generator". R68 has the two
   kinds of frame in the same pair.
 
+6, `46_Effects--Stateless` 2026-11-17 (`4a441c90`), Bruce's hand, two
+edits to the chapter's opening:
+- "The type checker verifies that every caller either handles each
+  Effect or declares it" -> "every function". The sentence before
+  says "the function's type", and no callee was on the page for
+  "caller" to stand against.
+- "`E` is its failure type." -> "`E` is its failure (error) type.",
+  and "`R` is what it produces." -> "`R` is what it produces, its
+  result." The chapter's terms are "the error channel" and "the
+  result", and the list had glossed the letters with other words. A
+  letter's gloss holds the word the letter stands for and the word
+  the chapter uses for it afterward.
+
 **Home.** antecedents (Accrued patterns) | super-prose (pass 5) |
 `[HEAD]` in `tools/sentence_shapes.py` since 2026-11-15, for sighting
 4's shape where the file rarely uses the head noun alone | this file.
@@ -5601,6 +5711,36 @@ incorrect with my edits':
   and the connective that joined them carried the new claim. A
   sentence made by joining two true sentences is probed at the join.
   The review he asked for changed this one sentence.
+
+4, `46_Effects--Stateless` 2026-11-17 (`4a441c90`), the second
+chapter, was Claude-written, Bruce: "does 'Never' also stand in with
+Depend and Try?":
+- "In `Success`, `Never` stands in for both `A` and `E`." stood under
+  a table of three aliases. -> the table gained a "Full signature"
+  column (`Effect[Never, Never, R]`, `Effect[A, Never, R]`,
+  `Effect[Never, E, R]`), and the sentence became "`Never` stands in
+  for each parameter an alias leaves out." with "A union with `Never`
+  is therefore the same type as the union without it."
+- "In `Success`" is the narrowing modifier, set on one row of a table
+  the reader has just read, so the question is about the other rows.
+- Probe, `ty` 0.0.104: `Depend[Need[Console], None]` and
+  `Effect[Need[Console], Never, None]` both reveal as
+  `Generator[Need[Console], Any, None]`, `Try[KeyError, int]` and
+  `Effect[Never, KeyError, int]` as `Generator[KeyError, Any, int]`,
+  and each assigns to the other. The library writes `Never` in
+  `Success` alone (`Generator[Never, Any, R]`), since `A | Never` is
+  `A`.
+
+5, the same chapter and day, Bruce: "why are we introducing
+'synchronous' here?":
+- "A synchronous program calls it once, at the outermost edge." in
+  The Simplest Effect. The other case, an asynchronous program that
+  awaits `run_async()`, is in Where to Call `run()`, 1,300 lines on.
+  -> cut, as a preview of that section (C21, sighting 2). When the
+  other case differs and belongs to a later section, the claim
+  belongs there too.
+
+**Promotion.** Proposed: two chapters.
 
 **Home.** ambiguity (Accrued shapes) | super-prose (pass 6) | this
 file.
@@ -5833,6 +5973,30 @@ next()?":
   modifier that implies other cases differ; a short list implies it
   the same way, and here the implication was true and unstated.
 
+2, `46_Effects--Stateless` 2026-11-17 (`4a441c90`), the second
+chapter, was Claude-written, Bruce: "does it not mention the result
+channel?":
+- "This chapter calls `A` the *Ability channel* and `E` the *error
+  channel*." stood under a list of three parameters, `A`, `E`, and
+  `R`, and gave no word to `R`. -> two sentences after it: "Both are
+  parts of the Effect's [yield channel]. The Effect returns its
+  result, of type `R`, on its return channel."
+- The set the reader counted against was on the page, five lines up,
+  and chapter 45 had given the word "channel" to all three parts of a
+  generator. So the test widens: the list may be one the passage just
+  gave, and the sentence may name or classify its members where the
+  first sighting listed them.
+- The facts: `Effect` is `Generator[A | E, Any, R]`, so `A` and `E`
+  share chapter 45's yield channel and `R` is on its return channel.
+  Neither chapter says "result channel".
+- An edit of Bruce's in the same pass had the opening say the Effect
+  "yields its dependencies, its failures, and its result", and the
+  question followed from it (R3 has that sighting).
+- The sibling, `47_Effects--Stateless_in_Practice`: "the two channels
+  an `Effect[A, E, R]` carries" now names both (R66).
+
+**Promotion.** Proposed: two chapters.
+
 **Home.** ambiguity (Accrued shapes) | super-prose (pass 6) | this
 file.
 
@@ -5987,6 +6151,38 @@ here otherwise":
   naming `__aiter__()` a second time ("Python supplies the
   generator's `__aiter__()` and `__anext__()`") without asking where
   it was introduced.
+
+3, `46_Effects--Stateless` 2026-11-17 (`4a441c90`), the second chapter
+for the name with no introduction, was Claude-written, Bruce: "This
+is the first time we see 'Need' and it is unexpected", "the reader
+will wonder 'why isn't it just Console?'", and "the first sentence
+states the obvious but nothing explains that, the link doesn't
+mention Need":
+- "For example: `Effect[Need[Console], KeyError, None]` ... The first
+  parameter is `Need[Console]` rather than `Console`. ... [Nothing
+  Runs Yet] explains why that request must be a value of its own." ->
+  a paragraph ahead of the example: "The Ability that asks for a
+  dependency is [`Need`](#declaring-a-dependency). An Effect that
+  uses a `Console` yields a `Need[Console]` to request one, and
+  `supply()` answers that request with a `Console`. `A` is the type
+  of the request, `Need[Console]`:"
+- Three faults in one passage. The example for one thing (the three
+  parameters) held a name the chapter had not introduced. The
+  sentence after it read the annotation aloud (R47) where the reader
+  wanted the reason. The reason was left to a later section through a
+  link whose text does not say `Need` (R7).
+- The test for a pass: for each code-span name in an example or a
+  lead-in, find its first mention in the chapter. If that is the
+  example, introduce the name in the sentence before it, with what it
+  is and a link to the section that teaches it, and give the reason
+  for a form the definition above did not lead the reader to expect.
+- Probe, `ty` 0.0.104: `Effect[Console, KeyError, None]` draws
+  `invalid-type-arguments`, "Type `Console` is not assignable to
+  upper bound `Ability[Any]` of type variable `A`".
+
+**Promotion.** Proposed, as a rule of its own: a code-span name's
+first mention says what it is. Two chapters (45's `__aiter__()`, 46's
+`Need`).
 
 ### C80. Two paragraphs that make one point between them become one paragraph that states it
 
@@ -6473,6 +6669,16 @@ opening: "Does the type checker perform delayed binding?"
   site. Appendix A's "type inference, which the type checker performs
   on every run" is the keep above.
 
+2, the same sentences 2026-11-17 (`4a441c90`), Bruce's hand on the
+repair:
+- "You declare each Effect, and you supply each dependency later. The
+  type checker verifies both." -> "The type checker ensures that you
+  declare each Effect and supply each dependency."
+- One sentence, with the checker as the subject of "ensures that" and
+  the reader as the actor of both acts. "Later" and "both" went. The
+  repair form is now: the checker "ensures that" the actor performs
+  the act.
+
 **Home.** `super-prose` pass 1 and the `literal` skill's Accrued
 patterns | this file.
 
@@ -6549,6 +6755,73 @@ Claude-written, Bruce on "reuses": "reuses or uses?":
 
 **Home.** `super-prose` pass 7 and the `activate` skill's Accrued
 patterns | this file.
+
+### C93. A claim about two names' spelling has "the names" as its subject
+
+**Test.** A sentence compares two code spans that look alike
+("`success()` and `Success` differ only in case") with the things as
+its subject. The claim is true of the names and false of the things:
+one is a function and the other is a type. Read the sentence with
+each span replaced by what it denotes ("a function and a type alias
+differ only in case"). If that is false, make the names the subject
+("the names `success` and `Success` differ in the case of one
+letter"), or cut the sentence and let the next ones say what each
+thing is.
+
+**Keep when.** The things do differ in that one respect ("The four
+runs of one program differ only in what you supply").
+
+**Sightings.** 1, `46_Effects--Stateless` 2026-11-17 (`4a441c90`),
+Bruce: "not really, one is callable and the other is a type.
+rewrite", then "or remove":
+- "`success()` and `Success` differ only in case. `success()` is a
+  function that builds an Effect. `Success` is the alias from the
+  table, the type of that Effect." -> the first sentence cut.
+- Why the passes missed it: the 2026-10-26 `tip overclaims` read
+  tested each "only" by asking for a second member, and under the
+  reading "the names" the bound holds. No pass read the subject for
+  whether it was the name or the thing.
+- Scale: a grep of both trees for `differ only in` found three other
+  sites, each about the things, the keep above.
+
+**Home.** ambiguity (Accrued shapes) | super-prose (pass 6) | this
+file.
+
+### C94. Under a listing that introduces several names, each name's facts sit in one paragraph, in the listing's order
+
+**Test.** A listing introduces several names (`Success`, `success()`,
+`run()`), and the paragraphs under it return to each name more than
+once: what a thing is in one paragraph, what it is for four
+paragraphs on, how it works in between. List the paragraphs under the
+listing by the name each one is about. A name that appears at two
+places in that list, with other names between, fails. Gather each
+name's sentences into one paragraph (what it is, what it is for, how
+it works), and order the paragraphs as the listing's lines show the
+names: the signature, the body, the call.
+
+**Keep when.** A later paragraph uses the name to explain a second
+listing (the `SuccessEffect` walkthrough ends on `run()`).
+
+**Sightings.** 1, `46_Effects--Stateless` 2026-11-17, The Simplest
+Effect, Bruce: "seems like this sentence is introductory and belongs
+with: 'success() is a function that builds an Effect ...'", then
+"this whole section seems to just be a jumble and doesn't have a
+good pedagogical sequence":
+- The paragraphs ran `Success[int]`, `run()`, `success()` and
+  `Success`, `double()`, `SuccessEffect`, `success()` again ("exists
+  for yield-free functions like `double()`"), `double()` again. ->
+  `Success` and what `Success[int]` says; `success()`, what it is
+  for, and `double()` as an ordinary function that returns its
+  Effect; the generator-function case; `run()`; `SuccessEffect`; the
+  bridge to the next section.
+- How it came about: each prose pass and each flag added or moved one
+  sentence, and no pass read the section's paragraphs as a list of
+  topics. Eight flags in this section and the one before it, the same
+  day, were symptoms.
+
+**Home.** cohesion (Accrued patterns) | super-prose (pass 4) | the
+deep-review skill's teaching pass, which owns the order of a section
+| this file.
 
 ## Retired
 

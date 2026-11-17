@@ -384,8 +384,12 @@ and it becomes part of every future pass.
   binds the dependency"). When that sentence is false, give the check
   "enforces" or "verifies", and give the act its actor in the same
   passage: "Those two checks enforce the Effect tracking and the
-  delayed binding of a full EMS. You declare each Effect, and you
-  supply each dependency later. The type checker verifies both."
+  delayed binding of a full EMS. The type checker ensures that you
+  declare each Effect and supply each dependency."
+  The second sentence is Bruce's (2026-11-17). The first repair gave
+  the acts and the check a sentence apiece and joined them with
+  "both"; his puts the checker in front of "ensures that" and the
+  reader in front of both acts.
   Keep an identity that holds: a test that is the specification, a
   type check that is the whole of a property.
   Grep the scope for `checks? (is|are) the` and
@@ -398,8 +402,11 @@ and it becomes part of every future pass.
   The phrase is a figure of construction, and it leaves the relation
   to the reader: implemented with, extends, requires, runs on.
   Name the relation with the verb for it.
-  A library and its mechanism: "Stateless implements Effects with
+  A library and its mechanism: "Stateless implements Effects using
   generators"; "frameworks such as FastAPI's `Depends` use it".
+  "Using" is Bruce's word (2026-11-17, over the first repair's
+  "with"): after a noun, "with" can attach to the noun ("Effects with
+  generators"), and "using" attaches to the verb.
   A listing that adds to an earlier one "extends" it or "adds" the
   new part to it.
   A chapter that needs an earlier one "uses" or "assumes" what that

@@ -64,16 +64,19 @@ each pass hands the next one less to do.
    dependency"); when that sentence is false, the check "enforces" or
    "verifies" and the act gets its own actor ("Those two checks
    enforce the Effect tracking and the delayed binding of a full EMS.
-   You declare each Effect, and you supply each dependency later. The
-   type checker verifies both", C89). Grep the scope for
+   The type checker ensures that you declare each Effect and supply
+   each dependency", C89; the second sentence is Bruce's wording,
+   2026-11-17, one sentence with the checker in front of "ensures
+   that"). Grep the scope for
    `checks? (is|are) the` and
    `checker (performs|does|provides|supplies|binds)`. "Builds on"
    names no relation ("Stateless builds on generators", Bruce:
    "'builds on' is awkward; 'implemented using' or something like
    that"): say which one it is. A library and its mechanism take
-   "implements ... with" or "uses" ("Stateless implements Effects
-   with generators"; "frameworks such as FastAPI's `Depends` use
-   it"), a listing that adds to an earlier one "extends" it, and a
+   "implements ... using" or "uses" ("Stateless implements Effects
+   using generators", his wording 2026-11-17, since "with" after a
+   noun can attach to the noun; "frameworks such as FastAPI's
+   `Depends` use it"), a listing that adds to an earlier one "extends" it, and a
    chapter that needs an earlier one "depends on" or "uses" what that
    chapter taught (R70; the book read that day rewrote all 24 other
    sites and kept none, so a hit is a sentence written since).
@@ -98,7 +101,11 @@ each pass hands the next one less to do.
    followed by "The successful run finishes without reaching `[1]`",
    is "starts at `[1]`"). It stays when the reader would otherwise
    assume the excluded case ("the first `send()` accepts only
-   `None`"). `tip watch-words CH=NN ARGS="--tier 1"` lists every
+   `None`"). When the exclusion is the claim and the excluded thing
+   is off the page, say where the whole comes from ("`double()`
+   depends on its argument alone", Bruce: "don't we have a rule
+   about 'alone'?" -> "`double()` computes its result from its
+   argument"). `tip watch-words CH=NN ARGS="--tier 1"` lists every
    `only`, `tip negatives CH=NN` counts them per paragraph, and
    `tip overclaims CH=NN` lists "X alone". Read the list for the
    scope, since both words are also what Claude reaches for when it
@@ -249,6 +256,33 @@ each pass hands the next one less to do.
    or "while" and get subjects of one kind ("a suspended generator
    keeps its execution frame alive, whereas an ordinary function
    discards its stack frame when the function returns", R65).
+   A code-span name is introduced before the example that uses it
+   ("For example: `Effect[Need[Console], KeyError, None]`", Bruce:
+   "This is the first time we see 'Need' and it is unexpected" ->
+   "The Ability that asks for a dependency is
+   [`Need`](#declaring-a-dependency). ... `A` is the type of the
+   request, `Need[Console]`:", C79). For each name in an example or
+   a lead-in, find its first mention in the chapter. A form the
+   definition above did not lead the reader to expect gets its
+   reason beside it ("why isn't it just `Console`?"), never a
+   sentence that reads the form aloud (R47) or a link to a later
+   section (R7). A sentence that states a later section's point
+   under a listing that cannot show it goes ("The work the Effect
+   describes waits for a call to `run()`", Bruce: "awkward"; "A
+   synchronous program calls it once, at the outermost edge",
+   Bruce: "why are we introducing 'synchronous' here?", C21). Ask
+   what on the page supports the sentence, and make a later sentence
+   that quotes it state the claim itself; grep the scope for a link
+   whose text is a quotation, `\["`. A sentence that names a class
+   the listing never shows, against the listing's own annotation,
+   gets a listing that shows the class ("`success()` returns a
+   `SuccessEffect`" under a signature that says `Success[int]`,
+   Bruce: "the code makes it look like it returns a Success" ->
+   `success_effect.py`, C31). Under a listing that introduces
+   several names, list the paragraphs by the name each is about; a
+   name at two places in the list fails, and its sentences are
+   gathered in the listing's order, signature, body, call (chapter
+   46's The Simplest Effect, Bruce: "a jumble", C94).
 5. `antecedents`: every pointer with two candidates gets its noun.
    A link is a pointer too: when its target teaches a named
    construct, the link text starts on the name ("The bare `raise`
@@ -337,7 +371,12 @@ each pass hands the next one less to do.
    does") is counted against what the chapter taught the first
    thing to have; for a member left out, probe the second thing and
    say what it does ("It is not an iterator, so `next()` on a
-   coroutine object raises a `TypeError`", C75). A trailing
+   coroutine object raises a `TypeError`", C75). The list can be one
+   the passage has just given: three parameters, then "This chapter
+   calls `A` the *Ability channel* and `E` the *error channel*"
+   (Bruce: "does it not mention the result channel?") gets a
+   sentence that says where `R` goes. After every list or table,
+   count the members the next sentences speak of. A trailing
    appositive with a role noun ("starts the event loop, a driver
    like ...") gets a sentence with its own subject (C67). A modifier that narrows a
    true claim tells the reader the other cases differ ("raise a
@@ -350,7 +389,15 @@ each pass hands the next one less to do.
    C70). Test the repair too: the first repair of that sentence
    ended "a machine that is paused in a state" and drew the same
    question. The claim check passes such a sentence, since it is
-   true. The other shapes: a count with two units, a
+   true. A claim set on one row of a table is the same modifier ("In
+   `Success`, `Never` stands in for both `A` and `E`", under three
+   aliases, Bruce: "does 'Never' also stand in with Depend and
+   Try?"): probe the other rows, and state the claim for all of them
+   or put it in the table. A comparison of two look-alike names is
+   true of the names and may be false of the things ("`success()`
+   and `Success` differ only in case", Bruce: "one is callable and
+   the other is a type"): make "the names" the subject or cut the
+   sentence (C93). The other shapes: a count with two units, a
    word with two senses, a modifier with two heads, an open scope, a
    definite noun the listing has several of, a missing comparand,
    and a verb that reads with or without an object set before "and"
