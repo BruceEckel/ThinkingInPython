@@ -416,3 +416,17 @@ and it becomes part of every future pass.
   `tip watch-words` lists the phrase as Tier 2 (since 2026-11-16), so
   `tip verify-ch` fails on a new one.
   R70 in `bruce_edit_db.md`.
+- **"Leaves open".**
+  "`need(SomeClass)` is an Effect that produces an instance of
+  `SomeClass` and leaves open what supplies that instance:" (Bruce,
+  2026-11-17, chapter 46: "awkward")
+  The phrase says a thing is undecided, and its object ("what
+  supplies") names neither the thing nor who decides it.
+  Ask who decides. When the sentence before says so ("code outside
+  the requesting function answers the `Need`"), cut the clause.
+  Otherwise state the decision with its actor, or say what remains:
+  "The type records which Abilities each layer leaves open" ->
+  "After each layer, the type lists the Abilities still to supply."
+  Keep the literal sense, a file or a stream left open.
+  Grep the scope for `leaves? open`.
+  C95 in `bruce_edit_db.md`.

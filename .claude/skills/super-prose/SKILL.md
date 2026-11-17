@@ -84,6 +84,12 @@ each pass hands the next one less to do.
    relative clause that parts the subject from its verb ("every
    singleton that keeps its state in a module depends"), use the
    chapter's own term ("the module form of a singleton").
+   "Leaves open what X" says a thing is undecided and names neither
+   the thing nor who decides it ("`need(SomeClass)` ... leaves open
+   what supplies that instance", Bruce: "awkward"): cut the clause
+   when the sentence before says who decides ("code outside the
+   requesting function answers the `Need`"), and otherwise state the
+   decision with its actor (C95). Grep the scope for `leaves? open`.
 2. `positive`: a negation that is an accident of phrasing turns around.
    A subject of "Nothing", "Nobody", or "No one" with a verb ("Nothing
    calls `throw()` on the first booking" -> "`list(book())` drives the

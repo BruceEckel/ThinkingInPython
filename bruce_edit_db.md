@@ -6846,6 +6846,36 @@ good pedagogical sequence":
 deep-review skill's teaching pass, which owns the order of a section
 | this file.
 
+### C95. "Leaves open" says a thing is undecided: say who decides it, or cut the clause
+
+**Test.** "X leaves open what supplies that instance", "leaves open
+which Abilities", "leaves open how". The phrase is a figure, and its
+object is a free relative ("what supplies") that names nothing (R69's
+shape with "what"). Ask who decides the open thing and whether the
+passage has said so. If the sentence before says it ("code outside
+the requesting function answers the `Need`"), the clause restates
+that sentence and goes (R19). If nothing has, state the decision with
+its actor ("the caller chooses the keywords").
+
+**Keep when.** A file or a stream left open, the literal sense.
+
+**Sightings.** 1, `46_Effects--Stateless` 2026-11-17, Bruce on
+"leaves open what supplies": "awkward":
+- "`need(SomeClass)` is an Effect that produces an instance of
+  `SomeClass` and leaves open what supplies that instance:" ->
+  "`need(SomeClass)` is an Effect that produces an instance of
+  `SomeClass`:". The sentence before already says code outside the
+  requesting function answers the `Need`.
+- The chapter's other site: "The type records which Abilities each
+  layer leaves open." -> "After each layer, the type lists the
+  Abilities still to supply."
+- Scale: a grep of both trees for `leaves? open` finds seven more
+  sites in six files (chapters 08, 09, 21, 30 and Solutions 43 and 45
+  twice), unread.
+
+**Home.** literal (Accrued patterns) | super-prose (pass 1) | this
+file.
+
 ## Retired
 
 Rejected by Bruce, or promoted and later withdrawn. Never propose these

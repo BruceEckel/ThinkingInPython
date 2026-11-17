@@ -159,7 +159,7 @@ Stateless does [dependency injection](11_Techniques--Testing.md#random-numbers)
 with `Need`.
 A `Need` is a request for an instance,
 and code outside the requesting function answers the `Need`.
-`need(SomeClass)` is an Effect that produces an instance of `SomeClass` and leaves open what supplies that instance:
+`need(SomeClass)` is an Effect that produces an instance of `SomeClass`:
 
 ```python
 # utils/greeter.py
@@ -800,7 +800,7 @@ so `supply()` must provide a `Console` and a `Log`.
 `supply(Log())(greet_all)` has the type `(list[str]) -> Depend[Need[Console], None]`,
 and wrapping that in `supply(Console())` leaves `(list[str]) -> Success[None]`.
 You can bind some Abilities near the Effect and the others at the edge.
-The type records which Abilities each layer leaves open.
+After each layer, the type lists the Abilities still to supply.
 
 A `type` alias normally shortens a repeated union like this one.
 Elsewhere the book writes such an alias.
