@@ -1,10 +1,10 @@
 {
-  "page": "45_Effects--Generators.html",
-  "title": "Generators",
-  "heading": "Three Ways to Write the Producer",
-  "heading_id": "three-ways-to-write-the-producer",
-  "text": "The generator cannot start an exchange. It runs when its driver resumes it, and it yields each value to that driver.",
-  "offset": 0.26,
-  "source": "Chapters/45_Effects--Generators.md:2334",
-  "saved": "2026-11-14T22:54:20"
+  "page": "46_Effects--Stateless.html",
+  "title": "Stateless",
+  "heading": "",
+  "heading_id": "",
+  "text": "Effect Management introduced library Effect systems. The Stateless library implements an Effect Management System (EMS).",
+  "offset": 0.0,
+  "source": "",
+  "saved": "2026-11-16T18:15:05"
 }
