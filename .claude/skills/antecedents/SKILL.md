@@ -440,3 +440,24 @@ and it becomes part of every future pass.
   `tip watch-words CH=NN ARGS="--only whatever"` lists the sites.
   R69 and R54 in `bruce_edit_db.md`; the concessive form is the
   `ambiguity` skill's.
+- **An "it" that ends a clause, far from its noun.**
+  "A `Need` is a request for an instance, and code outside the
+  requesting function answers it" (Bruce, 2026-11-17, chapter 46:
+  "what does 'it' refer to? Didn't we already create a rule about
+  this?").
+  The rule is R12. `tip pointers` lists only an "it" that opens a
+  sentence, so this one reached no list.
+  For each "it" before a period, comma, or colon, find the nearest
+  noun the verb could take. When that noun is another thing, write
+  the noun: "answers the `Need`".
+  Grep the scope for ` it[.,;:]`. Chapter 46 had 47 sites and four
+  rewrites.
+- **A term the book defines elsewhere, bare at its first use.**
+  "Stateless does dependency injection with `Need`" (Bruce,
+  2026-11-17: "Do we introduce dependency injection somewhere? this
+  should link to that").
+  Chapter 11 defines the term, so its first use in chapter 46 carries
+  the link on the term itself.
+  For each term of art in a section's opening sentences, grep the
+  book for the sentence that sets it in italics. R16 in
+  `bruce_edit_db.md`.

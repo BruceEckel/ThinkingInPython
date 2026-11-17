@@ -80,7 +80,7 @@ Each one takes the type parameters it uses and leaves out the rest:
 `Never` stands in for each parameter an alias leaves out.
 `Never` is Python's *bottom type*:
 it has no values and is a subtype of every other type.
-A union with `Never` is therefore the same type as the union without it.
+A union with `Never` is therefore the same type as the union without `Never`.
 
 ## The Simplest Effect
 
@@ -112,7 +112,7 @@ The annotation describes that returned object.
 
 In a generator function, `return value` sets the Effect's `R`.
 `return success(value)` there produces a `Success[R]` where the signature expects an `R`,
-so the type checker rejects it.
+so the type checker rejects that `return`.
 
 `run()` is the Stateless library's driver,
 similar to [`drive()`](45_Effects--Generators.md#a-generator-is-a-description).
@@ -155,9 +155,10 @@ such as a console, a file, or a network connection.
 
 ## Declaring a Dependency
 
-Stateless does dependency injection with `Need`.
+Stateless does [dependency injection](11_Techniques--Testing.md#random-numbers)
+with `Need`.
 A `Need` is a request for an instance,
-and code outside the requesting function answers it.
+and code outside the requesting function answers the `Need`.
 `need(SomeClass)` is an Effect that produces an instance of `SomeClass` and leaves open what supplies that instance:
 
 ```python
@@ -1195,7 +1196,7 @@ Every function that boundary calls passes the dependency onward as a parameter,
 which an EMS replaces with an Ability in the return type.
 
 An EMS requires more than the service locator does.
-The dependency must appear in the signature so the type checker can verify it.
+The dependency must appear in the signature so the type checker can verify the dependency.
 That is why the EMS `greet()` returns `Depend[Need[Console], None]` while `dependency_injection.py`'s `greet()` returns `None`.
 An EMS tracks every dependency,
 so the type checker reports errors that a programmer's memory or an exhaustive test suite must otherwise find.

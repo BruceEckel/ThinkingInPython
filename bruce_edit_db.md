@@ -684,6 +684,22 @@ reads the others as "prefer the noun" will overshoot.
   where the one checker is the type checker, a full term in the
   sentence before, a paragraph about one of the file's terms, a
   listing with one such construct.
+- `46_Effects--Stateless` 2026-11-17, Bruce: "what does 'it' refer
+  to? Didn't we already create a rule about this?": "A `Need` is a
+  request for an instance, and code outside the requesting function
+  answers it." -> "... answers the `Need`." The pointer ended its
+  clause, four nouns after the one it stood for: "a request", "an
+  instance", and "the requesting function" each sat nearer, and
+  "answers" takes two of them. `tip pointers` lists an "it" that
+  opens a sentence, so no tool listed this one. The test for a
+  clause-final "it": when the nearest noun the verb could take is
+  another thing, write the noun. Grep the scope for ` it[.,;:]`.
+  The chapter had 47 such sites. Three more were rewritten ("the
+  type checker rejects it" -> "rejects that `return`", after "where
+  the signature expects an `R`"; "so the type checker can verify it"
+  -> "verify the dependency", after "in the signature"; "the union
+  without it" -> "without `Never`"), and 43 kept, where the nearest
+  such noun is the referent.
 
 **Home.** the `antecedents` skill, as a keep-when (its "zero ambiguous
 pointers, not zero pronouns" line). Not a separate sweep. Promoted
@@ -811,6 +827,13 @@ where-to-read-more sentence closing a section.
 - `27_Patterns--Function_Objects` 2026-09-16: "It is a *closure* ([Functional
   Foundations](40_Functional--Foundations.md#closures)):" -> "use a
   [*closure*](40_Functional--Foundations.md#closures)."
+- `46_Effects--Stateless` 2026-11-17, Bruce: "Do we introduce
+  dependency injection somewhere? this should link to that":
+  "Stateless does dependency injection with `Need`." -> "Stateless
+  does [dependency injection](11_Techniques--Testing.md#random-numbers)
+  with `Need`." Chapter 11 defines the term there, in italics. This
+  is the test's second half: a bare term with a defining section
+  elsewhere, linked on first use in the chapter.
 
 **Home.** this file only: a linking convention rather than a prose
 register. Promoted 2026-09-16 on the second chapter's sighting (C12 -> R16).

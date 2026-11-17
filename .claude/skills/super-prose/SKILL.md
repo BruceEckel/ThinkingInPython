@@ -364,7 +364,16 @@ each pass hands the next one less to do.
    value", Bruce: "weird", after a sentence that called neither the
    Abilities nor the failures a value -> "An Effect yields an Ability
    to ask for what it needs, and it yields an exception to report a
-   failure"): name each item with what it is for.
+   failure"): name each item with what it is for. An "it" that ends
+   a clause is read for the nearest noun its verb could take ("A
+   `Need` is a request for an instance, and code outside the
+   requesting function answers it", Bruce: "what does 'it' refer
+   to?" -> "answers the `Need`", R12). `tip pointers` lists the
+   sentence-opening "it" alone, so grep the scope for ` it[.,;:]`.
+   A term the book defines in an earlier chapter is a link at its
+   first use in the chapter ("Stateless does [dependency
+   injection](11_Techniques--Testing.md#random-numbers) with
+   `Need`", R16).
 6. `ambiguity`: every sentence that counts, compares, coordinates,
    modifies, or limits keeps one reading. A list of what two things
    share ("has `send()`, `throw()`, and `close()`, as a generator
