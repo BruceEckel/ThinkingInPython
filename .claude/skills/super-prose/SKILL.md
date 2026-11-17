@@ -75,9 +75,9 @@ each pass hands the next one less to do.
    with generators"; "frameworks such as FastAPI's `Depends` use
    it"), a listing that adds to an earlier one "extends" it, and a
    chapter that needs an earlier one "depends on" or "uses" what that
-   chapter taught (C90; the book read that day rewrote all 24 other
-   sites and kept none, so a hit is a sentence written since). Grep
-   the scope for `buil[dt]s? on|building on`. When the repair is a
+   chapter taught (R70; the book read that day rewrote all 24 other
+   sites and kept none, so a hit is a sentence written since).
+   `tip watch-words` lists the phrase as Tier 2. When the repair is a
    relative clause that parts the subject from its verb ("every
    singleton that keeps its state in a module depends"), use the
    chapter's own term ("the module form of a singleton").
@@ -164,7 +164,7 @@ each pass hands the next one less to do.
    holds for which members ("An Effect's type declares three things:
    the dependencies the Effect needs, the ways it can fail, and the
    result it produces. The Effect yields its requests for
-   dependencies and its failures, and it returns its result", C91).
+   dependencies and its failures, and it returns its result", R71).
    Grep the scope for
    `^(Besides|Apart from|Aside from|Beyond|In addition to) `, and
    keep an opener whose member the page has just described ("Beyond

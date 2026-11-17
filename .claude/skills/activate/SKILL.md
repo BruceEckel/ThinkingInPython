@@ -431,6 +431,12 @@ and it becomes part of every future pass.
   Keep a first use in the same sentence ("inherit an implementation,
   to reuse the code from the base class") and a verb that is the
   operation's name ("re-raises").
+  Keep a first user that the listing above shows ("Every visitor
+  reuses that one loop") and "reuse" as a term ("reuse through
+  inheritance", a reusable context manager).
+  The book read that day rewrote 2 of the 56 other lines, each with no
+  earlier user on the page ("you reuse its existing classes" is "you
+  use its existing classes").
   C92 in `bruce_edit_db.md`.
 - "the count would be wrong again" becomes "the count would still be wrong".
   "Again" implies a history (wrong, fixed, wrong once more);

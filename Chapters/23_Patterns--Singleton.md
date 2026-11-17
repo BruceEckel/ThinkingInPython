@@ -579,7 +579,7 @@ A *Borg* points every instance's `__dict__` at the same storage:
 ![Three distinct instances share one `__dict__`](_images/borg_shared_state)
 
 Each previous design manages one specific class,
-but *Borg* is a base class that any class reuses through inheritance:
+but *Borg* is a base class that any class uses through inheritance:
 
 ```python
 # singleton_borg.py

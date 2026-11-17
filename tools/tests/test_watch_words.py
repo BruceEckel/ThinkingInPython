@@ -26,6 +26,14 @@ def test_tier_2_hit() -> None:
         (1, 2, "already", "The value is already set")]
 
 
+def test_builds_on_is_tier_2() -> None:
+    found = hits("Stateless builds on generators. A tool built on "
+                 "that design, building on the last chapter. It "
+                 "builds one on every call.")
+    assert [(h[1], h[2]) for h in found] == [
+        (2, "builds on"), (2, "built on"), (2, "building on")]
+
+
 def test_verb_with_no_or_none_object_is_tier_2() -> None:
     found = hits("Python raises no exception. The call runs none of "
                  "the body. It has no slots. The second supplies none.")

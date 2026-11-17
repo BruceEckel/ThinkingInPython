@@ -496,4 +496,4 @@ before/after pair, and it becomes part of every future pass.
   from that hazard,", after the paragraph on the hazard).
   Grep the scope for
   `^(Besides|Apart from|Aside from|Beyond|In addition to) `.
-  C91 in `bruce_edit_db.md`.
+  R71 in `bruce_edit_db.md`.

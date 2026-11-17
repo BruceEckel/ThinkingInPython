@@ -51,6 +51,12 @@ every case, a universal to test or a phrase to cut, and a free relative
 "whatever the caller supplies" is R54's shape with a thing, "the value
 the caller supplies". The 2026-11-16 read rewrote the 54 sites then
 standing and kept none, so the baseline holds no `whatever` entry.
+`builds on` joined Tier 2 on 2026-11-16 (rule R70, Bruce: "'builds
+on' is awkward; 'implemented using' or something like that"): the
+phrase is a figure of construction that leaves the relation to the
+reader, so the repair is the relation's verb, "implements ... with",
+"uses", "extends", "depends on". The book read that day rewrote all
+24 sites, so the baseline holds no entry for it either.
 `however` joined Tier 2 on
 2026-11-08 (rule R58, Bruce: "unclear usage of 'however'" on "however
 many `next()` calls that takes"): the concessive sense ("however
@@ -400,6 +406,7 @@ RULES: Final[tuple[tuple[int, re.Pattern[str]], ...]] = tuple(
         (2, r"could"),
         (2, r"whichever"),
         (2, r"whatever"),
+        (2, r"buil[dt]s? on|building on"),
         (2, r"however"),
         (2, r"even"),
         (2, r"honest(?:ly)?"),

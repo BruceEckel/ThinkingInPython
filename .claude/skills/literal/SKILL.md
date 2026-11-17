@@ -406,5 +406,6 @@ and it becomes part of every future pass.
   chapter taught.
   Keep the literal sense, a thing constructed on another ("building
   one that holds 0" is a different verb, to build).
-  Grep the scope for `buil[dt]s? on|building on`.
-  C90 in `bruce_edit_db.md`.
+  `tip watch-words` lists the phrase as Tier 2 (since 2026-11-16), so
+  `tip verify-ch` fails on a new one.
+  R70 in `bruce_edit_db.md`.

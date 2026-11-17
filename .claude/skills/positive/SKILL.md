@@ -237,4 +237,5 @@ before/after pair, and it becomes part of every future pass.
   The positive sentence is complete.
   The tag also set a noun phrase against a clause, and "how the body reads" is a figure for what the body contains.
   Keep "rather than" where it alone marks the substitution, and between two bare verb phrases ("return a description rather than raise an exception").
+  Keep it too where the tag is the one place the passage states the alternative, most often a clause set against a clause of the same form ("describing what the system does rather than how to build it"); the book read that day kept all six other sites for that reason.
   Grep the scope for `instead[.,:]` and `rather than (how|what|where|when|whether)`. C54 in `bruce_edit_db.md`.

@@ -5,7 +5,7 @@
 > A *Template Method* sets the sequence and lets you supply the steps that vary.
 
 To build a new application on an application framework,
-you reuse its existing classes and override methods to customize behavior.
+you use its existing classes and override methods to customize behavior.
 At the heart of a framework is the *Template Method* of *GoF Design Patterns*:
 a base-class method that drives the application by calling other base-class methods,
 some of which you override.

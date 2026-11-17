@@ -332,6 +332,13 @@ that two scoped accepts had recorded unread were read with the rest.
 The last site was chapter 15's epigraph, a block quote the check
 skips, which became "Everything you acquire must be released" when
 the candidate was promoted that day.
+Since 2026-11-16 `builds on` is Tier 2 (rule R70, promoted that day
+from C90; Bruce: "'builds on' is awkward; 'implemented using' or
+something like that"): the phrase leaves the relation to the reader,
+so the repair is the relation's verb ("Stateless implements Effects
+with generators", "extends", "depends on"). The read that day rewrote
+all 24 sites, so the baseline holds no entry and a hit is a sentence
+written since.
 Since 2026-11-08 `however` is Tier 2 too (rule R58, Bruce: "unclear
 usage of 'however'" on chapter 45's "however many `next()` calls
 that takes"): the concessive sense reads first as the contrastive

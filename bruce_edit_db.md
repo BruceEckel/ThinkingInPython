@@ -3865,6 +3865,136 @@ its paragraph, since 2026-11-16) | the project CLAUDE.md |
 pass 5 (the free relative) and pass 6 (the concessive), with the
 Accrued sections of the antecedents and ambiguity skills | this file.
 
+### R70. "Builds on" names no relation: say implements with, extends, or assumes
+
+**Test.** "X builds on Y", "built on", "building on", with a library,
+a listing, a design, or a chapter as X. The phrase is a figure of
+construction and leaves the relation for the reader to work out. Ask
+which relation the passage means, and write its verb. A library and
+its mechanism: "implements ... with", "uses". A listing or a class
+that adds to an earlier one: "extends", "adds ... to". A chapter or a
+section that needs an earlier one: "uses", "assumes".
+
+**Keep when.** None seen yet. The verb "build" with an object is a
+different word ("building one that holds 0").
+
+**Sightings.** 2 rounds, 16 files. Promoted by Bruce 2026-11-16 on
+the strength of that day's book read ("applied in more than a dozen
+files, which is the store's bar for a rule"); was C90. The first,
+`46_Effects--Stateless` 2026-11-16, Bruce:
+"'builds on' is awkward; 'implemented using' or something like that":
+- "Stateless builds on generators." -> "Stateless implements Effects
+  with generators."
+- The chapter's other site, the same day: "and frameworks such as
+  FastAPI's `Depends` build on it" -> "use it".
+- The book read, the same day (Bruce's "do the suggestions"): the 23
+  other sites in 15 files, and one split form, "a library that builds
+  Effect tracking on generators". All 24 rewritten, none kept. The
+  relation decided the verb:
+  - implemented with, or uses, 13: "Stateless builds on generators,
+    as TypeScript Effect's `function*` does" -> "Stateless implements
+    Effects with generators, as Effect in TypeScript does with
+    `function*`"; "`ProcessPoolExecutor` builds on `multiprocessing`"
+    -> "uses `multiprocessing` for its worker processes"; "An Effect
+    system builds on a generator" -> "uses a generator"; "A tool built
+    on the `Annotated` design" -> "that uses"; "every expression built
+    on that value" -> "that uses that value"; "built on the operating
+    system's I/O completion ports" -> "which uses".
+  - needs what an earlier part taught, 5: "later chapters build on
+    `ClassVar`" -> "use"; "The last two build on the chapters before
+    them" -> "depend on"; "Everything else in these chapters builds on
+    purity" -> "depends on"; "[Decorators] builds on that forwarding"
+    -> "uses".
+  - adds to, 3: "*State Machine* builds on *State*" -> "extends";
+    "[Rethinking Objects] builds on this" -> "develops that idea";
+    "override `report()` to build on `super().report()`" -> "so that
+    it calls `super().report()`".
+  - runs on, applies, or depends on, 3: "built on Erlang's BEAM
+    virtual machine" -> "runs on"; "two different disciplines built
+    on this same idea" -> "that apply this idea"; "If the steps ...
+    build on each other" -> "depend on each other".
+  One repair needed a second try. "Every singleton built on module
+  state" became "every singleton that keeps its state in a module",
+  which set a relative clause between the subject and its verb; the
+  chapter's own term fits: "the module form of a singleton".
+  Chapter 25's epigraph was a site too ("are both built on that
+  stand-in" -> "both use that stand-in").
+
+**Home.** `super-prose` pass 1 and the `literal` skill's Accrued
+patterns | `tip watch-words` (Tier 2, "builds on", since the
+promotion; the book had no site left, so the baseline holds no
+entry and a hit is a sentence written since) | the project
+CLAUDE.md | this file.
+
+### R71. An opener that sets one member aside comes after the set: state the whole list in its order
+
+**Test.** A sentence opens on "Besides X,", "Apart from X,", or
+"In addition to X," and its main clause then counts or lists the
+other members of a set X belongs to ("Besides its result, an Effect's
+type declares two things:"). The reader holds the exception before
+the set exists. Two more tells, either one enough: the opener has a
+pronoun whose noun comes later ("its result", before "an Effect"),
+and the count leaves X out (two things, of the type's three). State
+the whole set in its own order, then say what holds for which
+members.
+
+**Keep when.** X is on the page already and the sentence turns to
+the rest ("Apart from that hazard, the builder class solves a
+problem Python does not have", after the paragraph that describes
+the hazard), or X
+is a single contrast with no set behind it.
+
+**Sightings.** 2 rounds, 15 files. Promoted by Bruce 2026-11-16 on
+the strength of that day's book read; was C91. The first,
+`46_Effects--Stateless` 2026-11-16, was
+Claude-written, Bruce on "Besides its result,": "awkward":
+- "Besides its result, an Effect's type declares two things: the
+  dependencies the Effect needs and the ways it can fail." -> "An
+  Effect's type declares three things: the dependencies the Effect
+  needs, the ways it can fail, and the result it produces." The order
+  is the order of `Effect[A, E, R]`, which the next section defines.
+- The chapter's other site, the same day: "Besides matching lookups,
+  the DI registration key sets the type for which an instance
+  answers" -> "The DI registration key matches lookups and sets the
+  type for which an instance answers". Its opener also read two ways,
+  lookups that match or the act of matching them.
+- The book read, the same day (Bruce's "do the suggestions"): the 15
+  other openers in 14 files. Seven rewritten, eight kept.
+  - Rewritten, a forward pronoun: "Apart from its return type,
+    `trampoline()` has a state's annotation" -> "`trampoline()` has a
+    state's yield type and send type"; "Apart from their lengths, the
+    two runs differ only in the order of the tuple" -> "The two runs
+    differ in their lengths and in the order of the tuple"; "Beyond
+    how they read, a comprehension and `map()` return different
+    things" -> "A comprehension and `map()` read differently, and they
+    return different things"; "Apart from the line it prints, the
+    listing is `singleton_cached_race.py` plus the priming call" ->
+    "The listing is `singleton_cached_race.py` with two changes: the
+    priming call, and a `print()` of the count in place of the
+    comparison".
+  - Rewritten, a count that left the member out: "Apart from the new
+    subclass, `factory()` is the only code that changes" -> "Adding a
+    new type of `Shape` changes two places: the new subclass and
+    `factory()`"; "Apart from the function's name, the `finally` is
+    the one difference" -> "The two listings differ in the function's
+    name and in the `finally`".
+  - Rewritten, the exception moved behind its claim: "Apart from
+    `__slots__`, which comes up below, no syntax in a Python class
+    body allocates a per-object field" -> "No syntax ... allocates a
+    per-object field, apart from `__slots__`, which comes up below."
+  - Kept, eight, all the keep-when: the member is on the page and the
+    sentence turns to the rest ("Beyond those three, the output
+    holds", "Beyond that,", "Apart from that hazard,", "Apart from
+    `bind()`," four lines after "Ignore `bind()` for the moment",
+    "Besides a built-in like `tuple` or `str`,", "Apart from those
+    lines and the `pieces` and `bins` names they read,", "Beyond
+    `__iter__()`,"), and "Beyond the standard library," which is a
+    place, with no set behind it.
+
+**Home.** `super-prose` pass 3 and the `straighten` skill's Accrued
+patterns | this file. No tool lists the shape: eight of the fifteen
+openers are keeps, so the pass greps for it.
+
 ## Candidates
 
 One sighting each. Logged, not applied. A second sighting in a different
@@ -4269,7 +4399,7 @@ proposed promotion, which is Bruce's call.
   failures." The paragraph was a description, with no "must" to walk,
   and the same reading applied: say what the paragraph is for (what
   the type declares, and how the generator carries each part), then
-  give each part its sentence and its verb. The opener is C91. "Go
+  give each part its sentence and its verb. The opener is R71. "Go
   out on the yield channel" is chapter 45's phrase for a channel's
   direction, set against "comes back", and it stays there; here the
   Effect had no verb, and "yields" and "returns" are the verbs the
@@ -4669,7 +4799,10 @@ pair, a "not" or "rather than" in reach, a listing after the colon that
 shows the replacement, a verb that means replacement ("skip", "shadow",
 "discards" against "raises").
 
-**Keep when.** "instead" is the only word saying a substitution
+**Keep when.** A "rather than" clause that is the one place the
+passage states the alternative, most often a clause set against a
+clause of the same form ("what the system does rather than how to
+build it"). "instead" is the only word saying a substitution
 happened, so that without it the new thing reads as an addition:
 "`@dataclass` sets `__hash__` to `None` instead" (a reader would
 otherwise think it also inherits the default), "so a named constant in a
@@ -4704,8 +4837,30 @@ parallel-condition shape.
   contrast three sentences up ("Python decides generator-function
   status from the body alone"), so the deletion test passed. The tag
   also set a noun phrase against a clause, and its "reads" is a
-  figure for what the body contains. Scale: 6 other "rather than
-  how/what/where ..." clauses in the book, unread.
+  figure for what the body contains.
+- The book read, the same day: the 6 other "rather than
+  how/what/when/whether ..." clauses in 5 files. None rewritten, six
+  kept. In each the tag is the one place the passage states the
+  alternative, so the deletion test fails, and four of the six set a
+  clause against a clause of the same form:
+  - `21_Patterns--Design_Patterns`: "describing what the system
+    does rather than how to build it" (analysis against design is
+    the sentence's claim).
+  - `38_Patterns--Simulation`: "when the room enters the queue,
+    rather than when it leaves, so each room enters the queue once"
+    (the "so" clause follows from the choice between the two).
+  - `14_Techniques--Decorators`: "it asks what kind of value arrived
+    rather than whether one arrived" (the next sentence is the
+    failure that difference causes).
+  - Solutions 18: "it says what the result is rather than how the
+    parts accumulate" (`join()` against the `+=` loop).
+  - `07_Foundations--Classes`: "the method runs at the first read
+    rather than when the constructor runs". Without the tag the
+    clause repeats "created on first use"; the constructor is the
+    new information. It sets a phrase against a clause, the one
+    close call of the six.
+  - `21_Patterns--Design_Patterns`: Alan Kay's sentence, a
+    quotation.
 
 **Home.** CLAUDE.md (a bullet before "Prefer the positive statement",
 2026-11-01) | `super-prose` pass 2 and the `positive` skill's Accrued
@@ -6321,127 +6476,6 @@ opening: "Does the type checker perform delayed binding?"
 **Home.** `super-prose` pass 1 and the `literal` skill's Accrued
 patterns | this file.
 
-### C90. "Builds on" names no relation: say implements with, extends, or assumes
-
-**Test.** "X builds on Y", "built on", "building on", with a library,
-a listing, a design, or a chapter as X. The phrase is a figure of
-construction and leaves the relation for the reader to work out. Ask
-which relation the passage means, and write its verb. A library and
-its mechanism: "implements ... with", "uses". A listing or a class
-that adds to an earlier one: "extends", "adds ... to". A chapter or a
-section that needs an earlier one: "uses", "assumes".
-
-**Keep when.** None seen yet. The verb "build" with an object is a
-different word ("building one that holds 0").
-
-**Sightings.** 1, `46_Effects--Stateless` 2026-11-16, Bruce:
-"'builds on' is awkward; 'implemented using' or something like that":
-- "Stateless builds on generators." -> "Stateless implements Effects
-  with generators."
-- The chapter's other site, the same day: "and frameworks such as
-  FastAPI's `Depends` build on it" -> "use it".
-- The book read, the same day (Bruce's "do the suggestions"): the 23
-  other sites in 15 files, and one split form, "a library that builds
-  Effect tracking on generators". All 24 rewritten, none kept. The
-  relation decided the verb:
-  - implemented with, or uses, 13: "Stateless builds on generators,
-    as TypeScript Effect's `function*` does" -> "Stateless implements
-    Effects with generators, as Effect in TypeScript does with
-    `function*`"; "`ProcessPoolExecutor` builds on `multiprocessing`"
-    -> "uses `multiprocessing` for its worker processes"; "An Effect
-    system builds on a generator" -> "uses a generator"; "A tool built
-    on the `Annotated` design" -> "that uses"; "every expression built
-    on that value" -> "that uses that value"; "built on the operating
-    system's I/O completion ports" -> "which uses".
-  - needs what an earlier part taught, 5: "later chapters build on
-    `ClassVar`" -> "use"; "The last two build on the chapters before
-    them" -> "depend on"; "Everything else in these chapters builds on
-    purity" -> "depends on"; "[Decorators] builds on that forwarding"
-    -> "uses".
-  - adds to, 3: "*State Machine* builds on *State*" -> "extends";
-    "[Rethinking Objects] builds on this" -> "develops that idea";
-    "override `report()` to build on `super().report()`" -> "so that
-    it calls `super().report()`".
-  - runs on, applies, or depends on, 3: "built on Erlang's BEAM
-    virtual machine" -> "runs on"; "two different disciplines built
-    on this same idea" -> "that apply this idea"; "If the steps ...
-    build on each other" -> "depend on each other".
-  One repair needed a second try. "Every singleton built on module
-  state" became "every singleton that keeps its state in a module",
-  which set a relative clause between the subject and its verb; the
-  chapter's own term fits: "the module form of a singleton".
-  Chapter 25's epigraph was a site too ("are both built on that
-  stand-in" -> "both use that stand-in").
-
-**Home.** `super-prose` pass 1 and the `literal` skill's Accrued
-patterns | this file.
-
-### C91. An opener that sets one member aside comes after the set: state the whole list in its order
-
-**Test.** A sentence opens on "Besides X,", "Apart from X,", or
-"In addition to X," and its main clause then counts or lists the
-other members of a set X belongs to ("Besides its result, an Effect's
-type declares two things:"). The reader holds the exception before
-the set exists. Two more tells, either one enough: the opener has a
-pronoun whose noun comes later ("its result", before "an Effect"),
-and the count leaves X out (two things, of the type's three). State
-the whole set in its own order, then say what holds for which
-members.
-
-**Keep when.** X is on the page already and the sentence turns to
-the rest ("Apart from that hazard, the builder class solves a
-problem Python does not have", after the paragraph that describes
-the hazard), or X
-is a single contrast with no set behind it.
-
-**Sightings.** 1, `46_Effects--Stateless` 2026-11-16, was
-Claude-written, Bruce on "Besides its result,": "awkward":
-- "Besides its result, an Effect's type declares two things: the
-  dependencies the Effect needs and the ways it can fail." -> "An
-  Effect's type declares three things: the dependencies the Effect
-  needs, the ways it can fail, and the result it produces." The order
-  is the order of `Effect[A, E, R]`, which the next section defines.
-- The chapter's other site, the same day: "Besides matching lookups,
-  the DI registration key sets the type for which an instance
-  answers" -> "The DI registration key matches lookups and sets the
-  type for which an instance answers". Its opener also read two ways,
-  lookups that match or the act of matching them.
-- The book read, the same day (Bruce's "do the suggestions"): the 15
-  other openers in 14 files. Seven rewritten, eight kept.
-  - Rewritten, a forward pronoun: "Apart from its return type,
-    `trampoline()` has a state's annotation" -> "`trampoline()` has a
-    state's yield type and send type"; "Apart from their lengths, the
-    two runs differ only in the order of the tuple" -> "The two runs
-    differ in their lengths and in the order of the tuple"; "Beyond
-    how they read, a comprehension and `map()` return different
-    things" -> "A comprehension and `map()` read differently, and they
-    return different things"; "Apart from the line it prints, the
-    listing is `singleton_cached_race.py` plus the priming call" ->
-    "The listing is `singleton_cached_race.py` with two changes: the
-    priming call, and a `print()` of the count in place of the
-    comparison".
-  - Rewritten, a count that left the member out: "Apart from the new
-    subclass, `factory()` is the only code that changes" -> "Adding a
-    new type of `Shape` changes two places: the new subclass and
-    `factory()`"; "Apart from the function's name, the `finally` is
-    the one difference" -> "The two listings differ in the function's
-    name and in the `finally`".
-  - Rewritten, the exception moved behind its claim: "Apart from
-    `__slots__`, which comes up below, no syntax in a Python class
-    body allocates a per-object field" -> "No syntax ... allocates a
-    per-object field, apart from `__slots__`, which comes up below."
-  - Kept, eight, all the keep-when: the member is on the page and the
-    sentence turns to the rest ("Beyond those three, the output
-    holds", "Beyond that,", "Apart from that hazard,", "Apart from
-    `bind()`," four lines after "Ignore `bind()` for the moment",
-    "Besides a built-in like `tuple` or `str`,", "Apart from those
-    lines and the `pieces` and `bins` names they read,", "Beyond
-    `__iter__()`,"), and "Beyond the standard library," which is a
-    place, with no set behind it.
-
-**Home.** `super-prose` pass 3 and the `straighten` skill's Accrued
-patterns | this file.
-
 ### C92. A "re-" verb claims an earlier time: write the plain verb until that time is on the page
 
 **Test.** "Reuses", "redefines", "restates", or another "re-" verb
@@ -6457,7 +6491,11 @@ sentence states a standing relation.
 **Keep when.** The first use is in the sentence or the one before
 (chapter 7's "You therefore inherit an implementation, to reuse the
 code from the base class", where the base class is the first user),
-and a "re-" verb that is the operation's name ("re-raises").
+or in the listing above it, a sentence that names the one thing and
+its several users together ("Every visitor reuses that one loop"),
+"reuse" and "reusable" as a term (the OOP promise, a reusable
+context manager), and a "re-" verb that is the operation's name
+("re-raises").
 
 **Sightings.** 1, `46_Effects--Stateless` 2026-11-16, was
 Claude-written, Bruce on "reuses": "reuses or uses?":
@@ -6473,8 +6511,41 @@ Claude-written, Bruce on "reuses": "reuses or uses?":
   the function's Abilities in `A` and its failures in `E`." The
   given term, "That description", now comes first, and the chapter
   link has a verb.
-- Scale: 48 other uses of "reuse" in 32 files, unread under this
-  test.
+- The book read, the same day: the other "reuse" sites, 56 prose
+  lines in 34 files once listings, anchors, link text, and the
+  generated exercise quotes are set aside. Two rewritten, the rest
+  kept.
+  - Rewritten, no earlier user on the page:
+    `24_Patterns--Template_Method`, "you reuse its existing classes
+    and override methods" -> "you use its existing classes"
+    ("existing" already says the classes came first);
+    `23_Patterns--Singleton`, "*Borg* is a base class that any
+    class reuses through inheritance" -> "uses through
+    inheritance".
+  - Kept, the first use is in the sentence or the one before, the
+    largest group: "runs a module's top-level code once ... every
+    later import reuses the loaded module"; "name a value in its
+    `if` clause and reuse it in the result"; "builds the fixture
+    once and reuses it"; "reuses the generator's implementation"
+    (the generator is the first user); "reuses the caller's stack
+    frame"; "`run_async()` reuses the running loop"; "the consumer
+    reuses one of them", after the three producers; "`FloodGame`
+    reuses `new_grid()` from `grid_observer.py`"; "[Confidence]
+    reuses `withdraw()`", after the chapter that uses it first.
+  - Kept, the first user is in the listing above: "A new `Visitor`
+    subclass such as `Fly` reuses an existing operation" (`Bee`
+    has it), "Every visitor reuses that one loop".
+  - Kept, one thing and several users named together: "reuses a
+    pool of workers instead of spawning one process per call",
+    "Reusing `_` for every registration", "Several exercises below
+    reuse the book's generic table-driven engine".
+  - Kept, the word is the term: "reuse through inheritance" as the
+    OOP promise in chapter 20, "reusable" for a context manager
+    that can be entered twice (the documentation's word) and for an
+    iterable, the Pattern Catalog's one-line definitions of *Thread
+    Pool*, *Object Pool*, and *Mixin*, and the Solutions step labels
+    ("**Reuse the chapter's model.**") whose next sentence names
+    the source.
 
 **Home.** `super-prose` pass 7 and the `activate` skill's Accrued
 patterns | this file.
