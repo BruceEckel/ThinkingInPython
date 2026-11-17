@@ -1,19 +1,3 @@
-Suggestions
-
-Both of today's candidates were applied in more than a dozen files, which is the store's bar for a rule:
-
-Promote C90 ("builds on") and C91 (the set-aside opener) to rules in bruce_edit_db.md on the strength of today's book reads, and file each in its Home.
-
-Two entries from this morning still list unread sites:
-
-Read the 6 "rather than how/what/where" clauses that C54 lists and the 48 "reuse" sites that C92 lists in bruce_edit_db.md, rewrite the ones that fail each test, and record the keeps.
-
-The Jev skill, its hook script, and the new test exist on this machine alone, because the dotfiles backup has no rule for ~/.claude/skills/:
-
-Add ~/.claude/skills/ to the allow-list in C:/git/dotfiles-backup/.gitignore, leaving out the synced and plugin folders, and run make check to show what the next sync would add.
-
-----
-
 Reading level
 
 Implementation is Friction
