@@ -110,6 +110,13 @@ eleven prose passes in the session, including `/activate`,
 walkthrough's own register gets a frame, R57), and `/stutter`, over a
 chapter or one section (`/super-prose 45 section "<heading>"`), and
 commits; it is the in-session form of `tip rewrite`.
+Since 2026-11-17 a second read follows its passes, the reader's read:
+each paragraph is read as a reader who knows only what the book has
+said so far, and a question a sentence leaves open is a finding. A
+whole chapter goes through both one `##` section at a time. The
+whole-chapter pass over chapter 46 on 2026-11-15 had kept 15 of the 17
+sentences Bruce flagged in its first 300 lines two days later, seven
+of them plain cases of promoted rules.
 `tip rewrite CH=NN` runs these six plus `elements-of-style`,
 `bruce-edit-apply`, `alternative`, and `stutter` (last, since the
 other passes write new sentences) by

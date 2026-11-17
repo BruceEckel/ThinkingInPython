@@ -22,6 +22,8 @@ that puts the next lesson here.
 
 Load all eleven skills with the `Skill` tool before touching the
 prose, then read the scope once and apply them together.
+A second read follows the passes, "The reader's read" below, and a
+whole chapter goes through both one `##` section at a time.
 The order is the order the skills' own boundary notes give:
 each pass hands the next one less to do.
 
@@ -622,6 +624,63 @@ for the listing's own name and adds a sentence to introduce the name
 ("`g` is `outer()`'s generator." under `g = outer()`, cut by Bruce
 2026-11-12). Use the name and stop.
 Bruce's "we" and his em-dashes stay.
+
+## The reader's read
+
+The eleven passes test a sentence against a rule. Bruce reads a
+sentence and asks what a reader would ask. On 2026-11-17 he flagged
+17 sentences in the first 300 lines of chapter 46, two days after a
+super-prose pass over the whole chapter (`2a115633`) had read 15 of
+them and kept them, and had written a sixteenth ("depends on its
+argument alone"). Seven were plain applications of promoted rules
+(R7 twice, R47 twice, R10, R12, R16). Each flag was a question: "does
+it not mention the result channel?", "why isn't it just `Console`?",
+"does 'Never' also stand in with Depend and Try?", "why are we
+introducing 'synchronous' here?", "what does 'it' refer to?".
+
+So the scope gets a second read after the passes, one paragraph at a
+time, as a reader who knows only what the book has said up to that
+sentence. After each sentence, write down the question it leaves, and
+check that the page answers it before the paragraph ends:
+
+- A name in a code span: has the chapter said what it is? (`Need` in
+  an example, `SuccessEffect` under a signature that says `Success`.)
+- A list or a table, then a sentence about some of its members: what
+  about the others? (Three parameters and two channels, three aliases
+  and "In `Success`".)
+- A modifier or a limiter: what is the other case? ("A synchronous
+  program", "alone", "only".)
+- A pronoun that ends a clause: which noun? ("answers it".)
+- A verdict or a comparison: is it true as the reader will take it?
+  ("That signature is incomplete", of a standard Python signature;
+  "differ only in case", of a function and a type.)
+- A pointer to another place: does the sentence need the reason here?
+  ("below, says why".)
+- A sentence beside a listing: does the listing show it, and does the
+  reader already know it? ("`-> None` describes the return value".)
+- A term of art: where does the book define it, and is it linked?
+  ("dependency injection".)
+- Two listings that define one name: can the reader tell them apart?
+  (`greet()` in `greeter.py` and in `untyped_greet.py`, now
+  `plain_greet()`.)
+- The paragraphs under a listing: is each name's story in one place,
+  in the listing's order? (The Simplest Effect.)
+
+A question the page leaves open is a finding, under any rule or none.
+Fix it under the pass that owns it. When no pass does, say so in the
+report: a missing listing, a name used before its section, and a
+section's order belong to the `deep-review` teaching pass.
+
+Two limits on what a pass may take as settled:
+
+- A sentence that an earlier pass or sweep read and kept is not a
+  keep. The keeps the tools hold are keeps of one flagged word under
+  one rule. Fifteen of the seventeen sentences had come through about
+  twenty sweeps.
+- A whole chapter is read one `##` section at a time, each section
+  through the passes and then through this read, before the next one
+  starts. The 2026-11-15 pass read 1,900 lines at once and changed 75
+  sentences, most of them shapes a survey tool lists.
 
 ## After the edits
 

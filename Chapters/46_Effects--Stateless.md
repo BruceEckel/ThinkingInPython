@@ -180,17 +180,16 @@ import it.
 rather than using the one Stateless provides,
 to show that a dependency is an ordinary class.
 
-Compare `greeter.py`'s `greet()` to the version that calls the built-in `print()`:
+Compare `greeter.py`'s `greet()` to `plain_greet()`,
+which calls the built-in `print()`:
 
 ```python
 # untyped_greet.py
-def greet(name: str) -> None:
+def plain_greet(name: str) -> None:
     print(f"Hello, {name}!")
 ```
 
-That signature is incomplete.
-`-> None` describes the return value.
-The body also writes to standard output, a side effect the signature leaves out.
+The body writes to standard output, a side effect the signature leaves out.
 A caller must capture stdout to redirect the output or to test the function.
 
 `Depend[Need[Console], None]` states the dependency.
@@ -1171,8 +1170,8 @@ the value under key `type[T]` is a `T`.
 
 `greet()`'s body matches `greeter.py`'s `greet()` line for line,
 apart from `console: Console = get(Console)` in place of `console = yield from need(Console)`.
-Its signature matches the `untyped_greet.py` version in [Declaring a Dependency](#declaring-a-dependency).
-Both read `(str) -> None`, and neither names the `Console` it uses.
+Its signature matches `plain_greet()`'s in [Declaring a Dependency](#declaring-a-dependency).
+Both read `(str) -> None`, and neither shows where the output goes.
 
 The `greet("Alice")` call at `[1]` fails at runtime because it runs before `register()` binds a `Console`.
 The second, at `[2]`, succeeds because the binding now exists.

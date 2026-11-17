@@ -545,6 +545,14 @@ already stated nearby, as in a summary sentence that closes a section.
   (a loop) and what it keeps, "to track what it has seen" is one
   instance (a running total), and "may stop early" is the condition
   under which it stops.
+- `46_Effects--Stateless` 2026-11-17, was Claude-written
+  (`9b30696b`, 2026-09-25), Bruce on "That signature is incomplete.":
+  "no, it's standard python". The verdict was false as the reader
+  takes it: `def greet(name: str) -> None` is a complete signature.
+  The mechanism was in the third sentence, which now stands alone:
+  "The body writes to standard output, a side effect the signature
+  leaves out." A verdict on code ("incomplete", "wrong", "broken") is
+  tested by reading it as a plain statement about the code.
 
 **Home.** literal (Accrued patterns and the "Vague descriptions"
 section), the pass that owns figures; deep-review (prose pass, "Vague").
@@ -2305,6 +2313,14 @@ the rest of the chapter for similar issues"; 15 passages cut in
   behavior that no line of the trace shows, try the repair in the
   listing first (listing-design's fourth question, a trace that shows
   the chapter's subject). The sentence then falls to this rule.
+- `46_Effects--Stateless` 2026-11-17, two annotations read aloud that
+  the 2026-10-25 sweep and the 2026-11-15 super-prose pass both left:
+  "`-> None` describes the return value." (Bruce: "the reader knows
+  how to read a return value") -> cut; "The first parameter is
+  `Need[Console]` rather than `Console`." (Bruce: "states the obvious
+  but nothing explains that") -> the reason in its place (C79,
+  sighting 3). A sentence that survived an earlier sweep of this rule
+  is read again like any other.
 
 **Home.** CLAUDE.md (global, the "Prose beside a listing" bullet);
 deep-review (prose pass, "Restating"). Promoted on Bruce's ruling, the
@@ -6916,6 +6932,36 @@ its actor ("the caller chooses the keywords").
 
 **Home.** literal (Accrued patterns) | super-prose (pass 1) | this
 file.
+
+### C96. A comparison listing gives its version of the running function a name of its own (listing)
+
+**Test.** A listing shown for comparison defines a function with the
+name the running example already uses (`greet()` in `greeter.py`,
+then `greet()` in `untyped_greet.py`), and the prose then has to say
+"the version that calls the built-in `print()`". Give the comparison
+version its own name, and use the name in the lead-in: "Compare
+`greeter.py`'s `greet()` to `plain_greet()`, which calls the built-in
+`print()`:".
+
+**Keep when.** The listing is the next step of the running example
+and replaces the earlier version (`default_console.py`, `greet_all.py`,
+and `console_protocol.py` each define the chapter's `greet()` again).
+
+**Sightings.** 1, `46_Effects--Stateless` 2026-11-17, Bruce on
+`def greet(name: str) -> None:` in `untyped_greet.py`: "give this a
+different name so it isn't confused with the previous one":
+- `greet()` -> `plain_greet()`, in the listing, its lead-in, and the
+  sentence in Dependency Injection that refers back to it. That
+  sentence said of both functions "neither names the `Console` it
+  uses". The `print()` version uses none, and the sentence now reads
+  "neither shows where the output goes".
+- Scale: `dependency_injection.py` in the same chapter also defines a
+  `greet()` for comparison, and its prose tells the two apart by file
+  name ("`greet()`'s body matches `greeter.py`'s `greet()` line for
+  line"). Left as it is, for Bruce's call.
+
+**Home.** this file; the listing-design skill if promoted; the
+reader's read in super-prose lists the question.
 
 ## Retired
 
