@@ -33,14 +33,14 @@ Some of the examples in this chapter and the next derive from that book.
 
 ## The Effect Type
 
-Stateless builds everything atop a single type with three type parameters:
+Stateless describes every Effect with one type, which has three type parameters:
 
 ```python
 Effect[A, E, R]
 ```
 
-Those three parameters answer the three questions [Effect Management](44_Effects--Effect_Management.md#library-effect-management)
-asks of an Effect signature:
+Those three parameters carry the Effect information,
+as the three type parameters of `ZIO` do in [Effect Management](44_Effects--Effect_Management.md#library-effect-management):
 
 - `A` is what the computation needs, an *Ability*.
 - `E` is its failure (error) type.
@@ -227,8 +227,8 @@ Generator[Need[Console] | KeyError, Any, None]
 The union lists requests and failures alike.
 Two bounds on the library's type variables tell them apart.
 `A`'s bound is `Ability[Any]`, and `E`'s bound is `Exception`.
-[Waiting on a Coroutine](#waiting-on-a-coroutine)
-states the `A` bound as the rule for `Depend`.
+`Console` is not an `Ability`,
+so the type checker rejects `Effect[Console, KeyError, None]`.
 
 At runtime, the driver tells a request from a failure with `case Exception() as error`.
 A yielded value that matches `Exception` is a failure.
@@ -253,7 +253,8 @@ A generator has one `SendType`, which covers every `yield` in its body.
 An Effect needs a different answer for each request:
 
 - A `yield` that requests a `Need[Console]` should get back a `Console`.
-- A `yield` that requests a `Need[Log]` should get back a `Log`.
+- A `yield` that requests a second dependency, a `Need[Log]`,
+  should get back a `Log`.
 
 If you pin the `SendType` to `Console`,
 the type checker reads `yield Need(Log)` as producing a `Console`.
@@ -269,6 +270,7 @@ which expands to `Generator[Need[T], Any, T]`.
 Calling `need(Console)` binds `T` to `Console`,
 so `console` takes its type from that `ReturnType`,
 not from the `Any` in the `SendType`.
+That is the second detail: to the type checker, `console` is a `Console`.
 
 For that reason every request in this chapter uses `yield from` rather than `yield`,
 and each custom Ability in [Abilities Are Not Special](47_Effects--Stateless_in_Practice.md#abilities-are-not-special)
@@ -320,10 +322,14 @@ a frozen data class whose `t` field holds the requested class.
 The greeting has yet to print at that point,
 because `greet()` is suspended inside `need()`,
 at the `yield` its `yield from` reaches.
+`send(Console())` answers the request.
+`console` in `greet()` becomes that instance, the body prints the greeting,
+and the generator finishes by raising `StopIteration`.
 
 ## Supplying the Dependency
 
-`supply()` provides an instance to the `Need` that asks for it:
+`supply()` sends that answer for you.
+It provides an instance to the `Need` that asks for it:
 
 ```python
 # supply_console.py
@@ -388,10 +394,6 @@ the `Never` from the alias table.
 Handling an Ability *subtracts* it from the type.
 Here the subtraction empties the Ability channel.
 `greet()` declares one Ability and cannot fail, so `bound` produces a `Success`.
-That `Success` follows from `greet()`'s signature rather than from anything `run()` requires.
-`run()`'s parameter type rejects every unanswered Ability except `Async`.
-`run()` accepts an Effect that can still fail,
-and [raises the failure as an ordinary exception](#the-error-channel).
 Binding an implementation and satisfying the type checker are the same act.
 
 ## Forgetting to Supply
@@ -410,7 +412,9 @@ with expected(MissingAbilityError):
 #: [MissingAbilityError] Need(t=<class 'greeter.Console'>)
 ```
 
-If you remove the `# type: ignore`, `ty` rejects the program before it runs:
+At runtime, `run()` raises a `MissingAbilityError` that shows the unanswered `Need`.
+The `# type: ignore` hides an earlier report.
+If you remove it, `ty` rejects the program before it runs:
 
 ```text
 error[invalid-argument-type]: Argument to function `run` is incorrect
@@ -430,9 +434,8 @@ The expected type in that message names `Async` and `Exception`:
 
 - `Async` is a built-in [Ability for asynchronous work](#waiting-on-a-coroutine),
   which `run()` handles on its own.
-- `Exception` is the error channel,
-  the subject of [The Error Channel](#the-error-channel)
-  and everything after it.
+- `Exception` covers every failure an Effect declares,
+  the subject of [The Error Channel](#the-error-channel).
 
 `run()` accepts an Effect whose yield channel has narrowed to those two,
 which is all that remains once you supply every other Ability.
@@ -458,6 +461,8 @@ class Recorder(Console):
         self.messages.append(message)
 ```
 
+The test supplies a `Recorder` where `greet()` asks for a `Console`:
+
 ```python
 # test_greeter.py
 from greeter import Console, greet
@@ -482,6 +487,8 @@ so the test reads the messages back out of `recorder` afterward.
 It tells the type checker to treat `recorder` as a `Console`,
 and at runtime it returns its argument.
 `supply()` requires `as_type()` because it reads the Ability from the static type of its argument.
+A bare `supply(recorder)` answers `Need[Recorder]`,
+and `greet()` asks for `Need[Console]`.
 At runtime, `supply()` matches the request with `isinstance()`,
 which accepts `recorder` because `Recorder` derives from `Console`.
 
@@ -524,32 +531,6 @@ A `Depend` function's callers must also declare the Ability,
 all the way to `supply()`.
 The difference is that you can declare as many Abilities as you like.
 
-The `yield from` inside `greet_all()` relays `greet(name)`'s request to the driver.
-If you write that loop body as a bare `greet(name)`,
-`ty` reports an `invalid-implicit-return`:
-"Function always implicitly returns `None`."
-That diagnostic looks like protection, but it is an accident.
-That `yield from` is the only `yield` in `greet_all()`,
-so deleting it turns `greet_all()` into an ordinary function.
-The diagnostic is about the `None` that an ordinary function returns,
-not about the discarded Effect.
-
-A function with a second `yield` stays a generator function after the deletion.
-`greet_logged()` in [Retrofitting an Effect](#retrofitting-an-effect)
-makes two requests, one for the greeting and one for the log.
-If you write its first line as a bare `greet(name)`, every check passes.
-In that version, the type checker and `ruff` accept the code, the program runs,
-the log gains both entries, and no greeting prints.
-The call still builds a description, and the body discards it unrun.
-
-ZIO allows the same mistake for the same reason.
-An Effect written as a bare statement is a discarded value there too.
-In ZIO Direct the fix is `.run`,
-and in a `for` comprehension it is the `<-` binding.
-In Python it is `yield from`.
-The description/execution split causes the hazard, not generators.
-When an Effect appears to do nothing, look for a missing `yield from`.
-
 You declare the Ability in the annotation,
 and the type checker verifies the declaration.
 If you annotate `greet_all()` as pure, the type checker reports the mismatch:
@@ -588,6 +569,8 @@ Here, the signature and the body must agree.
 
 ## Retrofitting an Effect
 
+A working program often gains an Effect late:
+a function deep in a call chain starts to write a log.
 The second exercise in [Effect Management](44_Effects--Effect_Management.md#exercises)
 has you add a `Log` Effect alongside `greet()` and count how many of the edited signatures use it.
 Here is that exercise in Stateless:
@@ -670,12 +653,42 @@ Every Ability and failure a function declares stays visible at the point of use.
 Before you shorten one with an alias,
 confirm that your type checker reports an undeclared Ability through it.
 
+## A Missing `yield from`
+
+Calling an effectful function builds a description.
+The description runs when a `yield from` delegates to it.
+In `greet_all.py`, the `yield from` inside `greet_all()` relays `greet(name)`'s request to the driver.
+If you write that loop body as a bare `greet(name)`,
+`ty` reports an `invalid-implicit-return`:
+"Function always implicitly returns `None`."
+That diagnostic looks like protection, but it is an accident.
+That `yield from` is the only `yield` in `greet_all()`,
+so deleting it turns `greet_all()` into an ordinary function.
+The diagnostic is about the `None` that an ordinary function returns,
+not about the discarded Effect.
+
+A function with a second `yield` stays a generator function after the deletion.
+`greet_logged()` in `audit_log.py` makes two requests,
+one for the greeting and one for the log.
+If you write its first line as a bare `greet(name)`, every check passes.
+In that version, the type checker and `ruff` accept the code, the program runs,
+the log gains both entries, and no greeting prints.
+The call still builds a description, and the body discards it unrun.
+
+ZIO allows the same mistake for the same reason.
+An Effect written as a bare statement is a discarded value there too.
+In ZIO Direct the fix is `.run`,
+and in a `for` comprehension it is the `<-` binding.
+In Python it is `yield from`.
+The description/execution split causes the hazard, not generators.
+When an Effect appears to do nothing, look for a missing `yield from`.
+
 ## One Effect, Many Environments
 
 `audit_log.py` supplies two Abilities at one call site.
 A test suite usually needs many such call sites, one per environment.
-Because dependencies live in the return type rather than the argument list,
-varying the environment means varying data:
+`holds()` has two dependencies, a `Material` and a `Nailer`,
+and reports whether the material withstands the nailer's force:
 
 ```python
 # nailer.py
@@ -698,9 +711,9 @@ def holds() -> Depend[Need[Material] | Need[Nailer], bool]:
 
 `Material` and `Nailer` are distinct types,
 so `supply()` matches each request to one of them.
-[When Two Implementations Match](#when-two-implementations-match)
-covers the case where two supplied objects fit one Ability.
-Here the test varies both the `Material` and the `Nailer`:
+Because the dependencies live in the return type rather than the argument list,
+varying the environment means varying data.
+Each row of the test's table is one environment:
 
 ```python
 # test_nailer.py
@@ -916,7 +929,7 @@ but you cannot instantiate a `Protocol`,
 so every object you supply for it has an implementation's static type.
 
 `console_protocol.py` is the form to write in production.
-Most listings in these two chapters use a concrete `Console`,
+Most listings in this chapter and the next use a concrete `Console`,
 because an interface adds an `as_type()` call wherever a listing passes an implementation directly to `supply()`.
 [Composing a Program](47_Effects--Stateless_in_Practice.md#composing-a-program)
 declares its dependencies as `Protocol`s and shows the annotation that replaces that call.
@@ -979,6 +992,8 @@ and supply one implementation per Ability.
 
 ## Layering Handlers
 
+Two instances in one `supply()` call compete by argument order.
+Two `supply()` calls have an order of their own.
 A handler answers the Abilities `supply()` gives it and re-yields the rest to the next handler out.
 A second `supply()` wrapped around the first answers the requests the inner one re-yields.
 `answering_proxy.py` in [Generators](45_Effects--Generators.md#a-generator-in-the-middle)
@@ -1039,7 +1054,9 @@ a terminal in production, and a scripted one in a demo.
 
 Conventional DI meets that goal with a container.
 The container maps each type to the instance that satisfies it,
-and hands out those instances during execution:
+and hands out those instances during execution.
+The simplest form is a service locator,
+where a function body asks the container for what it needs:
 
 ```python
 # dependency_injection.py
@@ -1110,9 +1127,6 @@ The `Console` is swappable.
 But DI relocates a [side cause](44_Effects--Effect_Management.md#what-is-an-effect)
 rather than declaring one, so the type checker does not validate the dependency.
 
-`dependency_injection.py` uses a service locator,
-the usual alternative to injection:
-a body reads the container with `get(Console)`.
 Constructor injection is the stronger, more common shape of DI,
 and frameworks such as FastAPI's `Depends` use it.
 Constructor injection answers the complaint that the type checker does not validate the dependency.
@@ -1172,7 +1186,8 @@ compares the propagation to `async`.
 
 ## Waiting on a Coroutine
 
-The type `run()` expects names `Async` because `run()` answers `Async` requests.
+`Async` is the one Ability that `run()` answers itself,
+which is why [the type `run()` expects](#forgetting-to-supply) includes it.
 `wait()` makes an `Async` request,
 so a function that calls it declares `Async` in its signature.
 `wait()` accepts any awaitable,
@@ -1427,8 +1442,8 @@ Stateless has `repeat()` and `retry()` too,
 but each takes a schedule and returns a decorator of type `Callable[P, Effect[...]] -> Callable[P, Effect[...]]`.
 They decorate the function,
 because the function can produce a second description.
-`catch()`, `throws()`,
-and `supply()` return decorators over functions for the same reason.
+`supply()` returns a decorator over functions for the same reason,
+and so do `throws()` and `catch()` in [The Error Channel](#the-error-channel).
 
 <!-- The "---" below is the author's own em-dash. Leave it. House.EmDash
      exists to catch em-dashes the author did not write. -->
@@ -1441,12 +1456,11 @@ Other Effect systems let you describe the work once and decide later how many ti
 In Stateless, that decision belongs to whoever still holds the function.
 <!-- vale House.EmDash = YES -->
 
-`memoize()` is the one decorator that gives a second `run()` a result,
+[`memoize()`](47_Effects--Stateless_in_Practice.md#repeat-and-memoize)
+is the one decorator that gives a second `run()` a result,
 and it caches rather than replays.
 It wraps the Effect in an object that records the result and hands back that same result on a second `run()`.
 Like `repeat()` and `retry()`, `memoize()` decorates the function.
-[`repeat()` and `memoize()`](47_Effects--Stateless_in_Practice.md#repeat-and-memoize)
-shows it in use.
 
 ## The Error Channel
 
@@ -1487,7 +1501,8 @@ info[revealed-type]: Revealed type
 The revealed type is `Try[KeyError, int]` with [the alias](#the-effect-type)
 expanded.
 The `Generator`'s first parameter carries [`A | E`](#the-effect-definition).
-`Try` writes its `E` there and leaves `A` out, so that parameter is `KeyError`.
+`Try` writes its `E` there and puts `Never` in `A`'s place,
+so that parameter is `KeyError`.
 
 `Try` carries the same idea as the [`Result` type](42_Functional--Error_Handling.md#a-result-type)
 in a different form.
@@ -1521,7 +1536,8 @@ print(repr(next(effect)))
 
 The body raises the exception.
 `@throws` wraps that body in an ordinary `try`/`except`,
-so the wrapper catches the `KeyError` and yields the exception object over the same channel that carries Ability requests.
+so the wrapper catches the `KeyError` and yields the exception object on the yield channel,
+which also carries Ability requests.
 That is why `Effect`'s alias puts `A | E` in the `Generator`'s first parameter.
 Requests and failures are both values a description yields to its driver.
 
@@ -1557,9 +1573,8 @@ so its type declares one Ability and two failures.
 
 Declaring an error leaves handling it up to you.
 `run()` accepts an Effect with a failure still in its error channel.
-The driver throws the failure back into the generator.
-When no `catch()` wraps the function,
-the failure propagates out of `run()` as an ordinary exception:
+When that failure reaches `run()`, the driver throws it back into the generator,
+and the failure propagates out of `run()` as an ordinary exception:
 
 ```python
 # error_escapes.py
@@ -1583,90 +1598,9 @@ An exception raised from a body without `@throws` stays outside the type the sam
 [Nothing stops an undeclared Effect](47_Effects--Stateless_in_Practice.md#nothing-stops-an-undeclared-effect)
 examines that limit.
 
-### Catching Is Not Handling
-
-The driver throws a failure back into the generator,
-so an ordinary `try`/`except` around a `yield from` catches it,
-provided no handler sits between `run()` and that generator.
-The generator yields the exception as a value,
-`run()` receives it and calls the generator's `throw()` method,
-and `throw()` raises the exception at the [innermost suspended `yield`](45_Effects--Generators.md#throw-and-close-reach-the-innermost-generator).
-That `yield` belongs to the Effect to which the `yield from` delegates.
-The exception propagates out of that Effect as any raised exception does,
-and the `except` clause around the `yield from` catches it.
-
-Catching is different from handling.
-The caught failure stays in the error channel,
-so the signature keeps declaring a failure that can no longer escape.
-`catch()` alone moves an error out of the error channel and into the result.
-A `catch()` further out takes the failure before an inner `except` can catch it.
-One listing shows an `except`, a `catch()`,
-and a `catch()` wrapped around an `except`:
-
-```python
-# except_vs_catch.py
-from typing import assert_never
-from scores import score
-from stateless import Success, Try, catch, run
-
-def guarded(name: str) -> Try[KeyError, str]:
-    try:
-        value: int = yield from score(name)
-    except KeyError:
-        return f"{name}: unknown"
-    return f"{name}: {value}"
-
-def moved(name: str) -> Success[str]:
-    value: int | KeyError = yield from (
-        catch(KeyError)(score)(name))
-    match value:
-        case KeyError():
-            return f"{name}: unknown"
-        case int():
-            return f"{name}: {value}"
-        case _:
-            assert_never(value)
-
-if __name__ == "__main__":
-    print(run(guarded("Carol")), run(moved("Carol")))
-    print(repr(run(catch(KeyError)(guarded)("Carol"))))
-#: Carol: unknown Carol: unknown
-#: KeyError('Carol')
-```
-
-`run()` returns `Carol: unknown` from both `guarded()` and `moved()`.
-The two differ in their types.
-`guarded()` must keep declaring a `KeyError` it can no longer emit,
-while `moved()` is a `Success`.
-Wrapping `guarded()` in a `catch()` makes its inner `except` dead code,
-because `catch()` matches the yielded value before the driver gets it,
-returns that value as the result, and never resumes the inner generator.
-
-`supply()` returns a [`Handler`](#supplying-the-dependency),
-and that `Handler` breaks the condition that no handler sits between `run()` and the generator.
-Its loop passes an error outward instead of throwing that error back into the Effect it wraps,
-so the driver's `throw()` raises that error in the `Handler`'s own stack frame,
-not `guarded()`'s stack frame.
-The error propagates out of `run()`, and the inner `except` never runs:
-
-```python
-# handler_blocks_except.py
-from except_vs_catch import guarded
-from exceptions import expect
-from greeter import Console
-from stateless import run, supply
-
-expect(KeyError, run, supply(Console())(guarded)("Carol"))
-#: [KeyError] 'Carol'
-```
-
-This `guarded()` is the one that returned `Carol: unknown` in `except_vs_catch.py`.
-It requests no `Console`, so the `supply(Console())` around it does one thing:
-pass the `KeyError` outward.
-Wrapping `guarded()` in that `supply()` is enough to keep the `KeyError` out of its `except` clause.
-
 ## Turning an Error Into a Value
 
+Stateless handles a declared failure with `catch()`.
 `catch()` empties the error channel the way `supply()` empties the Ability channel,
 but the two do different things with what they remove.
 `supply()` answers the Ability inside the Effect,
@@ -1715,12 +1649,6 @@ with every request answered and the `KeyError` moved into the result.
 The Effect "succeeds" at producing either a score or a `KeyError` that reports the missing score.
 A raised `KeyError` is a failure.
 A returned `KeyError` is data.
-
-`catch_score.py` has the same shape as `handler_blocks_except.py`.
-`supply()` wraps a function `run()` drives.
-The `catch()` here still works, because it matches the yielded value.
-The `except` clause in `guarded()` relies on the driver to throw the error back in.
-The `Handler` that `supply()` puts between them passes the error outward.
 
 With the error in the result, every caller must match on it.
 If you drop the `match` and use `value` as a number,
@@ -1817,6 +1745,7 @@ so its signature must declare that failure.
 Calling it on `"Bob"` propagates that failure to the `run()` call at the program's edge,
 which raises it as an ordinary exception,
 as `error_escapes.py` does for a single error.
+Testing confirms each outcome:
 
 ```python
 # test_catch_subset.py
@@ -1842,6 +1771,96 @@ def test_one_unhandled() -> None:
 The caller sees the failure that the signature declares.
 A failure leaves the error channel in one of two ways:
 `catch()` moves it into the result, or `run()` raises it at the edge.
+
+## Catching Is Not Handling
+
+An ordinary `try`/`except` can also catch a declared failure,
+and it differs from `catch()` in two ways.
+The driver throws a failure back into the generator,
+so a `try`/`except` around a `yield from` catches it,
+provided no handler sits between `run()` and that generator.
+The generator yields the exception as a value,
+`run()` receives it and calls the generator's `throw()` method,
+and `throw()` raises the exception at the [innermost suspended `yield`](45_Effects--Generators.md#throw-and-close-reach-the-innermost-generator).
+That `yield` belongs to the Effect to which the `yield from` delegates.
+The exception propagates out of that Effect as any raised exception does,
+and the `except` clause around the `yield from` catches it.
+
+Catching is different from handling.
+The caught failure stays in the error channel,
+so the signature keeps declaring a failure that can no longer escape.
+`catch()` alone moves an error out of the error channel and into the result.
+A `catch()` further out takes the failure before an inner `except` can catch it.
+One listing shows an `except`, a `catch()`,
+and a `catch()` wrapped around an `except`:
+
+```python
+# except_vs_catch.py
+from typing import assert_never
+from scores import score
+from stateless import Success, Try, catch, run
+
+def guarded(name: str) -> Try[KeyError, str]:
+    try:
+        value: int = yield from score(name)
+    except KeyError:
+        return f"{name}: unknown"
+    return f"{name}: {value}"
+
+def moved(name: str) -> Success[str]:
+    value: int | KeyError = yield from (
+        catch(KeyError)(score)(name))
+    match value:
+        case KeyError():
+            return f"{name}: unknown"
+        case int():
+            return f"{name}: {value}"
+        case _:
+            assert_never(value)
+
+if __name__ == "__main__":
+    print(run(guarded("Carol")), run(moved("Carol")))
+    print(repr(run(catch(KeyError)(guarded)("Carol"))))
+#: Carol: unknown Carol: unknown
+#: KeyError('Carol')
+```
+
+`run()` returns `Carol: unknown` from both `guarded()` and `moved()`.
+The two differ in their types.
+`guarded()` must keep declaring a `KeyError` it can no longer emit,
+while `moved()` is a `Success`.
+Wrapping `guarded()` in a `catch()` makes its inner `except` dead code,
+because `catch()` matches the yielded value before the driver gets it,
+returns that value as the result, and never resumes the inner generator.
+
+`supply()` returns a [`Handler`](#supplying-the-dependency),
+and that `Handler` breaks the condition that no handler sits between `run()` and the generator.
+Its loop passes an error outward instead of throwing that error back into the Effect it wraps,
+so the driver's `throw()` raises that error in the `Handler`'s own stack frame,
+not `guarded()`'s stack frame.
+The error propagates out of `run()`, and the inner `except` never runs:
+
+```python
+# handler_blocks_except.py
+from except_vs_catch import guarded
+from exceptions import expect
+from greeter import Console
+from stateless import run, supply
+
+expect(KeyError, run, supply(Console())(guarded)("Carol"))
+#: [KeyError] 'Carol'
+```
+
+This `guarded()` is the one that returned `Carol: unknown` in `except_vs_catch.py`.
+It requests no `Console`, so the `supply(Console())` around it does one thing:
+pass the `KeyError` outward.
+Wrapping `guarded()` in that `supply()` is enough to keep the `KeyError` out of its `except` clause.
+
+`catch_score.py` in [Turning an Error Into a Value](#turning-an-error-into-a-value)
+has the same shape: `supply()` wraps a function that `run()` drives.
+Its `catch()` still works, because `catch()` matches the yielded value.
+The `except` clause in `guarded()` relies on the driver to throw the error back in,
+and the `Handler` that `supply()` puts between them passes the error outward.
 
 ## Emptying the Channels
 
