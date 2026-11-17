@@ -155,6 +155,17 @@ such as a console, a file, or a network connection.
 
 ## Declaring a Dependency
 
+`plain_greet()` calls the built-in `print()`:
+
+```python
+# untyped_greet.py
+def plain_greet(name: str) -> None:
+    print(f"Hello, {name}!")
+```
+
+The body writes to standard output, a side effect the signature leaves out.
+A caller must capture stdout to redirect the output or to test the function.
+
 Stateless does [dependency injection](11_Techniques--Testing.md#random-numbers)
 with `Need`.
 A `Need` is a request for an instance,
@@ -174,28 +185,16 @@ def greet(name: str) -> Depend[Need[Console], None]:
     console.print(f"Hello, {name}!")
 ```
 
+`Depend[Need[Console], None]` states the dependency.
+A caller now has two options: supply a `Console`,
+or declare `Need[Console]` in its own signature and pass the Ability to its caller.
+A caller that does neither fails the type check.
+
 `greeter.py` lives in `utils/` because both this chapter and [Stateless in Practice](47_Effects--Stateless_in_Practice.md)
 import it.
 `greeter.py` defines its own `Console`,
 rather than using the one Stateless provides,
 to show that a dependency is an ordinary class.
-
-Compare `greeter.py`'s `greet()` to `plain_greet()`,
-which calls the built-in `print()`:
-
-```python
-# untyped_greet.py
-def plain_greet(name: str) -> None:
-    print(f"Hello, {name}!")
-```
-
-The body writes to standard output, a side effect the signature leaves out.
-A caller must capture stdout to redirect the output or to test the function.
-
-`Depend[Need[Console], None]` states the dependency.
-A caller now has two options: supply a `Console`,
-or declare `Need[Console]` in its own signature and pass the Ability to its caller.
-A caller that does neither fails the type check.
 
 Two details in `greeter.py` matter:
 
@@ -274,31 +273,6 @@ not from the `Any` in the `SendType`.
 For that reason every request in this chapter uses `yield from` rather than `yield`,
 and each custom Ability in [Abilities Are Not Special](47_Effects--Stateless_in_Practice.md#abilities-are-not-special)
 gets a small function of its own.
-
-## Built-in Dependencies {#builtin-dependencies}
-
-Stateless provides three dependencies,
-one of them named `Console` like the class in `greeter.py`:
-
-- `Console` in `stateless.console`,
-  whose `print_line()` and `read_line()` *accessors* call its `print()` and `input()` methods
-  (an accessor is a small function that wraps one request and declares its answer type)
-- `Files` in `stateless.files`, which reads a whole file
-- `Time` in `stateless.time`,
-  which [Adding Behavior to an Existing Effect](47_Effects--Stateless_in_Practice.md#adding-behavior-to-an-existing-effect)
-  supplies to `retry()`
-
-All three are concrete classes rather than interfaces.
-Because they are concrete,
-[a test double for one of them must inherit from it](#supplying-an-interface).
-
-The `read_file()` accessor in `stateless.files` is also the library's own example of both channels at once.
-It carries `@throws(FileNotFoundError, PermissionError)` on a function that already returns an Effect,
-so its type declares an Ability and two failures together.
-[The Error Channel](#the-error-channel) introduces that decorator.
-
-Before you write a dependency class of your own,
-check what the library provides.
 
 ## Nothing Runs Yet
 
@@ -420,121 +394,6 @@ That `Success` follows from `greet()`'s signature rather than from anything `run
 and [raises the failure as an ordinary exception](#the-error-channel).
 Binding an implementation and satisfying the type checker are the same act.
 
-## Layering Handlers
-
-A handler answers the Abilities `supply()` gives it and re-yields the rest to the next handler out.
-A second `supply()` wrapped around the first answers the requests the inner one re-yields.
-`answering_proxy.py` in [Generators](45_Effects--Generators.md#a-generator-in-the-middle)
-shows that mechanism written out as a generator:
-`proxy()` answers the questions in its table and yields the rest up to `drive()`.
-
-A dependency injection container often lets you register a fallback for a type nobody else provides.
-Stateless has no such registration, and `need()` takes no default argument.
-Layering handlers produces the fallback.
-Here, `Console` carries a tag so the output says which handler answered:
-
-```python
-# default_console.py
-from record import record
-from stateless import Depend, Need, need, run, supply
-
-@record
-class Console:
-    tag: str
-    def print(self, message: str) -> None:
-        print(f"[{self.tag}] {message}")
-
-def greet(name: str) -> Depend[Need[Console], None]:
-    console = yield from need(Console)
-    console.print(f"Hello, {name}!")
-
-fallback = supply(Console("default"))
-run(fallback(greet)("Alice"))
-#: [default] Hello, Alice!
-chosen = supply(Console("chosen"))(greet)
-run(fallback(chosen)("Bob"))
-#: [chosen] Hello, Bob!
-```
-
-`fallback` is an ordinary handler, applied at the edge.
-The second run wraps `greet()` in its own `supply()` first,
-and that inner `supply()` answers the `Need[Console]` request before it reaches `fallback`.
-The handler nearest the Effect answers first,
-and the outer one handles the requests that remain.
-The type records which handler answered.
-`chosen` is already `(str) -> Success[None]`,
-so `fallback(chosen)` keeps that type.
-
-A function declares its `Need` so the type checker reports a missing binding.
-A default removes that check.
-An Effect missing its `Console` now passes the type check and runs.
-A forgotten binding then shows up as the default `Console`'s output rather than as an error.
-Use a fallback for a genuine default, a null logger or a no-op console,
-not to silence a type error that reports a missing binding.
-
-## An Effect Runs Once
-
-A description you can hold as a value looks like one you can run twice.
-In Stateless you cannot, because that description is a generator,
-and driving a generator consumes it:
-
-```python
-# effect_runs_once.py
-from greeter import Console, greet
-from stateless import run, success, supply
-
-bound = supply(Console())(greet)
-description = bound("Alice")
-run(description)  # [1]
-#: Hello, Alice!
-print(repr(run(description)))  # [2]
-#: None
-run(bound("Bob"))
-#: Hello, Bob!
-constant = success(42)
-print(run(constant), run(constant))
-#: 42 42
-```
-
-The `run()` at `[1]` exhausts the generator.
-The `run()` at `[2]` drives that exhausted generator and gets an immediate `StopIteration` whose value is `None`.
-Calling `bound("Bob")` builds a fresh description, and that one runs.
-A second call to `bound("Alice")` would build a fresh one too.
-
-An Effect from `success()` can run more than once,
-because `success()` returns a `SuccessEffect` instead of a generator object.
-A `SuccessEffect`'s `send()` raises `StopIteration` carrying the value on every call,
-so a constant Effect replays.
-
-Here Stateless differs from Effect systems in other languages.
-A ZIO or Effect-TS value is an immutable description that you can interpret as often as you like,
-so the combinators in those libraries are operations on that value.
-In ZIO, `action repeat policy` repeats the effect that `action` describes.
-Stateless has `repeat()` and `retry()` too,
-but each takes a schedule and returns a decorator of type `Callable[P, Effect[...]] -> Callable[P, Effect[...]]`.
-They decorate the function,
-because the function can produce a second description.
-`catch()`, `throws()`,
-and `supply()` return decorators over functions for the same reason.
-
-<!-- The "---" below is the author's own em-dash. Leave it. House.EmDash
-     exists to catch em-dashes the author did not write. -->
-<!-- vale House.EmDash = NO -->
-So pass the function rather than the Effect.
-A Stateless Effect runs once: build it, run it, discard it.
-Storing one in a registry to run later, handing the same one to two consumers,
-or keeping one around to retry after a failure---each of these returns `None` on the second run instead of raising an exception.
-Other Effect systems let you describe the work once and decide later how many times to perform it.
-In Stateless, that decision belongs to whoever still holds the function.
-<!-- vale House.EmDash = YES -->
-
-`memoize()` is the one decorator that gives a second `run()` a result,
-and it caches rather than replays.
-It wraps the Effect in an object that records the result and hands back that same result on a second `run()`.
-Like `repeat()` and `retry()`, `memoize()` decorates the function.
-[`repeat()` and `memoize()`](47_Effects--Stateless_in_Practice.md#repeat-and-memoize)
-shows it in use.
-
 ## Forgetting to Supply
 
 Here, `run()` receives an Effect that still needs a `Console`:
@@ -625,8 +484,6 @@ and at runtime it returns its argument.
 `supply()` requires `as_type()` because it reads the Ability from the static type of its argument.
 At runtime, `supply()` matches the request with `isinstance()`,
 which accepts `recorder` because `Recorder` derives from `Console`.
-[Supplying an Interface](#supplying-an-interface) explains both halves,
-along with what changes when the Ability is an interface rather than a class.
 
 ## Effects Propagate, and the Type Checker Verifies It
 
@@ -906,6 +763,24 @@ def test_greet_all(console: Console) -> None:
 The parameter version adds a `console` argument to both, although `greet()`,
 one level further down, is the one function that uses it.
 
+## Built-in Dependencies {#builtin-dependencies}
+
+Stateless provides three dependencies,
+one of them named `Console` like the class in `greeter.py`:
+
+- `Console` in `stateless.console`,
+  whose `print_line()` and `read_line()` *accessors* call its `print()` and `input()` methods
+  (an accessor is a small function that wraps one request and declares its answer type)
+- `Files` in `stateless.files`, which reads a whole file
+- `Time` in `stateless.time`, a clock whose one method is `sleep()`
+
+Before you write a dependency class of your own,
+check what the library provides.
+
+All three are concrete classes rather than interfaces.
+A test double for one of them must therefore inherit from it,
+as `Recorder` inherits from `greeter.py`'s `Console`.
+
 ## Supplying an Interface
 
 [Swapping the Implementation](#swapping-the-implementation)
@@ -1101,6 +976,58 @@ because its `provide` resolves the dependency graph during compilation.
 so the same mistake produces a program that runs and hands each request to the instance that comes first in the argument list.
 Give Abilities distinct method names when that ambiguity is possible,
 and supply one implementation per Ability.
+
+## Layering Handlers
+
+A handler answers the Abilities `supply()` gives it and re-yields the rest to the next handler out.
+A second `supply()` wrapped around the first answers the requests the inner one re-yields.
+`answering_proxy.py` in [Generators](45_Effects--Generators.md#a-generator-in-the-middle)
+shows that mechanism written out as a generator:
+`proxy()` answers the questions in its table and yields the rest up to `drive()`.
+
+A dependency injection container often lets you register a fallback for a type nobody else provides.
+Stateless has no such registration, and `need()` takes no default argument.
+Layering handlers produces the fallback.
+Here, `Console` carries a tag so the output says which handler answered:
+
+```python
+# default_console.py
+from record import record
+from stateless import Depend, Need, need, run, supply
+
+@record
+class Console:
+    tag: str
+    def print(self, message: str) -> None:
+        print(f"[{self.tag}] {message}")
+
+def greet(name: str) -> Depend[Need[Console], None]:
+    console = yield from need(Console)
+    console.print(f"Hello, {name}!")
+
+fallback = supply(Console("default"))
+run(fallback(greet)("Alice"))
+#: [default] Hello, Alice!
+chosen = supply(Console("chosen"))(greet)
+run(fallback(chosen)("Bob"))
+#: [chosen] Hello, Bob!
+```
+
+`fallback` is an ordinary handler, applied at the edge.
+The second run wraps `greet()` in its own `supply()` first,
+and that inner `supply()` answers the `Need[Console]` request before it reaches `fallback`.
+The handler nearest the Effect answers first,
+and the outer one handles the requests that remain.
+The type records which handler answered.
+`chosen` is already `(str) -> Success[None]`,
+so `fallback(chosen)` keeps that type.
+
+A function declares its `Need` so the type checker reports a missing binding.
+A default removes that check.
+An Effect missing its `Console` now passes the type check and runs.
+A forgotten binding then shows up as the default `Console`'s output rather than as an error.
+Use a fallback for a genuine default, a null logger or a no-op console,
+not to silence a type error that reports a missing binding.
 
 ## Dependency Injection
 
@@ -1458,6 +1385,69 @@ For the opposite mistake,
 calling `run_async()` without `await` in synchronous code,
 `ty` reports an `unused-awaitable` warning.
 
+## An Effect Runs Once
+
+A description you can hold as a value looks like one you can run twice.
+In Stateless you cannot, because that description is a generator,
+and driving a generator consumes it:
+
+```python
+# effect_runs_once.py
+from greeter import Console, greet
+from stateless import run, success, supply
+
+bound = supply(Console())(greet)
+description = bound("Alice")
+run(description)  # [1]
+#: Hello, Alice!
+print(repr(run(description)))  # [2]
+#: None
+run(bound("Bob"))
+#: Hello, Bob!
+constant = success(42)
+print(run(constant), run(constant))
+#: 42 42
+```
+
+The `run()` at `[1]` exhausts the generator.
+The `run()` at `[2]` drives that exhausted generator and gets an immediate `StopIteration` whose value is `None`.
+Calling `bound("Bob")` builds a fresh description, and that one runs.
+A second call to `bound("Alice")` would build a fresh one too.
+
+An Effect from `success()` can run more than once,
+because `success()` returns a `SuccessEffect` instead of a generator object.
+A `SuccessEffect`'s `send()` raises `StopIteration` carrying the value on every call,
+so a constant Effect replays.
+
+Here Stateless differs from Effect systems in other languages.
+A ZIO or Effect-TS value is an immutable description that you can interpret as often as you like,
+so the combinators in those libraries are operations on that value.
+In ZIO, `action repeat policy` repeats the effect that `action` describes.
+Stateless has `repeat()` and `retry()` too,
+but each takes a schedule and returns a decorator of type `Callable[P, Effect[...]] -> Callable[P, Effect[...]]`.
+They decorate the function,
+because the function can produce a second description.
+`catch()`, `throws()`,
+and `supply()` return decorators over functions for the same reason.
+
+<!-- The "---" below is the author's own em-dash. Leave it. House.EmDash
+     exists to catch em-dashes the author did not write. -->
+<!-- vale House.EmDash = NO -->
+So pass the function rather than the Effect.
+A Stateless Effect runs once: build it, run it, discard it.
+Storing one in a registry to run later, handing the same one to two consumers,
+or keeping one around to retry after a failure---each of these returns `None` on the second run instead of raising an exception.
+Other Effect systems let you describe the work once and decide later how many times to perform it.
+In Stateless, that decision belongs to whoever still holds the function.
+<!-- vale House.EmDash = YES -->
+
+`memoize()` is the one decorator that gives a second `run()` a result,
+and it caches rather than replays.
+It wraps the Effect in an object that records the result and hands back that same result on a second `run()`.
+Like `repeat()` and `retry()`, `memoize()` decorates the function.
+[`repeat()` and `memoize()`](47_Effects--Stateless_in_Practice.md#repeat-and-memoize)
+shows it in use.
+
 ## The Error Channel
 
 Dependencies are one half of the `Effect` type.
@@ -1557,6 +1547,11 @@ def announce(
 If you drop the `KeyError` from the annotation,
 the type checker reports an error at the `yield from score(name)` line.
 Every function on the path must declare the `KeyError`.
+
+`announce()` declares an Ability and a failure together.
+The library's `read_file()`, in `stateless.files`, does too.
+It carries `@throws(FileNotFoundError, PermissionError)` on a function that returns `Depend[Need[Files], str]`,
+so its type declares one Ability and two failures.
 
 ### Declaring Is Not Handling
 
