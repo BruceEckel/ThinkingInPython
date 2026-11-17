@@ -6,7 +6,8 @@
 > handlers for testing and for production, and the operators that combine them.
 
 [Stateless](46_Effects--Stateless.md)
-establishes the two channels an `Effect[A, E, R]` carries.
+names two channels in an `Effect[A, E, R]`:
+the Ability channel in `A` and the error channel in `E`.
 A dependency is a `Need` that `supply()` answers.
 A failure is an exception that `@throws` lifts into the type and `catch()` takes back out.
 A type checker verifies that every caller either absorbs an Effect or declares it.

@@ -6,34 +6,30 @@
 > implements an Effect Management System (EMS).
 
 The easiest things to forget about a function are its Effects:
-how it affects its environment, what it needs from its environment,
+how it changes its environment, what it needs from its environment,
 and how it can fail.
 Stateless writes the Effects into the function's type.
 
-The type checker verifies that every caller either handles each Effect or declares it in its own signature.
+The type checker verifies that every function either handles each Effect or declares it in its own signature.
 If you forget to declare a dependency, the check fails.
 If you forget to supply one, the check fails.
 Those two checks enforce the Effect tracking and the delayed binding of a full EMS.
-You declare each Effect, and you supply each dependency later.
-The type checker verifies both.
+The type checker ensures that you declare each Effect and supply each dependency.
 
-Stateless implements Effects with generators.
+Stateless implements Effects using generators.
 [Generators](45_Effects--Generators.md)
 covers the three-parameter `Generator` annotation,
 a driver that answers a generator's requests one `send()` at a time,
 and `yield from`, which composes generators and produces the inner generator's return value.
 Every Effect in this chapter is such a generator.
-Stateless supplies the vocabulary for the requests and the driver that answers them.
 
 An Effect's type declares three things: the dependencies the Effect needs,
 the ways it can fail, and the result it produces.
 The Effect yields its requests for dependencies and its failures,
 and it returns its result.
-[Stateless in Practice](47_Effects--Stateless_in_Practice.md)
-builds examples that combine dependencies and failures.
 
 My understanding of Effects came from work with Bill Frasure and James Ward as we created [Effect Oriented Programming](https://effectorientedprogramming.com/).
-Some of the examples in these two chapters derive from that book.
+Some of the examples in this chapter and the next derive from that book.
 
 ## The Effect Type
 
@@ -47,8 +43,8 @@ Those three parameters answer the three questions [Effect Management](44_Effects
 asks of an Effect signature:
 
 - `A` is what the computation needs, an *Ability*.
-- `E` is its failure type.
-- `R` is what it produces.
+- `E` is its failure (error) type.
+- `R` is what it produces, its result.
 
 Stateless uses the word Effect for the whole description a function returns.
 That description declares the Effects that [Effect Management](44_Effects--Effect_Management.md#what-is-an-effect)
@@ -57,32 +53,34 @@ defines: the function's Abilities in `A` and its failures in `E`.
 An Effect yields an Ability to ask for what it needs,
 and it yields an exception to report a failure.
 This chapter calls `A` the *Ability channel* and `E` the *error channel*.
+Both are parts of the Effect's [yield channel](45_Effects--Generators.md#annotating-a-generator).
+The Effect returns its result, of type `R`, on its return channel.
 
-For example:
+The Ability that asks for a dependency is [`Need`](#declaring-a-dependency).
+An Effect that uses a `Console` yields a `Need[Console]` to request one,
+and `supply()` answers that request with a `Console`.
+`A` is the type of the request, `Need[Console]`:
 
 ```python
 Effect[Need[Console], KeyError, None]
 ```
 
 This Effect needs a `Console`, can fail with a `KeyError`, and produces `None`.
-The first parameter is `Need[Console]` rather than `Console`.
-The Effect asks for a console, and a later `supply()` call provides one.
-[Nothing Runs Yet](#nothing-runs-yet)
-explains why that request must be a value of its own.
 
 Although you can write the full `Effect` signature each time,
 the library provides three aliases for the most common cases.
 Each one takes the type parameters it uses and leaves out the rest:
 
-| Alias | Meaning |
-|---|---|
-| `Success[R]` | Needs nothing, cannot fail, produces `R` |
-| `Depend[A, R]` | Needs `A`, cannot fail, produces `R` |
-| `Try[E, R]` | Needs nothing, can fail with `E`, produces `R` |
+| Alias | Full signature | Meaning |
+|---|---|---|
+| `Success[R]` | `Effect[Never, Never, R]` | Needs nothing, cannot fail, produces `R` |
+| `Depend[A, R]` | `Effect[A, Never, R]` | Needs `A`, cannot fail, produces `R` |
+| `Try[E, R]` | `Effect[Never, E, R]` | Needs nothing, can fail with `E`, produces `R` |
 
-In `Success`, `Never` stands in for both `A` and `E`.
+`Never` stands in for each parameter an alias leaves out.
 `Never` is Python's *bottom type*:
 it has no values and is a subtype of every other type.
+A union with `Never` is therefore the same type as the union without it.
 
 ## The Simplest Effect
 
@@ -99,17 +97,15 @@ print(run(double(21)))
 #: 42
 ```
 
+`Success[int]` says `double()` is pure.
+`double()` computes its result from its argument, and it cannot fail.
+
 `run()` is the Stateless library's driver,
 similar to [`drive()`](45_Effects--Generators.md#a-generator-is-a-description).
 `run()` primes the generator, drives it to completion, and returns the result.
-The work the Effect describes waits for a call to `run()`.
-A synchronous program calls it once, at the outermost edge.
 
-`success()` and `Success` differ only in case.
 `success()` is a function that builds an Effect.
 `Success` is the alias from the table, the type of that Effect.
-`Success[int]` says `double()` is pure.
-`double()` depends on its argument alone, and it cannot fail.
 
 `double()` contains no `yield`, so it is an ordinary function.
 Python decides generator-function status from the body alone.
@@ -118,12 +114,35 @@ A `yield` in the body makes a function a generator function.
 the way an ordinary function returns a list.
 The annotation describes that returned object.
 
-The Effect that `double()` returns implements the generator protocol,
-and `run()` drives any object that implements that protocol.
-`success()` returns a `SuccessEffect`,
-a small class that implements that protocol with its own `send()` and `throw()` methods.
-Its `send()` raises `StopIteration` carrying the value,
-so `run()` gets the result on its first step.
+The Effect that `success()` builds is an instance of the library's `SuccessEffect` class:
+
+```python
+# success_effect.py
+from collections.abc import Generator
+from stateless import success
+
+effect = success(42)
+print(effect)
+#: SuccessEffect(value=42)
+print(isinstance(effect, Generator))
+#: True
+try:
+    next(effect)
+except StopIteration as stop:
+    print(stop.value)
+#: 42
+```
+
+`SuccessEffect` is a frozen data class whose `value` field holds the result.
+It inherits from `Generator`, so its instances satisfy `Success[int]`,
+the alias for `Generator[Never, Any, int]`.
+The class implements the generator protocol with two methods of its own,
+`send()` and `throw()`, which `Generator` requires of a subclass.
+Its `send()` raises `StopIteration` carrying `value`.
+`next(effect)` calls `send(None)`,
+so the first step ends the Effect and delivers `42`.
+`run()` drives any object that implements the generator protocol,
+and it gets a `SuccessEffect`'s result on that first step.
 
 `success()` exists for yield-free functions like `double()`.
 In a generator function, `return value` sets the Effect's `R`.
@@ -1391,7 +1410,8 @@ even for an Effect with no `Async` in it.
 On Windows, `run(success(42))` measured about 650 microseconds,
 more than four orders of magnitude above a plain function call.
 On Linux it measured about 75 microseconds.
-That is the cost behind ["a synchronous program calls it once, at the outermost edge"](#the-simplest-effect).
+Each `run()` call takes that time, so you call `run()` once,
+at the outermost edge of a program.
 `test_nailer.py` starts a loop once per parametrized case,
 which is fine for four rows and adds up over a much longer parametrized list.
 
