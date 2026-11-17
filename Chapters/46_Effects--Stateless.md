@@ -1114,7 +1114,7 @@ the value under key `type[T]` is a `T`.
 
 `greet()`'s body matches `greeter.py`'s `greet()` line for line,
 apart from `console: Console = get(Console)` in place of `console = yield from need(Console)`.
-Its signature matches `plain_greet()`'s in [Declaring a Dependency](#declaring-a-dependency).
+Its signature matches the signature of `plain_greet()` in [Declaring a Dependency](#declaring-a-dependency).
 Both read `(str) -> None`, and neither shows where the output goes.
 
 The `greet("Alice")` call at `[1]` fails at runtime because it runs before `register()` binds a `Console`.
@@ -1774,8 +1774,8 @@ A failure leaves the error channel in one of two ways:
 
 ## Catching Is Not Handling
 
-An ordinary `try`/`except` can also catch a declared failure,
-and it differs from `catch()` in two ways.
+An ordinary `try`/`except` can also catch a declared failure.
+It differs from `catch()` in what the signature then declares and in where it works.
 The driver throws a failure back into the generator,
 so a `try`/`except` around a `yield from` catches it,
 provided no handler sits between `run()` and that generator.

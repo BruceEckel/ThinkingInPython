@@ -290,6 +290,36 @@ Any new listing follows the full verify loop in `CLAUDE.md` (fenced
 block with `# slug.py` first line, deterministic markers or wide-margin
 threshold booleans, sync, gates, `tip reflow CH=NN` on the new prose).
 
+Accrued note from chapter 46's fourth review (2026-11-17, Bruce: "this
+whole section seems to just be a jumble", then "What can I ask you to
+do with this chapter so that it isn't so jumbled and confusing?"):
+
+- Three earlier reviews of that chapter checked every claim against
+  the library's source and reported no structural finding. The order
+  pass then found six moves in one sitting. Run the "Order is a
+  choice" table on every review, including one asked for as a
+  correctness check, and put it first: it is cheap, and its findings
+  change which sentences the other passes read.
+- Four shapes the table found, each worth looking for by name. A
+  catalog section (the library's built-in dependencies) set between a
+  concept's declaration and its first use. A hazard paragraph that
+  reasons about a function whose listing is in the next section. A
+  subsection that uses a construct (`catch()`) one section before the
+  section that teaches it. A section that shows the mechanism and
+  then the problem it solves (`greeter.py` before `plain_greet()`).
+- For each function, class, or library name a paragraph mentions,
+  check that a listing or a sentence above it has shown that name.
+  The check is mechanical, and it found three of the six moves.
+- A moved section is cheap when the chapter links by anchor and
+  listings import by file name: the moves changed no anchor and no
+  listing. The price was in sentences written against the old order
+  (a pointer "below", a preview of the section that used to follow),
+  so read every seam, the lines above and below each heading, after
+  the moves.
+- Section order is this skill's to fix. `super-prose` reads sentences
+  and paragraphs, and its "reader's read" reports an order finding
+  here.
+
 Accrued notes from the chapters 18-38 review sweep:
 
 - "reach for" sits in `tools/data/banned_phrases.txt` and is an easy tic to

@@ -53,6 +53,7 @@ Chapters/42_Functional--Error_Handling.md	[prep] prints .. paths: The listing pr
 Chapters/44_Effects--Effect_Management.md	[prep] Which .. applies: Which of the three conversions from Converting Effectful to Pure applies to the exceptions, and which technique from Effects by Hand applies to the rest?
 Chapters/46_Effects--Stateless.md	[advmod,cc,conj] one .. believes: Then declare a second Ability and request that one too, and report which requests your handler answered at runtime and which ones the type checker believes it answered.
 Chapters/46_Effects--Stateless.md	[cc,conj,dobj,prep] Supply .. stays: Supply a scripted CODE in a test and a real one in a demo, and confirm CODE stays unchanged between them.
+Chapters/46_Effects--Stateless.md	[relcl] Effect .. answers: An Effect that uses a CODE yields a CODE to request one, and CODE answers that request with a CODE.
 Chapters/47_Effects--Stateless_in_Practice.md	[cc,conj,dobj,xcomp] Change .. stays: Change CODE to use a CODE instead of a CODE, and confirm CODE stays unchanged.
 Chapters/A_Effect_Tracking.md	[cc,relcl] Something .. rejects: **Something that compares the computed row with the declared one,** and rejects the program when they differ.
 Chapters/B_An_Effect_Checker.md	[acl,appos,prep] CODE .. calls: CODE in CODE called CODE, a method on an imported constant, and now calls CODE.

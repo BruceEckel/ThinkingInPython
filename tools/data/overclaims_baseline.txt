@@ -749,7 +749,9 @@ Chapters/46_Effects--Stateless.md	[BOUND] Both instances need CODE, since each i
 Chapters/46_Effects--Stateless.md	[BOUND] CODE accepts an Effect whose yield channel has narrowed to those two, which is all that remains once you supply every other Ability
 Chapters/46_Effects--Stateless.md	[BOUND] CODE alone moves an error out of the error channel and into the result
 Chapters/46_Effects--Stateless.md	[BOUND] CODE binds for one execution of one Effect, so two bindings for the same type can be live at once, as the screen and memory CODEs are in When Two Implementations Match
-Chapters/46_Effects--Stateless.md	[BOUND] CODE depends on its argument alone, and it cannot fail
+Chapters/46_Effects--Stateless.md	[BOUND] CODE defines its own CODE, rather than using the one Stateless provides, to show that a dependency is an ordinary class
+Chapters/46_Effects--Stateless.md	[BOUND] CODE in CODE, a clock whose one method is CODE
+Chapters/46_Effects--Stateless.md	[BOUND] CODE is the one Ability that CODE answers itself, which is why the type CODE expects includes it
 Chapters/46_Effects--Stateless.md	[BOUND] CODE is the one decorator that gives a second CODE a result, and it caches rather than replays
 Chapters/46_Effects--Stateless.md	[BOUND] CODE is the only CODE here
 Chapters/46_Effects--Stateless.md	[BOUND] CODE is the only extra call in that test
@@ -766,16 +768,15 @@ Chapters/46_Effects--Stateless.md	[BOUND] One rule covers both cases
 Chapters/46_Effects--Stateless.md	[BOUND] Python decides generator-function status from the body alone
 Chapters/46_Effects--Stateless.md	[BOUND] So the two channels guarantee different things
 Chapters/46_Effects--Stateless.md	[BOUND] That CODE is the only CODE in CODE, so deleting it turns CODE into an ordinary function
-Chapters/46_Effects--Stateless.md	[BOUND] The failure the signature declares is the one the caller sees
+Chapters/46_Effects--Stateless.md	[BOUND] The class implements the generator protocol with two methods of its own, CODE and CODE, which CODE requires of a subclass
 Chapters/46_Effects--Stateless.md	[BOUND] The output above shows standard output alone, so it leaves out the warning
 Chapters/46_Effects--Stateless.md	[BOUND] The parameter version adds a CODE argument to both, although CODE, one level further down, is the one function that uses it
 Chapters/46_Effects--Stateless.md	[BOUND] The parameter version then adds two parameters to every function on the path
 Chapters/46_Effects--Stateless.md	[BOUND] The two calls are identical, and registration sits outside the types, so the type checker accepts both
 Chapters/46_Effects--Stateless.md	[BOUND] The two styles differ when a function three calls deep requests the dependency
 Chapters/46_Effects--Stateless.md	[BOUND] This CODE is the one that returned CODE in CODE
-Chapters/46_Effects--Stateless.md	[BOUND] This chapter builds its own CODE rather than using the one Stateless provides
 Chapters/46_Effects--Stateless.md	[BOUND] This version changes the table row alone
-Chapters/46_Effects--Stateless.md	[BOUND] Those three parameters answer the three questions Effect Management asks of an Effect signature
+Chapters/46_Effects--Stateless.md	[BOUND] Those three parameters carry the Effect information, as the three type parameters of CODE do in Effect Management
 Chapters/46_Effects--Stateless.md	[BOUND] Those two lines do three things
 Chapters/46_Effects--Stateless.md	[BOUND] Three consequences follow
 Chapters/46_Effects--Stateless.md	[BOUND] Two details in CODE matter

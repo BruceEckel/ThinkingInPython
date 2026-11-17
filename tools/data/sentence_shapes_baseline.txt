@@ -33,6 +33,7 @@ Chapters/45_Effects--Generators.md	[PAIR] A generator that sits between CODE and
 Chapters/45_Effects--Generators.md	[PRT] A generator yields a request out, and the driver sends the answer back in.
 Chapters/45_Effects--Generators.md	[PRT] Because each CODE hands a result back to its caller, a recursive generator can combine results on the way back up a tree.
 Chapters/45_Effects--Generators.md	[PRT] Each CODE passes the CODE up and the CODE down unchanged, so the trace repeats the three request lines of CODE before the new one.
+Chapters/46_Effects--Stateless.md	[COLON+AND] The easiest things to forget about a function are its Effects: how it changes its environment, what it needs from its environment, and how it can fail.
 Chapters/46_Effects--Stateless.md	[IMP] Explain what each one catches, and why the checker catches assigning a dropped request but not discarding one.
 Chapters/46_Effects--Stateless.md	[PRT] A handler answers the Abilities CODE gives it and re-yields the rest to the next handler out.
 Chapters/47_Effects--Stateless_in_Practice.md	[IMP] Explain what the types claim, what the run does, and which line restores the guarantee.

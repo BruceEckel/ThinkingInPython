@@ -558,12 +558,10 @@ Chapters/45_Effects--Generators.md	never: so you can compose a conversation from
 Chapters/45_Effects--Generators.md	prints nothing: Closing CODE before its first CODE therefore prints nothing
 Chapters/46_Effects--Stateless.md	already: CODE is already CODE
 Chapters/46_Effects--Stateless.md	already: For a function that already returns an Effect
-Chapters/46_Effects--Stateless.md	already: It carries CODE on a function that already returns an Effect
 Chapters/46_Effects--Stateless.md	already: which raises a CODE because a loop is already running
 Chapters/46_Effects--Stateless.md	captures nothing: The test captures nothing from stdout and mocks nothing
 Chapters/46_Effects--Stateless.md	contains no: CODE contains no CODE
 Chapters/46_Effects--Stateless.md	contains no: CODE is not an CODE and contains no CODE
-Chapters/46_Effects--Stateless.md	cost: That is the cost behind "a synchronous program calls it once
 Chapters/46_Effects--Stateless.md	declares none: The record drops its slots because CODE declares none
 Chapters/46_Effects--Stateless.md	do nothing: When an Effect appears to do nothing
 Chapters/46_Effects--Stateless.md	even: even for an Effect with no CODE in it
@@ -585,7 +583,6 @@ Chapters/46_Effects--Stateless.md	never: and never resumes the inner generator
 Chapters/46_Effects--Stateless.md	never: and the inner CODE never runs
 Chapters/46_Effects--Stateless.md	never: so CODE never returns a subclass registered under its own name
 Chapters/46_Effects--Stateless.md	nobody else provides: A dependency injection container often lets you register a fallback for a type nobody else provides
-Chapters/46_Effects--Stateless.md	nothing runs: Nothing Runs Yet explains why that request must be a value of its own
 Chapters/46_Effects--Stateless.md	nothing stops: Nothing stops an undeclared Effect examines that limit
 Chapters/46_Effects--Stateless.md	only: A CODE-shaped value appears in Stateless only after CODE
 Chapters/46_Effects--Stateless.md	only: A function that constructs its own CODE can use only that class
