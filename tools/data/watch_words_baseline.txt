@@ -562,7 +562,7 @@ Chapters/46_Effects--Stateless.md	already: which raises a CODE because a loop is
 Chapters/46_Effects--Stateless.md	captures nothing: The test captures nothing from stdout and mocks nothing
 Chapters/46_Effects--Stateless.md	contains no: CODE contains no CODE
 Chapters/46_Effects--Stateless.md	contains no: CODE is not an CODE and contains no CODE
-Chapters/46_Effects--Stateless.md	declares none: The record drops its slots because CODE declares none
+Chapters/46_Effects--Stateless.md	declares no: CODE is CODE because CODE declares no CODE
 Chapters/46_Effects--Stateless.md	do nothing: When an Effect appears to do nothing
 Chapters/46_Effects--Stateless.md	even: even for an Effect with no CODE in it
 Chapters/46_Effects--Stateless.md	exactly: A dictionary matches the key exactly
@@ -574,14 +574,12 @@ Chapters/46_Effects--Stateless.md	has no: Stateless has no such registration
 Chapters/46_Effects--Stateless.md	has no: it has no values and is a subtype of every other type
 Chapters/46_Effects--Stateless.md	is how: The difference is how many places you edit
 Chapters/46_Effects--Stateless.md	is what: CODE is what it produces
-Chapters/46_Effects--Stateless.md	is what: CODE is what the computation needs
 Chapters/46_Effects--Stateless.md	mocks nothing: The test captures nothing from stdout and mocks nothing
 Chapters/46_Effects--Stateless.md	names each place: The type checker names each place that needs changing
 Chapters/46_Effects--Stateless.md	never: A test then supplies a clock that never waits
 Chapters/46_Effects--Stateless.md	never: and never resumes the inner generator
 Chapters/46_Effects--Stateless.md	never: and the inner CODE never runs
-Chapters/46_Effects--Stateless.md	never: so CODE never returns a subclass registered under its own name
-Chapters/46_Effects--Stateless.md	nobody else provides: A dependency injection container often lets you register a fallback for a type nobody else provides
+Chapters/46_Effects--Stateless.md	never: so CODE never returns an instance registered under a subclass of CODE
 Chapters/46_Effects--Stateless.md	nothing stops: Nothing stops an undeclared Effect examines that limit
 Chapters/46_Effects--Stateless.md	only: A CODE-shaped value appears in Stateless only after CODE
 Chapters/46_Effects--Stateless.md	only: A function that constructs its own CODE can use only that class
@@ -593,7 +591,6 @@ Chapters/46_Effects--Stateless.md	only: Only the static type changes
 Chapters/46_Effects--Stateless.md	only: That CODE is the only CODE in CODE
 Chapters/46_Effects--Stateless.md	only: You can catch both errors or only one
 Chapters/46_Effects--Stateless.md	only: so looking up a name is the only step and CODE is the only failure
-Chapters/46_Effects--Stateless.md	only: so today the parent contributes only the name CODE matches
 Chapters/46_Effects--Stateless.md	provided no: provided no handler sits between CODE and that generator
 Chapters/46_Effects--Stateless.md	share no: CODE and CODE share no base class
 Chapters/46_Effects--Stateless.md	takes no: and CODE takes no default argument

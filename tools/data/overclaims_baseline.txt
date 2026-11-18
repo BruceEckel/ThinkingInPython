@@ -739,31 +739,31 @@ Chapters/45_Effects--Generators.md	[BOUND] The one assignment CODE replaces the 
 Chapters/45_Effects--Generators.md	[BOUND] Without generators, you have three ways to write such a producer in a single thread
 Chapters/45_Effects--Generators.md	[BOUND] Written as a generator, the squasher delivers a single asterisk and the character after it with two statements in a row
 Chapters/46_Effects--Stateless.md	[BOUND] A caller now has two options
-Chapters/46_Effects--Stateless.md	[BOUND] A channel empties in one of three ways, two of which take a vocabulary of their own
+Chapters/46_Effects--Stateless.md	[BOUND] A channel empties in one of three ways, two of which have a vocabulary of their own
+Chapters/46_Effects--Stateless.md	[BOUND] A dependency injection container often lets you register a fallback for a type that no other registration provides
 Chapters/46_Effects--Stateless.md	[BOUND] A failure leaves the error channel in one of two ways
-Chapters/46_Effects--Stateless.md	[BOUND] A full EMS does three things, and the second is to separate each Effect's interface from its implementation
 Chapters/46_Effects--Stateless.md	[BOUND] A structural check matches on method names alone, so two supplied objects that both define CODE are indistinguishable
 Chapters/46_Effects--Stateless.md	[BOUND] An Effect's type declares three things
 Chapters/46_Effects--Stateless.md	[BOUND] Because the one CODE runs in the driver, neither CODE nor anything that calls it needs CODE
 Chapters/46_Effects--Stateless.md	[BOUND] Both instances need CODE, since each is a CODE by structure alone
 Chapters/46_Effects--Stateless.md	[BOUND] CODE accepts an Effect whose yield channel has narrowed to those two, which is all that remains once you supply every other Ability
-Chapters/46_Effects--Stateless.md	[BOUND] CODE alone moves an error out of the error channel and into the result
 Chapters/46_Effects--Stateless.md	[BOUND] CODE binds for one execution of one Effect, so two bindings for the same type can be live at once, as the screen and memory CODEs are in When Two Implementations Match
 Chapters/46_Effects--Stateless.md	[BOUND] CODE defines its own CODE, rather than using the one Stateless provides, to show that a dependency is an ordinary class
+Chapters/46_Effects--Stateless.md	[BOUND] CODE in CODE stores its values as CODEs, so looking up a name is the only step and CODE is the only failure
 Chapters/46_Effects--Stateless.md	[BOUND] CODE in CODE, a clock whose one method is CODE
-Chapters/46_Effects--Stateless.md	[BOUND] CODE is the one Ability that CODE answers itself, which is why the type CODE expects includes it
-Chapters/46_Effects--Stateless.md	[BOUND] CODE is the one decorator that gives a second CODE a result, and it caches rather than replays
+Chapters/46_Effects--Stateless.md	[BOUND] CODE is the one Ability that CODE answers on its own, which is why the type CODE expects includes it
+Chapters/46_Effects--Stateless.md	[BOUND] CODE is the one decorator that gives a second CODE a result, and it caches the result rather than running the Effect a second time
 Chapters/46_Effects--Stateless.md	[BOUND] CODE is the only CODE here
 Chapters/46_Effects--Stateless.md	[BOUND] CODE is the only extra call in that test
 Chapters/46_Effects--Stateless.md	[BOUND] CODE likewise leaves the body alone, but it specifies the exception types it lifts and puts them in the signature rather than in a returned wrapper
-Chapters/46_Effects--Stateless.md	[BOUND] CODE stores its values as CODEs, so looking up a name is the only step and CODE is the only failure
+Chapters/46_Effects--Stateless.md	[BOUND] CODE produces the same static type as CODE, but the type checker checks the two calls differently
 Chapters/46_Effects--Stateless.md	[BOUND] CODE supplies two Abilities at one call site
 Chapters/46_Effects--Stateless.md	[BOUND] Each of the next three functions has one Effect, a different kind in each
 Chapters/46_Effects--Stateless.md	[BOUND] Effect Management defines three kinds of Effect
 Chapters/46_Effects--Stateless.md	[BOUND] Everything else is an Ability request
 Chapters/46_Effects--Stateless.md	[BOUND] Explain which of the two shapes CODE requires, and why it takes a schedule and returns a decorator of type CODE, rather than being an operation on an Effect
 Chapters/46_Effects--Stateless.md	[BOUND] If you advance the Effect one step with CODE, CODE returns the CODE as a value instead of raising it
-Chapters/46_Effects--Stateless.md	[BOUND] If you remove it from CODE, CODE reports an CODE at CODE, since the CODE produces a CODE and the signature now declares CODE alone
+Chapters/46_Effects--Stateless.md	[BOUND] If you remove it from CODE, CODE reports an CODE at CODE, since the CODE relays a CODE and the signature now declares CODE alone
 Chapters/46_Effects--Stateless.md	[BOUND] It is an ordinary class whose one method is CODE
 Chapters/46_Effects--Stateless.md	[BOUND] It requests no CODE, so the CODE around it does one thing
 Chapters/46_Effects--Stateless.md	[BOUND] One rule covers both cases
@@ -772,11 +772,11 @@ Chapters/46_Effects--Stateless.md	[BOUND] So the two channels guarantee differen
 Chapters/46_Effects--Stateless.md	[BOUND] That CODE is the only CODE in CODE, so deleting it turns CODE into an ordinary function
 Chapters/46_Effects--Stateless.md	[BOUND] The class implements the generator protocol with two methods of its own, CODE and CODE, which CODE requires of a subclass
 Chapters/46_Effects--Stateless.md	[BOUND] The output above shows standard output alone, so it leaves out the warning
-Chapters/46_Effects--Stateless.md	[BOUND] The parameter version adds a CODE argument to both, although CODE, one level further down, is the one function that uses it
+Chapters/46_Effects--Stateless.md	[BOUND] The parameter version adds a CODE parameter to both, although CODE, one level further down, is the one function that uses it
 Chapters/46_Effects--Stateless.md	[BOUND] The parameter version then adds two parameters to every function on the path
-Chapters/46_Effects--Stateless.md	[BOUND] The two calls are identical, and registration sits outside the types, so the type checker accepts both
+Chapters/46_Effects--Stateless.md	[BOUND] The two calls are identical, and no type records whether CODE has run, so the type checker accepts both
 Chapters/46_Effects--Stateless.md	[BOUND] The two styles differ when a function three calls deep requests the dependency
-Chapters/46_Effects--Stateless.md	[BOUND] This CODE is the one that returned CODE in CODE
+Chapters/46_Effects--Stateless.md	[BOUND] The type checker and CODE treat the two channels differently
 Chapters/46_Effects--Stateless.md	[BOUND] This version changes the table row alone
 Chapters/46_Effects--Stateless.md	[BOUND] Those three parameters carry the Effect information, as the three type parameters of CODE do in Effect Management
 Chapters/46_Effects--Stateless.md	[BOUND] Those two lines do three things

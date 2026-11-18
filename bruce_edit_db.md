@@ -3711,6 +3711,18 @@ second chapter (his "do the suggestions"); was C33. The first two are
   channels in an `Effect[A, E, R]`: the Ability channel in `A` and
   the error channel in `E`". The count stood beside a type with three
   parameters (C75, sighting 2).
+- `46_Effects--Stateless` 2026-11-18, the super-prose pass, was
+  Claude-written: "The substitution poses two questions, one for the
+  type checker and one for the runtime check." -> "The substitution
+  must satisfy two checks, one by the type checker and one at
+  runtime." The sentence counted two questions and stated neither.
+  It named who answers each. A later sentence then pointed at "the
+  runtime question", and it was cut.
+- The same pass: "A full EMS does [three things], and the second is
+  to separate each Effect's interface from its implementation." ->
+  "A full EMS [separates each Effect's interface from its
+  implementation]." A count of three with one member named, and the
+  link on the count. The link now sits on the member (R16).
 
 **Home.** antecedents (Accrued patterns, the unnamed-items bullet) |
 super-prose (pass 5) | this file; a cousin of R9 (name the concrete
@@ -6315,6 +6327,27 @@ mention Need":
   `invalid-type-arguments`, "Type `Console` is not assignable to
   upper bound `Ability[Any]` of type variable `A`".
 
+4, the same chapter 2026-11-18, the super-prose pass, a form used
+before the definition it follows from, was Claude-written
+(2026-11-17):
+- "A union with `Never` is therefore the same type as the union
+  without `Never`." stood in The Effect Type, 220 lines above the
+  `A | E` union in The Effect Definition, so the reader asked which
+  union. -> moved under the definition, with the case that uses it:
+  "`Depend[Need[Console], None]`, whose `E` is `Never`, is therefore
+  `Generator[Need[Console], Any, None]`", the type `ty` reveals for
+  `greet` 150 lines later.
+- "so its instances satisfy `Success[int]`, the alias for
+  `Generator[Never, Any, int]`" stood in The Simplest Effect, where
+  the one expansion on the page was the table's
+  `Effect[Never, Never, R]`. -> "and [`Effect` is an alias for a
+  `Generator`](#the-effect-definition), so a `SuccessEffect`
+  satisfies `Success[int]`". The reason is in the clause and the
+  link is on the claim.
+- The test for a pass: for each type expansion in the prose, find
+  the definition it is computed from. If the definition comes later,
+  move the expansion to it, or give the one fact the sentence needs.
+
 **Promotion.** Proposed, as a rule of its own: a code-span name's
 first mention says what it is. Two chapters (45's `__aiter__()`, 46's
 `Need`).
@@ -7073,6 +7106,46 @@ function":
 **Home.** this file; the deep-review skill's teaching pass (accrued
 note, 2026-11-17), which owns a missing listing; the reader's read in
 super-prose lists the question; the listing-design skill if promoted.
+
+### C98. A reason given for a line that fails is tested on the line beside it that passes
+
+**Test.** A sentence explains why one line of a listing fails a check
+by saying what the checker does not do ("Structural matching decides
+what `isinstance()` accepts, not what the type checker accepts").
+Find a line in the same listing that passes the check, and ask
+whether it passes because of the thing the sentence denies. If it
+does, the reason is false and the failing line has another cause.
+Write what the two lines share, then the cause that belongs to the
+failing line.
+
+**Keep when.** The passing line does not depend on the capability the
+sentence denies.
+
+**Sightings.** 1, `46_Effects--Stateless` 2026-11-18, found in the
+`/super-prose 46` pass by the reader's read (the verdict question),
+was Claude-written:
+- "Structural matching decides what `isinstance()` accepts, not what
+  the type checker accepts. `supply(Terminal())` still builds a
+  handler for `Need[Terminal]`, which leaves `greet()`'s
+  `Need[Console]` in place." -> "`Terminal` satisfies `Console` by
+  structure, for the type checker as for `isinstance()`. The bare
+  `supply(Terminal())` line fails the type check because `supply()`
+  builds its handler from the static type of its argument. That
+  handler answers `Need[Terminal]` and leaves `greet()`'s
+  `Need[Console]` in place."
+- The listing: the second line of `protocol_supply.py`,
+  `supply(as_type(Console)(Terminal()))`, carries no
+  `# type: ignore`. `as_type(Console)` returns a function annotated
+  `(Console) -> Console`, and the type checker accepts a `Terminal`
+  as its argument by structure.
+- Why the passes missed it: each claim check asked whether the first
+  line fails the type check, and it does. No pass tested the stated
+  reason on the line that passes.
+- Scale: no tool or grep lists the shape. Read each sentence that
+  follows a quoted diagnostic and gives its reason.
+
+**Home.** super-prose (the reader's read, the verdict question) |
+this file.
 
 ## Retired
 

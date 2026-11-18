@@ -679,19 +679,18 @@ Chapters/45_Effects--Generators.md	[TWO] Explain why a driver must prime with CO
 Chapters/46_Effects--Stateless.md	[ADD] An CODE function's callers must also be CODE, all the way to CODE. | after: Effects propagate the way CODE does.
 Chapters/46_Effects--Stateless.md	[ADD] An Effect written as a bare statement is a discarded value there too. | after: ZIO allows the same mistake for the same reason.
 Chapters/46_Effects--Stateless.md	[ADD] CODE likewise leaves the body alone, but it specifies the exception types it lifts and puts them in the signature rather than in a returned wrapper. | after: For CODE, you either rewrite the body to return an CODE or an CODE, or wrap the function in CODE, which turns every exception into an CODE.
-Chapters/46_Effects--Stateless.md	[ADD] Nothing awaits the coroutine, so the run also prints a CODE to standard error. | after: CODE builds the CODE coroutine and hands it to CODE, which raises a CODE because a loop is already running.
-Chapters/46_Effects--Stateless.md	[ADD] Stateless also provides three dependencies of its own: | after: The CODE in CODE is one this chapter defines.
-Chapters/46_Effects--Stateless.md	[ADD] Stateless has CODE and CODE too, but each takes a schedule and returns a decorator of type CODE. | after: In ZIO, CODE repeats the effect that CODE describes.
-Chapters/46_Effects--Stateless.md	[ADD] The body also writes to standard output, a side effect the signature leaves out. | after: CODE describes the return value.
+Chapters/46_Effects--Stateless.md	[ADD] Nothing awaits the coroutine, so the program also prints a CODE to standard error. | after: CODE builds the CODE coroutine and hands it to CODE, which raises a CODE because a loop is already running.
+Chapters/46_Effects--Stateless.md	[ADD] Stateless has CODE and CODE too, but each takes a schedule and returns a decorator of type CODE. | after: In ZIO, CODE repeats the Effect that CODE describes.
 Chapters/46_Effects--Stateless.md	[CAN] CODE creates a delayed binding, so different runs can bind different implementations.
 Chapters/46_Effects--Stateless.md	[CAN] Only a subclass can replace it.
 Chapters/46_Effects--Stateless.md	[CAN] This Effect needs a CODE, can fail with a CODE, and produces CODE.
 Chapters/46_Effects--Stateless.md	[CAUS] makes kinds provide: Over the whole run, CODE makes both kinds of request, so CODE must provide a CODE and a CODE.
-Chapters/46_Effects--Stateless.md	[CAUS] needs CODE upcast: An interface needs the CODE upcast more than a base class does.
+Chapters/46_Effects--Stateless.md	[HEAD] call: Calling CODE inside a coroutine is a runtime error rather than a type error, because whether an event loop is running is a fact about the moment of the call, not about any type.
 Chapters/46_Effects--Stateless.md	[HEAD] loop: Building and tearing down that loop takes time, even for an Effect with no CODE in it.
-Chapters/46_Effects--Stateless.md	[SAME+NEW] mistake: CODE resolves at runtime by scanning its arguments, so the same mistake produces a program that runs and hands each request to the instance that comes first in the argument list.
+Chapters/46_Effects--Stateless.md	[SAME+NEW] mistake: CODE resolves each request at runtime by scanning its arguments, so the same mistake produces a program that runs and hands each request to the instance that comes first in the argument list.
 Chapters/46_Effects--Stateless.md	[SAME] ZIO allows the same mistake for the same reason.
 Chapters/46_Effects--Stateless.md	[TWO] A ZIO or Effect-TS value is an immutable description that you can interpret as often as you like, so the combinators in those libraries are operations on that value.
+Chapters/46_Effects--Stateless.md	[TWO] CODE is the one decorator that gives a second CODE a result, and it caches the result rather than running the Effect a second time.
 Chapters/47_Effects--Stateless_in_Practice.md	[ADD] A bare CODE also runs, since the handler receives the same request, but the answer then has the type CODE. | after: You can skip the accessor and write CODE inside CODE, and both the program and the type checker still work, because the checker reads the answer type from CODE's base, CODE.
 Chapters/47_Effects--Stateless_in_Practice.md	[ADD] A handler can also produce moments that are hard to get from a real clock. | after: Skipping the wait is the obvious benefit of a handled clock.
 Chapters/47_Effects--Stateless_in_Practice.md	[ADD] CODE also carries CODE, so the CODE row applies to it as well. | after: CODE, CODE, and CODE, the accessors for the library's own dependencies, each call CODE for one class, so CODE's row covers them.

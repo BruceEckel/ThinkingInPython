@@ -670,6 +670,15 @@ check that the page answers it before the paragraph ends:
 - A verdict or a comparison: is it true as the reader will take it?
   ("That signature is incomplete", of a standard Python signature;
   "differ only in case", of a function and a type.)
+- A reason for a line that fails a check: is it false of the line
+  beside it that passes? ("Structural matching decides what
+  `isinstance()` accepts, not what the type checker accepts", under
+  a listing whose second line passes the type check by structural
+  matching, C98.)
+- A type expansion: is the definition it follows from on the page
+  yet? ("the alias for `Generator[Never, Any, int]`" and "A union
+  with `Never`", both 150 lines or more above `Effect`'s definition,
+  C79 sighting 4.)
 - A pointer to another place: does the sentence need the reason here?
   ("below, says why".)
 - A sentence beside a listing: does the listing show it, and does the
