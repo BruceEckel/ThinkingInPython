@@ -11,8 +11,8 @@ and how it can fail.
 Stateless writes the Effects into the function's type.
 
 The type checker verifies that every function either handles each Effect or declares it in its own signature.
-If you forget to declare a dependency, the check fails.
-If you forget to supply one, the check fails.
+If you forget to declare an Effect, the check fails.
+If you forget to supply a dependency, the check fails.
 Those two checks enforce the Effect tracking and the delayed binding of a full EMS.
 The type checker ensures that you declare each Effect and supply each dependency.
 

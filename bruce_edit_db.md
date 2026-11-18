@@ -5820,6 +5820,44 @@ Depend and Try?":
   other case differs and belongs to a later section, the claim
   belongs there too.
 
+6, the same chapter 2026-11-18, the narrowing in noun form, a member
+where the paragraph's rule is about the class, Bruce on the chapter's
+opening: "should this be Effect rather than dependency?":
+- "If you forget to declare a dependency, the check fails. If you
+  forget to supply one, the check fails." -> "If you forget to declare
+  an Effect, the check fails. If you forget to supply a dependency,
+  the check fails."
+- The sentence above says "handles each Effect or declares it", and
+  the one two lines below says "declare each Effect and supply each
+  dependency". Between them "declare" took "a dependency", so the
+  reader asks whether an undeclared failure passes the check. A
+  dependency is one kind of Effect (a `Need` in the Ability channel).
+  A failure is the other kind.
+- Probe, `ty` 0.0.104: `announce()` from `announce.py` with its
+  signature cut to `Depend[Need[Console], None]` draws an
+  `invalid-yield` at `yield from score(name)` ("expression of type
+  `KeyError`, expected `Need[Console]`"). The claim holds for the
+  class, so the class noun goes in.
+- "One" in the second sentence pointed at "a dependency". With the
+  first noun changed it would point at "an Effect", which nobody
+  supplies, so that sentence got its noun in the same edit.
+- Why the passes missed it: the two sentences date from 2026-08-03
+  (`77571c27`), when the paragraph spoke of dependencies. The
+  sentences on both sides were rewritten on 2026-11-16 and 2026-11-17
+  with "Effect" as the object of "declare" (C89's repair and Bruce's
+  rewording of it), and neither edit reread the paragraph for the
+  verb's other object. The sentence is true (`undeclared_need.py`), so
+  every claim check passed it.
+- The test for a pass: when a paragraph states a rule of a class
+  ("declares each Effect"), list the objects its other sentences give
+  the rule's verbs. A member of the class in that list is this shape.
+  Run the claim with the class noun, and write the class noun when it
+  holds.
+- Keep: a passage about the member alone (the section Declaring a
+  Dependency, whose listing has one `Need` and no failure).
+- Scale: a grep of both trees for "declare" or "undeclared" with a
+  dependency as its object found this line and that section's title.
+
 **Promotion.** Proposed: two chapters.
 
 **Home.** ambiguity (Accrued shapes) | super-prose (pass 6) | this

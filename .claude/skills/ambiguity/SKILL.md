@@ -446,3 +446,24 @@ Shapes Bruce flags that the catalog above did not name, dated, with the sentence
   again. If it is false, make "the names" the subject, or cut it when
   the next sentences already say what each thing is.
   C93 in `bruce_edit_db.md`.
+- 2026-11-18, chapter 46: a member noun where the paragraph's rule is
+  about the class.
+  "If you forget to declare a dependency, the check fails. If you
+  forget to supply one, the check fails." (Bruce: "should this be
+  Effect rather than dependency?").
+  The sentence above said "handles each Effect or declares it" and
+  the one below "declare each Effect and supply each dependency", so
+  "a dependency" as the object of "declare" told the reader an
+  undeclared failure might pass.
+  This is C70's narrowing modifier in noun form. The probe (`ty`: a
+  `KeyError` dropped from `announce()`'s signature draws an
+  `invalid-yield`) showed the claim holds for the class, so the
+  sentences became "If you forget to declare an Effect, the check
+  fails. If you forget to supply a dependency, the check fails."
+  For each verb in a paragraph's rule sentence, list the objects the
+  paragraph's other sentences give it, and after rewriting one
+  sentence of a paragraph, reread the others for the old noun: both
+  neighbors had been rewritten in the two days before, around these
+  two.
+  When the noun changes, a pronoun that pointed at it ("one") gets
+  its noun.

@@ -418,7 +418,17 @@ each pass hands the next one less to do.
    `Success`, `Never` stands in for both `A` and `E`", under three
    aliases, Bruce: "does 'Never' also stand in with Depend and
    Try?"): probe the other rows, and state the claim for all of them
-   or put it in the table. A comparison of two look-alike names is
+   or put it in the table. A member noun where the paragraph's rule
+   is about the class is the same modifier ("If you forget to
+   declare a dependency, the check fails", between "declares each
+   Effect" and "declare each Effect", Bruce: "should this be Effect
+   rather than dependency?"): for each verb in a paragraph's rule
+   sentence, list the objects the other sentences give it, probe
+   the claim with the class noun (an undeclared failure draws an
+   `invalid-yield` too), and write the class noun when it holds
+   ("If you forget to declare an Effect", C70 sighting 6). A pronoun
+   in the next sentence that pointed at the old noun gets its noun
+   ("supply one" -> "supply a dependency"). A comparison of two look-alike names is
    true of the names and may be false of the things ("`success()`
    and `Success` differ only in case", Bruce: "one is callable and
    the other is a type"): make "the names" the subject or cut the
