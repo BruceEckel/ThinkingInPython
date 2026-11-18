@@ -730,6 +730,35 @@ the agents marked unsure and one sentence off the list that an agent
 reported. The session wrote the rule's spec from a
 prototype and a Sonnet agent built it (`shortened_terms()` in
 `tools/sentence_shapes.py`); rules R12 and R68 in `bruce_edit_db.md`.
+The eleventh survey rule is `[VERB+OBJ]` (2026-11-18), a rule's verb
+with a second, generic object: "If you forget to declare a
+dependency, the check fails", in a paragraph of chapter 46 whose last
+sentence says "declare each Effect and supply each dependency"
+(Bruce: "should this be Effect rather than dependency?"). A rule
+sentence gives a verb an object with "each", "every", "all", or
+"any", and the rule fires on another sentence of the same paragraph
+that gives that verb a different noun with "a" or "an", or as a bare
+plural. The reader takes the second noun for the range of the rule
+and asks whether the rule holds outside it. The repair writes the
+rule's noun when a probe shows the claim holds for it (an undeclared
+failure draws an `invalid-yield` too); C70 in `bruce_edit_db.md`,
+sighting 6. A definite object ("Python accepts the new method"), a
+counted plural, a code span, and "one" are quiet by design, since a
+definite object is an instance on the page. The hit prints the verb,
+both nouns, and the rule sentence (`[VERB+OBJ] declare: dependency /
+Effect: ... | rule: ...`), and its baseline entry holds both
+sentences, as an `[ADD]` entry does. The two sentences had stood
+since August through four deep reviews, a whole-chapter super-prose
+pass, and a reader's read, because the sentence is true and no pass
+compared a verb's objects across a paragraph. It is the eighth rule
+in `JUDGED_SURVEY_RULES`. The first book-wide run had 8 hits after
+the chapter 46 repair: 7 keeps in the survey baseline (a contrast, a
+consequence the passage draws, an instruction), and chapter 44's "Its
+`bind effect` rebinds a handler separately from its use" beside
+"rebinds each implementation", left unjudged for Bruce. The rule
+sees a rule only through its universal word, and misses a pronoun
+object ("declares it"), a passive, and a rule in another paragraph,
+so the ambiguity pass still lists each rule verb's objects by hand.
 The fifth default rule is `[PRT]` (2026-11-04), a phrasal verb split
 around a noun-phrase object ("the driver carries the request out",
 Bruce: "general style: carries out the request"); the particle holds

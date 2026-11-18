@@ -426,7 +426,10 @@ each pass hands the next one less to do.
    sentence, list the objects the other sentences give it, probe
    the claim with the class noun (an undeclared failure draws an
    `invalid-yield` too), and write the class noun when it holds
-   ("If you forget to declare an Effect", C70 sighting 6). A pronoun
+   ("If you forget to declare an Effect", C70 sighting 6).
+   `[VERB+OBJ]` in `tip sentence-shapes CH=NN ARGS=--survey` lists
+   the shape when the rule's object carries "each", "every", "all",
+   or "any"; a rule stated another way is found by the list. A pronoun
    in the next sentence that pointed at the old noun gets its noun
    ("supply one" -> "supply a dependency"). A comparison of two look-alike names is
    true of the names and may be false of the things ("`success()`

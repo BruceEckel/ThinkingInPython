@@ -591,13 +591,17 @@ def sentence_shapes(v: Vars) -> None:
     `yield`, which "its `yield`" says). [SAME+NEW] is a "same" on a
     noun the 30 lines above never use. [HEAD] is a compound term
     shortened to its head noun ("the channel" in a chapter whose
-    terms are "Ability channel" and "error channel"). [ADD], [CAN],
-    [SAME], [SAME+NEW], [HEAD], [TWO] (a comparison whose two terms
-    each carry a verb), and [CAUS] (a causative verb whose object is
-    the actor) share a baseline of their own,
+    terms are "Ability channel" and "error channel"). [VERB+OBJ] is
+    a rule's verb with a second, generic object ("If you forget to
+    declare a dependency" in a paragraph that says "declare each
+    Effect"); it prints the verb, both nouns, and the rule sentence.
+    [ADD], [CAN],
+    [SAME], [SAME+NEW], [HEAD], [VERB+OBJ], [TWO] (a comparison whose
+    two terms each carry a verb), and [CAUS] (a causative verb whose
+    object is the actor) share a baseline of their own,
     tools/data/sentence_shapes_survey_baseline.txt, written by
     ARGS=--survey-accept after a read, so the survey prints only the
-    sentences of those seven rules not yet judged.
+    sentences of those eight rules not yet judged.
     Run `tip sentence-shapes CH=31 ARGS=--survey` at the start of a
     chapter pass. It reports and never gates; `tip prose` runs it after
     the subject-gap scan. CH= picks one chapter and its Solutions file.

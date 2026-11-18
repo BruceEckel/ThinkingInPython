@@ -289,7 +289,8 @@ ahead of "both limits"), and a term stated only afterward. The other
 96 were keeps. Reprinted on every run, they would make a chapter pass
 reread all of them to find one written since, so the rules in
 `JUDGED_SURVEY_RULES` (`[ADD]`, `[CAN]`, `[CAUS]`, `[SAME]`,
-`[SAME+NEW]`, `[TWO]`, and `[HEAD]`) share a baseline of their own,
+`[SAME+NEW]`, `[TWO]`, `[HEAD]`, and `[VERB+OBJ]`) share a baseline
+of their own,
 `tools/data/sentence_shapes_survey_baseline.txt` (`SURVEY_BASELINE`).
 `--survey` prints the hits of those rules not in it and ends on `K
 survey, J judged`; `--survey --all` prints the judged ones too, marked
@@ -409,9 +410,49 @@ loop, three kinds of block in one listing, a `check()` function or a
 hypothetical tool beside the type checker. So a chapter pass sees
 only a sentence written or edited since.
 
+`[VERB+OBJ]` (2026-11-18, from the author's "should this be Effect
+rather than dependency?" on chapter 46's opening) is a rule's verb
+with a second, generic object: "If you forget to declare a
+dependency, the check fails", in a paragraph whose last sentence says
+"The type checker ensures that you declare each Effect and supply
+each dependency". A rule sentence gives a verb an object with "each",
+"every", "all", or "any" (`universal_object()`). The rule
+(`second_objects()`) fires on another sentence of the same paragraph
+that gives that verb a generic object with a different noun
+(`generic_object()`): an object with "a" or "an", or a plural with no
+determiner, possessive, or number. The reader takes the second noun
+for the range of the rule and asks whether the rule holds outside it
+(does an undeclared failure pass the check?). The repair writes the
+rule's noun when the claim holds for it ("If you forget to declare an
+Effect"), which a probe decides, and keeps the member when the
+sentence is about that member alone. Quiet by design: a definite
+object ("Python accepts the new method" after "Python accepts any
+method name"), which is a thing on the page and an instance of the
+rule; a counted plural ("computes nine squares"); a code-span object;
+the stand-in "one"; and a noun that some rule sentence in the
+paragraph gives the verb too. The message names the verb and both
+nouns and ends on the rule sentence:
+`[VERB+OBJ] declare: dependency / Effect: ... | rule: ...`, so the
+baseline entry holds both sentences and an edit to either retires it.
+It is a survey rule because a generic member after a rule is most
+often a contrast ("the setter announces every assignment ... a setter
+that announces a reading only when it differs") or a consequence the
+passage draws ("accepts any callable ... also accepts a responder
+that returns a value by mistake"). Known blind spots: a rule stated
+with no universal word, a rule whose object is a pronoun ("declares
+it"), a passive, and a rule sentence in another paragraph. Without
+the generic-object test the scan had 51 hits over both trees, nearly
+all an instance or an unrelated use of a common verb ("leaves",
+"runs", "accepts the file"). With it the first book-wide run had 8,
+after the chapter 46 sentence was repaired: 7 keeps, in the judged
+baseline described under `[SAME+NEW]` above, and chapter 44's "Its
+CODE rebinds a handler separately from its use" beside "rebinds each
+implementation", left unjudged for the author. C70 in
+`bruce_edit_db.md` (sighting 6) has the test.
+
 Five rules run by default, `RULES`: `[IMP]`, `[COLON+AND]`, `[PAIR]`,
-`[AND+REL]`, and `[PRT]`, judged against a baseline. Ten are survey rules, `SURVEY_RULES`: `[AND]`,
-plain `[COLON]`, `[ADD]`, `[TWO]`, `[CAN]`, `[SAME]`, `[SAME+NEW]`, `[CAUS]`, `[REL+AND]`, and `[HEAD]`. The calibration shows why. `[AND]` fired on 7 before
+`[AND+REL]`, and `[PRT]`, judged against a baseline. Eleven are survey rules, `SURVEY_RULES`: `[AND]`,
+plain `[COLON]`, `[ADD]`, `[TWO]`, `[CAN]`, `[SAME]`, `[SAME+NEW]`, `[CAUS]`, `[REL+AND]`, `[HEAD]`, and `[VERB+OBJ]`. The calibration shows why. `[AND]` fired on 7 before
 only, 1 both, and 6 after only of the 72 rewritten pairs, so the
 author's own rewrites carry the shape: it is a judgment made per
 sentence in an editing pass, not a fault, and the whole book yields
@@ -444,7 +485,9 @@ A hit prints as `path:line: [RULE] sentence`, the line holding the
 sentence's first character. A `[SAME+NEW]` hit puts the noun and a
 colon before the sentence, a `[CAUS]` hit the verb, object, and
 complement, a `[HEAD]` hit the head noun and a colon, and an `[ADD]`
-hit the previous sentence after ` | after: `.
+hit the previous sentence after ` | after: `. A `[VERB+OBJ]` hit puts
+the verb and the two nouns before the sentence and the rule sentence
+after ` | rule: `.
 Every hit is read once by a human, and the
 ones judged keeps live in `tools/data/sentence_shapes_baseline.txt`, so
 a run prints only what is new. An entry is `path<TAB>[RULE] sentence`
@@ -487,7 +530,7 @@ or introduces a list whose items hold relative clauses.
     uv run python -m tools.sentence_shapes           # new hits
     uv run python -m tools.sentence_shapes --all     # every hit
     uv run python -m tools.sentence_shapes --accept  # judged keeps
-    uv run python -m tools.sentence_shapes --survey  # + AND, COLON, ADD, TWO, CAN, SAME, SAME+NEW, CAUS, REL+AND, HEAD
+    uv run python -m tools.sentence_shapes --survey  # + AND, COLON, ADD, TWO, CAN, SAME, SAME+NEW, CAUS, REL+AND, HEAD, VERB+OBJ
     uv run python -m tools.sentence_shapes --survey-accept  # keeps of the judged survey rules
     uv run python -m tools.sentence_shapes --calibrate
     uv run python -m tools.sentence_shapes Chapters/31_*.md
@@ -503,7 +546,7 @@ import re
 from collections import Counter
 from collections.abc import Iterator, Mapping, Sequence
 from pathlib import Path
-from typing import Final
+from typing import Final, NamedTuple
 from tools import parse_check
 from tools.config import DATA_DIR
 from tools.markdown import Document
@@ -554,7 +597,8 @@ SURVEY_BASELINE: Final = DATA_DIR / "sentence_shapes_survey_baseline.txt"
 SURVEY_HEADER: Final = (
     "# Survey hits a human read and judged keeps, for the survey rules\n"
     "# in JUDGED_SURVEY_RULES ([ADD], [CAN], [CAUS], [SAME], [SAME+NEW],\n"
-    "# [TWO], [HEAD]): the sentence passes its rule's test as it stands.\n"
+    "# [TWO], [HEAD], [VERB+OBJ]): the sentence passes its rule's test\n"
+    "# as it stands.\n"
     "# An entry is not an exemption from the rule.\n"
     "# path<TAB>[RULE] sentence, with whitespace normalized and no\n"
     "# line number, so a reflow leaves an entry alone and an edit to\n"
@@ -563,7 +607,10 @@ SURVEY_HEADER: Final = (
     "# [CAUS] the verb, object, and\n"
     "# complement. [ADD] puts \" | after: \" and the sentence before it\n"
     "# after its own sentence, because the reading depends on both, so\n"
-    "# an edit to either one retires the entry. For the other rules an\n"
+    "# an edit to either one retires the entry. [VERB+OBJ] puts the\n"
+    "# verb and the two nouns before the sentence and \" | rule: \" and\n"
+    "# the rule sentence after it, for the same reason. For the other\n"
+    "# rules an\n"
     "# edit to the passage above leaves the entry in place, so reread\n"
     "# a kept sentence when the text above it changes.\n"
     "# Rewritten by `tip sentence-shapes ARGS=--survey-accept`; read\n"
@@ -595,10 +642,11 @@ SURVEY_RULES: Final = {
     "CAUS": "a causative verb that demotes the actor to its object",
     "REL+AND": "a relative clause's verb, a conjunction, and a verb",
     "HEAD": "a compound term shortened to its head noun",
+    "VERB+OBJ": "a rule's verb with a second, generic object",
 }
 """Printed only under `--survey`; never in the default baseline."""
 JUDGED_SURVEY_RULES: Final = frozenset(
-    {"ADD", "CAN", "CAUS", "SAME", "SAME+NEW", "TWO", "HEAD"})
+    {"ADD", "CAN", "CAUS", "SAME", "SAME+NEW", "TWO", "HEAD", "VERB+OBJ"})
 """The survey rules whose read hits are kept in `SURVEY_BASELINE`."""
 ALL_RULES: Final = tuple(RULES) + tuple(SURVEY_RULES)
 REL_JOINERS: Final = frozenset({"and", "or", "but"})
@@ -744,6 +792,19 @@ HEAD_POSTMODIFIERS: Final = frozenset({"relcl", "acl", "appos"})
 """Dependents after a head noun that identify it, so it is not bare."""
 HEAD_FOLLOWERS: Final = frozenset({"that", "which", "where", "whose", "of"})
 """Words right after a head noun that attach its identification."""
+VERB_OBJ_RULE: Final = " | rule: "
+"""Joins a `[VERB+OBJ]` hit's sentence to the sentence with the rule."""
+OBJECT_DEPS: Final = frozenset({"dobj", "obj"})
+"""A verb's direct object, under either name the parser gives it."""
+UNIVERSAL_DETERMINERS: Final = frozenset({"each", "every", "all", "any"})
+"""On a verb's object, the words that make the sentence a rule."""
+GENERIC_ARTICLES: Final = frozenset({"a", "an"})
+"""An article that makes an object any member of its kind."""
+SPECIFIC_DEPS: Final = frozenset(
+    {"det", "predet", "poss", "nummod", "quantmod"})
+"""Dependents that make a plural object a counted or a named set."""
+STAND_IN_OBJECTS: Final = frozenset({"one"})
+"""An object the parser tags as a noun that stands for another noun."""
 
 CALIBRATION_EXAMPLES: Final[tuple[tuple[str, str, bool], ...]] = (
     # (rule, text, should it fire)
@@ -853,6 +914,11 @@ CALIBRATION_EXAMPLES: Final[tuple[tuple[str, str, bool], ...]] = (
     ("HEAD", "The execution frame holds the locals. The stack frame sits on the call stack. A `yield` suspends one execution frame. A `return` removes one stack frame. The frame of the generator stays in the generator object.", False),
     ("HEAD", "The Ability channel carries each request. The error channel carries each failure. A handler empties the Ability channel first and the error channel second. If a function declares a channel of its own, the channel's type appears in the signature.", False),
     ("HEAD", "The Moore shape runs its action on entry. The Mealy shape runs its action on a transition. The listing has the Moore shape at the top and the Mealy shape below it. Exercise 9 puts the shape at `[1]` into `proxy()`.", False),
+    ("VERB+OBJ", "The type checker verifies that every function either handles each Effect or declares it in its own signature. If you forget to declare a dependency, the check fails. If you forget to supply one, the check fails. The type checker ensures that you declare each Effect and supply each dependency.", True),
+    ("VERB+OBJ", "The type checker verifies that every function either handles each Effect or declares it in its own signature. If you forget to declare an Effect, the check fails. If you forget to supply a dependency, the check fails. The type checker ensures that you declare each Effect and supply each dependency.", False),
+    ("VERB+OBJ", "Python accepts any method name in a subclass. Python accepts the new method.", False),
+    ("VERB+OBJ", "An eager version computes every value up front. The lazy pipeline computes nine squares.", False),
+    ("VERB+OBJ", "The alias accepts any callable that takes a `T`. A stricter alias accepts responders.", True),
 )
 """The style rules' own examples: (rule, text, should it fire)."""
 
@@ -1808,6 +1874,87 @@ def shortened_terms(paragraph: Paragraph,
     return hits
 
 
+class SecondObject(NamedTuple):
+    """A `[VERB+OBJ]` hit: a rule's verb with a second, generic object."""
+
+    verb: Token
+    noun: Token
+    """The generic object, in the reported sentence."""
+    rule_noun: Token
+    """The object the rule sentence gives the same verb."""
+    rule_index: int
+    """The rule sentence's index in the paragraph."""
+
+
+def prose_objects(sentence: Sentence) -> Iterator[tuple[Token, Token]]:
+    """(verb, direct object) for each verb whose object is a prose noun."""
+    for tok in sentence.tokens:
+        if tok.pos != "VERB":
+            continue
+        for child in children(tok, sentence):
+            if (child.dep in OBJECT_DEPS
+                    and child.pos in ("NOUN", "PROPN")
+                    and not child.text.startswith("CODE")
+                    and child.lemma.lower() not in STAND_IN_OBJECTS):
+                yield tok, child
+
+
+def universal_object(noun: Token, sentence: Sentence) -> bool:
+    """Does the object carry "each", "every", "all", or "any"?"""
+    return any(c.lemma.lower() in UNIVERSAL_DETERMINERS
+               for c in children(noun, sentence))
+
+
+def generic_object(noun: Token, sentence: Sentence) -> bool:
+    """Is the object any member of its kind: "a handler", "failures"?
+
+    An indefinite article, or a plural with no determiner, possessive,
+    or number. A definite object ("the new method", "its argument",
+    "nine squares") is a thing on the page, an instance of the rule
+    and not a second statement of it.
+    """
+    kids = children(noun, sentence)
+    if any(c.dep == "det" and c.lemma.lower() in GENERIC_ARTICLES
+           for c in kids):
+        return True
+    return noun.tag == "NNS" and not any(
+        c.dep in SPECIFIC_DEPS or c.text.startswith("CODE") for c in kids)
+
+
+def second_objects(paragraph: Paragraph) -> dict[int, SecondObject]:
+    """Sentence index to its first generic object of a rule's verb.
+
+    A rule sentence gives a verb a universal object ("declare each
+    Effect"). A hit is another sentence of the paragraph that gives
+    that verb a generic object with a different noun ("declare a
+    dependency"). Quiet when some rule sentence gives the verb the
+    hit's own noun, since the paragraph then states the rule of that
+    noun too. The hit records the nearest rule sentence.
+    """
+    stated: dict[str, list[tuple[int, Token]]] = {}
+    generic: list[tuple[int, Token, Token]] = []
+    for index, sentence in enumerate(paragraph.sentences):
+        for verb, noun in prose_objects(sentence):
+            if universal_object(noun, sentence):
+                stated.setdefault(verb.lemma.lower(), []).append(
+                    (index, noun))
+            elif generic_object(noun, sentence):
+                generic.append((index, verb, noun))
+    hits: dict[int, SecondObject] = {}
+    for index, verb, noun in generic:
+        if index in hits:
+            continue
+        rules = [(i, n) for i, n in stated.get(verb.lemma.lower(), ())
+                 if i != index]
+        if not rules or any(n.lemma.lower() == noun.lemma.lower()
+                            for _, n in rules):
+            continue
+        rule_index, rule_noun = min(
+            rules, key=lambda found: abs(found[0] - index))
+        hits[index] = SecondObject(verb, noun, rule_noun, rule_index)
+    return hits
+
+
 def shapes(paragraph: Paragraph, source: Sequence[str] = (),
            heads: Mapping[str, frozenset[str]] | None = None,
            ) -> Iterator[tuple[str, Sentence]]:
@@ -1823,6 +1970,7 @@ def shapes(paragraph: Paragraph, source: Sequence[str] = (),
     if heads is None:
         heads = term_heads([paragraph])
     shortened = shortened_terms(paragraph, heads)
+    second = second_objects(paragraph)
     previous: Sentence | None = None
     for index, sentence in enumerate(paragraph.sentences):
         if split_particle(sentence):
@@ -1853,6 +2001,8 @@ def shapes(paragraph: Paragraph, source: Sequence[str] = (),
             yield "REL+AND", sentence
         if index in shortened:
             yield "HEAD", sentence
+        if index in second:
+            yield "VERB+OBJ", sentence
     for sentence in colon_units(paragraph):
         label = colon_clause(sentence)
         if label:
@@ -1886,6 +2036,14 @@ def find(docs: list[Document], parser: Parser = parse) -> Iterator[Finding]:
                                  if s is sentence)
                     tail = ADD_AFTER + sentence_text(
                         paragraph, paragraph.sentences[index - 1])
+                if rule == "VERB+OBJ":
+                    index = next(i for i, s in enumerate(paragraph.sentences)
+                                 if s is sentence)
+                    hit = second_objects(paragraph)[index]
+                    detail = (f"{hit.verb.lemma.lower()}: {hit.noun.text}"
+                              f" / {hit.rule_noun.text}: ")
+                    tail = VERB_OBJ_RULE + sentence_text(
+                        paragraph, paragraph.sentences[hit.rule_index])
                 yield Finding(doc.path, line, f"[{rule}] " + detail
                               + sentence_text(paragraph, sentence) + tail)
 
@@ -1946,10 +2104,12 @@ def main(argv: list[str] | None = None, parser: Parser = parse) -> int:
         __doc__, fail_help="exit 1 when any NEW sentence is found",
         survey_help="also print the survey rules, never counted as "
                     "new; a judged hit of [ADD], [CAN], [CAUS], [SAME], "
-                    "[SAME+NEW], [TWO], or [HEAD] prints only with --all",
+                    "[SAME+NEW], [TWO], [HEAD], or [VERB+OBJ] prints "
+                    "only with --all",
         survey_accept_help="add the unjudged hits of [ADD], [CAN], "
-                           "[CAUS], [SAME], [SAME+NEW], [TWO], and [HEAD] "
-                           "to their own baseline and drop stale entries",
+                           "[CAUS], [SAME], [SAME+NEW], [TWO], [HEAD], "
+                           "and [VERB+OBJ] to their own baseline and "
+                           "drop stale entries",
         calibrate_help="run the rules over tools/data/edit_pairs.json "
                        "and the built-in examples")
     ap.add_argument("--rule", action="append", default=[],

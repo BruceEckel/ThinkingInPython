@@ -1,6 +1,7 @@
 # Survey hits a human read and judged keeps, for the survey rules
 # in JUDGED_SURVEY_RULES ([ADD], [CAN], [CAUS], [SAME], [SAME+NEW],
-# [TWO], [HEAD]): the sentence passes its rule's test as it stands.
+# [TWO], [HEAD], [VERB+OBJ]): the sentence passes its rule's test
+# as it stands.
 # An entry is not an exemption from the rule.
 # path<TAB>[RULE] sentence, with whitespace normalized and no
 # line number, so a reflow leaves an entry alone and an edit to
@@ -9,7 +10,10 @@
 # [CAUS] the verb, object, and
 # complement. [ADD] puts " | after: " and the sentence before it
 # after its own sentence, because the reading depends on both, so
-# an edit to either one retires the entry. For the other rules an
+# an edit to either one retires the entry. [VERB+OBJ] puts the
+# verb and the two nouns before the sentence and " | rule: " and
+# the rule sentence after it, for the same reason. For the other
+# rules an
 # edit to the passage above leaves the entry in place, so reread
 # a kept sentence when the text above it changes.
 # Rewritten by `tip sentence-shapes ARGS=--survey-accept`; read
@@ -316,6 +320,7 @@ Chapters/19_Techniques--Concurrency.md	[SAME] ** Guard it with CODE, the same fi
 Chapters/19_Techniques--Concurrency.md	[SAME] A CODE nested inside its CODE block falls under the same deadline:
 Chapters/19_Techniques--Concurrency.md	[SAME] CODE gets the same overlap from suspended tasks.
 Chapters/19_Techniques--Concurrency.md	[TWO] A live consumer thread calls CODE and lets that blocking call do the waiting, rather than polling whether the queue is empty:
+Chapters/19_Techniques--Concurrency.md	[VERB+OBJ] start: interpreter / worker: To create a worker, the operating system starts a fresh Python interpreter, and that interpreter imports this module, the program's main module, before it runs any work. | rule: macOS and Windows use CODE, which starts each worker fresh.
 Chapters/20_Patterns--Rethinking_Objects.md	[ADD] A method must also behave the way callers expect: return a description rather than raise an exception, finish rather than block, describe the object rather than change it. | after: The other half is semantic.
 Chapters/20_Patterns--Rethinking_Objects.md	[ADD] CODE also lists every operation the object supports through dot-completion. | after: "Bundling behavior with state" gives you this: one object holds the state, and the same class defines every method that changes it.
 Chapters/20_Patterns--Rethinking_Objects.md	[ADD] CODE declares an empty CODE too, so the chain stays slotted from CODE up to CODE. | after: A base class with no CODE gives every instance of its subclasses a CODE, the per-instance dictionary that CODE exists to remove.
@@ -429,6 +434,7 @@ Chapters/26_Patterns--Factory.md	[SAME] A lazy import produces the same failure 
 Chapters/26_Patterns--Factory.md	[SAME] CODE has the same shape.
 Chapters/26_Patterns--Factory.md	[SAME] Running with CODE makes ordinary imports lazy along with the marked ones, so the same failure can appear in a program with no CODE keyword in it.
 Chapters/26_Patterns--Factory.md	[SAME] The standard library's CODE has the same shape.
+Chapters/26_Patterns--Factory.md	[VERB+OBJ] pass: list / field: Pass a fresh list for that field when the variant must own one. | rule: CODE passes every field besides CODE and CODE by reference, so CODE shares CODE's CODE list.
 Chapters/27_Patterns--Function_Objects.md	[CAN] Because CODE takes the setting as an ordinary parameter, CODE can replace the closure.
 Chapters/27_Patterns--Function_Objects.md	[CAN] Building commands in a loop can produce Python's best-known closure mistake:
 Chapters/27_Patterns--Function_Objects.md	[CAN] CODE names a function with its instance attached, so a macro can hold it alongside plain functions.
@@ -487,6 +493,8 @@ Chapters/30_Patterns--Observer.md	[TWO] A weak reference lets Python collect its
 Chapters/30_Patterns--Observer.md	[TWO] Concurrency means each responder finishes as soon as its own wait ends, so the faster responder prints first.
 Chapters/30_Patterns--Observer.md	[TWO] Connect a second view to CODE's CODE: one that prints a bar of asterisks as long as the count, beside the CODE that prints the number.
 Chapters/30_Patterns--Observer.md	[TWO] The broadcaster receives its responders when you create it, and the set stays the same for as long as the broadcaster lives.
+Chapters/30_Patterns--Observer.md	[VERB+OBJ] accept: responder / callable: That alternative also accepts a responder that returns a value by mistake. | rule: The alternative alias CODE accepts any callable that takes a CODE, since every return type, CODE included, is assignable to CODE.
+Chapters/30_Patterns--Observer.md	[VERB+OBJ] announce: reading / assignment: Deciding What Matters shows a setter that announces a reading only when it differs enough from the previous reading. | rule: In this case, the setter announces every assignment.
 Chapters/31_Patterns--State_Machines.md	[CAN] Because the machine is deterministic, a test can drive it through a sequence of inputs and check which state it reaches.
 Chapters/31_Patterns--State_Machines.md	[CAN] In this *Chain of Responsibility* shape, a single input can lead to different states, depending on which condition passes.
 Chapters/31_Patterns--State_Machines.md	[CAN] Several rules can share one CODE key.
@@ -717,6 +725,7 @@ Chapters/47_Effects--Stateless_in_Practice.md	[SAME] CODE is the boundary functi
 Chapters/47_Effects--Stateless_in_Practice.md	[SAME] Supplying a CODE moves the same work into processes.
 Chapters/47_Effects--Stateless_in_Practice.md	[SAME] The same limit applies on the error side.
 Chapters/47_Effects--Stateless_in_Practice.md	[TWO] Name each contact with the outside (the clock, the feed, the pool, the console) and bind it at the edge instead of calling it in the middle.
+Chapters/47_Effects--Stateless_in_Practice.md	[VERB+OBJ] accept: Effect / channel: Two of CODE's four overloads accept an Effect that still declares an error, and every one of the four returns a CODE with no error type on it: | rule: The checker accepts any error channel that function declares.
 Chapters/A_Effect_Tracking.md	[ADD] Stateless and ZIO put their rows in the return type too. | after: Every function returns a value, so CODE reads the row from the return annotation.
 Chapters/A_Effect_Tracking.md	[CAN] **A row can contain a variable.
 Chapters/A_Effect_Tracking.md	[CAN] A language can have one without the other.
@@ -954,6 +963,7 @@ Solutions/31_Patterns--State_Machines/README.md	[CAUS] let condition read: Put a
 Solutions/31_Patterns--State_Machines/README.md	[CAUS] makes caller read: The enum design makes the states visible and nameable: a caller can read CODE, print it, and compare it with CODE.
 Solutions/31_Patterns--State_Machines/README.md	[HEAD] key: A Vending Machine explains that the engine looks up CODE as the key, so an instance of a subclass of an input type finds the rules filed under the subclass and passes over the base class's rules.
 Solutions/31_Patterns--State_Machines/README.md	[SAME] Where exercise 1's CODE swaps in a whole CODE object through CODE, this machine reaches the same moods by returning the next member from a transition function.
+Solutions/31_Patterns--State_Machines/README.md	[VERB+OBJ] accept: member / object: CODE enumerates them, a reader can search for the name CODE, and a parameter typed CODE accepts a member and rejects a stray CODE instance of the kind exercise 1 constructs. | rule: Exercise 1's CODE accepts any object with a CODE, so the set of moods there is open, scattered across every class that defines a CODE.
 Solutions/32_Patterns--Multiple_Dispatching/README.md	[ADD] A subclass of one weapon can also override one combination there and inherit the rest, where the grid matches types exactly and needs a row and a column for the subclass. | after: Its CODE methods receive the competing objects, so a weapon whose result depends on its state fits there, while this grid needs exercise 9's callable cells.
 Solutions/32_Patterns--Multiple_Dispatching/README.md	[CAN] Every weapon loses to two others, so no group can count on winning.
 Solutions/32_Patterns--Multiple_Dispatching/README.md	[CAUS] makes change checks: The solution makes its change in CODE, so its listing checks the change with CODE printing CODE, the reversed duel printing CODE, and a CODE with no rows raising a CODE.
@@ -978,6 +988,7 @@ Solutions/34_Patterns--Composite_and_Interpreter/README.md	[CAN] Matching also c
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	[CAN] The rule can print one redundant pair of parentheses around a right-hand child at the same precedence as its parent, as in CODE where CODE is enough.
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	[CAUS] let type implement: To open the set, move CODE onto an abstract base class as an CODE, and let each entry type implement it.
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	[SAME+NEW] tree: CODE on a CODE fold of CODE through CODE raises a CODE, while your CODE returns CODE for the same tree and CODE for CODE with CODE at CODE.
+Solutions/34_Patterns--Composite_and_Interpreter/README.md	[VERB+OBJ] count: link / byte: ** CODE counts a link as zero bytes, since the target file's own entry counts its bytes. | rule: **Count each byte once.
 Solutions/35_Patterns--Flyweight/README.md	[CAN] As Choosing a *Flyweight* and Its Pool says, CODE can look in a CODE as easily as in a CODE.
 Solutions/35_Patterns--Flyweight/README.md	[CAN] Only a miss can start a race.
 Solutions/35_Patterns--Flyweight/README.md	[CAN] The bug depends on that assignment, so every cell can share one record safely.

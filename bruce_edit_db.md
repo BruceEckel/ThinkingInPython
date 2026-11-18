@@ -5857,6 +5857,23 @@ opening: "should this be Effect rather than dependency?":
   Dependency, whose listing has one `Need` and no failure).
 - Scale: a grep of both trees for "declare" or "undeclared" with a
   dependency as its object found this line and that section's title.
+- The tool, the same day (Bruce: "what could we have done to have
+  caught that?"): `[VERB+OBJ]`, a survey rule in `tip sentence-shapes`.
+  A rule sentence gives a verb an object with "each", "every", "all",
+  or "any", and the rule fires on another sentence of the paragraph
+  that gives the verb a generic object with a different noun ("a
+  dependency", a bare plural). On the chapter as it stood it prints
+  one hit, this sentence. A first scan with no generic-object test
+  had 51 hits over both trees, nearly all an instance ("Python
+  accepts the new method") or an unrelated use of a common verb. With
+  the test the book has 8: 7 keeps (a contrast, a consequence the
+  passage draws, an instruction), recorded in the survey baseline,
+  and chapter 44's "Its `bind effect` rebinds a handler separately
+  from its use" beside "A separate `using` clause rebinds each
+  implementation", left unjudged for Bruce. The rule misses a rule
+  sentence with no universal word, a pronoun object ("declares it"),
+  a passive, and a rule in another paragraph, so the by-hand list of
+  each rule verb's objects stays in the pass.
 
 **Promotion.** Proposed: two chapters.
 

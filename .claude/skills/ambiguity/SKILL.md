@@ -63,6 +63,10 @@ most of the book's hits read one way.
   `[REL+AND]` (2026-11-11) is a relative clause that ends on its verb directly before a conjunction and a second verb; it has no judged list, so every hit prints.
   `[HEAD]` (2026-11-15) is a compound term shortened to its head noun ("the channel" in a file whose terms are "the Ability channel" and "the error channel"); it prints the head (`[HEAD] channel: ...`) and is judged like `[SAME]`.
   It fires only for a noun the file rarely uses outside its terms, so the head-noun grep in Accrued shapes (2026-11-13) still finds the rest, such as "the loop" in a chapter with an event loop and `for` loops.
+  `[VERB+OBJ]` (2026-11-18) is a rule's verb with a second, generic object: one sentence of a paragraph says "declare each Effect" and another says "declare a dependency".
+  It prints the verb, both nouns, and the rule sentence (`[VERB+OBJ] declare: dependency / Effect: ... | rule: ...`).
+  Run the claim with the rule's noun; write that noun when the claim holds, and keep a contrast or a consequence the passage draws.
+  It sees a rule only when the object carries "each", "every", "all", or "any", so the by-hand list of each rule verb's objects (Accrued shapes, 2026-11-18) still covers a rule stated another way.
   `[SAME+NEW]` (2026-11-09) is a "same" on a noun that no line in the 30 above uses, and it prints the noun (`[SAME+NEW] separation: ...`);
   ask "same as what?" and check that the passage called the thing by that noun.
   The survey prints only the `[SAME]`, `[SAME+NEW]`, and `[TWO]` hits not yet judged and ends on `K survey, J judged` (`[ADD]` is judged the same way; `[PAIR]` and `[AND+REL]` are default rules with the ordinary baseline).

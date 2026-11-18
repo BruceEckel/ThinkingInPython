@@ -144,6 +144,12 @@ SOURCES: Final[tuple[str, ...]] = (
     "Here all three delegations request `Console`, so the channel stays at `Need[Console]`.",
     "The Ability channel carries each request. The error channel carries each failure. A handler empties the Ability channel first and the error channel second. If a function declares a channel of its own, the channel's type appears in the signature.",
     "The Moore shape runs its action on entry. The Mealy shape runs its action on a transition. The listing has the Moore shape at the top and the Mealy shape below it. Exercise 9 puts the shape at `[1]` into `proxy()`.",
+    "The type checker verifies that every function either handles each Effect or declares it in its own signature. If you forget to declare a dependency, the check fails. If you forget to supply one, the check fails. The type checker ensures that you declare each Effect and supply each dependency.",
+    "The type checker verifies that every function either handles each Effect or declares it in its own signature. If you forget to declare an Effect, the check fails. If you forget to supply a dependency, the check fails. The type checker ensures that you declare each Effect and supply each dependency.",
+    "The type checker verifies that every function either handles each Effect or declares it in its own signature. If you forget to declare a dependency, the check fails. If you forget to supply one, the check fails. The type checker ensures that you declare every Effect and supply each dependency.",
+    "Python accepts any method name in a subclass. Python accepts the new method.",
+    "An eager version computes every value up front. The lazy pipeline computes nine squares.",
+    "The alias accepts any callable that takes a `T`. A stricter alias accepts responders.",
 )
 """Markdown paragraphs; each is cleaned the way the checks clean it."""
 

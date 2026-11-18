@@ -18,6 +18,7 @@ from tools.sentence_shapes import (
     JUDGED_SURVEY_RULES,
     RULES,
     SURVEY_RULES,
+    VERB_OBJ_RULE,
     colon_clause,
     colon_units,
     find,
@@ -43,6 +44,19 @@ def paragraph(source: str) -> Paragraph:
 
 def rules(source: str) -> list[str]:
     return [rule for rule, _ in shapes(paragraph(source))]
+
+
+VERB_OBJ_OPENING = (
+    "The type checker verifies that every function either handles each "
+    "Effect or declares it in its own signature. If you forget to "
+    "declare a dependency, the check fails. If you forget to supply "
+    "one, the check fails. ")
+VERB_OBJ_P1 = VERB_OBJ_OPENING + (
+    "The type checker ensures that you declare each Effect and supply "
+    "each dependency.")
+VERB_OBJ_P2 = VERB_OBJ_OPENING + (
+    "The type checker ensures that you declare every Effect and supply "
+    "each dependency.")
 
 
 @pytest.mark.parametrize("source, expected", [
@@ -161,6 +175,11 @@ def rules(source: str) -> list[str]:
     ("The execution frame holds the locals. The stack frame sits on the call stack. A `yield` suspends one execution frame. A `return` removes one stack frame. The frame of the generator stays in the generator object.", []),
     ("The Ability channel carries each request. The error channel carries each failure. A handler empties the Ability channel first and the error channel second. If a function declares a channel of its own, the channel's type appears in the signature.", []),
     ("The Moore shape runs its action on entry. The Mealy shape runs its action on a transition. The listing has the Moore shape at the top and the Mealy shape below it. Exercise 9 puts the shape at `[1]` into `proxy()`.", []),
+    (VERB_OBJ_P1, ["VERB+OBJ"]),
+    ("The type checker verifies that every function either handles each Effect or declares it in its own signature. If you forget to declare an Effect, the check fails. If you forget to supply a dependency, the check fails. The type checker ensures that you declare each Effect and supply each dependency.", []),
+    ("Python accepts any method name in a subclass. Python accepts the new method.", []),
+    ("An eager version computes every value up front. The lazy pipeline computes nine squares.", []),
+    ("The alias accepts any callable that takes a `T`. A stricter alias accepts responders.", ["VERB+OBJ"]),
 ])
 def test_rules(source: str, expected: list[str]) -> None:
     assert rules(source) == expected
@@ -212,9 +231,9 @@ def test_calibration_examples_name_known_rules() -> None:
     assert set(RULES) == {"IMP", "COLON+AND", "PAIR", "AND+REL", "PRT"}
     assert set(SURVEY_RULES) == {
         "AND", "COLON", "ADD", "TWO", "CAN", "SAME", "SAME+NEW", "CAUS",
-        "REL+AND", "HEAD"}
+        "REL+AND", "HEAD", "VERB+OBJ"}
     assert JUDGED_SURVEY_RULES == {
-        "ADD", "CAN", "CAUS", "SAME", "SAME+NEW", "TWO", "HEAD"}
+        "ADD", "CAN", "CAUS", "SAME", "SAME+NEW", "TWO", "HEAD", "VERB+OBJ"}
     assert JUDGED_SURVEY_RULES <= set(SURVEY_RULES)
 
 
@@ -378,6 +397,7 @@ def test_same_hits_are_judged_in_the_shared_baseline(
      "first and the error channel second. Here all three delegations "
      "request `Console`, so the channel stays at `Need[Console]`.\n",
      "HEAD"),
+    (VERB_OBJ_P1 + "\n", "VERB+OBJ"),
 ])
 def test_judged_survey_rules_share_one_baseline(
     source: str, label: str, tmp_path: Path,
@@ -496,6 +516,36 @@ def test_an_edit_to_the_sentence_before_retires_an_add_entry(
     assert main([str(path), "--survey-accept"],
                 recorded_parser) == 0
     assert "added 1, dropped 1 stale" in capsys.readouterr().out
+
+
+def test_a_verb_obj_message_carries_the_rule_sentence() -> None:
+    doc = Document.from_text(VERB_OBJ_P1 + "\n", Path("fixture.md"))
+    [found] = list(find([doc], recorded_parser))
+    assert found.message == (
+        "[VERB+OBJ] declare: dependency / Effect: If you forget to "
+        "declare a dependency, the check fails." + VERB_OBJ_RULE
+        + "The type checker ensures that you declare each Effect and "
+        "supply each dependency.")
+
+
+def test_an_edit_to_the_rule_sentence_retires_a_verb_obj_entry(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(sentence_shapes, "BASELINE", tmp_path / "base.txt")
+    path = tmp_path / "a.md"
+    path.write_text(VERB_OBJ_P1 + "\n", encoding="utf-8")
+    assert main([str(path), "--survey-accept"], recorded_parser) == 0
+    assert "added 1" in capsys.readouterr().out
+    path.write_text(VERB_OBJ_P2 + "\n", encoding="utf-8")
+    assert main([str(path), "--survey"], recorded_parser) == 0
+    out = capsys.readouterr().out
+    lines = out.splitlines()
+    assert any(line.startswith("survey   ")
+               and "you declare every Effect" in line for line in lines)
+    assert any(line.startswith("stale    ")
+               and "you declare each Effect" in line for line in lines)
+    assert "1 survey, 0 judged, 1 stale" in out
 
 
 IMP_P = "Remove `frozen=True` and the pattern fails."
