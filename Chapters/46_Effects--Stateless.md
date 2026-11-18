@@ -14,7 +14,6 @@ The type checker verifies that every function either handles each Effect or decl
 If you forget to declare an Effect, the check fails.
 If you forget to supply a dependency, the check fails.
 Those two checks enforce the Effect tracking and the delayed binding of a full EMS.
-The type checker ensures that you declare each Effect and supply each dependency.
 
 Stateless implements Effects using generators.
 [Generators](45_Effects--Generators.md)
