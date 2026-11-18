@@ -573,7 +573,10 @@ scope's line range:
   `[CAUS]`, a causative with the actor in object position, R61, judged
   the same way; `antecedents` reads `[HEAD]`, a compound term
   shortened to its head noun, "the channel" beside "the Ability
-  channel" and "the error channel", R12, judged the same way)
+  channel" and "the error channel", R12, judged the same way;
+  `ambiguity` reads `[VERB+OBJ]`, a rule's verb with a second,
+  generic object, "declare a dependency" in a paragraph that says
+  "declare each Effect", C70, judged the same way)
 - `tip watch-words CH=NN` (for `ambiguity`: `however`, Tier 2 since
   2026-11-08, the concessive "however many" that reads first as a
   contrast and is a universal over a count or a manner, R58; the
@@ -711,7 +714,8 @@ Two limits on what a pass may take as settled:
    word is unchanged is a re-keyed keep, accepted with the scoped
    `tip <check>-accept CH=NN`.
 3. The survey rules with a judged list, `[ADD]`, `[CAN]`, `[CAUS]`,
-   `[HEAD]`, `[SAME]`, `[SAME+NEW]`, `[TWO]`, and `[LEAD]`: run
+   `[HEAD]`, `[SAME]`, `[SAME+NEW]`, `[TWO]`, `[VERB+OBJ]`, and
+   `[LEAD]`: run
    `tip sentence-shapes CH=NN ARGS=--survey` and
    `tip overclaims CH=NN ARGS=--survey` again. A kept sentence the
    pass edited prints as `survey` beside its `stale` entry, so reread
