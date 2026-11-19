@@ -103,7 +103,7 @@ def slope(rise: int, run: int) -> float:
 except when `run` is zero,
 where it raises an exception instead of returning a result.
 Does the exception break purity?
-The question has two answers:
+Two perspectives produce two different answers:
 
 1.  **Pure.**
     Raising `ZeroDivisionError` instead of returning a number does not break purity.
@@ -167,7 +167,7 @@ for args in [(10, 2), (10, 0)]:
 ```
 
 Because `@safe` catches every exception `slope()` raises,
-`slope()` becomes total.
+`slope()` becomes a total function.
 Every call returns a `Result`,
 and the caller must unpack it to reach the number.
 
@@ -202,12 +202,12 @@ expect(ValueError, slope, 10, -1)
 ```
 
 Catching the exception keeps `slope()`'s return type, `float`.
-But an `except` clause catches the exceptions it specifies and lets the rest propagate.
+But an `except` clause catches only the exceptions it specifies and lets the rest propagate.
 Because `slope()` calls `validate()`,
 `validate()`'s Effect becomes `slope()`'s Effect.
 
-`slope_catch.py` puts `validate()` directly above `slope()`,
-so the uncaught `ValueError` is easy to spot.
+Because `validate()` appears directly above `slope()`,
+the uncaught `ValueError` is easy to spot.
 In a real call stack the `raise` is usually in another file, several calls down.
 A `try`/`except` you write covers the exceptions you know a callee can raise.
 The rest reach the caller.
