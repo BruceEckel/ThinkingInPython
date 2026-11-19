@@ -305,8 +305,8 @@ so the caller's `case Err(error)` must inspect the exception to tell a bad argum
 describes this limitation of `@safe` and the production fix,
 a version that catches the exception types you specify and lets the rest propagate.
 
-Standard practice combines the first and third,
-the `Result` and the `NonZero` type.
+The first and third approaches, the `Result` and the `NonZero` type,
+combine where input enters the program.
 `parse_run()` receives input as text, parses the text into a `NonZero`,
 and returns a `Result` instead of raising an exception.
 `slope()` stays total and takes the `NonZero` that `parse_run()` built:

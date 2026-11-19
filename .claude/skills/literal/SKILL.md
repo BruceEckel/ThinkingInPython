@@ -445,3 +445,18 @@ and it becomes part of every future pass.
   Keep "bit" and "flag" for a real one, a boolean in a listing or a
   command-line option.
   C101 in `bruce_edit_db.md`.
+- "Standard practice combines the first and third, the `Result` and
+  the `NonZero` type." (Bruce, 2026-11-19, chapter 44: "is it?")
+  An appeal to practice is a claim about what programmers do, and
+  nothing on the page supports it. In Python most code that validates
+  input raises an exception; parsing into a narrow type and returning
+  a `Result` is what the book teaches.
+  Ask whose practice. When the answer is "the book recommends it",
+  cut the phrase and say what the design does or where it applies:
+  "The first and third approaches, the `Result` and the `NonZero`
+  type, combine where input enters the program."
+  Keep a practice the field holds and a reference would confirm ("The
+  standard solution is a thread-safe queue").
+  Grep the scope for
+  `(standard|common|usual|accepted|typical) (practice|approach|way|solution|answer|fix)`.
+  C102 in `bruce_edit_db.md`.

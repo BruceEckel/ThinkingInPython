@@ -100,6 +100,14 @@ each pass hands the next one less to do.
    The reader can look up a keyword and cannot look up "a bit". Grep
    the scope for `\b(bit|flag|switch|marker)\b` said of a feature of
    a language, and keep the word for a real flag or bit in a listing.
+   An appeal to practice is a claim about what programmers do
+   ("Standard practice combines the first and third", Bruce: "is
+   it?"). Ask whose practice. When the answer is "the book
+   recommends it", say what the design does or where it applies
+   ("The first and third approaches ... combine where input enters
+   the program", C102). Grep the scope for
+   `(standard|common|usual|accepted|typical) (practice|approach|way|solution|answer|fix)`
+   and keep a practice the field holds.
 2. `positive`: a negation that is an accident of phrasing turns around.
    A subject of "Nothing", "Nobody", or "No one" with a verb ("Nothing
    calls `throw()` on the first booking" -> "`list(book())` drives the

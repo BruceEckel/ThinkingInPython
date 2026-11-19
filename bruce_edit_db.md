@@ -7349,6 +7349,47 @@ hour earlier, which kept the phrase:
 name goes; Accrued patterns) | super-prose (The order, 1) | this
 file.
 
+### C102. An appeal to practice is a claim about what programmers do: support it, or say what the design does
+
+**Test.** A sentence gives a design its standing by saying who uses
+it: "Standard practice combines", "the standard answer is", "the
+accepted answer", "the usual fix". Ask whose practice, and whether a
+reader in that community would agree. If the answer is "the book
+recommends it", the phrase goes, and the sentence says what the
+design does or where it applies.
+
+**Keep when.** The practice is established in the field the sentence
+is about and a reference would confirm it (a thread-safe queue
+between a producer and a consumer; iterating a dataflow rule to a
+fixed point).
+
+**Sightings.** 1, `44_Effects--Effect_Management` 2026-11-19, Bruce
+on Combine the First and Third: "is it?" Claude-written:
+- "Standard practice combines the first and third, the `Result` and
+  the `NonZero` type." -> "The first and third approaches, the
+  `Result` and the `NonZero` type, combine where input enters the
+  program."
+- It is not standard practice in Python, where most code that
+  validates input raises an exception. Parsing at the edge into a
+  narrow type and returning the failure as a value is the idiom of
+  typed functional languages, and it is what this book teaches in
+  chapters 12 and 42. The sentence presented the book's
+  recommendation as a fact about the profession.
+- Why the passes missed it: no pass asks for the evidence behind a
+  claim about practice, and no listing can disprove one.
+- Scale: a grep of both trees for standard, common, usual, accepted,
+  or typical before practice, approach, way, solution, answer, or fix
+  found five other claims of this kind. Three name a practice the
+  field does hold (chapter 19's thread-safe queue and its
+  symmetry-breaking fix for a livelock, appendix B's fixed-point
+  iteration). Two are left for Bruce: chapter 11's "`time-machine` is
+  the standard answer for code built around `datetime`" and chapter
+  12's "The accepted answer is a validating setter".
+
+**Home.** `literal` (a verdict standing where the sentence could say
+what the design does) | super-prose (The order, 1, and the reader's
+read) | this file.
+
 ## Retired
 
 Rejected by Bruce, or promoted and later withdrawn. Never propose these
