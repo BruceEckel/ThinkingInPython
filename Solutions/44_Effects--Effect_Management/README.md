@@ -1,21 +1,23 @@
 # Effect Management: Solutions
 
-## 1. Production bindings for `ask_tell.py`
+## 1. A tracing layer for `Tell`
 
-> Write the production bindings for `ask_tell.py`:
-> a `Console` class whose `ask()` calls `input()` and whose `tell()` calls `print()`.
-> Then run `greet(Console(), Console())` interactively.
-> Confirm `greet()` runs unchanged.
-> Serving a new context without edits is what delayed binding provides.
+> [Tracking and Management](../../Chapters/44_Effects--Effect_Management.md#tracking-and-management)
+> says that tracing goes in a layer at the binding point.
+> Write that layer yourself for `greet_console.py`:
+> a `Traced` class that takes a `Tell`,
+> and whose `tell()` prints `tell: ` and the message's `repr()` before it passes on the message.
+> Run `greet(Scripted(), Traced(Console()))` and confirm that `greet()` and `Console` run unchanged.
+> Then make `Traced.tell()` return a `str` and say where the type checker reports the error.
 
 <details>
 <summary>Where to look</summary>
 
 [Effects by Hand](../../Chapters/44_Effects--Effect_Management.md#effects-by-hand)
-shows `greet()` taking its `Ask` and `Tell` Effects as parameters.
-The `Ask` and `Tell` protocols are structural,
-so `Console` needs only methods with matching signatures.
-Pass one `Console` for both parameters, or pass a double for either.
+passes each Effect to `greet()` as a parameter,
+and `greet_console.py` binds `tell` to a `Console`.
+A layer is an object that satisfies `Tell` and holds another `Tell`.
+Its `tell()` does its own work and then calls the `tell()` of the object it holds.
 
 <details>
 <summary>The shape</summary>
@@ -23,6 +25,7 @@ Pass one `Console` for both parameters, or pass a double for either.
 ```python
 # The shape of exercise_1.py
 from typing import Protocol
+from record import record
 
 class Ask(Protocol):
     def ask(self, prompt: str) -> str: ...
@@ -43,15 +46,22 @@ class Console:
 class Scripted:
     def ask(self, prompt: str) -> str:
         ...
+
+@record
+class Traced:
+    inner: Tell
+
+    def tell(self, message: str) -> None:
+        ...
 ```
 
 <details>
 <summary>Done when</summary>
 
-`greet(Console(), Console())` prompts `What is your name? ` and prints `Hello, ` plus the name you type,
-with `greet()` identical to the one in `ask_tell.py`.
+`greet(Scripted(), Traced(Console()))` prints `tell: 'Hello, Alice!'` and then `Hello, Alice!`,
+with `greet()` and `Console` as the chapter wrote them.
 `uv run ty check` passes,
-and changing `Console.tell()` to return a `str` makes it report `invalid-argument-type` at the `greet(...)` call.
+and changing `Traced.tell()` to return a `str` makes it report `invalid-argument-type` at the `greet(...)` call.
 
 <details>
 <summary>Solution</summary>
@@ -59,6 +69,7 @@ and changing `Console.tell()` to return a `str` makes it report `invalid-argumen
 ```python
 # exercise_1.py
 from typing import Protocol
+from record import record
 
 class Ask(Protocol):
     def ask(self, prompt: str) -> str: ...
@@ -81,42 +92,47 @@ class Scripted:
     def ask(self, prompt: str) -> str:
         return "Alice"
 
-greet(Scripted(), Console())  # Real tell, scripted ask
+@record
+class Traced:
+    inner: Tell
+
+    def tell(self, message: str) -> None:
+        print(f"tell: {message!r}")
+        self.inner.tell(message)
+
+greet(Scripted(), Traced(Console()))
+#: tell: 'Hello, Alice!'
 #: Hello, Alice!
 ```
 
-An interactive run of `greet(Console(), Console())` looks like this:
+`exercise_1.py` repeats the protocols, `greet()`, `Console`,
+and `Scripted` from the chapter so that it runs alone.
+`Traced` is the one new class.
 
-```text
-What is your name? Alice
-Hello, Alice!
-```
+**Give the layer the interface it wraps.**
+`Traced` holds a `Tell` in `inner` and has a `tell()` of its own,
+so a `Traced` satisfies `Tell` and goes wherever a `Tell` goes.
+`greet()` calls `tell.tell()` once, and the output has two lines:
+`Traced.tell()` prints the trace and then passes the message to the `Console`,
+which prints the greeting.
 
-`exercise_1.py` binds the real `Console` for `tell` and keeps the scripted `ask`,
-because a book listing that calls `input()` runs with no terminal attached.
-The substitution is the point either way.
-One `Console` instance satisfies both protocols,
-so you can pass the same object for both parameters.
-You can also replace either parameter with a double,
-and the other parameter keeps its binding.
+**Change the binding and nothing else.**
+`greet()` asks for a `Tell` and receives one.
+`Console` receives the message that `greet()` sent.
+The one edit is at the call, where `Traced(Console())` replaces `Console()`.
+In `bookkeeping_scales.py`,
+passing `Traced(captured)` to `main()` traces the `tell()` call three functions down,
+with `session()`, `menu()`, and `greet()` as written.
 
-**Declare what the function needs.**
-`greet()` runs unchanged, as it must.
-Its body names its parameters, `ask` and `tell`, and no implementation,
-so changing the binding leaves that body as it is.
-Delayed binding moves the choice of implementation to the call site,
-where a test can choose differently from production.
-
-**Satisfy the protocols structurally.**
-After the choice moves, the type checker still enforces the protocols.
-`Console` inherits from `object` rather than from `Ask` or `Tell`,
-but it has the two methods with the right signatures,
-so it satisfies both protocols structurally.
-If you give `Console` a `tell()` that returns a `str`,
+**Let the type checker hold the layer to the protocol.**
+With `Traced.tell()` declared to return a `str`,
 `ty` reports `invalid-argument-type` at the `greet(...)` call,
-not at the class definition.
-The checker compares `Console` with `Tell` where `greet()` receives the `Console` as `tell`,
-the one place the class meets the protocol.
+on the argument `Traced(Console())`.
+It expects a `Tell` and finds a `Traced`,
+whose `tell()` returns a `str` where the protocol's `tell()` returns `None`.
+The error is at the call, not at the class definition.
+`Traced` inherits from `object` rather than from `Tell`,
+so the call is the one place the class meets the protocol.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.

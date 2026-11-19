@@ -1,5 +1,6 @@
 # exercise_1.py
 from typing import Protocol
+from record import record
 
 class Ask(Protocol):
     def ask(self, prompt: str) -> str: ...
@@ -22,5 +23,14 @@ class Scripted:
     def ask(self, prompt: str) -> str:
         return "Alice"
 
-greet(Scripted(), Console())  # Real tell, scripted ask
+@record
+class Traced:
+    inner: Tell
+
+    def tell(self, message: str) -> None:
+        print(f"tell: {message!r}")
+        self.inner.tell(message)
+
+greet(Scripted(), Traced(Console()))
+#: tell: 'Hello, Alice!'
 #: Hello, Alice!

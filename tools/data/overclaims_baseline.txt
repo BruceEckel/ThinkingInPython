@@ -1328,13 +1328,17 @@ Solutions/43_Functional--Confidence/README.md	[BOUND] The round trip ends in a d
 Solutions/43_Functional--Confidence/README.md	[BOUND] The solution compares the counts alone, the part a pure function guarantees
 Solutions/43_Functional--Confidence/README.md	[BOUND] the one that returns CODE, the one that returns the first element, and the one that drops the last element
 Solutions/43_Functional--Confidence/README.md	[BOUND] your CODE version prints the chapter's three CODE lines, its CODE is two lines shorter than the CODE version, and CODE on the value inside the CODE shows CODE in both versions under CODE
+Solutions/44_Effects--Effect_Management/README.md	[BOUND] **Change the binding and nothing else
 Solutions/44_Effects--Effect_Management/README.md	[BOUND] Both read their arguments alone and leave everything outside themselves as it was
+Solutions/44_Effects--Effect_Management/README.md	[BOUND] CODE calls CODE once, and the output has two lines
 Solutions/44_Effects--Effect_Management/README.md	[BOUND] CODE holds both a side cause and a side effect in three lines
-Solutions/44_Effects--Effect_Management/README.md	[BOUND] CODE inherits from CODE rather than from CODE or CODE, but it has the two methods with the right signatures, so it satisfies both protocols structurally
-Solutions/44_Effects--Effect_Management/README.md	[BOUND] CODE prompts CODE and prints CODE plus the name you type, with CODE identical to the one in CODE
+Solutions/44_Effects--Effect_Management/README.md	[BOUND] CODE inherits from CODE rather than from CODE, so the call is the one place the class meets the protocol
+Solutions/44_Effects--Effect_Management/README.md	[BOUND] CODE is the one new class
+Solutions/44_Effects--Effect_Management/README.md	[BOUND] CODE repeats the protocols, CODE, CODE, and CODE from the chapter so that it runs alone
+Solutions/44_Effects--Effect_Management/README.md	[BOUND] In CODE, passing CODE to CODE traces the CODE call three functions down, with CODE, CODE, and CODE as written
 Solutions/44_Effects--Effect_Management/README.md	[BOUND] It tracks one Effect, chosen by the language, with the implementation set at the call site
 Solutions/44_Effects--Effect_Management/README.md	[BOUND] Making the helper CODE forces four changes
-Solutions/44_Effects--Effect_Management/README.md	[BOUND] The checker compares CODE with CODE where CODE receives the CODE as CODE, the one place the class meets the protocol
+Solutions/44_Effects--Effect_Management/README.md	[BOUND] The one edit is at the call, where CODE replaces CODE
 Solutions/44_Effects--Effect_Management/README.md	[BOUND] The other three of the five, CODE, CODE, and CODE, each gain a CODE parameter whose one use is passing it to the next function
 Solutions/44_Effects--Effect_Management/README.md	[BOUND] The two Effects are both exceptions
 Solutions/44_Effects--Effect_Management/README.md	[BOUND] Two mechanisms in two places cover the two bad values independently

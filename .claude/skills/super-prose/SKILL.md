@@ -310,7 +310,15 @@ each pass hands the next one less to do.
    gets a listing that shows the class ("`success()` returns a
    `SuccessEffect`" under a signature that says `Success[int]`,
    Bruce: "the code makes it look like it returns a Success" ->
-   `success_effect.py`, C31). Under a listing that introduces
+   `success_effect.py`, C31). A sentence that says what "the
+   production version" or "the real implementation" does, with no
+   listing of it on the page, gets the listing ("The production
+   version uses objects that read with `input()` and write with
+   `print()`", Bruce: "perhaps we should show the example instead
+   of describing it" -> `greet_console.py`). First grep the
+   chapter's Exercises and its Solutions file for that code: a
+   listing that answers an exercise takes the exercise's place, and
+   which exercise replaces it is Bruce's call. Under a listing that introduces
    several names, list the paragraphs by the name each is about; a
    name at two places in the list fails, and its sentences are
    gathered in the listing's order, signature, body, call (chapter

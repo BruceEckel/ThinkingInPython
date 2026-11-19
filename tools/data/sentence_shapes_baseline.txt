@@ -26,7 +26,6 @@ Chapters/32_Patterns--Multiple_Dispatching.md	[PRT] You also need two small help
 Chapters/36_Patterns--Memento.md	[IMP] Write tests proving existing mementos and histories stay unchanged in each version.
 Chapters/40_Functional--Foundations.md	[IMP] In CODE, add CODE beside CODE, and give CODE a second CODE stage built with CODE, so only readings between 20.0 and 30.0 Celsius reach the output.
 Chapters/44_Effects--Effect_Management.md	[COLON+AND] With it you know what a function does: whether it is safe to run in parallel with another, and what it does when you call it twice in a row.
-Chapters/44_Effects--Effect_Management.md	[COLON+AND] Write the production bindings for CODE: a CODE class whose CODE calls CODE and whose CODE calls CODE.
 Chapters/44_Effects--Effect_Management.md	[IMP] Effect information into the return type of every function, and the compiler's ordinary type checking tracks it from there.
 Chapters/44_Effects--Effect_Management.md	[PRT] You pass every parameter down at every call.
 Chapters/45_Effects--Generators.md	[PAIR] A generator that sits between CODE and CODE can do both: answer the requests it knows and relay the rest.

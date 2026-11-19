@@ -544,8 +544,33 @@ print(captured.messages)
 #: ['Hello, Alice!']
 ```
 
-The production version uses objects that read with `input()` and write with `print()`.
-Passing those objects instead changes what `greet()` does without changing `greet()`.
+The production binding is a class that uses the console:
+
+```python
+# greet_console.py
+from ask_tell import Scripted, greet
+
+class Console:
+    def ask(self, prompt: str) -> str:
+        return input(prompt)
+
+    def tell(self, message: str) -> None:
+        print(message)
+
+greet(Scripted(), Console())
+#: Hello, Alice!
+```
+
+This binds `tell` to a `Console` and keeps `Scripted` for `ask`,
+because the book's listings run with no keyboard attached.
+An interactive run of `greet(Console(), Console())` looks like this:
+
+```text
+What is your name? Alice
+Hello, Alice!
+```
+
+Passing different objects changes what `greet()` does without changing `greet()`.
 The signature says what `greet()` needs, not everything `greet()` might do.
 
 The technique works, but you do the bookkeeping.
@@ -1159,11 +1184,13 @@ puts the library to work.
 
 Try each exercise before opening its [solution](../Solutions/44_Effects--Effect_Management/).
 
-1.  Write the production bindings for `ask_tell.py`:
-    a `Console` class whose `ask()` calls `input()` and whose `tell()` calls `print()`.
-    Then run `greet(Console(), Console())` interactively.
-    Confirm `greet()` runs unchanged.
-    Serving a new context without edits is what delayed binding provides.
+1.  [Tracking and Management](#tracking-and-management)
+    says that tracing goes in a layer at the binding point.
+    Write that layer yourself for `greet_console.py`:
+    a `Traced` class that takes a `Tell`,
+    and whose `tell()` prints `tell: ` and the message's `repr()` before it passes on the message.
+    Run `greet(Scripted(), Traced(Console()))` and confirm that `greet()` and `Console` run unchanged.
+    Then make `Traced.tell()` return a `str` and say where the type checker reports the error.
 2.  Do the bookkeeping the chapter describes.
     Starting from `bookkeeping_scales.py`, add a `Log` Effect
     (a protocol with `log(message)`) used by a new helper that `greet()` calls,

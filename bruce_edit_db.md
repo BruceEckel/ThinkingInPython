@@ -4478,7 +4478,32 @@ somehow":
   when the sentence opens on the name (`absent-subject`); this one
   held the name after the verb.
 
-**Promotion.** Proposed: two chapters.
+5, `44_Effects--Effect_Management` 2026-11-19, the third chapter, the
+listing-sized form, Bruce: "perhaps we should show the example
+instead of describing it":
+- "The production version uses objects that read with `input()` and
+  write with `print()`. Passing those objects instead changes what
+  `greet()` does" stood under `greet_demo.py`, and no listing in the
+  chapter held those objects. -> a new listing, `greet_console.py`,
+  with a `Console` class and `greet(Scripted(), Console())`, then a
+  text block with the interactive run of `greet(Console(),
+  Console())`.
+- The code the sentence described was exercise 1 ("Write the
+  production bindings for `ask_tell.py`"), and its solution held the
+  listing. Before a description becomes a listing, grep the chapter's
+  Exercises and its Solutions file for the code: a listing that
+  answers an exercise takes the exercise's place. Bruce chose to
+  replace it, and exercise 1 is now a tracing layer written for
+  `greet_console.py` (`Traced`), so exercises 2 to 5 keep their
+  numbers.
+- A listing that calls `input()` cannot run in the gate. The listing
+  binds `tell` to the `Console` and keeps `Scripted` for `ask`, which
+  gives it a `#:` marker, and the prose says why.
+- The test for the listing-sized form: a sentence says what "the
+  production version", "the real implementation", or "the other
+  version" does, and the page has no listing of it.
+
+**Promotion.** Proposed: three chapters.
 
 **Home.** this file; the deep-review skill (teaching) if promoted;
 cohesion (Accrued patterns) and super-prose (pass 4) for the

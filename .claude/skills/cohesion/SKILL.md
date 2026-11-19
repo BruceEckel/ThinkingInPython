@@ -509,3 +509,21 @@ and it becomes part of every future pass.
   the tuple directly, since the tuple holds the same responders for
   the whole loop").
   C103 in `bruce_edit_db.md`.
+- **A described version gets its listing; check the exercises first.**
+  "The production version uses objects that read with `input()` and
+  write with `print()`" (Bruce, 2026-11-19, chapter 44: "perhaps we
+  should show the example instead of describing it").
+  The page had no listing of those objects, so the reader had to
+  write the class in their head to follow the next sentence.
+  The listing went in as `greet_console.py`.
+  The same code was exercise 1 and its solution. Before a description
+  becomes a listing, grep the chapter's Exercises and its Solutions
+  file for the code. A listing that answers an exercise takes the
+  exercise's place, and Bruce chooses the replacement: here a tracing
+  layer written for the new listing, which kept exercises 2 to 5 at
+  their numbers.
+  A listing that reads the keyboard cannot run in the gate, so it
+  binds the real object where it can (`tell`) and keeps the scripted
+  one where it cannot (`ask`), with a text block for the interactive
+  run.
+  C31 in `bruce_edit_db.md`, sighting 5.
