@@ -389,7 +389,15 @@ each pass hands the next one less to do.
    resumed it" -> "the call that resumed it", R54): write the
    definite noun phrase, and the name when the passage has one
    ("wraps whatever arrives" -> "wraps `other`"). `tip watch-words`
-   lists both words.
+   lists both words. The plain "what" form is the same fault where
+   the clause's verb has a noun ("infers the row from what the body
+   calls", Bruce: "a little awkward" -> "from the calls in its
+   body"; "to what the body raises" -> "to the exceptions the body
+   raises"): grep the scope for
+   `(from|of|to|on) what \S+ \S+ (calls|raises|returns|yields|performs)`,
+   and keep "what X does". Then read the rest of the paragraph for
+   the same claim in better words: this one had "from the calls in
+   the body" four lines down, and the second statement went.
    A repair that names the items for a bare "each" gives two items a
    clause apiece ("The producer is simplest to write as a loop, and
    so is the consumer"), never the two names in front of the old

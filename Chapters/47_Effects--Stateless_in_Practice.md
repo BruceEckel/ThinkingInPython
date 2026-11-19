@@ -1166,7 +1166,7 @@ shows in full.
 A `raise` gets no such check.
 `@throws` lifts the types it specifies.
 Anything else propagates untracked.
-No diagnostic connects the decorator's list to what the body raises.
+No diagnostic connects the decorator's list to the exceptions the body raises.
 A failure that enters through `throw()` is in the type system from the moment it exists.
 
 ### Catching the Whole Channel

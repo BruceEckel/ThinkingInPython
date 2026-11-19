@@ -4001,6 +4001,30 @@ between"), a noun that does not fit the verb ("undo the rows"), and
 a second "whether" directly after one. An exercise statement with
 the word was rewritten in its chapter, as in R54's and R58's sweeps.
 
+`44_Effects--Effect_Management` 2026-11-19, the plain "what" form of
+the free relative, Bruce: "a little awkward". Claude-written:
+- "The compiler infers the row from what the body calls" -> "The
+  compiler infers a function's row from the calls in its body". A
+  preposition, "what", and a clause ("from what the body calls")
+  leave unnamed a thing the verb's noun names: the calls.
+- The paragraph said it twice. Four lines down stood "Since the
+  compiler computes each row from the calls in the body, you rarely
+  write a row yourself", with the noun the first sentence lacked. The
+  clause went, and the sentence is "You therefore rarely write a row
+  yourself." A flagged phrase sends the pass to the rest of its
+  paragraph for the same claim in better words.
+- Sibling, chapter 47: "No diagnostic connects the decorator's list
+  to what the body raises." -> "... to the exceptions the body
+  raises."
+- The test: a preposition before "what" and a clause whose verb has a
+  noun (calls, raises, returns, yields, holds). Write the noun. "What
+  X does" stays, since "does" has no noun. A grep of both trees for
+  that shape found ten lines: these two, five "what X does", and
+  three with "holds" or "needs" left as they are (chapters 10 and 46,
+  Solutions 36), where the sentence is about a difference in content.
+  No tool lists the shape; grep
+  `(from|of|to|on) what \S+ \S+ (calls|raises|returns|yields|performs)`.
+
 **Home.** the global CLAUDE.md watch list (Tier 2, "whatever", with
 its paragraph, since 2026-11-16) | the project CLAUDE.md |
 `super-prose`

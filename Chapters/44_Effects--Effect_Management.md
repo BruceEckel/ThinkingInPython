@@ -684,12 +684,11 @@ Here the Effect row carries them, so the parameter list is empty.
 The `()` after the row is the return type: Koka's unit type,
 the counterpart of Python's `None`.
 
-The compiler infers the row from what the body calls
+The compiler infers a function's row from the calls in its body
 (this listing writes out the rows for `greet()` and `main()` so you can see them).
 If another function calls `greet()`,
 the compiler adds `ask` and `tell` to that function's row automatically.
-Since the compiler computes each row from the calls in the body,
-you rarely write a row yourself.
+You therefore rarely write a row yourself.
 You write one to specify a constraint,
 such as declaring that a function must remain Effect-free.
 

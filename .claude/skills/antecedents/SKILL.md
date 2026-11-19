@@ -493,3 +493,18 @@ and it becomes part of every future pass.
   Keep the condition sense ("the test sits between the `pop()` and
   the addition") and a test spoken of in general.
   C104 in `bruce_edit_db.md`.
+- 2026-11-19, chapter 44: the plain "what" form of the free relative.
+  "The compiler infers the row from what the body calls" (Bruce: "a
+  little awkward").
+  A preposition, "what", and a clause leave unnamed a thing the
+  clause's verb has a noun for: the calls.
+  "The compiler infers a function's row from the calls in its body."
+  The same paragraph had the noun four lines down ("computes each row
+  from the calls in the body"), so the claim stood twice, once in each
+  form. The second went.
+  Chapter 47's "to what the body raises" became "to the exceptions
+  the body raises".
+  Grep the scope for
+  `(from|of|to|on) what \S+ \S+ (calls|raises|returns|yields|performs)`.
+  "What X does" stays: "does" has no noun.
+  R69 in `bruce_edit_db.md`.
