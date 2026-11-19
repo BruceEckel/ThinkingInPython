@@ -2251,7 +2251,8 @@ before the module binds it). R18 is the special case of a verdict on
 output that is on the page; R7 the sentence that only points at the
 next listing.
 
-**Sightings.** 3 rounds, 1 chapter, 2026-10-25, Bruce's ruling on two
+**Sightings.** 3 rounds and the later ones listed, 3 chapters (45, 46,
+44), first 2026-10-25, Bruce's ruling on two
 pasted passages ("Most of this seems to reiterate what's in the code.
 Strip it down to the essential observations.") and then "look through
 the rest of the chapter for similar issues"; 15 passages cut in
@@ -2334,6 +2335,23 @@ the rest of the chapter for similar issues"; 15 passages cut in
   but nothing explains that") -> the reason in its place (C79,
   sighting 3). A sentence that survived an earlier sweep of this rule
   is read again like any other.
+- `44_Effects--Effect_Management` 2026-11-19, the lead-in shape,
+  Bruce: "this restates the code that follows". "A `NonZero` that
+  holds 2 passes to `slope()`, while building one that holds 0 raises
+  a `ValueError`:" above `slope_nonzero.py`, whose two calls are
+  `slope(10, NonZero(2))` and `NonZero(0)` with their markers -> "A
+  caller builds the `NonZero` before it calls `slope()`:". The
+  lead-in gave each call's literal argument and its result, so the
+  reader read the listing twice. The tell is a literal from the
+  listing (2, 0) in the lead-in. The replacement says what the design
+  asks of a caller, a Keep-when above. A lead-in that states the rule
+  a listing demonstrates stays ("Calling `unwrap()` on an `Err`
+  raises an `AttributeError`:", chapter 42): it names no call the
+  listing makes. The 2026-10-25 sweep's keep, "a one-sentence lead-in
+  above a test listing stays", had covered this one. A grep of
+  `Chapters/` for a lead-in that ends on a result ("raises a ...:",
+  "returns ...:", "fails:") found 21 others, each the rule form.
+  Second chapter for the rule.
 
 **Home.** CLAUDE.md (global, the "Prose beside a listing" bullet);
 deep-review (prose pass, "Restating"). Promoted on Bruce's ruling, the

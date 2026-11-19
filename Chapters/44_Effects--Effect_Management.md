@@ -251,8 +251,7 @@ def slope(rise: int, run: NonZero) -> float:
     return rise / run.value
 ```
 
-A `NonZero` that holds 2 passes to `slope()`,
-while building one that holds 0 raises a `ValueError`:
+A caller builds the `NonZero` before it calls `slope()`:
 
 ```python
 # slope_nonzero.py

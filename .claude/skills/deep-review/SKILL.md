@@ -161,7 +161,13 @@ flourishes, nothing that obscures the point.
   a value travels through a chain, what would happen without a line, why
   an annotation is what it is, what a driver must do. Rule R47 in
   `bruce_edit_db.md` has the test and the chapter 45 pairs (Bruce,
-  2026-10-25). A cut must not orphan a `[n]` tag.
+  2026-10-25). A cut must not orphan a `[n]` tag. A lead-in is read
+  the same way (Bruce, 2026-11-19, chapter 44: "this restates the code
+  that follows"): one that gives each call's literal argument and its
+  result ("A `NonZero` that holds 2 passes to `slope()`, while
+  building one that holds 0 raises a `ValueError`:") narrates the
+  listing below it, and one that states the rule the listing
+  demonstrates stays.
 - **List punctuation:** every bullet item starts with a capital. An
   item that is a sentence ends with a period; one that is a fragment
   ends with nothing, the test being whether the items could be

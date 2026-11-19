@@ -662,6 +662,16 @@ sentence goes. The usual case is a repair that swaps a description
 for the listing's own name and adds a sentence to introduce the name
 ("`g` is `outer()`'s generator." under `g = outer()`, cut by Bruce
 2026-11-12). Use the name and stop.
+A lead-in is held to R47 too. One that gives each call's argument and
+its result reads the listing aloud before the reader reaches it ("A
+`NonZero` that holds 2 passes to `slope()`, while building one that
+holds 0 raises a `ValueError`:" above `slope(10, NonZero(2))` and
+`NonZero(0)`, Bruce, 2026-11-19: "this restates the code that
+follows"). The tell is a literal from the listing in the lead-in.
+Write what the listing cannot say, here what the design asks of a
+caller ("A caller builds the `NonZero` before it calls `slope()`:").
+A lead-in that states the rule the listing demonstrates, and names no
+call the listing makes, stays.
 Bruce's "we" and his em-dashes stay.
 
 ## The reader's read
