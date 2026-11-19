@@ -815,15 +815,14 @@ and execute the description later.
 ### ZIO
 
 [ZIO](https://zio.dev/) is a library Effect system for Scala.
-Here is the greeting program again.
-In ZIO it is a description first and a run second:
+In ZIO the greeting program is a description first and a run second:
 
 ```scala
 // zio/Greet.scala
 import zio.*
 import zio.Console.{print, printLine, readLine}
 
-// The Effects' interfaces
+// The Effect interfaces
 trait Ask:
   def ask(prompt: String): UIO[String]
 
@@ -892,7 +891,7 @@ When a description fails, ZIO's `retry` interprets it again from its start.
 A native handler that invokes the continuation a second time runs only the rest of the computation,
 from the point of the Effect forward.
 
-### Effect for TypeScript
+### TypeScript Effect
 
 The TypeScript [Effect](https://effect.website/)
 library also builds a description and runs it later:
