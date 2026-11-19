@@ -274,23 +274,23 @@ it returns `rise / run.value` as a `float` rather than a `Result`.
 
 All three approaches keep a division by zero from reaching `slope()`'s caller as an exception,
 but each handles it in a different place.
-With a `Result`, the place is every call site,
+With a `Result`, that place is every call site,
 where each caller unpacks the `Result` and decides what a failure means.
-With a `try`, the place is inside `slope()`,
+With a `try`, that place is inside `slope()`,
 where the `except` clause handles `ZeroDivisionError`.
 Every other exception propagates through `slope()` to its caller.
-With `NonZero`, the place is `__post_init__()`, which runs once,
+With `NonZero`, that place is `__post_init__()`, which runs once,
 when `NonZero(...)` builds the instance.
 `slope()` trusts its argument,
 as does every other function that takes a `NonZero`,
 because the check ran when the caller built it.
 
-None of the three makes the failure disappear.
+None of the three approaches makes the failure disappear.
 A `Result` turns it into a value.
 A `try` catches it.
 `NonZero` moves it to the line that builds the argument.
 `NonZero(0)` raises a `ValueError` before `slope()` runs.
-The three differ in how many functions contain code for the failure.
+The three approaches differ in how many functions contain code for the failure.
 
 `slope_result.py` has a drawback that `slope_catch.py` and `nonzero.py` avoid.
 `@safe` catches `Exception`,
