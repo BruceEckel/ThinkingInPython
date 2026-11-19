@@ -7591,6 +7591,22 @@ sectioning for that?":
 - The site's chapter contents list stops at `###` and the EPUB's at
   `##`, so the new headings appear in the text and in no contents
   list.
+- Bruce, the next message: "Perhaps Native Effect Management and
+  Library Effect Management should be promoted one level? See if
+  that works". It does. The two became `##` sections, the three new
+  headings became `###`, and "Custom AI Languages with Effects" went
+  to `##` with them, since as a `###` it would have sat under
+  Library. No slug changed, so every link held, and the anchor and
+  self-reference checks pass. "Effect Management Systems" had run 585
+  lines, more than half the chapter, and now holds Tracking and
+  Management and Effects by Hand. The three headings are in the
+  site's contents list, and the three promoted sections in the
+  EPUB's.
+- A subsection that needs `####` is a sign to look one level up. The
+  book has two `####` headings, both in chapter 20. Before adding a
+  third, measure the parent `##` section, and when it is most of the
+  chapter, promote the `###` that needs subsections, with each
+  sibling that would land under the wrong parent.
 - Why the passes missed it: super-prose adds a heading only for a
   listing that leaves the running example (C71), and no pass lists a
   section's paragraphs by topic.

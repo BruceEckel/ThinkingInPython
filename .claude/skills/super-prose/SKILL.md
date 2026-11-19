@@ -725,10 +725,16 @@ paragraphs seems like it should be a subsection about handlers"):
 inside a long section with no subsections, list the paragraphs by
 topic, and where several in a row take up one term the section
 introduces in italics, add a heading one level down that is the term
-("#### Handlers"). Give each later run its own heading too
-("#### Continuations", "#### Flix"), so that no run sits under a
+("Handlers"). Give each later run its own heading too
+("Continuations", "Flix"), so that no run sits under a
 title that does not describe it, and point each term link at the
 subsection that defines the term (C106).
+When the new headings would be `####`, measure the parent `##`
+section first: if it is most of the chapter, promote the `###` that
+needs subsections, with each sibling that would land under the wrong
+parent (chapter 44's Native and Library Effect Management, and Custom
+AI Languages with them). Slugs do not change with the level, so the
+links hold.
 Every claim a rewrite touches is checked against the listing it
 describes before the new sentence is written.
 A sentence a pass adds beside a listing is held to R47 like any

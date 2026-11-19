@@ -629,7 +629,7 @@ An EMS moves the bookkeeping into the type system.
 Either the system infers each Effect from the body,
 or you declare it and the type checker verifies the declaration.
 
-### Native Effect Management
+## Native Effect Management
 
 Ideally, Effect tracking comes built into the language,
 as a *native* Effect system.
@@ -692,7 +692,7 @@ You therefore rarely write a row yourself.
 You write one to specify a constraint,
 such as declaring that a function must remain Effect-free.
 
-#### Handlers
+### Handlers
 
 A *handler* fulfills an Effect.
 The compiler rejects a program that performs an Effect with no handler in scope,
@@ -718,7 +718,7 @@ Different handlers make different decisions.
 A test installs a handler that returns a known name,
 so `greet()` produces the same result for each test run.
 
-#### Continuations
+### Continuations
 
 Handlers do more than `except` blocks.
 When an Effect runs, the handler receives a *continuation*:
@@ -735,7 +735,7 @@ which is how native systems express a backtracking search as an ordinary handler
 Language designers call this design *algebraic effects*:
 Effects declared as an interface, plus handlers that receive the continuation.
 
-#### Flix
+### Flix
 
 [Flix](https://flix.dev/) expresses the same design with different notation.
 The Effect row follows a backslash,
@@ -793,7 +793,7 @@ Languages in this family include Koka, Flix, Eff, Effekt, and Unison.
 OCaml 5 has the handler mechanism,
 though it does not yet track Effects in function types.
 
-### Library Effect Management
+## Library Effect Management
 
 Changing languages is rarely an option.
 A team committed to Scala or TypeScript cannot use native Effects,
@@ -989,7 +989,7 @@ That makes a suspended generator a continuation you can resume once or discard,
 but not resume twice,
 because a paused generator holds the one copy of its position and local variables.
 
-### Custom AI Languages with Effects
+## Custom AI Languages with Effects
 
 At this writing, experimental languages designed for AI code generation are proliferating.
 Their designers try to balance better code generation for the AI against human verifiability.

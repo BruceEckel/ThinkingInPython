@@ -555,8 +555,14 @@ and it becomes part of every future pass.
   List a long section's paragraphs by topic. Where several in a row
   take up a term the section introduces in italics, add a heading one
   level down that is the term, and give each later run a heading of
-  its own: "#### Handlers", "#### Continuations", "#### Flix".
+  its own: "Handlers", "Continuations", "Flix".
   One heading alone would have put the Flix listing under "Handlers".
   Point each term link at the subsection that defines the term, and
   leave a link whose text is the section's title.
+  The headings went in at the fourth level, which the book uses in
+  one other chapter and no contents list shows. Bruce then promoted
+  the section, its sibling, and the sibling after it one level
+  ("See if that works"). The parent had been 585 lines, more than
+  half the chapter. A subsection that needs the fourth level is a
+  sign to measure the parent and look one level up.
   C106 in `bruce_edit_db.md`.
