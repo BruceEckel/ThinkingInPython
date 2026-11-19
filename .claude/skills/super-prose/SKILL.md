@@ -92,6 +92,14 @@ each pass hands the next one less to do.
    when the sentence before says who decides ("code outside the
    requesting function answers the `Need`"), and otherwise state the
    decision with its actor (C95). Grep the scope for `leaves? open`.
+   A language construct takes its keyword, not a measure of what it
+   holds ("put a single bit in their place: whether a function can
+   throw an exception", Bruce: "'a single bit' is confusing and less
+   clear than using 'noexcept'" -> "added the `noexcept` keyword,
+   which states whether a function can throw an exception", C101).
+   The reader can look up a keyword and cannot look up "a bit". Grep
+   the scope for `\b(bit|flag|switch|marker)\b` said of a feature of
+   a language, and keep the word for a real flag or bit in a listing.
 2. `positive`: a negation that is an accident of phrasing turns around.
    A subject of "Nothing", "Nobody", or "No one" with a verb ("Nothing
    calls `throw()` on the first booking" -> "`list(book())` drives the
@@ -308,7 +316,7 @@ each pass hands the next one less to do.
    places, or out of date order, are gathered at the end in date
    order, and the description above them keeps one tense ("C++
    checked its list at runtime ... C++11 deprecated its lists and
-   put a single bit in their place ... C++17 abandoned the lists
+   added the `noexcept` keyword ... C++17 abandoned the lists
    altogether",
    C100). Grep the scope for a version or a year between commas
    inside a sentence about something else.

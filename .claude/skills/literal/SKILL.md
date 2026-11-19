@@ -430,3 +430,18 @@ and it becomes part of every future pass.
   Keep the literal sense, a file or a stream left open.
   Grep the scope for `leaves? open`.
   C95 in `bruce_edit_db.md`.
+- "C++11 deprecated its lists and put a single bit in their place:
+  whether a function can throw an exception." (Bruce, 2026-11-19,
+  chapter 44: "'a single bit' is confusing and less clear than using
+  'noexcept'")
+  "A single bit" measures how much the construct says and gives the
+  reader nothing to look up. `noexcept` is a keyword on a function's
+  declaration, and no bit appears in the source.
+  Write the construct's keyword or name, then what it states: "added
+  the `noexcept` keyword, which states whether a function can throw
+  an exception."
+  A language the book does not teach gets the same treatment: the
+  name is what a reader searches for.
+  Keep "bit" and "flag" for a real one, a boolean in a listing or a
+  command-line option.
+  C101 in `bruce_edit_db.md`.

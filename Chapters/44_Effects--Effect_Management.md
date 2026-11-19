@@ -223,8 +223,8 @@ so an exception introduced three levels down means editing every signature above
 To avoid that work, programmers usually widen the specification until it permits every exception.
 The specifications expose implementation details.
 Most people now count them a failure.
-C++11 deprecated its lists and put a single bit in their place:
-whether a function can throw an exception.
+C++11 deprecated its lists and added the `noexcept` keyword,
+which states whether a function can throw an exception.
 C++17 abandoned the lists altogether.
 
 ### Make the Bad Value Impossible

@@ -7271,8 +7271,45 @@ sentences were Claude-written:
 - Scale: a grep of both trees for a version between commas after
   "before" found this site alone.
 
+- Revised the same day under C101: "put a single bit in their place:
+  whether a function can throw an exception" -> "added the `noexcept`
+  keyword, which states whether a function can throw an exception".
+
 **Home.** `cohesion` (order; Accrued patterns) | super-prose (The
 order, 4) | this file.
+
+### C101. A language construct is called by its keyword, not by a measure of what it holds
+
+**Test.** A sentence describes a feature of a language by how much it
+says or by what it amounts to ("a single bit", and by extension "a
+flag", "a marker", "a switch") when the feature has a keyword or a
+name. Write the name in a code span, then what it states. The reader
+can look up a name.
+
+**Keep when.** The word is literal: a boolean in a listing, a
+command-line option, a bit in a bit pattern.
+
+**Sightings.** 1, `44_Effects--Effect_Management` 2026-11-19, Bruce
+on Catch the Exception You Expect: "'a single bit' is confusing and
+less clear than using 'noexcept'". Claude-written, both the original
+("C++11 reduced its version to a single bit") and the C100 repair an
+hour earlier, which kept the phrase:
+- "C++11 deprecated its lists and put a single bit in their place:
+  whether a function can throw an exception." -> "C++11 deprecated
+  its lists and added the `noexcept` keyword, which states whether a
+  function can throw an exception."
+- Why the repair kept it: the C100 edit moved and reordered the
+  sentences and tested each for its facts. It did not ask the literal
+  pass's question of a phrase it carried over. A repair reads the
+  whole sentence it touches under every pass, the words it keeps
+  included.
+- Scale: a grep of both trees for bit, flag, switch, and toggle after
+  an article found 23 other lines, each a real flag or bit (a
+  command-line option, a boolean, a bit pattern) or a quotation.
+
+**Home.** `literal` (a description standing where the construct's
+name goes; Accrued patterns) | super-prose (The order, 1) | this
+file.
 
 ## Retired
 
