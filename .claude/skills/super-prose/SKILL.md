@@ -298,7 +298,20 @@ each pass hands the next one less to do.
    several names, list the paragraphs by the name each is about; a
    name at two places in the list fails, and its sentences are
    gathered in the listing's order, signature, body, call (chapter
-   46's The Simplest Effect, Bruce: "a jumble", C94).
+   46's The Simplest Effect, Bruce: "a jumble", C94). A thing's
+   history told at two places in one paragraph is the same fault in
+   time: "while C++, before C++17 removed them, checked it at
+   runtime" in the second sentence and "C++11 reduced its version to
+   a single bit" in the last (Bruce: "Can we combine this C++
+   evolution at the end of the paragraph"). List the paragraph's
+   dated steps (a version number, a year, a PEP); steps at two
+   places, or out of date order, are gathered at the end in date
+   order, and the description above them keeps one tense ("C++
+   checked its list at runtime ... C++11 deprecated its lists and
+   put a single bit in their place ... C++17 abandoned the lists
+   altogether",
+   C100). Grep the scope for a version or a year between commas
+   inside a sentence about something else.
 5. `antecedents`: every pointer with two candidates gets its noun.
    A link is a pointer too: when its target teaches a named
    construct, the link text starts on the name ("The bare `raise`

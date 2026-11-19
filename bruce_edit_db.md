@@ -7212,6 +7212,50 @@ continuations?" Both sentences were Claude-written:
 **Home.** `ambiguity` (a word with two senses, read across the Part) |
 super-prose (The order, 6) | this file.
 
+### C100. A thing's dated history sits at one place in its paragraph, in date order
+
+**Test.** List the dated steps in a paragraph: a version number, a
+year, or a PEP with a verb of change (added, deprecated, removed).
+Steps about one thing that sit at two places fail, and so do steps
+out of date order. Gather them where the paragraph ends, in date
+order, each with what it did, and write the description above them in
+one tense.
+
+**Keep when.** The paragraph is itself a history told in order, or a
+single dated step sits beside the one fact it dates ("adopted in
+Python 3.3 (2012)").
+
+**Sightings.** 1, `44_Effects--Effect_Management` 2026-11-19, Bruce
+on Catch the Exception You Expect, flagging both fragments: "Can we
+combine this C++ evolution at the end of the paragraph". Both
+sentences were Claude-written:
+- "Java's compiler checks the list (...), while C++, before C++17
+  removed them, checked it at runtime" and, seven sentences on,
+  "C++11 reduced its version to a single bit: whether a function can
+  throw an exception." -> "while C++ checked its list at runtime" and
+  "C++11 deprecated its lists and put a single bit in their place:
+  whether a function can throw an exception. C++17 abandoned the
+  lists altogether."
+- The last sentence first read "C++17 removed the lists." Bruce, the
+  same hour: "can we say 'abandoned exception specifications
+  altogether'?" The verb and "altogether" are his. The object stayed
+  "the lists": `noexcept` is an exception specification in the C++
+  standard's terms, and the sentence before says it took the lists'
+  place, so "exception specifications altogether" would say the bit
+  went too. Local wording, no rule.
+- The 2017 step came before the 2011 step, inside a clause that
+  split "C++" from "checked". "Reduced its version to a single bit"
+  said the lists were gone in C++11, which left C++17 nothing to
+  remove. C++11 deprecated them and added `noexcept` beside them.
+- Why the passes missed it: each sentence is true and reads alone.
+  The straighten pass tests a subject held open at nine words, and
+  this clause is four. No pass listed a paragraph's dates.
+- Scale: a grep of both trees for a version between commas after
+  "before" found this site alone.
+
+**Home.** `cohesion` (order; Accrued patterns) | super-prose (The
+order, 4) | this file.
+
 ## Retired
 
 Rejected by Bruce, or promoted and later withdrawn. Never propose these

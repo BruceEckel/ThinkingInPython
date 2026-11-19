@@ -469,3 +469,20 @@ and it becomes part of every future pass.
   is, what it is for, how it works), and order the paragraphs as the
   listing's lines show the names: signature, body, call.
   C94 in `bruce_edit_db.md`.
+- **A thing's history in one place, in date order.**
+  Chapter 44's paragraph on exception specifications gave C++'s
+  history twice: "while C++, before C++17 removed them, checked it at
+  runtime" in its second sentence, and "C++11 reduced its version to
+  a single bit" in its last (Bruce, 2026-11-19: "Can we combine this
+  C++ evolution at the end of the paragraph").
+  The later step came first, inside a clause that interrupted the
+  description of what the design did, and "reduced" left the reader
+  to work out what C++17 still had to remove.
+  List the dated steps in a paragraph (a version, a year, a PEP). If
+  they sit at two places or out of date order, gather them where the
+  paragraph ends, in date order, each with what it did: "C++11
+  deprecated its lists and put a single bit in their place: whether a
+  function can throw an exception. C++17 abandoned the lists
+  altogether."
+  The description above them then holds one tense for each language.
+  C100 in `bruce_edit_db.md`.

@@ -216,16 +216,16 @@ An Effect Management System replaces that tedious, error-prone work.
 
 *Exception specifications* in C++ and Java track exceptions with a list the programmer writes on each function.
 Java's compiler checks the list
-(Java calls the listed exceptions *checked exceptions*), while C++,
-before C++17 removed them,
-checked it at runtime and ended the program on an exception the list left out.
+(Java calls the listed exceptions *checked exceptions*),
+while C++ checked its list at runtime and ended the program on an exception the list left out.
 Neither language infers the list from the functions a body calls,
 so an exception introduced three levels down means editing every signature above it.
 To avoid that work, programmers usually widen the specification until it permits every exception.
 The specifications expose implementation details.
 Most people now count them a failure.
-C++11 reduced its version to a single bit:
+C++11 deprecated its lists and put a single bit in their place:
 whether a function can throw an exception.
+C++17 abandoned the lists altogether.
 
 ### Make the Bad Value Impossible
 
