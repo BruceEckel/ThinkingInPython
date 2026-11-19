@@ -602,7 +602,7 @@ ambiguity, not on pronouns.
 sighting from chapter 26 below is the point of the entry: a sweep that
 reads the others as "prefer the noun" will overshoot.
 
-**Sightings.** 35 (6 chapters)
+**Sightings.** 36 (7 chapters)
 - `26_Patterns--Factory` 2026-08-31 (`40323f50`), was Claude-written,
   six: "It covers only the first level of inheritance" ->
   "`__subclasses__()` covers only the first level of inheritance"; "It
@@ -753,6 +753,22 @@ reads the others as "prefer the noun" will overshoot.
   what N holds is more than a few sentences up, write it again
   ("of exceptions"), in the number the paragraph uses. 35 sightings,
   6 chapters.
+- `46_Effects--Stateless` 2026-11-19, a pronoun in a heading, Bruce:
+  'awkward and "it" unclear'. "## Effects Propagate, and the Type
+  Checker Verifies It" -> "## Effects Propagate". "It" had no noun to
+  stand for: the heading's first half is a clause, and the section's
+  own sentence says the checker verifies "the declaration", a word
+  the heading lacks. The short form matches "### Errors Propagate"
+  later in the chapter, and the checker's part is the section's
+  second half ("the type checker verifies the declaration"). Three
+  links took the new anchor, `#effects-propagate` (chapter 46,
+  appendix A, Solutions 46). The test for a heading: a pronoun in it
+  stands for a noun that is also in the heading ("Visitor, and Why
+  Python Skips It"), and a heading of two clauses joined by ", and"
+  is two headings or one claim. A grep of the chapters' headings for
+  it, them, this, and that found 21 others; "### Watching It Happen"
+  in chapter 38 is the one whose "it" has no noun in the heading,
+  left for Bruce. 36 sightings, 7 chapters.
 
 **Home.** the `antecedents` skill, as a keep-when (its "zero ambiguous
 pointers, not zero pronouns" line). Not a separate sweep. Promoted

@@ -585,7 +585,7 @@ whereas `greet()` asks for `Need[Console]`.
 At runtime, `supply()` matches the request with `isinstance()`,
 which accepts `recorder` because `Recorder` derives from `Console`.
 
-## Effects Propagate, and the Type Checker Verifies It
+## Effects Propagate
 
 A function that calls an effectful function becomes effectful.
 `greet_all()` must declare `Need[Console]` although no `Console` appears in its body:
@@ -1268,7 +1268,7 @@ A pass-through function such as `greet_all()` still declares `Need[Log]` in its 
 Removing that Ability later changes every signature on the path a second time.
 People made the same complaint against [Java's checked exceptions](44_Effects--Effect_Management.md#catch-the-exception-you-expect),
 where an exception added three levels down meant editing every signature above it.
-That complaint is the reason [Effects Propagate, and the Type Checker Verifies It](#effects-propagate-and-the-type-checker-verifies-it)
+That complaint is the reason [Effects Propagate](#effects-propagate)
 compares the propagation to `async`.
 
 ## Waiting on a Coroutine

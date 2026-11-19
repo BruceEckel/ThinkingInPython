@@ -743,6 +743,12 @@ include", flagged by Bruce, became "### The Native Family" over
 sentence that defines the term stays. A sentence that pointed back
 across the new heading gets its noun ("[ZIO] is such a library" ->
 "[ZIO] is a library Effect system").
+A pronoun in a heading stands for a noun in that heading, and a
+heading of two clauses joined by ", and" is cut to its claim
+("## Effects Propagate, and the Type Checker Verifies It", Bruce:
+'awkward and "it" unclear' -> "## Effects Propagate", R12). A
+renamed heading takes every link to its anchor with it: grep both
+trees for the old slug.
 Every claim a rewrite touches is checked against the listing it
 describes before the new sentence is written.
 A sentence a pass adds beside a listing is held to R47 like any

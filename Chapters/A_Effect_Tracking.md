@@ -234,7 +234,7 @@ That same rule is the design's weakness.
 The type checker accepts `shout()`,
 because the PEP instructs every type checker to ignore metadata,
 including the `Tell` in the return annotation of `tell()`.
-Compare `undeclared_need.py` in [Stateless](46_Effects--Stateless.md#effects-propagate-and-the-type-checker-verifies-it),
+Compare `undeclared_need.py` in [Stateless](46_Effects--Stateless.md#effects-propagate),
 where the type checker reports the same mistake as an `invalid-yield` error.
 A row inside `Annotated` is a structured comment until a tool reads it.
 `greet()`'s row lists `Ask` and `Tell` because its annotation declares them,

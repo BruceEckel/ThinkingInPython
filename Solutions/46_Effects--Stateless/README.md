@@ -133,7 +133,7 @@ a different design, a detail, or an equivalent alternative.
 <details>
 <summary>Where to look</summary>
 
-[Effects Propagate, and the Type Checker Verifies It](../../Chapters/46_Effects--Stateless.md#effects-propagate-and-the-type-checker-verifies-it)
+[Effects Propagate](../../Chapters/46_Effects--Stateless.md#effects-propagate)
 shows what `ty` reports when a function's annotation leaves out a request that `greet()` makes.
 Read the error's yield type,
 then change the return annotation of `greet_all()` so it declares the request that `yield from` relays from `greet()`.
