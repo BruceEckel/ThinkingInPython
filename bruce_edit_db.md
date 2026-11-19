@@ -1683,6 +1683,15 @@ a `(continued)` part ("complete `items.py`:"), and a generic name
   the function is where it is. The thing became the subject, with
   the cause in front. `survey self-name` reads lead-ins, and this
   sentence follows its listing, so no tool listed it.
+- `44_Effects--Effect_Management` 2026-11-19, Bruce's hand, typed
+  while a session commit was being made and committed inside it
+  (`c01e0ce9`): "Koka's `main()` reads a line with `readline()`. The
+  `ConsoleAsk` layer must open Node's `readline` interface" ->
+  "... Here, the `ConsoleAsk` layer must open ...". The sentence
+  before is about the Koka listing, sixty lines up, and "Here,"
+  says the next one is back on the listing above it. After a
+  sentence about another listing, the sentence that returns to the
+  listing on the page opens with "Here,".
 
 **Home.** this file only. Promoted 2026-10-11 on the second chapter's
 sighting (C22 -> R31), widened from the trailing "below" to the
