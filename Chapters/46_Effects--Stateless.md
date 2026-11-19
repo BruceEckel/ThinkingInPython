@@ -436,7 +436,7 @@ run(bound("Alice"))
 
 Those two lines do three things:
 
-1. `supply(Console())` builds a [handler](44_Effects--Effect_Management.md#native-effect-management),
+1. `supply(Console())` builds a [handler](44_Effects--Effect_Management.md#handlers),
    an object that answers `Need[Console]` with that instance.
 2. Calling the handler on `greet` returns a new function `bound` that answers the requests `greet()` makes.
 3. Calling that function with `"Alice"` builds a fully supplied Effect,

@@ -589,7 +589,12 @@ each pass hands the next one less to do.
    it, write the plain verb, "uses", and let the sentence that holds
    the earlier use make the comparison (C92; "again" for "still" is
    the same word of history). Grep the scope for `\breus(e|es|ed)\b`
-   and `\bagain\b`.
+   and `\bagain\b`. "X is the name for this design" is a passive in
+   meaning ("*Algebraic effects* is the name for this design:",
+   Bruce: "passive awkward"): give the naming to those who named it,
+   with the term last ("Language designers call this design
+   *algebraic effects*:", C107). `tip passive` cannot see a copula,
+   so grep the scope for `is the (name|term|word) for`.
 8. `bruce-edit-apply`: the Rules section of `bruce_edit_db.md`.
 9. `elements-of-style:writing-clearly-and-concisely`: Strunk's rules,
    mostly needless words and emphatic words at the end.
@@ -715,6 +720,15 @@ leaves the running example to take up a question of its own gets a
 subsection heading that names the question (C71, "### Why a
 Trampoline" in chapter 45's "One Generator per State"). Report each
 heading added, since it changes the chapter's table of contents.
+A second addition (Bruce, 2026-11-19, chapter 44: "this block of
+paragraphs seems like it should be a subsection about handlers"):
+inside a long section with no subsections, list the paragraphs by
+topic, and where several in a row take up one term the section
+introduces in italics, add a heading one level down that is the term
+("#### Handlers"). Give each later run its own heading too
+("#### Continuations", "#### Flix"), so that no run sits under a
+title that does not describe it, and point each term link at the
+subsection that defines the term (C106).
 Every claim a rewrite touches is checked against the listing it
 describes before the new sentence is written.
 A sentence a pass adds beside a listing is held to R47 like any

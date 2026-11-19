@@ -194,7 +194,7 @@ Chapters/43_Functional--Confidence.md	[PAST] put: The list put in its place leav
 Chapters/44_Effects--Effect_Management.md	[PAST] added: Each swap of an implementation, and each layer added around one, happens at the edge of the program.
 Chapters/44_Effects--Effect_Management.md	[PAST] chose: To prevent collisions, the programmer chose distinct names.
 Chapters/44_Effects--Effect_Management.md	[PAST] committed: A team committed to Scala or TypeScript cannot use native Effects, so designers build *library* Effect systems on top of existing type systems.
-Chapters/44_Effects--Effect_Management.md	[PAST] declared: *Algebraic effects* is the name for this design: Effects declared as an interface, plus handlers that receive the continuation.
+Chapters/44_Effects--Effect_Management.md	[PAST] declared: Language designers call this design *algebraic effects*: Effects declared as an interface, plus handlers that receive the continuation.
 Chapters/44_Effects--Effect_Management.md	[PAST] delayed: Native systems deliver tracking, interface separation, and delayed binding while the code runs eagerly, with no description trees and no interpreter.
 Chapters/44_Effects--Effect_Management.md	[PAST] divided: The solution divided names among separate namespaces.
 Chapters/44_Effects--Effect_Management.md	[PAST] faced: Gradual typing faced the same problem, and took a decade.

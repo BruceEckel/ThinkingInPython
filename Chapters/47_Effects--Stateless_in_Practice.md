@@ -2198,7 +2198,7 @@ and the handlers are the interface.
 A library cannot reproduce a native handler's control over the rest of the Effect.
 `handle()` passes a handler the Ability and takes back an answer,
 and the driver resumes the Effect with that answer, once, always.
-A native handler receives the [continuation](44_Effects--Effect_Management.md#native-effect-management)
+A native handler receives the [continuation](44_Effects--Effect_Management.md#continuations)
 and chooses what to do with it.
 Invoking it once gives you what Stateless has.
 Declining to invoke it gives you exception behavior:

@@ -580,3 +580,15 @@ and it becomes part of every future pass.
   for `\bI\b` and `\b[Ww]e\b` outside code spans. Keep an opinion, the
   author's history, and a chapter's established "we" for a shared step
   ("We can modify `task_runner()`"). C72 in `bruce_edit_db.md`.
+- **"X is the name for this design."**
+  "*Algebraic effects* is the name for this design: Effects declared
+  as an interface, plus handlers that receive the continuation."
+  (Bruce, 2026-11-19, chapter 44: "passive awkward").
+  The sentence has a copula and no passive auxiliary, so `tip passive`
+  is quiet, but it is a passive in meaning: someone named the design.
+  Make them the subject, "call" the verb, and put the term last, where
+  a definition puts its news: "Language designers call this design
+  *algebraic effects*: ...".
+  Grep the scope for `is the (name|term|word) for`.
+  Keep "is called" where nobody in particular did the naming.
+  C107 in `bruce_edit_db.md`.

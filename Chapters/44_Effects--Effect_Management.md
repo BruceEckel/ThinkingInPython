@@ -692,6 +692,8 @@ You therefore rarely write a row yourself.
 You write one to specify a constraint,
 such as declaring that a function must remain Effect-free.
 
+#### Handlers
+
 A *handler* fulfills an Effect.
 The compiler rejects a program that performs an Effect with no handler in scope,
 so every Effect a program performs must have a handler.
@@ -716,6 +718,8 @@ Different handlers make different decisions.
 A test installs a handler that returns a known name,
 so `greet()` produces the same result for each test run.
 
+#### Continuations
+
 Handlers do more than `except` blocks.
 When an Effect runs, the handler receives a *continuation*:
 the rest of the computation from that point forward.
@@ -728,8 +732,10 @@ and the Effect then behaves like an exception.
 A handler can even invoke the continuation several times,
 which is how native systems express a backtracking search as an ordinary handler.
 
-*Algebraic effects* is the name for this design:
+Language designers call this design *algebraic effects*:
 Effects declared as an interface, plus handlers that receive the continuation.
+
+#### Flix
 
 [Flix](https://flix.dev/) expresses the same design with different notation.
 The Effect row follows a backslash,

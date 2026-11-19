@@ -7556,6 +7556,80 @@ order:" to eliminate the second sentence'. Claude-written:
 **Home.** `cohesion` (Accrued patterns) | super-prose (The order, 4)
 | this file.
 
+### C106. A run of paragraphs that defines a term inside a long section gets a subsection heading
+
+**Test.** Inside a section with no subsections, several consecutive
+paragraphs take up one term the section introduces in italics
+("A *handler* fulfills an Effect." and the three paragraphs after
+it). List each paragraph of the section by its topic. Where the topic
+changes to a term the reader will come back for, add a heading one
+level down that is the term, and give every later run its own heading
+so that no run sits under a title that does not describe it.
+
+**Keep when.** The section is short enough to read at one sitting, or
+the term gets a single paragraph.
+
+**Sightings.** 1, `44_Effects--Effect_Management` 2026-11-19, Bruce
+on Native Effect Management: "this block of paragraphs seems like it
+should be a subsection about handlers -- can we organize the
+sectioning for that?":
+- The section ran 160 lines under one `###` heading: an introduction,
+  the Koka listing and its Effect row, handlers, continuations, the
+  Flix listing. It now has three `####` headings: "Handlers" (a
+  handler fulfills an Effect, handling discharges it, request apart
+  from fulfillment), "Continuations" (what a handler receives, and
+  the name *algebraic effects*), and "Flix". The introduction and the
+  Koka listing stay directly under the `###` heading, as chapter 20's
+  Protocols section does above its two `####` headings.
+- One heading alone would have put the Flix listing under
+  "Handlers", so each later run got its own.
+- Three term links that pointed at the whole section now point at
+  the subsection that defines the term: chapter 45's "[handler]" and
+  chapter 47's "[continuation]" to `#continuations`, chapter 46's
+  "[handler]" to `#handlers`. A link whose text is the section's
+  title keeps `#native-effect-management`.
+- The site's chapter contents list stops at `###` and the EPUB's at
+  `##`, so the new headings appear in the text and in no contents
+  list.
+- Why the passes missed it: super-prose adds a heading only for a
+  listing that leaves the running example (C71), and no pass lists a
+  section's paragraphs by topic.
+
+**Home.** `cohesion` (a paragraph's topic; Accrued patterns) |
+super-prose (the heading note under The order) | deep-review
+(teaching pass, structure) if promoted | this file.
+
+### C107. "X is the name for this design" gives the naming to those who named it
+
+**Test.** A sentence that introduces a term with the term as subject
+and "is the name for", "is the term for", or "is the word for" and a
+pointer ("*Algebraic effects* is the name for this design:"). The
+frame is a passive in meaning: someone named the design, and the
+sentence leaves them out. Make them the subject and "call" the verb,
+with the term last before the colon or the period, where a definition
+puts its news.
+
+**Keep when.** Nobody in particular named it, and "is called" reads
+plainly ("is called *Multiton*", a keep in the passive baseline).
+
+**Sightings.** 1, `44_Effects--Effect_Management` 2026-11-19, Bruce:
+"passive awkward". Claude-written:
+- "*Algebraic effects* is the name for this design: Effects declared
+  as an interface, plus handlers that receive the continuation." ->
+  "Language designers call this design *algebraic effects*: Effects
+  declared as an interface, plus handlers that receive the
+  continuation."
+- Why the passes missed it: `tip passive` reads the parse for a
+  passive auxiliary, and this sentence has a copula and a noun. The
+  term also opened the sentence, ahead of the design it names, which
+  the previous paragraph had just described.
+- Scale: a grep of both trees for "is the name/term/word for" and
+  "the name for this" found this site alone. Chapter 12's "often goes
+  by the name *parse, don't validate*" is active and stays.
+
+**Home.** `activate` (an empty frame; Accrued patterns) | super-prose
+(The order, 7) | this file.
+
 ## Retired
 
 Rejected by Bruce, or promoted and later withdrawn. Never propose these

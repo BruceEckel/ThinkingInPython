@@ -547,3 +547,16 @@ and it becomes part of every future pass.
   Keep a position in a listing or a call sequence that comes with a
   reason.
   C105 in `bruce_edit_db.md`.
+- **A run of paragraphs on one term gets a subsection heading.**
+  Chapter 44's Native Effect Management ran 160 lines under one
+  heading (Bruce, 2026-11-19: "this block of paragraphs seems like it
+  should be a subsection about handlers -- can we organize the
+  sectioning for that?").
+  List a long section's paragraphs by topic. Where several in a row
+  take up a term the section introduces in italics, add a heading one
+  level down that is the term, and give each later run a heading of
+  its own: "#### Handlers", "#### Continuations", "#### Flix".
+  One heading alone would have put the Flix listing under "Handlers".
+  Point each term link at the subsection that defines the term, and
+  leave a link whose text is the section's title.
+  C106 in `bruce_edit_db.md`.

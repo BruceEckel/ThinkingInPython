@@ -207,7 +207,7 @@ so that state lasts until the body finishes or the program drops its last refere
 
 The suspended generator is what [Native Effect Management](44_Effects--Effect_Management.md#native-effect-management)
 calls a continuation: the rest of the computation from the `yield` forward.
-A [handler](44_Effects--Effect_Management.md#native-effect-management)
+A [handler](44_Effects--Effect_Management.md#continuations)
 can do three things with a continuation: resume it once, discard it,
 or resume it several times for a backtracking search.
 A generator's driver can do the first two.
