@@ -645,6 +645,8 @@ shows how different Effect Management Systems work:
 - Two languages with native Effects: Koka and Flix
 - Two library Effect systems: ZIO for Scala and Effect for TypeScript
 
+### Koka
+
 []{#koka-greeting}[Koka](https://koka-lang.github.io/)
 is a research language with native Effects.
 Its greeting program has the same `ask` and `tell` as `ask_tell.py`:
@@ -789,7 +791,9 @@ the counterpart of Koka's `<console,exn>`.
 Flix installs the `Console` handler when the program starts,
 so `main()` installs handlers for `Ask` and `Tell` alone.
 
-Languages in this family include Koka, Flix, Eff, Effekt, and Unison.
+### The Native Family
+
+Languages with native Effects include Koka, Flix, Eff, Effekt, and Unison.
 OCaml 5 has the handler mechanism,
 though it does not yet track Effects in function types.
 
@@ -807,7 +811,10 @@ In a native Effect language,
 the compiler infers the Effects of the computation you write.
 With a library, you build a *description* of a computation,
 and execute the description later.
-[ZIO](https://zio.dev/) is such a library, for Scala.
+
+### ZIO
+
+[ZIO](https://zio.dev/) is a library Effect system for Scala.
 Here is the greeting program again.
 In ZIO it is a description first and a run second:
 
@@ -885,6 +892,8 @@ When a description fails, ZIO's `retry` interprets it again from its start.
 A native handler that invokes the continuation a second time runs only the rest of the computation,
 from the point of the Effect forward.
 
+### Effect for TypeScript
+
 The TypeScript [Effect](https://effect.website/)
 library also builds a description and runs it later:
 
@@ -945,6 +954,8 @@ The `ConsoleAsk` layer must open Node's `readline` interface, await its promise,
 close the interface,
 and wrap all of that in `Effect.promise` so the result is a description the library can track.
 
+### Wrapping the Standard Library
+
 The machinery does not stop at your own code.
 A library Effect system tracks Effects only in values of its own type,
 so it cannot see an ordinary function that performs an Effect.
@@ -960,6 +971,8 @@ and you must wrap a third-party library to make it conform.
 The library needs these copies because it tracks Effects without the compiler's help.
 A native system's standard library declares its Effects in its own signatures,
 written once, so no second copy exists.
+
+### The Description/Execution Split {#description-execution-split}
 
 The description/execution split is an artifact of building the Effect system as a library,
 rather than a feature of Effect Management.
@@ -977,7 +990,9 @@ Code that mixes the two compiles cleanly but misbehaves,
 because the imperative part runs when the program builds the description,
 not when the runtime executes it.
 
-Libraries in this family include ZIO, Cats Effect, and Kyo in Scala,
+### The Library Family
+
+Library Effect systems include ZIO, Cats Effect, and Kyo in Scala,
 Polysemy and Effectful in Haskell, Effect in TypeScript,
 and Stateless in Python.
 

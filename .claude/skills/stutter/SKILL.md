@@ -214,3 +214,18 @@ sentence, the date, and the repair.
   actor: "the caller must `await` a call to any of the three".
   Read for `awaitable` near `await`, `iterable` near "iterate",
   `callable` near "call", and `hashable` near "hash".
+- 2026-11-19, chapter 44: a heading lifted from the sentence under
+  it.
+  "### Languages in This Family" over "Languages in this family
+  include Koka, Flix, Eff, Effekt, and Unison." (Bruce pasted the
+  pair: "LANGUAGES IN THIS FAMILY / Languages in this family").
+  Claude had written the heading that hour from the sentence's first
+  four words, and "this" in a heading points at nothing.
+  A heading added to existing prose is a noun phrase for the topic,
+  and the sentence under it then opens on other words: "### The
+  Native Family" over "Languages with native Effects include ...".
+  Read every heading a pass adds together with the line under it.
+  Keep a term and its definition ("## Lazy Evaluation" over "*Lazy
+  evaluation* computes a value only when something needs it"), the
+  book's usual way to open a section on a term.
+  C106 in `bruce_edit_db.md`.

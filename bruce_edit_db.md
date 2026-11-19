@@ -7607,6 +7607,27 @@ sectioning for that?":
   third, measure the parent `##` section, and when it is most of the
   chapter, promote the `###` that needs subsections, with each
   sibling that would land under the wrong parent.
+- On his "do both", the same day: "Koka" before the Koka listing, and
+  five headings in Library Effect Management ("ZIO", "Effect for
+  TypeScript", "Wrapping the Standard Library", "The
+  Description/Execution Split" with the id
+  `description-execution-split`, and a closing one), with a closing
+  one for Native to match. "[ZIO] is such a library, for Scala"
+  pointed across the new "ZIO" heading and became "[ZIO] is a library
+  Effect system for Scala". Four links in chapters 46 and 47 now land
+  on `#zio` or `#description-execution-split`.
+- The two closing headings first read "Languages in This Family" and
+  "Libraries in This Family", each lifted from the first words of the
+  sentence under it. Bruce pasted the pair: "LANGUAGES IN THIS FAMILY
+  / Languages in this family". They are "The Native Family" and "The
+  Library Family", over "Languages with native Effects include ..."
+  and "Library Effect systems include ...". A heading is a noun
+  phrase for the topic, written before reading the first sentence
+  under it, and it holds no pointer word ("this"). The book's
+  term-and-definition pairs stay ("## Lazy Evaluation" over "*Lazy
+  evaluation* computes a value only when something needs it"): a
+  script over both trees listed 18 headings whose first sentence
+  opens with the heading's words, each a term and its definition.
 - Why the passes missed it: super-prose adds a heading only for a
   listing that leaves the running example (C71), and no pass lists a
   section's paragraphs by topic.

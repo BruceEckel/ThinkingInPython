@@ -39,7 +39,7 @@ Effect[A, E, R]
 ```
 
 Those three parameters carry the Effect information,
-as the three type parameters of `ZIO` do in [Effect Management](44_Effects--Effect_Management.md#library-effect-management):
+as the three type parameters of `ZIO` do in [Effect Management](44_Effects--Effect_Management.md#zio):
 
 - `A` is what the Effect needs, an *Ability*.
 - `E` is its failure (error) type.
@@ -382,7 +382,7 @@ print(type(greet("Alice")))
 ```
 
 `greet("Alice")` builds a description of a greeting.
-This is the [description/execution split](44_Effects--Effect_Management.md#library-effect-management).
+This is the [description/execution split](44_Effects--Effect_Management.md#description-execution-split).
 A language with built-in Effects intercepts an Effect where it runs.
 Stateless is ordinary Python,
 so a function body's `console.print()` calls the method,

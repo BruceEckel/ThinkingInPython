@@ -120,7 +120,7 @@ so `Tell` is `Ability[None]` and `capture()` returns `None`.
 `ask()` and `tell()` are accessors,
 small functions that each wrap one Ability and declare its answer type.
 `need()` has the same shape,
-and the ZIO listing in [Effect Management](44_Effects--Effect_Management.md#library-effect-management)
+and the ZIO listing in [Effect Management](44_Effects--Effect_Management.md#zio)
 has an accessor object doing the same job.
 The declared `Depend[Ask, str]` types `name` as `str` inside `greet()`.
 
@@ -2216,7 +2216,7 @@ Koka tracks failure in its Effect row,
 because an exception there is an ordinary Ability whose handler declines to resume.
 The extra type parameter exists because a Stateless handler always resumes the Effect,
 so a failure cannot be an Ability.
-The `ZIO[R, E, A]` of [Effect Management](44_Effects--Effect_Management.md#library-effect-management)
+The `ZIO[R, E, A]` of [Effect Management](44_Effects--Effect_Management.md#zio)
 carries one for the same reason.
 `Async` is the other piece.
 Native systems derive asynchronous execution from Effects.

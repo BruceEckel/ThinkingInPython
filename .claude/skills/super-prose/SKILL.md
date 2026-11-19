@@ -735,6 +735,14 @@ needs subsections, with each sibling that would land under the wrong
 parent (chapter 44's Native and Library Effect Management, and Custom
 AI Languages with them). Slugs do not change with the level, so the
 links hold.
+A heading a pass adds is a noun phrase for the topic, with no
+pointer word, and the sentence under it opens on other words
+("### Languages in This Family" over "Languages in this family
+include", flagged by Bruce, became "### The Native Family" over
+"Languages with native Effects include"). A term heading over the
+sentence that defines the term stays. A sentence that pointed back
+across the new heading gets its noun ("[ZIO] is such a library" ->
+"[ZIO] is a library Effect system").
 Every claim a rewrite touches is checked against the listing it
 describes before the new sentence is written.
 A sentence a pass adds beside a listing is held to R47 like any
