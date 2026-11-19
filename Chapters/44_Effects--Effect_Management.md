@@ -342,7 +342,7 @@ rather than `@safe`'s catch-all `Exception`.
 A bug inside `parse_run()` raises some other exception,
 and that exception propagates to the caller.
 
-When the `match` unpacks an `Ok`, `slope()` divides at once,
+When the `match` unpacks an `Ok`, `slope()` succeeds,
 because `NonZero` guarantees that `run.value` is nonzero.
 
 ## A Program Can Never Be Pure

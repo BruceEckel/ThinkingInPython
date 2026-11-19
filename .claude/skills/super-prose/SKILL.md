@@ -329,7 +329,14 @@ each pass hands the next one less to do.
    favor of a single `noexcept` keyword, which states whether a
    function can throw an exception"). Steps the argument uses are
    gathered at the end in date order, and the description above
-   them keeps one tense ("C++ checked its list at runtime", C100). Grep the scope for a version or a year between commas
+   them keeps one tense ("C++ checked its list at runtime", C100).
+   A "because" clause is matched to the clause it supports: ask what
+   the reason is a reason for, and read the main clause for that
+   word ("`slope()` divides at once, because `NonZero` guarantees
+   that `run.value` is nonzero", Bruce: '"succeeds"?' -> "`slope()`
+   succeeds, because ...", C103). The guarantee explains success,
+   and "at once" said when. Grep the scope for `because|since` and
+   read each main clause that ends on an adverb of time or manner. Grep the scope for a version or a year between commas
    inside a sentence about something else.
 5. `antecedents`: every pointer with two candidates gets its noun.
    A link is a pointer too: when its target teaches a named

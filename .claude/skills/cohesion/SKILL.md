@@ -494,3 +494,18 @@ and it becomes part of every future pass.
   ends, in date order, each with what it did.
   The description above them then holds one tense for each language.
   C100 in `bruce_edit_db.md`.
+- **The clause before "because" states what the reason explains.**
+  "When the `match` unpacks an `Ok`, `slope()` divides at once,
+  because `NonZero` guarantees that `run.value` is nonzero" (Bruce,
+  2026-11-19, chapter 44: '"succeeds"?').
+  The guarantee is a reason the division succeeds. The main clause
+  said when it happens, so the reader looked for a delay that the
+  reason removes.
+  For each "because" or "since", ask what the clause is a reason
+  for, and read the main clause for that word. An adverb of time or
+  manner ("at once", "directly", "simply") is the usual stand-in for
+  "cannot fail" or "needs no check".
+  Keep the adverb when it is what the reason explains ("loops over
+  the tuple directly, since the tuple holds the same responders for
+  the whole loop").
+  C103 in `bruce_edit_db.md`.

@@ -7390,6 +7390,41 @@ on Combine the First and Third: "is it?" Claude-written:
 what the design does) | super-prose (The order, 1, and the reader's
 read) | this file.
 
+### C103. The clause before "because" states the thing the reason explains
+
+**Test.** Read a "because" or "since" clause and ask what it is a
+reason for. Then read the main clause for that word. "`slope()`
+divides at once, because `NonZero` guarantees that `run.value` is
+nonzero": the guarantee is a reason the division succeeds, and the
+main clause says when it happens. Write the word the reason explains
+("succeeds"). The usual stand-in is an adverb of time or manner ("at
+once", "directly", "simply") where the claim is that a step cannot
+fail or needs no check.
+
+**Keep when.** The adverb is what the reason explains: "loops over
+the tuple directly, since the tuple holds the same responders for the
+whole loop" (no copy is needed); "returns `True` at once", where the
+point is that later code does not run.
+
+**Sightings.** 1, `44_Effects--Effect_Management` 2026-11-19, Bruce
+on Combine the First and Third: '"succeeds"?' Claude-written:
+- "When the `match` unpacks an `Ok`, `slope()` divides at once,
+  because `NonZero` guarantees that `run.value` is nonzero." ->
+  "... `slope()` succeeds, because ...".
+- "At once" stood for "with no check and no failure". The reader
+  takes it for "immediately" and asks what the delay would have
+  been. "Divides" read the listing's `rise / run.value` aloud (R47).
+- Why the passes missed it: the claim is true, and each pass read the
+  two clauses for their own faults. No pass matched the reason to the
+  clause it supports.
+- Scale: a grep of both trees for "at once", "immediately", or
+  "directly" before "because" or "since" found three other sites
+  (chapters 30, 40, 47), each a Keep-when. The book has 88 "at once"
+  sites in all, most of them the plain time sense, unread here.
+
+**Home.** `cohesion` (a connective states a real relation; Accrued
+patterns) | super-prose (The order, 4) | this file.
+
 ## Retired
 
 Rejected by Bruce, or promoted and later withdrawn. Never propose these
