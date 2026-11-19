@@ -342,6 +342,14 @@ its own ("The next listing shows the same trap in a generator").
   Grep the scope for `(says|explains|shows) why`. One other site in
   the book: `41_Functional--Toolkits`, "[Recursion](#recursion)
   explains why `fib()` keeps its recursive form."
+- `44_Effects--Effect_Management` 2026-11-19 (`6c2c2c72`), Bruce's
+  hand: "[ZIO] is a library Effect system for Scala. Here is the
+  greeting program again. In ZIO it is a description first and a run
+  second:" -> "... In ZIO the greeting program is a description first
+  and a run second:". "Here is X again." only pointed, and its noun
+  went into the sentence that makes the claim. The pointer was
+  Claude-written and had stood through every pass; the ZIO heading
+  added that hour put it second under a heading, where it showed.
 
 **Home.** activate (Accrued patterns), which already cuts metadiscourse;
 this sighting is the concrete pair for it. Promoted at Bruce's call
@@ -1666,6 +1674,15 @@ a `(continued)` part ("complete `items.py`:"), and a generic name
   only when it differs from the reading before it by at least
   `_delta`:"; "To break the cycle, the setter returns early" -> "Here,
   the setter returns early"
+- `44_Effects--Effect_Management` 2026-11-19 (`272fc9e5`), Bruce's
+  hand, the filename as the subject of a walkthrough sentence, below
+  its listing: "`slope_catch.py` puts `validate()` directly above
+  `slope()`, so the uncaught `ValueError` is easy to spot." ->
+  "Because `validate()` appears directly above `slope()`, the
+  uncaught `ValueError` is easy to spot." The file "puts" nothing:
+  the function is where it is. The thing became the subject, with
+  the cause in front. `survey self-name` reads lead-ins, and this
+  sentence follows its listing, so no tool listed it.
 
 **Home.** this file only. Promoted 2026-10-11 on the second chapter's
 sighting (C22 -> R31), widened from the trailing "below" to the
@@ -3772,6 +3789,13 @@ second chapter (his "do the suggestions"); was C33. The first two are
   "A full EMS [separates each Effect's interface from its
   implementation]." A count of three with one member named, and the
   link on the count. The link now sits on the member (R16).
+- `44_Effects--Effect_Management` 2026-11-19 (`86e668db`), Bruce's
+  hand, a count standing as a noun: "None of the three makes the
+  failure disappear." -> "None of the three approaches makes ...";
+  "The three differ in how many functions" -> "The three approaches
+  differ in". The paragraph above had said "All three approaches",
+  one paragraph up. A bare "the three" as a subject takes its noun
+  again in each paragraph that uses it.
 
 **Home.** antecedents (Accrued patterns, the unnamed-items bullet) |
 super-prose (pass 5) | this file; a cousin of R9 (name the concrete
@@ -7666,6 +7690,41 @@ plainly ("is called *Multiton*", a keep in the passive baseline).
 
 **Home.** `activate` (an empty frame; Accrued patterns) | super-prose
 (The order, 7) | this file.
+
+### C108. Three small repairs from one hand pass: an adjective term takes its noun, "the N" after "a different N" is "that N", and a set with a rest takes "only"
+
+**Test.** Three shapes, each one sighting, kept together until one
+recurs. (a) A term of art that is an adjective stands alone as a
+complement ("`slope()` becomes total"): write it with its noun ("a
+total function"), the form the chapter defined. (b) A sentence
+introduces a noun with "a different" or "another" ("each handles it
+in a different place"), and the next sentences say "the place":
+write "that place", which ties each one to the place just raised.
+(c) A clause states what a construct takes and a second clause says
+what happens to the rest ("catches the exceptions it specifies and
+lets the rest propagate"): the first clause takes "only".
+
+**Keep when.** (a) The adjective is predicated in a sentence that
+defines it. (c) No second clause speaks of the rest.
+
+**Sightings.** 1 each, `44_Effects--Effect_Management` 2026-11-19,
+Bruce's hand (`272fc9e5`, `86e668db`), all on Claude-written
+sentences:
+- "`slope()` becomes total." -> "`slope()` becomes a total function."
+- "With a `Result`, the place is every call site," and two more ->
+  "that place is", three times.
+- "an `except` clause catches the exceptions it specifies and lets
+  the rest propagate" -> "catches only the exceptions it specifies".
+  This "only" is the claim, a keep under the watch-word rule for
+  "only".
+- Also in that pass, local: "The question has two answers:" -> "Two
+  perspectives produce two different answers:" (the list under it is
+  two points of view), and "// The Effects' interfaces" -> "// The
+  Effect interfaces" in the ZIO listing. The TypeScript listing's
+  comment had the same possessive and was changed to match.
+
+**Home.** `antecedents` for (a) and (b), `ambiguity` for (c) | this
+file. No skill entry until a second sighting.
 
 ## Retired
 

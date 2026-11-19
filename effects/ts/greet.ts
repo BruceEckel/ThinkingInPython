@@ -3,7 +3,7 @@ import { Context, Effect, Layer } from "effect"
 import * as readline from "node:readline/promises"
 import { stdin, stdout } from "node:process"
 
-// The Effects' interfaces, as services
+// The Effect interfaces, as services
 class Ask extends Context.Service<
   Ask,
   { ask: (prompt: string) => Effect.Effect<string> }

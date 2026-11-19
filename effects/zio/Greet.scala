@@ -2,7 +2,7 @@
 import zio.*
 import zio.Console.{print, printLine, readLine}
 
-// The Effects' interfaces
+// The Effect interfaces
 trait Ask:
   def ask(prompt: String): UIO[String]
 

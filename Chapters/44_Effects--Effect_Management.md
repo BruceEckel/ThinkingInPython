@@ -902,7 +902,7 @@ import { Context, Effect, Layer } from "effect"
 import * as readline from "node:readline/promises"
 import { stdin, stdout } from "node:process"
 
-// The Effects' interfaces, as services
+// The Effect interfaces, as services
 class Ask extends Context.Service<
   Ask,
   { ask: (prompt: string) => Effect.Effect<string> }
@@ -949,7 +949,7 @@ Effect.runPromise(greet.pipe(Effect.provide(Console)))
 Here `greet` reads as straight-line code because `Effect.gen` builds the description from a generator,
 and each `yield*` hands a sub-description to the library and receives its result back.
 Koka's `main()` reads a line with `readline()`.
-The `ConsoleAsk` layer must open Node's `readline` interface, await its promise,
+Here, the `ConsoleAsk` layer must open Node's `readline` interface, await its promise,
 close the interface,
 and wrap all of that in `Effect.promise` so the result is a description the library can track.
 

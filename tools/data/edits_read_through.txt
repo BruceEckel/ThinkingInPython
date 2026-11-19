@@ -2,4 +2,4 @@
 # prose commit up to and including it has been read.
 # `tip uncaptured ARGS=--mark` rewrites it after the session has
 # read the listed commits. See tools/uncaptured_edits.py.
-db9ab0671e2bf4e58eea53a42428746e53000d18
+6c2c2c722408616c62d5a66a3a1148f034bba4f1
