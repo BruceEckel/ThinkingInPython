@@ -708,7 +708,7 @@ and the Effect then behaves like a normal function return.
 A handler can also discard the continuation,
 and the Effect then behaves like an exception.
 A handler can even invoke the continuation several times,
-which is how native systems express retries and backtracking as ordinary handlers.
+which is how native systems express a backtracking search as an ordinary handler.
 
 *Algebraic effects* is the name for this design:
 Effects declared as an interface, plus handlers that receive the continuation.

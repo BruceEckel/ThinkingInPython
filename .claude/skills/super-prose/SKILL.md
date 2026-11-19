@@ -475,7 +475,17 @@ each pass hands the next one less to do.
    cut, read the sentence against the next one for a clause the two
    now share ("stays what you last read. Because a deeply immutable
    value stays what you last read" took its phrase back as "no matter
-   which code ran in between").
+   which code ran in between"). A capability credited to a mechanism
+   ("invoke the continuation several times, which is how native
+   systems express retries and backtracking", Bruce: "zio is a
+   library effect system, yet it is able to do things that native
+   effect systems achieve using continuations, like retries?") is a
+   word with two senses when a design the book says lacks the
+   mechanism has the capability by name: grep the Part for the
+   capability's word (`retry()` in chapters 46 and 47 runs the
+   function again from its start and needs no continuation), then
+   cut the capability that does not need the mechanism ("express a
+   backtracking search") or say how the two differ (C99).
 7. `activate`: passives with a natural actor, nominalizations,
    metadiscourse, empty frames, tense drift (a relative-clause past
    in a sentence about standing behavior included: "the value that

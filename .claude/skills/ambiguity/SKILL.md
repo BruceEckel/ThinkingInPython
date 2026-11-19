@@ -471,3 +471,23 @@ Shapes Bruce flags that the catalog above did not name, dated, with the sentence
   two.
   When the noun changes, a pronoun that pointed at it ("one") gets
   its noun.
+- 2026-11-19, chapters 44 and 45: a capability word with a second
+  sense two chapters on.
+  "A handler can even invoke the continuation several times, which is
+  how native systems express retries and backtracking as ordinary
+  handlers" (Bruce: "zio is a library effect system, yet it is able
+  to do things that native effect systems achieve using
+  continuations, like retries? Does Scala have continuations?").
+  Resuming a continuation again runs the rest of the computation from
+  the point of the Effect. `retry()` in Stateless and `retry` in ZIO
+  run the whole computation again from its start, by calling the
+  function again or interpreting the description again, with no
+  continuation.
+  The sentence was true in its own sense, and the reader who had met
+  `retry()` in chapter 47 took the two for one thing.
+  When a sentence says a mechanism is how a system does a named
+  thing, grep the Part for the name. If a design the book says lacks
+  the mechanism has it, cut that capability from the sentence or say
+  how the two differ.
+  Both sentences now say "a backtracking search" alone.
+  C99 in `bruce_edit_db.md`.

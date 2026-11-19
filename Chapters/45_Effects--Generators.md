@@ -209,7 +209,7 @@ The suspended generator is what [Native Effect Management](44_Effects--Effect_Ma
 calls a continuation: the rest of the computation from the `yield` forward.
 A [handler](44_Effects--Effect_Management.md#native-effect-management)
 can do three things with a continuation: resume it once, discard it,
-or resume it several times for a retry or a backtracking search.
+or resume it several times for a backtracking search.
 A generator's driver can do the first two.
 It resumes the continuation once with `send()`.
 To discard it, the driver drops the last reference to the generator.

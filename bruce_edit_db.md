@@ -935,7 +935,20 @@ the noun into the concrete sentence and cut the abstract one.
 a mechanism the earlier text did not state. A contrast drawn across
 several listings that no one listing shows is such a consequence.
 
-**Sightings.** 13, 4 chapters
+**Sightings.** 14, 5 chapters
+- `46_Effects--Stateless` 2026-11-18 (`db9ab067`), Bruce's hand, on a
+  sentence Claude wrote the day before (`4a441c90`), the
+  paragraph-closing shape: "If you forget to declare an Effect, the
+  check fails. If you forget to supply a dependency, the check fails.
+  Those two checks enforce the Effect tracking and the delayed binding
+  of a full EMS. The type checker ensures that you declare each Effect
+  and supply each dependency." -> the last sentence deleted. It said
+  the two "If you forget" sentences again as one rule. The
+  `/super-prose 46` pass of the same day (`847fb746`) kept it, and
+  the `[VERB+OBJ]` repair (`b74b5d67`) had used it as the rule
+  sentence that fixed the noun in the two above it. A rule sentence
+  that closes a paragraph is tested against the paragraph's cases: if
+  the cases already state each half of it, the rule is the recap.
 - `45_Effects--Generators` 2026-11-13, was Claude-written, both found
   while joining two paragraphs at Bruce's request (C80). The
   section-opening shape in its citation form: "The chapter's opening
@@ -7146,6 +7159,51 @@ was Claude-written:
 
 **Home.** super-prose (the reader's read, the verdict question) |
 this file.
+
+### C99. A capability credited to a mechanism is searched for in the designs the book says lack the mechanism
+
+**Test.** A sentence says a mechanism is how a system does a named
+thing ("A handler can even invoke the continuation several times,
+which is how native systems express retries and backtracking").
+Grep the Part for the capability's word. If a design the book says
+lacks the mechanism has the capability under that name (`retry()` in
+Stateless, `retry` in ZIO, both without a continuation the handler
+can invoke twice), the reader takes the two for one thing and asks
+how the second design does it. Keep the capabilities that need the
+mechanism and cut the one that does not, or say how the two differ.
+
+**Keep when.** The capability appears nowhere else in the book, or
+the sentence already states the sense that needs the mechanism.
+
+**Sightings.** 1, `44_Effects--Effect_Management` and
+`45_Effects--Generators` 2026-11-19, Bruce's question: "zio is a
+library effect system, yet it is able to do things that native effect
+systems achieve using continuations, like retries? Does Scala have
+continuations?" Both sentences were Claude-written:
+- "which is how native systems express retries and backtracking as
+  ordinary handlers" -> "which is how native systems express a
+  backtracking search as an ordinary handler" (chapter 44).
+- "or resume it several times for a retry or a backtracking search"
+  -> "or resume it several times for a backtracking search" (chapter
+  45).
+- The two senses: resuming a continuation a second time runs the rest
+  of the computation again from the point of the Effect. `retry()` in
+  Stateless and `retry` in ZIO run the whole computation again from
+  its start, which needs a function to call again or a description to
+  interpret again, and no continuation. Chapter 47 says so of
+  Stateless ("a generator runs once. For the same reason, `retry()`
+  decorates the function").
+- Chapter 47's limitation 3 already read "Invoking it repeatedly
+  gives you backtracking and search", with no "retry", in a chapter
+  whose operator list has `retry()`.
+- Why the passes missed it: each sentence is true in the sense it
+  meant, and the ambiguity pass reads a word's senses inside one
+  passage. The second sense is two chapters on.
+- Scale: the only other "which is how" in either tree is chapter 17's
+  "which is how `list[int]` works at runtime", a keep.
+
+**Home.** `ambiguity` (a word with two senses, read across the Part) |
+super-prose (The order, 6) | this file.
 
 ## Retired
 
