@@ -949,8 +949,8 @@ Effect.runPromise(greet.pipe(Effect.provide(Console)))
 Here `greet` reads as straight-line code because `Effect.gen` builds the description from a generator,
 and each `yield*` hands a sub-description to the library and receives its result back.
 Koka's `main()` reads a line with `readline()`.
-Here, the `ConsoleAsk` layer must open Node's `readline` interface, await its promise,
-close the interface,
+Here, the `ConsoleAsk` layer must open Node's `readline` interface,
+await its promise, close the interface,
 and wrap all of that in `Effect.promise` so the result is a description the library can track.
 
 ### Wrapping the Standard Library
@@ -966,7 +966,7 @@ and `readLine` in the ZIO listing are the wrapped versions of Scala's own consol
 The TypeScript listing does its own wrapping:
 `console.log` goes in `Effect.sync` and Node's `readline` in `Effect.promise`.
 Console, file, clock, random, and network calls each get a wrapped version,
-and you must wrap a third-party library to make it conform.
+and you must wrap every third-party library to make it conform.
 The library needs these copies because it tracks Effects without the compiler's help.
 A native system's standard library declares its Effects in its own signatures,
 written once, so no second copy exists.
@@ -1007,7 +1007,7 @@ because a paused generator holds the one copy of its position and local variable
 
 At this writing, experimental languages designed for AI code generation are proliferating.
 Their designers try to balance better code generation for the AI against human verifiability.
-A language written for an AI can drop conveniences that help people write and read code.
+A language written for an AI can drop the affordances that help people write and read code.
 An AI can start using that language as soon as it works,
 while people take years to adopt a new language.
 
@@ -1147,7 +1147,7 @@ Collisions were often silent, producing hidden bugs,
 and third-party libraries made the problem worse.
 The solution divided names among separate namespaces.
 In Python, every module is automatically a namespace.
-The practice is so settled that the Zen of Python celebrates it:
+The practice is so settled that Tim Peters' Zen of Python celebrates it:
 <!-- vale House.EmDash = NO -->
 "Namespaces are one honking great idea -- let's do more of those!"
 <!-- vale House.EmDash = YES -->
@@ -1159,7 +1159,7 @@ Version control gives every state of the code a name to which you can return,
 so experimenting is safe.
 Automated testing moves "does it still work?" from a manual ritual into the build.
 Garbage collection takes the tracking of memory ownership out of the programmer's head.
-Each meets resistance as unnecessary overhead, then wins adoption,
+Each meets initial resistance as unnecessary overhead, then wins adoption,
 then fades as a question.
 
 A barrier is hardest to see from inside,
