@@ -887,6 +887,18 @@ where-to-read-more sentence closing a section.
   with `Need`." Chapter 11 defines the term there, in italics. This
   is the test's second half: a bare term with a defining section
   elsewhere, linked on first use in the chapter.
+- `44_Effects--Effect_Management` 2026-11-19, Bruce on Effect
+  Management for Python: "do we have something to link to here? If
+  not something in the book, the python docs". "The annotation syntax
+  can carry the Effect row." -> "The [annotation syntax] can carry
+  the Effect row.", linked to appendix A's "A Row Inside `Annotated`"
+  (`#a-row-inside-annotated`), the section that writes a row in
+  `Annotated` metadata. The sentence claimed a capability and showed
+  nothing, and the appendix link two paragraphs down was on the
+  appendix's title. A sentence that says a feature "can" do a thing
+  the book demonstrates links the feature to the demonstration. The
+  book came first: chapter 8 has `Annotated` only as a table row, and
+  the Python docs would have been the third choice.
 
 **Home.** this file only: a linking convention rather than a prose
 register. Promoted 2026-09-16 on the second chapter's sighting (C12 -> R16).

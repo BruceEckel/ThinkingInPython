@@ -1110,7 +1110,8 @@ because its compiler reads every call in the body.
 
 Could Python itself gain Effect tracking,
 so that a tool infers every declaration instead of you writing it?
-The annotation syntax can carry the Effect row.
+The [annotation syntax](A_Effect_Tracking.md#a-row-inside-annotated)
+can carry the Effect row.
 Imagine a signature that declares every Effect, as `async def` declares `async`.
 The hard part is propagation, not syntax.
 A type checker must compute the Effect row of every function from the functions it calls,
