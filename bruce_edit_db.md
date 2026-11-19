@@ -7193,6 +7193,13 @@ continuations?" Both sentences were Claude-written:
   interpret again, and no continuation. Chapter 47 says so of
   Stateless ("a generator runs once. For the same reason, `retry()`
   decorates the function").
+- The other repair, "say how the two differ", went into chapter 44's
+  ZIO section the same day at Bruce's "add it": "A description is a
+  value, so the runtime can interpret it more than once. When a
+  description fails, ZIO's `retry` interprets it again from its
+  start. A native handler that invokes the continuation a second time
+  runs only the rest of the computation, from the point of the Effect
+  forward."
 - Chapter 47's limitation 3 already read "Invoking it repeatedly
   gives you backtracking and search", with no "retry", in a chapter
   whose operator list has `retry()`.

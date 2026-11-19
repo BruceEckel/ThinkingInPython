@@ -856,6 +856,11 @@ A library works with values alone, so every Effect must become a value.
 Execution begins when the ZIO runtime interprets that structure at `run`,
 the edge between description and action.
 
+A description is a value, so the runtime can interpret it more than once.
+When a description fails, ZIO's `retry` interprets it again from its start.
+A native handler that invokes the continuation a second time runs only the rest of the computation,
+from the point of the Effect forward.
+
 The TypeScript [Effect](https://effect.website/)
 library also builds a description and runs it later:
 
