@@ -548,7 +548,7 @@ The production binding is a class that uses the console:
 
 ```python
 # greet_console.py
-from ask_tell import Scripted, greet
+from ask_tell import greet
 
 class Console:
     def ask(self, prompt: str) -> str:
@@ -557,13 +557,10 @@ class Console:
     def tell(self, message: str) -> None:
         print(message)
 
-greet(Scripted(), Console())
-#: Hello, Alice!
+greet(Console(), Console())
 ```
 
-This binds `tell` to a `Console` and keeps `Scripted` for `ask`,
-because the book's listings run with no keyboard attached.
-An interactive run of `greet(Console(), Console())` looks like this:
+The program waits for you to type a name, here `Alice`:
 
 ```text
 What is your name? Alice

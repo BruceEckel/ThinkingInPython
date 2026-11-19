@@ -522,8 +522,14 @@ and it becomes part of every future pass.
   exercise's place, and Bruce chooses the replacement: here a tracing
   layer written for the new listing, which kept exercises 2 to 5 at
   their numbers.
-  A listing that reads the keyboard cannot run in the gate, so it
-  binds the real object where it can (`tell`) and keeps the scripted
-  one where it cannot (`ask`), with a text block for the interactive
-  run.
+  A listing is what its lead-in says it is. The first form of this
+  one kept `Scripted` for `ask` so that the gate could run it, and
+  told the reader why: "because the book's listings run with no
+  keyboard attached" (Bruce: "this is confusing"). The listing now
+  ends `greet(Console(), Console())`. A listing the gate cannot run
+  goes in `tools/data/norun.txt` and shows its run as a text block,
+  with a lead-in that says what the transcript cannot ("The program
+  waits for you to type a name, here `Alice`:").
+  No sentence tells the reader how the book is built: grep the scope
+  for `book's (listings|build)`, `unattended`, and `no (terminal|keyboard)`.
   C31 in `bruce_edit_db.md`, sighting 5.

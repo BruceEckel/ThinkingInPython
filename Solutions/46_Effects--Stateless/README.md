@@ -90,8 +90,8 @@ What is your name? Alice
 Hello, Alice!
 ```
 
-The demo in `test_ch46_ask_and_greet.py` supplies `Scripted` rather than `Terminal` because the book's build runs its listings,
-and a call to `input()` in that run has no terminal from which to read.
+The demo in `test_ch46_ask_and_greet.py` supplies `Scripted` rather than `Terminal`,
+so it runs without waiting at the keyboard.
 
 **Request an interface, not a class.**
 `ask_and_greet()` is the same function, character for character,

@@ -4496,9 +4496,23 @@ instead of describing it":
   replace it, and exercise 1 is now a tracing layer written for
   `greet_console.py` (`Traced`), so exercises 2 to 5 keep their
   numbers.
-- A listing that calls `input()` cannot run in the gate. The listing
-  binds `tell` to the `Console` and keeps `Scripted` for `ask`, which
-  gives it a `#:` marker, and the prose says why.
+- A listing that calls `input()` cannot run in the gate. The first
+  form bent the listing to the gate: it bound `tell` to the `Console`
+  and kept `Scripted` for `ask`, which gave it a `#:` marker, and the
+  prose said why ("keeps `Scripted` for `ask`, because the book's
+  listings run with no keyboard attached"). Bruce, the same day:
+  "this is confusing". The reader had been promised the production
+  binding and got half of it, with a reason from the book's build.
+  The listing now ends `greet(Console(), Console())`, is listed in
+  `tools/data/norun.txt`, and carries no marker. A text block shows
+  the run, under "The program waits for you to type a name, here
+  `Alice`:". A listing is what its lead-in says it is. When the gate
+  cannot run it, the listing goes in `norun.txt` with its run as a
+  text block, and no sentence tells the reader how the book is
+  built. The one sibling, Solutions 46's "because the book's build
+  runs its listings, and a call to `input()` in that run has no
+  terminal from which to read", became "so it runs without waiting
+  at the keyboard".
 - The test for the listing-sized form: a sentence says what "the
   production version", "the real implementation", or "the other
   version" does, and the page has no listing of it.

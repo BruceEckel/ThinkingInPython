@@ -23,6 +23,10 @@
 06_Foundations--Modules_and_Packages/a_package/module4.py
 06_Foundations--Modules_and_Packages/a_package/b_package/module6.py
 
+# The production binding of chapter 44's greet(): it reads a name from
+# the keyboard with input(). The chapter shows the run as a text block.
+44_Effects--Effect_Management/greet_console.py
+
 # Everything under the next header is started by `tip by-hand`
 # (tools/by_hand.py), all at once, for a human to try and close. The
 # header is a comment, so `tip run` still skips these like any other
