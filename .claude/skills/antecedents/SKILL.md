@@ -461,3 +461,18 @@ and it becomes part of every future pass.
   For each term of art in a section's opening sentences, grep the
   book for the sentence that sets it in italics. R16 in
   `bruce_edit_db.md`.
+- 2026-11-19, chapter 44: a possessive on a bare noun, far from the
+  phrase that says what the noun holds.
+  "C++11 deprecated its lists" (Bruce: "the list of exceptions?
+  something better than 'its lists'").
+  The paragraph opened with "a list the programmer writes on each
+  function", eight sentences up, and four other nouns had come
+  between. "Its" had two owners, C++ and C++11, and the plural
+  appeared here alone.
+  Write the identifying phrase again, in the paragraph's number:
+  "C++11 deprecated the list of exceptions ... C++17 abandoned the
+  list altogether."
+  The sentence had been moved to the paragraph's end an hour before.
+  After a repair moves a sentence, read each of its nouns where it
+  lands.
+  R12 in `bruce_edit_db.md`.

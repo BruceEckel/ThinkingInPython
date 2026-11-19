@@ -481,8 +481,8 @@ and it becomes part of every future pass.
   List the dated steps in a paragraph (a version, a year, a PEP). If
   they sit at two places or out of date order, gather them where the
   paragraph ends, in date order, each with what it did: "C++11
-  deprecated its lists and added the `noexcept` keyword, which states
-  whether a function can throw an exception. C++17 abandoned the
-  lists altogether."
+  deprecated the list of exceptions and added the `noexcept` keyword,
+  which states whether a function can throw an exception. C++17
+  abandoned the list altogether."
   The description above them then holds one tense for each language.
   C100 in `bruce_edit_db.md`.

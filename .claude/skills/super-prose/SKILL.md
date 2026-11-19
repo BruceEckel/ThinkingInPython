@@ -315,9 +315,9 @@ each pass hands the next one less to do.
    dated steps (a version number, a year, a PEP); steps at two
    places, or out of date order, are gathered at the end in date
    order, and the description above them keeps one tense ("C++
-   checked its list at runtime ... C++11 deprecated its lists and
-   added the `noexcept` keyword ... C++17 abandoned the lists
-   altogether",
+   checked its list at runtime ... C++11 deprecated the list of
+   exceptions and added the `noexcept` keyword ... C++17 abandoned
+   the list altogether",
    C100). Grep the scope for a version or a year between commas
    inside a sentence about something else.
 5. `antecedents`: every pointer with two candidates gets its noun.
@@ -389,7 +389,14 @@ each pass hands the next one less to do.
    ("the PEP" in a section that cites four PEPs, "the listing", "the
    function") passes when the sentence before it names the one
    meant, and otherwise takes the name ("two years before the PEP"
-   -> "before PEP 255", R12). A part noun ("the body", "the loop",
+   -> "before PEP 255", R12). A bare noun far from the phrase that
+   says what it holds takes the phrase again, in the number the
+   paragraph uses ("C++11 deprecated its lists", eight sentences
+   after "a list the programmer writes on each function", Bruce:
+   "the list of exceptions? something better than 'its lists'" ->
+   "deprecated the list of exceptions", R12). A repair that moves a
+   sentence moves its nouns away from the sentence that identified
+   them, so read each one where it lands. A part noun ("the body", "the loop",
    "the frame") names its owner when the paragraph holds a second
    thing with that part ("compile the body" -> "compile the
    generator's body", beside a loop body, C50). A count of items

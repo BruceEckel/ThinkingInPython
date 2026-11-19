@@ -594,7 +594,7 @@ ambiguity, not on pronouns.
 sighting from chapter 26 below is the point of the entry: a sweep that
 reads the others as "prefer the noun" will overshoot.
 
-**Sightings.** 34 (5 chapters)
+**Sightings.** 35 (6 chapters)
 - `26_Patterns--Factory` 2026-08-31 (`40323f50`), was Claude-written,
   six: "It covers only the first level of inheritance" ->
   "`__subclasses__()` covers only the first level of inheritance"; "It
@@ -727,6 +727,24 @@ reads the others as "prefer the noun" will overshoot.
   -> "verify the dependency", after "in the signature"; "the union
   without it" -> "without `Never`"), and 43 kept, where the nearest
   such noun is the referent.
+- `44_Effects--Effect_Management` 2026-11-19, a possessive on a bare
+  noun, Bruce: "the list of exceptions? something better than 'its
+  lists'". "C++11 deprecated its lists and added the `noexcept`
+  keyword ... C++17 abandoned the lists altogether." -> "C++11
+  deprecated the list of exceptions ... C++17 abandoned the list
+  altogether." The paragraph's first sentence had "a list the
+  programmer writes on each function", eight sentences up, and
+  "signature", "specification", "implementation details", and "them"
+  had come between. "Its" had two owners, C++ and the C++11 just
+  named, and the plural was new: every other sentence says "the
+  list". Claude wrote "its lists" that day in the C100 repair, which
+  moved the history to the paragraph's end and so moved the noun
+  away from the sentence that says what it lists. A sentence a repair
+  moves is read again for each noun whose identifying phrase stayed
+  behind. The test for "its N" or "the N": when the phrase that says
+  what N holds is more than a few sentences up, write it again
+  ("of exceptions"), in the number the paragraph uses. 35 sightings,
+  6 chapters.
 
 **Home.** the `antecedents` skill, as a keep-when (its "zero ambiguous
 pointers, not zero pronouns" line). Not a separate sweep. Promoted
