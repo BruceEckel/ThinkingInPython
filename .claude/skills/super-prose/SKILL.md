@@ -344,7 +344,12 @@ each pass hands the next one less to do.
    that `run.value` is nonzero", Bruce: '"succeeds"?' -> "`slope()`
    succeeds, because ...", C103). The guarantee explains success,
    and "at once" said when. Grep the scope for `because|since` and
-   read each main clause that ends on an adverb of time or manner. Grep the scope for a version or a year between commas
+   read each main clause that ends on an adverb of time or manner.
+   A sentence that places one item of the list before it ("three
+   parts: the parameter types, the Effect row, and the result type.
+   The row sits between the other two.") folds into the list as
+   "in order" (Bruce: "to eliminate the second sentence" -> "three
+   parts, in order: ...", C105). Grep the scope for a version or a year between commas
    inside a sentence about something else.
 5. `antecedents`: every pointer with two candidates gets its noun.
    A link is a pointer too: when its target teaches a named

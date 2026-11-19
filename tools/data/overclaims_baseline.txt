@@ -685,7 +685,7 @@ Chapters/43_Functional--Confidence.md	[BOUND] Without using CODE, write two func
 Chapters/43_Functional--Confidence.md	[BOUND] Write Hypothesis properties for CODE using two shapes from A Family of Property Shapes
 Chapters/44_Effects--Effect_Management.md	[BOUND] *Composite* and *Interpreter*'s CODE returns a new tree instead of editing the one it receives
 Chapters/44_Effects--Effect_Management.md	[BOUND] *Observer*'s CODE returns a new grid instead of mutating the one it receives, so a test checks the change without a GUI
-Chapters/44_Effects--Effect_Management.md	[BOUND] A Koka function type has three parts
+Chapters/44_Effects--Effect_Management.md	[BOUND] A Koka function type has three parts, in order
 Chapters/44_Effects--Effect_Management.md	[BOUND] A behavior confined to one function is easy to manage, because one read of that function tells you what's happening
 Chapters/44_Effects--Effect_Management.md	[BOUND] A library works with values alone, so every Effect must become a value
 Chapters/44_Effects--Effect_Management.md	[BOUND] An CODE block has two options, catch or propagate, and both discard the continuation

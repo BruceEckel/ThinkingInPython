@@ -677,9 +677,8 @@ fun main() : <console,exn> ()
 
 The angle brackets in `greet()`'s signature hold the *Effect row*,
 the set of Effects the function performs.
-A Koka function type has three parts: the parameter types, the Effect row,
-and the result type.
-The row sits between the other two.
+A Koka function type has three parts, in order: the parameter types,
+the Effect row, and the result type.
 In `ask_tell.py`, `greet()` receives `ask` and `tell` as parameters.
 Here the Effect row carries them, so the parameter list is empty.
 The `()` after the row is the return type: Koka's unit type,

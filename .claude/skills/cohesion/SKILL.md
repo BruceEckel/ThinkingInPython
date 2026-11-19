@@ -533,3 +533,17 @@ and it becomes part of every future pass.
   No sentence tells the reader how the book is built: grep the scope
   for `book's (listings|build)`, `unattended`, and `no (terminal|keyboard)`.
   C31 in `bruce_edit_db.md`, sighting 5.
+- **A list whose order matters says "in order".**
+  "A Koka function type has three parts: the parameter types, the
+  Effect row, and the result type. The row sits between the other
+  two." (Bruce, 2026-11-19, chapter 44: 'perhaps "... in order:" to
+  eliminate the second sentence').
+  The second sentence placed one item of a list the first had just
+  given in that order. "In order" on the list carries it: "three
+  parts, in order: the parameter types, the Effect row, and the
+  result type."
+  After a list, read the next sentence for a position word (between,
+  first, last, before, after) said of one of its items.
+  Keep a position in a listing or a call sequence that comes with a
+  reason.
+  C105 in `bruce_edit_db.md`.

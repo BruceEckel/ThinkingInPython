@@ -7502,6 +7502,36 @@ reserved for actual test files". Claude-written:
 **Home.** `antecedents` (a stand-in noun of the wrong kind; Accrued
 patterns) | super-prose (The order, 5) | this file.
 
+### C105. A list whose order matters says "in order", and the sentence that places one item goes
+
+**Test.** A sentence gives a list, and the next sentence says where
+one of its items sits ("The row sits between the other two"). Write
+the list in the order that matters, put "in order" in front of its
+colon, and cut the second sentence.
+
+**Keep when.** The position is news the list's order cannot carry: a
+position in a listing or a call sequence, with a reason ("so the test
+sits between the `pop()` and the addition").
+
+**Sightings.** 1, `44_Effects--Effect_Management` 2026-11-19, Bruce
+on Native Effect Management: 'perhaps "three parameter types, in
+order:" to eliminate the second sentence'. Claude-written:
+- "A Koka function type has three parts: the parameter types, the
+  Effect row, and the result type. The row sits between the other
+  two." -> "A Koka function type has three parts, in order: the
+  parameter types, the Effect row, and the result type."
+- The noun stayed "parts". His "three parameter types" would call the
+  row and the result parameter types.
+- Why the passes missed it: the second sentence adds a fact, that the
+  list's order is the type's order, so the restating rule (R19) kept
+  it. Two words on the first sentence carry that fact.
+- Scale: a grep of both trees for "sits between", "comes first", "in
+  that order", and their kin found 12 other lines, each a position in
+  a listing or a sequence of calls.
+
+**Home.** `cohesion` (Accrued patterns) | super-prose (The order, 4)
+| this file.
+
 ## Retired
 
 Rejected by Bruce, or promoted and later withdrawn. Never propose these
