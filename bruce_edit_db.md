@@ -7253,9 +7253,12 @@ super-prose (The order, 6) | this file.
 **Test.** List the dated steps in a paragraph: a version number, a
 year, or a PEP with a verb of change (added, deprecated, removed).
 Steps about one thing that sit at two places fail, and so do steps
-out of date order. Gather them where the paragraph ends, in date
-order, each with what it did, and write the description above them in
-one tense.
+out of date order. First ask which steps the paragraph's argument
+uses. In an aside about another language that is usually the outcome
+alone, so state where the thing ended up and by when, in one
+sentence, and cut the steps between. Steps the argument does use are
+gathered where the paragraph ends, in date order, each with what it
+did. Write the description above them in one tense.
 
 **Keep when.** The paragraph is itself a history told in order, or a
 single dated step sits beside the one fact it dates ("adopted in
@@ -7292,6 +7295,23 @@ sentences were Claude-written:
 - Revised the same day under C101: "put a single bit in their place:
   whether a function can throw an exception" -> "added the `noexcept`
   keyword, which states whether a function can throw an exception".
+- Bruce's fourth flag on the two sentences, the same day: "let's
+  instead skip the intermediate step, and say 'by the time C++
+  reached version 17, it had eliminated the list of exceptions in
+  favor of a single noexcept keyword indicating ...' or similar
+  wording". "C++11 deprecated the list of exceptions and added the
+  `noexcept` keyword, which states whether a function can throw an
+  exception. C++17 abandoned the list altogether." -> "By C++17, the
+  language had eliminated the list of exceptions in favor of a single
+  `noexcept` keyword, which states whether a function can throw an
+  exception." The paragraph argues that exception specifications
+  failed. The outcome supports that, and the deprecation in C++11
+  does not add to it. The repair that gathered the steps had asked
+  where they go and in which order, and had not asked whether the
+  paragraph needs each one. The test above now asks that first.
+  "By C++17" stands for his "by the time C++ reached version 17",
+  the same words with the version as the date (C87 keeps "reach" off
+  a version).
 
 **Home.** `cohesion` (order; Accrued patterns) | super-prose (The
 order, 4) | this file.

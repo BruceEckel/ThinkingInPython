@@ -312,13 +312,16 @@ each pass hands the next one less to do.
    runtime" in the second sentence and "C++11 reduced its version to
    a single bit" in the last (Bruce: "Can we combine this C++
    evolution at the end of the paragraph"). List the paragraph's
-   dated steps (a version number, a year, a PEP); steps at two
-   places, or out of date order, are gathered at the end in date
-   order, and the description above them keeps one tense ("C++
-   checked its list at runtime ... C++11 deprecated the list of
-   exceptions and added the `noexcept` keyword ... C++17 abandoned
-   the list altogether",
-   C100). Grep the scope for a version or a year between commas
+   dated steps (a version number, a year, a PEP). For steps at two
+   places, or out of date order, first ask which ones the
+   paragraph's argument uses: an aside about another language
+   usually needs the outcome alone (Bruce, on the first repair's two
+   gathered steps: "let's instead skip the intermediate step" ->
+   "By C++17, the language had eliminated the list of exceptions in
+   favor of a single `noexcept` keyword, which states whether a
+   function can throw an exception"). Steps the argument uses are
+   gathered at the end in date order, and the description above
+   them keeps one tense ("C++ checked its list at runtime", C100). Grep the scope for a version or a year between commas
    inside a sentence about something else.
 5. `antecedents`: every pointer with two candidates gets its noun.
    A link is a pointer too: when its target teaches a named

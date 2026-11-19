@@ -479,10 +479,18 @@ and it becomes part of every future pass.
   description of what the design did, and "reduced" left the reader
   to work out what C++17 still had to remove.
   List the dated steps in a paragraph (a version, a year, a PEP). If
-  they sit at two places or out of date order, gather them where the
-  paragraph ends, in date order, each with what it did: "C++11
-  deprecated the list of exceptions and added the `noexcept` keyword,
-  which states whether a function can throw an exception. C++17
-  abandoned the list altogether."
+  they sit at two places or out of date order, first ask which steps
+  the paragraph's argument uses. The first repair gathered both steps
+  at the end in date order ("C++11 deprecated the list of exceptions
+  and added the `noexcept` keyword ... C++17 abandoned the list
+  altogether"), and Bruce cut the middle one: "let's instead skip the
+  intermediate step". The paragraph argues that the specifications
+  failed, and the outcome is what supports that: "By C++17, the
+  language had eliminated the list of exceptions in favor of a single
+  `noexcept` keyword, which states whether a function can throw an
+  exception."
+  In an aside about another language, state where the thing ended up
+  and by when. Steps the argument does use go where the paragraph
+  ends, in date order, each with what it did.
   The description above them then holds one tense for each language.
   C100 in `bruce_edit_db.md`.
