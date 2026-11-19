@@ -435,7 +435,14 @@ each pass hands the next one less to do.
    A term the book defines in an earlier chapter is a link at its
    first use in the chapter ("Stateless does [dependency
    injection](11_Techniques--Testing.md#random-numbers) with
-   `Need`", R16).
+   `Need`", R16). "The test" is a `test_*.py` file. A script that
+   calls and prints is not one ("Here, the test binds the Effects
+   to `Scripted` and `Capture`, so it checks the greeting" above
+   `greet_demo.py`, Bruce: "let's not call it the test, as that is
+   usually reserved for actual test files" -> "the call to `greet()`
+   binds the Effects ..., so `greet()` runs without the console",
+   C104). Read the filename under each "the test" and each "checks";
+   the condition sense and a test in general stay.
 6. `ambiguity`: every sentence that counts, compares, coordinates,
    modifies, or limits keeps one reading. A list of what two things
    share ("has `send()`, `throw()`, and `close()`, as a generator

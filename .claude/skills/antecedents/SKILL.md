@@ -476,3 +476,20 @@ and it becomes part of every future pass.
   After a repair moves a sentence, read each of its nouns where it
   lands.
   R12 in `bruce_edit_db.md`.
+- 2026-11-19, chapter 44: "the test" for a script that is not a test.
+  "Here, the test binds the Effects to `Scripted` and `Capture`, so
+  it checks the greeting without using the console:" above
+  `greet_demo.py` (Bruce: "let's not call it the test, as that is
+  usually reserved for actual test files").
+  The listing calls `greet()` and prints a list. It has no `assert`
+  and no `test_` name.
+  The chapter speaks of tests in general eight times ("a test
+  binds", "a test swaps"), and the lead-in carried the noun onto the
+  demo.
+  Read the filename under each "the test", and give the verb to what
+  acts in the listing: "the call to `greet()` binds the Effects ...,
+  so `greet()` runs without the console".
+  "Checks" and "asserts" go with the noun: a script runs and prints.
+  Keep the condition sense ("the test sits between the `pop()` and
+  the addition") and a test spoken of in general.
+  C104 in `bruce_edit_db.md`.

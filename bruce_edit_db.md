@@ -7425,6 +7425,44 @@ on Combine the First and Third: '"succeeds"?' Claude-written:
 **Home.** `cohesion` (a connective states a real relation; Accrued
 patterns) | super-prose (The order, 4) | this file.
 
+### C104. "The test" is a test file: a script that demonstrates gets its own noun
+
+**Test.** Prose beside a listing calls it "the test", "this test", or
+says it "checks" or "asserts". Read the listing's first line and its
+body. If the file is not `test_*.py` and holds no `assert`, it is a
+script that prints. Give the verb to what acts in it ("the call to
+`greet()` binds", "the script prints"), and say "runs" or "prints"
+for "checks".
+
+**Keep when.** "Test" in its other sense, a condition ("the test
+sits between the `pop()` and the addition"); a hypothetical test the
+chapter talks about in general ("A test binds an in-memory store");
+prose that leads to a `test_*.py` listing; an exercise whose own
+statement says "test".
+
+**Sightings.** 1, `44_Effects--Effect_Management` 2026-11-19, Bruce
+on Effects by Hand: "let's not call it the test, as that is usually
+reserved for actual test files". Claude-written:
+- "Here, the test binds the Effects to `Scripted` and `Capture`, so
+  it checks the greeting without using the console:" above
+  `greet_demo.py`, which calls `greet()` and prints
+  `captured.messages` -> "Here, the call to `greet()` binds the
+  Effects to `Scripted` and `Capture`, so `greet()` runs without the
+  console:".
+- Why the passes missed it: the chapter says "a test binds", "a test
+  swaps", and "a test installs" eight times of tests in general, and
+  the lead-in carried the word onto a demo script. No pass compared
+  the noun with the filename under it.
+- Scale: a script listed every "the/this/that test" in the paragraph
+  above or below a listing that is not `test_*.py` and holds no
+  `assert`: 33 lines in both trees. This is the one demo script
+  called a test. The others are the condition sense, a lead-in to a
+  `test_*.py` listing that follows, or Solutions 47's exercise 4,
+  whose statement says "Use it to test".
+
+**Home.** `antecedents` (a stand-in noun of the wrong kind; Accrued
+patterns) | super-prose (The order, 5) | this file.
+
 ## Retired
 
 Rejected by Bruce, or promoted and later withdrawn. Never propose these

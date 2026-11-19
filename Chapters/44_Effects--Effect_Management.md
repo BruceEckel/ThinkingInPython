@@ -531,8 +531,8 @@ class Capture:
 `greet()` performs an `Ask` Effect and a `Tell` Effect.
 Its signature says so, because the parameters are the Effects.
 
-Here, the test binds the Effects to `Scripted` and `Capture`,
-so it checks the greeting without using the console:
+Here, the call to `greet()` binds the Effects to `Scripted` and `Capture`,
+so `greet()` runs without the console:
 
 ```python
 # greet_demo.py
