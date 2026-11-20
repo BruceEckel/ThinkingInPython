@@ -7763,6 +7763,38 @@ sentences:
 **Home.** `antecedents` for (a) and (b), `ambiguity` for (c) | this
 file. No skill entry until a second sighting.
 
+### C109. Two small repairs from one hand pass: an obligation that holds for each member takes "every", and a resistance that later ends is "initial"
+
+**Test.** Two shapes, each one sighting, kept together until one
+recurs. (a) A sentence states an obligation with "must" on an
+indefinite object ("you must wrap a third-party library"), and the
+passage's point is how far the obligation reaches: "a" reads as one
+library, so write "every". This runs against C1, which drops the
+universal where the indefinite carries it. The difference is the
+claim: here the count of libraries is the burden the paragraph
+describes, so the indefinite does not carry it. (b) A sentence walks
+a thing through stages in order ("meets resistance ..., then wins
+adoption, then fades"): the first stage takes the word that says it
+is a stage ("initial resistance"), so the reader knows before "then"
+that the resistance ends.
+
+**Keep when.** (a) The sentence is about one instance, or the reach
+is stated beside it. (b) The stage's end is already in its clause.
+
+**Sightings.** 1 each, `44_Effects--Effect_Management` 2026-11-19,
+Bruce's hand (`69911c79`):
+- "and you must wrap a third-party library to make it conform" ->
+  "you must wrap every third-party library".
+- "Each meets resistance as unnecessary overhead, then wins
+  adoption," -> "Each meets initial resistance".
+- Also in that pass, local: "drop conveniences that help people" ->
+  "drop the affordances that help people" (a word choice), "the Zen
+  of Python celebrates it" -> "Tim Peters' Zen of Python" (an
+  attribution), and a rewrapped line.
+
+**Home.** `ambiguity` for (a), `cohesion` for (b) | this file. No
+skill entry until a second sighting.
+
 ## Retired
 
 Rejected by Bruce, or promoted and later withdrawn. Never propose these
