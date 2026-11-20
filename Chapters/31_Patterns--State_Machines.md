@@ -586,17 +586,6 @@ If you pair `Column` with `choose_row()`, written for a `Row`,
 `ty` reports `invalid-argument-type` on that rule.
 `refund()` accepts `object`, so it pairs with any input type.
 
-`__init__()` binds the list to `rules`, with no annotation, before the call,
-and that binding leaves each `Rule(...)` to infer its `I` from its own arguments.
-If you write the list inline as the argument,
-the parameter's `Sequence[Rule[Any]]` becomes its expected type.
-That `Any` reaches into every `Rule(...)` and makes its `I` `Any`,
-so the checker accepts any method on any rule.
-In that version the `Column`/`choose_row()` mismatch above passes the checker.
-When the mismatched rule fires at runtime,
-`choose_row()` stores a `Column` in `self.row`,
-and `_slot()` then uses that column's `value` as the row index.
-
 Adding a state or an input is now a local change:
 a `State` member or an input class, its rules in the list, and a method or two.
 Two language features do the work of a `switch`, reflection,

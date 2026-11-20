@@ -394,9 +394,34 @@ Moved from `CLAUDE.md`, which keeps the rule that you never start an upgrade you
   about 145k tokens, six minutes, brief in
   `build/upgrade-2026-11-20/PROBES.md` while that directory lasts).
   Then `tip version-pins ARGS=--write` bumped the ten pins. The
-  "cannot, misses, accepts" read did not run, since no changelog
-  entry was read that day; run it when one of the three releases
-  turns out to change narrowing or inference. winget's pandoc
+  changelogs, read afterward, list inference changes beside the
+  splits: 0.0.105 changes constrained-`TypeVar` calls, type context
+  in nested expressions, and `assert_never` arguments; 0.0.106
+  changes overloads called with a union argument and `ParamSpec`
+  with `Concatenate`; 0.0.107 has "Reject union narrowing attempts
+  with failed nested calls" and an enum-complement change. So the
+  "cannot, misses, accepts" read ran, on a wider list: the search
+  added "infers", "narrows", "treats", "reads", and "follows", and
+  found 210 lines where the 2026-11-14 list had 117
+  (`build/upgrade-2026-11-20/claims.py` builds it). Four report-only
+  Opus agents by chapter band (153k to 179k tokens, five to seven
+  minutes each, brief in `build/upgrade-2026-11-20/CLAIMS-BRIEF.md`)
+  probed every line under both versions. No sentence moved with the
+  upgrade. Three were false under both versions, which the brief
+  asked for as a verdict of its own, "FALSE (both versions)"; a read
+  that compares only old with new calls such a sentence unchanged.
+  Chapter 31 said that writing the vending machine's rules list
+  inline makes each `Rule`'s `I` `Any` and hides the
+  `Column`/`choose_row()` mismatch; the checker reports the mismatch
+  in both forms, and the paragraph was cut. Chapter 17 said the
+  checker "cannot represent a class built any other way" than a
+  dataclass-like decorator, against its own `type()` section, and
+  said the checker reports every line that uses a metaclass's
+  changes; `ty` and Pyright both find an attribute that a
+  metaclass's `__init__()` assigns as `cls.name = value` (`setattr()`,
+  an assignment in `__new__()`, and an assignment in a class
+  decorator are still reported). Both sentences were reworded. Keep
+  the "FALSE (both versions)" verdict in the next brief. winget's pandoc
   uninstall failed with 1603 again, so pandoc stays at 3.12.1 with
   3.14 available. `ty check tools` prints one error under both
   versions, `unsupported-operator` at `tools/tests/test_serve.py:282`,

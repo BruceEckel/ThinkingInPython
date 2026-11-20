@@ -873,9 +873,8 @@ and `frozen_default=True` tells the checker that classes built by `model()` reje
 
 `@dataclass_transform` generalizes one shape:
 a decorator that builds a class's methods from its field declarations.
-The checker cannot represent a class built any other way,
-because it neither imports nor executes your code.
-The checker learns about a class from two sources alone:
+The checker neither imports nor executes your code,
+so it learns about a class from two sources alone:
 the constructs it recognizes and emulates, and what you declare.
 That is why `commander.py` uses a `cast()` to state the real signature.
 Its class exists only as [text in a string](#generating-classes-with-exec).
@@ -1163,7 +1162,12 @@ A type describes a known set of attributes and signatures,
 but a metaclass changes that structure at runtime,
 adding attributes the class does not declare and replacing methods like `__new__()`.
 The type checker never runs the metaclass,
-so it reports the lines that use those changes as errors.
+so it reports most lines that use those changes as errors.
+`simple_meta.py` adds its method with `setattr()`,
+and the type checker reports `Simple().uses_metaclass()` as a missing attribute.
+The exception is an attribute that a metaclass's `__init__()` assigns as `cls.name = value`.
+The type checker reads that assignment as it reads `self.name = value` in any `__init__()`,
+so it finds the attribute on every class the metaclass builds.
 
 Three ways suppress the type checker's reports, from narrowest to broadest:
 
