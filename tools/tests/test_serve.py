@@ -279,7 +279,7 @@ def test_the_bookmark_message_drops_what_is_empty() -> None:
 def site(tmp_path: Path) -> Path:
     out = tmp_path / "site"
     out.mkdir()
-    (out / MARK["page"]).write_text("<html></html>", encoding="utf-8")
+    (out / str(MARK["page"])).write_text("<html></html>", encoding="utf-8")
     return out
 
 
