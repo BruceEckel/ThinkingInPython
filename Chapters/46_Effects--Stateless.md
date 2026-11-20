@@ -736,7 +736,7 @@ After each layer, the type lists the Abilities still to supply.
 
 A `type` alias normally shortens a repeated union like this one.
 Elsewhere the book writes such an alias.
-`ty` 0.0.104 reports an `invalid-yield` for an undeclared Ability when the return annotation is an alias such as `type Greeting = Depend[...]`,
+`ty` 0.0.107 reports an `invalid-yield` for an undeclared Ability when the return annotation is an alias such as `type Greeting = Depend[...]`,
 as it does for the written-out signature of `greet_all()`.
 This book still writes out Effect signatures in full,
 because the union is the information.

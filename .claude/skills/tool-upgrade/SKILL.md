@@ -364,6 +364,43 @@ Moved from `CLAUDE.md`, which keeps the rule that you never start an upgrade you
   Bruce's answer, was `uv lock --upgrade` and `uv sync`. Every agent
   brief now says that a modified file outside the brief belongs to
   someone else and that the agent runs no git command that writes.
+  The 0.0.104 to 0.0.107 upgrade (2026-11-20, with uv 0.13.8 to
+  0.13.9, ruff 0.17.5 to 0.17.6, hypothesis 6.170.15 to 6.170.17, and
+  vale to 3.28.1; Python, pyright, and the other libraries unchanged)
+  was a quiet one: `tip sweep` green on both trees, `tip
+  unused-ignores` clean, `tip check output-check` clean, the pyright
+  delta empty, and every quoted diagnostic a MATCH. The diff of the
+  `# name` headings of `ty explain rule` showed no rule renamed or
+  removed and four added, three of them splits that leave the parent
+  name on the remaining cases: `missing-module-member` (0.0.105, from
+  `import-not-found`, for a `from m import name` whose name the
+  module lacks; a whole-module import that fails is still
+  `import-not-found`), `invalid-dataclass-post-init` (0.0.105, from
+  `invalid-dataclass`, a `__post_init__` signature that does not fit
+  the `InitVar` fields), and `disjoint-type-is-narrowing` with
+  `suspicious-type-is-narrowing` (0.0.106, from
+  `invalid-type-guard-definition`, a `TypeIs[T]` whose `T` is not
+  assignable to the parameter's type). A heading diff shows a split
+  only as an addition, so read each added rule's "Rule history" line
+  and grep both trees and `tools/` for the parent name. No sentence
+  in the book names a parent; the four
+  `# ty: ignore[import-not-found]` comments in `tools/` are
+  whole-module imports and still apply. The book has no `InitVar`,
+  and its five sentences about `TypeIs` and `TypeGuard` (chapter 16
+  twice, chapter 08's table, appendix B) probed true under both
+  versions. All 13 pinned probes HOLD, byte-identical under both
+  versions, with `record(cls)` still mistyped (one report-only Opus
+  agent for the probes, `ty check tools`, and the `TypeIs` read,
+  about 145k tokens, six minutes, brief in
+  `build/upgrade-2026-11-20/PROBES.md` while that directory lasts).
+  Then `tip version-pins ARGS=--write` bumped the ten pins. The
+  "cannot, misses, accepts" read did not run, since no changelog
+  entry was read that day; run it when one of the three releases
+  turns out to change narrowing or inference. winget's pandoc
+  uninstall failed with 1603 again, so pandoc stays at 3.12.1 with
+  3.14 available. `ty check tools` prints one error under both
+  versions, `unsupported-operator` at `tools/tests/test_serve.py:282`,
+  which no gate reads.
   **Sweep `Solutions/` for quoted diagnostics too, not just `Chapters/`.**
   The 2026-09-02 exercise pass found ten stale `ty` quotes, every one of
   them in `Solutions/` and not one in `Chapters/`: wrong line numbers,
