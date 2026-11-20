@@ -32,6 +32,13 @@ own return-code documentation names a different meaning for this exact
 code, disagreeing with the behavior actually observed, so this trusts
 the test over the docs.
 
+A package installed per machine (pandoc's MSI) fails differently: the
+silent upgrade cannot remove the old version without elevation. At a
+terminal this script retries once with `--interactive`, so the
+installer can raise its own UAC prompt; in a headless run it prints
+the command to run from an elevated shell. See
+`WINGET_UNINSTALL_FAILED`.
+
 `git` is left alone: it is outside this project's control, and
 `tip tools-check` already treats it as assumed.
 
@@ -44,6 +51,7 @@ Usage:
 """
 import shutil
 import subprocess
+import sys
 
 from tools.repo import run_echoed
 
@@ -65,26 +73,67 @@ EXTERNAL: dict[str, tuple[str, str, str]] = {
 # return-code table: it names 0x8A15002B as a manifest-validation
 # error, which contradicts what was actually observed here.
 WINGET_ALREADY_LATEST = 0x8A15002B
+WINGET_OK = (0, WINGET_ALREADY_LATEST)
+
+# winget's exit code when the old version's uninstaller fails, printed
+# with "Uninstall failed with exit code: 1603" (1603 is the MSI's own
+# code; winget's is this one). Observed 2026-11-20 on pandoc, winget's
+# only package here that installs per machine: its MSI lives in
+# `C:\Program Files` and removing it needs an elevated process. A
+# `--silent` run from an unelevated shell cannot raise the UAC prompt,
+# so the uninstall fails on every upgrade. typst and vale are portable
+# packages under the user profile and never return it.
+WINGET_UNINSTALL_FAILED = 0x8A150030
 
 
-def winget_upgrade(package_id: str) -> bool:
-    cmd = ["winget", "upgrade", "--id", package_id, "--silent"]
+def winget_command(package_id: str, *, interactive: bool = False) -> list[str]:
+    mode = "--interactive" if interactive else "--silent"
+    return ["winget", "upgrade", "--id", package_id, mode]
+
+
+def winget_upgrade(package_id: str, *, interactive: bool = False) -> int | None:
+    """Run the upgrade and return winget's exit code, None if it cannot start."""
+    cmd = winget_command(package_id, interactive=interactive)
     print(f"$ {' '.join(cmd)}")
     try:
         proc = subprocess.run(cmd)
     except OSError:
-        return False
+        return None
     # subprocess.run()'s returncode on Windows may come back signed or
     # unsigned; masking to 32 bits normalizes either representation.
-    code = proc.returncode & 0xFFFFFFFF
-    return code in (0, WINGET_ALREADY_LATEST)
+    return proc.returncode & 0xFFFFFFFF
+
+
+def needs_elevation(name: str, winget_id: str) -> bool:
+    """Handle a failed uninstall: retry with a UAC prompt, or say how.
+
+    The interactive retry lets the installer ask for elevation, so it
+    runs only when a person is at a terminal to answer; a headless run
+    (CI, an agent, output redirected to a log) prints the command to
+    run from an elevated shell and never opens a dialog.
+    """
+    if sys.stdout.isatty():
+        print(f"{name}: the silent upgrade could not remove the old "
+              "version; retrying with the installer's own prompts.")
+        if winget_upgrade(winget_id, interactive=True) in WINGET_OK:
+            return True
+    cmd = " ".join(winget_command(winget_id))
+    print(f"Could not auto-update {name}: removing the installed version "
+          "needs administrator rights.\n"
+          f"Run this from an elevated shell: {cmd}")
+    return False
 
 
 def update_external(
     name: str, winget_id: str, brew_formula: str, link: str
 ) -> None:
-    if shutil.which("winget") and winget_upgrade(winget_id):
-        return
+    if shutil.which("winget"):
+        code = winget_upgrade(winget_id)
+        if code in WINGET_OK:
+            return
+        if code == WINGET_UNINSTALL_FAILED:
+            needs_elevation(name, winget_id)
+            return
     if shutil.which("brew") and run_echoed(["brew", "upgrade", brew_formula]):
         return
     print(f"Could not auto-update {name}. "
