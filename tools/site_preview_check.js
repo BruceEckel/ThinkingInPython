@@ -139,6 +139,8 @@ const panelIn = w => w.document.querySelector(".link-preview");
 
 // True when `href` names an authored anchor: the empty span that
 // `[]{#id}` in the Markdown puts at the start of a listing's lead-in.
+// The book index's locators are empty spans too, and sit in any
+// paragraph, so the `ix-` prefix reserved for them is excluded.
 const pageText = new Map();
 function targetsAuthoredAnchor(name, href) {
   const hash = href.indexOf("#");
@@ -150,6 +152,7 @@ function targetsAuthoredAnchor(name, href) {
                  fs.existsSync(file) ? fs.readFileSync(file, "utf8") : "");
   }
   const id = decodeURIComponent(href.slice(hash + 1));
+  if (id.startsWith("ix-")) return false;
   return pageText.get(page).includes(`<span id="${id}"></span>`);
 }
 
