@@ -8,7 +8,9 @@
 A test you wrote last week starts failing about one run in five.
 The function it calls computes a total price, and the math is right.
 Three calls down, a helper that formats currency reads a configuration service and writes to an audit log.
-Every signature on the path hides the read and the write.
+The test passes the same arguments on every run,
+so the read and the write make the function unpredictable.
+Every signature on the path hides both.
 
 This book emphasizes the benefits of pure functions:
 
@@ -81,7 +83,8 @@ The second is a *side cause*, the counterpart of a side effect:
 what the environment does to the function.
 Suppose your function reads the time of day.
 The read leaves the environment as it was,
-yet the result of your function differs from one call to the next.
+yet two calls with the same arguments return different results.
+Your function is unpredictable.
 Information a function uses beyond its arguments is a side cause whenever that information changes between calls.
 The usual sources are I/O,
 such as the time of day or reading from a network connection.
@@ -394,8 +397,9 @@ and its return value,
 so the function is safe to run in parallel with any other code.
 
 Purity also makes testing trivial.
-Calling a pure function with the same arguments produces the same result every time.
-No side cause, side effect, or failure can surprise you.
+A pure function is predictable.
+The same arguments produce the same result on every call,
+so a test that passes once passes on every run.
 
 ## Two Phases of Effect Analysis
 
@@ -428,8 +432,8 @@ An Effect Management System scales.
 
 Most functions in most programs perform Effects,
 and their signatures show only the arguments and the return type.
-The hidden Effects make code hard to understand.
-A reader who sees only the signature must ask:
+The hidden Effects make a function unpredictable to a reader who sees only its signature.
+That reader must ask:
 
 - Can you call this function in a test without mocking every service it calls?
 - If you call it twice with the same arguments, do you get the same result?
@@ -468,9 +472,10 @@ An Effect Management System (EMS) does three things:
    The signature then tells you whether the function is pure,
    and for an impure function it specifies the kinds of impurity.
 2. **Separates each Effect's interface from its implementation.**
-   A function declares which Effects it uses, not how to fulfill them.
-   It says "I need something that can read from storage" but doesn't specify a storage mechanism
-   (such as a database).
+   A function declares which Effects it uses,
+   while code outside the function fulfills them.
+   It says "I need something that can read from storage."
+   The call that reads a database sits in the implementation.
 3. **Binds the implementation later.**
    A caller or context supplies the implementation at some point after the function's definition,
    usually the edge of the program.
@@ -498,8 +503,9 @@ Each is a hand-built version of something an EMS automates.
 
 Side effects and side causes also have a by-hand technique:
 pass in the implementation as a parameter.
-Instead of calling the built-in `input()` and `print()`,
-`greet()` declares what it needs:
+If `greet()` calls the built-in `input()` and `print()` in its body,
+`greet()` picks the console for every caller, a test included.
+Here, `greet()` declares what it needs:
 
 ```python
 # ask_tell.py
@@ -567,6 +573,7 @@ What is your name? Alice
 Hello, Alice!
 ```
 
+The calls to `input()` and `print()` now sit in `Console`, outside `greet()`.
 Passing different objects changes what `greet()` does without changing `greet()`.
 The signature says what `greet()` needs, not everything `greet()` might do.
 
@@ -705,6 +712,20 @@ A handler intercepts an Effect and decides what it means.
 In `main()`, the `with fun ask(prompt)` handler says that `ask` means "prompt the console and read a line,"
 and the `with fun tell(message)` handler says that `tell` means "print the message."
 
+When `greet()` reaches `ask("What is your name? ")`,
+execution leaves `greet()` and enters the `with fun ask(prompt)` handler in `main()`.
+The handler prints the prompt and reads a line.
+Execution then returns to `greet()`,
+where the line becomes the value of the call to `ask()`.
+The calls to `print()` and `readline()` sit in the handler,
+while `greet()` holds the request.
+
+![The handler stands between greet() and the console.](_images/effect_handler)
+
+`greet()` has two arrows, and both connect it to the handler.
+The console's two arrows end at the handler as well,
+so the prompt and the line pass through code that `main()` installs.
+
 Handling an Effect also discharges it.
 `main()`'s row is not `<ask,tell>` but `<console,exn>`.
 The handlers remove `ask` and `tell`,
@@ -723,8 +744,9 @@ so `greet()` produces the same result for each test run.
 ### Continuations
 
 Handlers do more than `except` blocks.
-When an Effect runs, the handler receives a *continuation*:
-the rest of the computation from that point forward.
+When a function requests an Effect, the function pauses,
+and the handler receives a *continuation*:
+the rest of the computation from the request forward.
 An `except` block has two options, catch or propagate,
 and both discard the continuation.
 A handler can resume the continuation once,
@@ -879,8 +901,9 @@ Even `greet()` grows: it cannot call `ask` and then `tell`,
 because each call produces a description, not a value,
 so a `for` comprehension chains the two descriptions into one.
 
-The machinery exists because Scala cannot intercept an Effect at the point where it runs,
-the way a native handler does.
+The machinery exists because a Scala call runs the function it names,
+at the line where you wrote it.
+A library cannot send that call to a handler, the way a native language does.
 A library works with values alone, so every Effect must become a value.
 `greet` is a data structure describing a program.
 Execution begins when the ZIO runtime interprets that structure at `run`,
