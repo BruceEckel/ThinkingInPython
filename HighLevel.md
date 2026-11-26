@@ -122,6 +122,11 @@ The handler, in another part of the program, runs the Effect.
 The call to `input()` is now in the handler,
 while `greet()` holds a request where the call was.
 
+![The call to input() moves out of greet() and into the handler.](resources/images/effect_request.svg)
+
+In both panels, the red box is the call to `input()`,
+and the gray box is the world outside your program.
+
 A restaurant works the same way.
 You give your order to a waiter and stay at your table.
 The order goes to the kitchen, the kitchen cooks,
