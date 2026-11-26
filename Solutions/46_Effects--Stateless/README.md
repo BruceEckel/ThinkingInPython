@@ -597,9 +597,9 @@ so every combination of instances is a valid environment for it.
 The `parametrize` table is a list of environments,
 and the test body is the driver that runs the Effect in each one.
 Six rows share one assertion.
-A version constructing its own `Material` inside `holds()` needs three copies of the function,
-one per material, and a version that also constructs its own `Nailer` needs six,
-one per row.
+A version that constructs its own `Material` inside `holds()` needs three copies of the function,
+one per material.
+A version that also constructs its own `Nailer` needs six, one per row.
 
 Before you move on, name what separates your attempt from this one:
 a different design, a detail, or an equivalent alternative.
@@ -667,9 +667,9 @@ def default(ability: Need[Console]) -> Console:
 <summary>Done when</summary>
 
 your handler, wrapped with `handle()`,
-makes `greeter.py`'s `greet()` print its greeting,
-and an Effect that also requests a second Ability runs to completion,
-with a `print()` in the handler showing it answered both requests.
+makes `greeter.py`'s `greet()` print its greeting.
+An Effect that also requests a second Ability runs to completion,
+and a `print()` in the handler shows that it answered both requests.
 `ty` reports an `invalid-argument-type` at that second `run()`,
 naming the leftover `Need`,
 until a `# type: ignore` on that line silences the report.
@@ -1224,8 +1224,8 @@ def announce(
 <summary>Done when</summary>
 
 `uv run ty check` passes.
-For a name with a positive score the program prints one line,
-for a name with a negative score `run()` raises a `ValueError`,
+For a name with a positive score the program prints one line.
+For a name with a negative score `run()` raises a `ValueError`,
 and for a name missing from `SCORES` it raises a `KeyError`.
 With `ValueError` deleted from `announce()`'s annotation,
 `ty` reports `invalid-yield` at your helper's `yield from`.
@@ -1276,8 +1276,10 @@ for who in ("Alice", "Cyd", "Dana"):
 ```
 
 **Lift the helper into an Effect.**
-`@throws(ValueError)` turns `format_score()` from a function that raises an exception into one that returns an Effect declaring it,
-so the Effect yields the exception as a value instead of letting it propagate up the stack.
+`@throws(ValueError)` turns `format_score()` into a function that returns an Effect,
+with `ValueError` in the Effect's error channel.
+When the body raises a `ValueError`,
+`@throws` catches the exception and yields it as a value instead of letting it propagate up the stack.
 
 **Declare the second failure.**
 Following the type checker until the program builds means one edit:
@@ -1397,14 +1399,16 @@ def to_log(name: str) -> Depend[Need[Recorder], None]:
 your six predictions for `ambiguous_supply.py` with a third implementation match your six runs.
 `supply()` hands the request to the first argument that satisfies it.
 With separate `Protocol`s,
-the type checker reports an `invalid-argument-type` that names the missing method when you hand `Terminal` to the recording Effect,
-and you can name the case that two `Protocol`s still leave to argument order.
+the type checker rejects a `Terminal` handed to the recording Effect,
+with an `invalid-argument-type` that names the missing method.
+You can name the case that two `Protocol`s still leave to argument order.
 
 <details>
 <summary>Solution</summary>
 
 With a third implementation added to `ambiguous_supply.py`,
-the three implementations have six orderings, and one rule predicts them all.
+the three implementations have six orderings.
+One rule predicts them all.
 `supply()` scans its arguments and takes the first that satisfies the request,
 so the implementation listed first answers it.
 Two of the six orderings put `Terminal` first and send the greeting to the screen.
@@ -1481,12 +1485,12 @@ info: └── protocol member `record` is not defined on type `Terminal`
 
 In the second `info` line,
 the type checker gives the reason as a missing method, `record`.
-Structural typing means that `Terminal` fails for the method it lacks,
-not for the class it is.
+Under structural typing, `Terminal` fails because it lacks `record()`,
+not because of its class.
 
 If you keep `print()` on both implementations and declare it in both `Protocol`s,
-each implementation satisfies both,
-and the type checker accepts `as_type(Recorder)(Terminal())`.
+each implementation satisfies both `Protocol`s.
+The type checker then accepts `as_type(Recorder)(Terminal())`.
 Handing that object to `to_log()` prints `Hello, Carol!` to the screen while `capture.messages` stays `['Hello, Bob!']`,
 with no diagnostic.
 Two `Protocol`s that share one method name describe one structure under two names.

@@ -576,12 +576,10 @@ Chapters/46_Effects--Stateless.md	is what: CODE is what it produces
 Chapters/46_Effects--Stateless.md	mocks nothing: The test captures nothing from stdout and mocks nothing
 Chapters/46_Effects--Stateless.md	names each place: The type checker names each place that needs changing
 Chapters/46_Effects--Stateless.md	never: A test then supplies a clock that never waits
-Chapters/46_Effects--Stateless.md	never: and never resumes the inner generator
 Chapters/46_Effects--Stateless.md	never: and the inner CODE never runs
 Chapters/46_Effects--Stateless.md	never: so CODE never returns an instance registered under a subclass of CODE
 Chapters/46_Effects--Stateless.md	nothing stops: Nothing stops an undeclared Effect examines that limit
 Chapters/46_Effects--Stateless.md	only: A CODE-shaped value appears in Stateless only after CODE
-Chapters/46_Effects--Stateless.md	only: A function that constructs its own CODE can use only that class
 Chapters/46_Effects--Stateless.md	only: A library acts only on objects handed to it
 Chapters/46_Effects--Stateless.md	only: CODE is the only CODE here
 Chapters/46_Effects--Stateless.md	only: CODE is the only extra call in that test

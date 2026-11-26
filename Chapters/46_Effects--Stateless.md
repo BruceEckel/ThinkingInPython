@@ -186,7 +186,9 @@ and `Need[random.Random]` in the return type declares the request.
 The two `run(bound())` calls are identical, yet they return different numbers.
 `roll()` returns the number it reads from the `random.Random`,
 which produces a new number at each `randint()` call.
-The seed determines the sequence, so the program always prints `3 1`.
+A side cause makes a function unpredictable:
+the same call returns different results.
+Here the seed determines the sequence, so the program always prints `3 1`.
 
 ### A Side Effect
 
@@ -274,6 +276,11 @@ def greet(name: str) -> Depend[Need[Console], None]:
     console = yield from need(Console)
     console.print(f"Hello, {name}!")
 ```
+
+Compared with `plain_greet()`,
+the call to the built-in `print()` moves out of the function body and into `Console.print()`.
+`greet()` requests a `Console` and calls the `print()` method of the instance it receives,
+so the code that answers the request decides where the greeting goes.
 
 `Depend[Need[Console], None]` declares the dependency.
 A caller now has two options: supply a `Console`,
@@ -383,7 +390,7 @@ print(type(greet("Alice")))
 
 `greet("Alice")` builds a description of a greeting.
 This is the [description/execution split](44_Effects--Effect_Management.md#description-execution-split).
-A language with built-in Effects intercepts an Effect where it runs.
+A language with built-in Effects transfers execution from the line that requests an Effect to a handler.
 Stateless is ordinary Python,
 so a function body's `console.print()` calls the method,
 and no library code runs in between.
@@ -1034,8 +1041,8 @@ so `supply(screen)` builds a `Need[Terminal]` handler again.
 ## When Two Implementations Match
 
 A structural check matches on method names alone,
-so two supplied objects that both define `print()` are indistinguishable.
-If you supply both, argument order decides which one answers the request:
+so it accepts every supplied object that defines `print()`.
+If you supply two of them, argument order decides which one answers the request:
 
 ```python
 # ambiguous_supply.py
@@ -1067,14 +1074,14 @@ The handler answers the request with the first instance that `isinstance()` acce
 `greet()`'s body is the same in both runs.
 The type checker accepts both runs alike,
 because both bindings have the same type.
-Both instances need `as_type(Console)`,
-since each is a `Console` by structure alone.
+Both instances need the `as_type(Console)` upcast,
+because each one's static type is its own class, `Terminal` or `Capture`.
 
 Here Stateless lacks a check that ZIO performs.
 ZIO reports two implementations of one requirement as a compile-time error naming both candidates,
 because its `provide` resolves the dependency graph during compilation.
-`supply()` resolves each request at runtime by scanning its arguments,
-so the same mistake produces a program that runs and hands each request to the instance that comes first in the argument list.
+`supply()` resolves each request at runtime by scanning its arguments.
+It accepts two implementations of one Ability and hands each request to the instance that comes first in the argument list.
 Give Abilities distinct method names when that ambiguity is possible,
 and supply one implementation per Ability.
 
@@ -1136,8 +1143,8 @@ not to silence a type error that reports a missing binding.
 
 Dependency injection (DI) has one goal:
 separate a function from the choice of what it uses.
-A function that constructs its own `Console` can use only that class,
-while a function handed a `Console` can receive a recorder in a test,
+A function that constructs its own `Console` always uses that class.
+A function handed a `Console` can receive a recorder in a test,
 a terminal in production, and a scripted one in a demo.
 
 Conventional DI meets that goal with a container.
@@ -1206,8 +1213,8 @@ Both read `(str) -> None`, and neither shows where the output goes.
 
 The `greet("Alice")` call at `[1]` fails at runtime because it runs before `register()` binds a `Console`.
 The second, at `[2]`, succeeds because the binding now exists.
-The two calls are identical, and no type records whether `register()` has run,
-so the type checker accepts both.
+The two calls are identical.
+No type records whether `register()` has run, so the type checker accepts both.
 
 DI meets its goal.
 The `Console` is swappable.
@@ -1220,8 +1227,8 @@ Constructor injection answers the complaint that the type checker does not valid
 The dependency arrives as a parameter,
 so a static type checker validates every call that supplies one.
 You bind the dependency once, at the endpoint or the constructor.
-Every function called from there passes the dependency onward as a parameter,
-which an EMS replaces with an Ability in the return type.
+Every function called from there passes the dependency onward as a parameter.
+An EMS replaces that parameter with an Ability in the return type.
 
 An EMS requires more than the service locator does.
 The dependency must appear in the signature so the type checker can verify the dependency.
@@ -1244,8 +1251,9 @@ Three consequences follow:
 2. Stateless bindings are per call rather than per process.
    DI usually holds one binding per type for the life of the program.
    `supply()` binds for one execution of one Effect,
-   so two bindings for the same type can be live at once,
-   as the screen and memory `Console`s are in [When Two Implementations Match](#when-two-implementations-match).
+   so two bindings for the same type can be live at once.
+   The screen and memory `Console`s in [When Two Implementations Match](#when-two-implementations-match)
+   are two such bindings.
    Each test case supplies its own bindings and starts clean.
    A typical DI container has one flat registry and no equivalent to [handler layering](#layering-handlers).
 
@@ -1480,8 +1488,8 @@ so you `await` it.
 A synchronous program calls `run()` once at its outermost edge.
 An asynchronous program such as a web service or a bot awaits `run_async()` at the edge of each request.
 
-Calling `run()` inside a coroutine is a runtime error rather than a type error,
-because whether an event loop is running is a fact about the moment of the call,
+Calling `run()` inside a coroutine is a runtime error rather than a type error.
+Whether an event loop is running is a fact about the moment of the call,
 not about any type.
 For the opposite mistake,
 calling `run_async()` without `await` in synchronous code,
@@ -1490,7 +1498,7 @@ calling `run_async()` without `await` in synchronous code,
 ## An Effect Runs Once
 
 A description you can hold as a value looks like one you can run twice.
-In Stateless you cannot, because that description is a generator,
+In Stateless that description runs once, because it is a generator,
 and driving a generator consumes it:
 
 ```python
@@ -1918,15 +1926,15 @@ if __name__ == "__main__":
 The two differ in their types.
 `guarded()` must keep declaring a `KeyError` that can no longer escape it,
 while `moved()` is a `Success`.
-Wrapping `guarded()` in a `catch()` makes its inner `except` dead code,
-because `catch()` matches the yielded value before the driver gets it,
-returns that value as the result, and never resumes the inner generator.
+Wrapping `guarded()` in a `catch()` makes its inner `except` dead code.
+`catch()` matches the yielded value before the driver gets it.
+It returns that value as the result and leaves the inner generator suspended.
 
 `supply()` returns a [`Handler`](#supplying-the-dependency),
 and that `Handler` sits between `run()` and the generator.
-Its loop passes an error outward instead of throwing that error back into the Effect it wraps,
-so the driver's `throw()` raises that error in the `Handler`'s own stack frame,
-not `guarded()`'s stack frame.
+The `Handler`'s loop passes an error outward instead of throwing that error back into the Effect it wraps.
+The driver's `throw()` therefore raises the error in the `Handler`'s own stack frame,
+not in `guarded()`'s stack frame.
 The error propagates out of `run()`, and the inner `except` never runs:
 
 ```python

@@ -119,6 +119,8 @@ Chapters/43_Functional--Confidence.md	every run	`database=None` turns off the ex
 Chapters/43_Functional--Confidence.md	every run	`derandomize=True` seeds the search from a hash of the test function, so this book gets the same answer on every run.
 Chapters/43_Functional--Confidence.md	every run	`random.seed(42)` makes the hand-written loop draw the same strings on every run.
 Chapters/43_Functional--Confidence.md	the first call	The body of `withdraw()` runs once, for the first call, and subtracts one `30`.
+Chapters/44_Effects--Effect_Management.md	every run	The same arguments produce the same result on every call, so a test that passes once passes on every run.
+Chapters/44_Effects--Effect_Management.md	the line where	The machinery exists because a Scala call runs the function it names, at the line where you wrote it.
 Chapters/45_Effects--Generators.md	The last `send()`	The last `send()` resumes `interview()`'s body, which encounters `return` instead of another `yield`, so the generator returns its `Result`.
 Chapters/45_Effects--Generators.md	The outer `except GeneratorExit`	The outer `except GeneratorExit` clause then catches it and returns `"closed"`.
 Chapters/45_Effects--Generators.md	The outermost `visit()`	The outermost `visit()` returns the `Counter` for the whole garden.
@@ -135,6 +137,7 @@ Chapters/46_Effects--Stateless.md	both runs	`greet()`'s body is the same in both
 Chapters/46_Effects--Stateless.md	second run	Storing one in a registry to run later, handing the same one to two consumers, or keeping one around to retry after a failure---each of these returns `None` on the second run instead of raising an exception.
 Chapters/46_Effects--Stateless.md	second run	The second run first wraps `greet()` in an inner `supply()`, which answers the `Need[Console]` request before the request reaches `fallback`.
 Chapters/46_Effects--Stateless.md	the inner `except`	The error propagates out of `run()`, and the inner `except` never runs:
+Chapters/46_Effects--Stateless.md	the line that	A language with built-in Effects transfers execution from the line that requests an Effect to a handler.
 Chapters/47_Effects--Stateless_in_Practice.md	Each run	Each run's last line is the outcome that `report()` returns.
 Chapters/47_Effects--Stateless_in_Practice.md	The outer loop	The outer loop then calls `plug()` again for a replacement.
 Chapters/47_Effects--Stateless_in_Practice.md	The second call	The second call's answer comes from `db1`'s cache entry, because `memoize()` keys on `"Morty"` alone.

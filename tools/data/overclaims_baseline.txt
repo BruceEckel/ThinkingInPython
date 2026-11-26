@@ -712,7 +712,7 @@ Chapters/44_Effects--Effect_Management.md	[BOUND] The CODE declares CODE with on
 Chapters/44_Effects--Effect_Management.md	[BOUND] The CODE supplies automatic propagation, but it removes the parameter along with the two benefits the parameter provided
 Chapters/44_Effects--Effect_Management.md	[BOUND] The error type in CODE's CODE is CODE, the one failure its caller can handle, rather than CODE's catch-all CODE
 Chapters/44_Effects--Effect_Management.md	[BOUND] The function reads its arguments alone and leaves everything outside itself as it was
-Chapters/44_Effects--Effect_Management.md	[BOUND] The read leaves the environment as it was, yet the result of your function differs from one call to the next
+Chapters/44_Effects--Effect_Management.md	[BOUND] The read leaves the environment as it was, yet two calls with the same arguments return different results
 Chapters/44_Effects--Effect_Management.md	[BOUND] Three calls down, a helper that formats currency reads a configuration service and writes to an audit log
 Chapters/44_Effects--Effect_Management.md	[BOUND] Three things pass from callee to caller
 Chapters/45_Effects--Generators.md	[BOUND] A CODE added above CODE in CODE runs when the mouse is trapped and at no other time
@@ -742,12 +742,11 @@ Chapters/46_Effects--Stateless.md	[BOUND] A caller now has two options
 Chapters/46_Effects--Stateless.md	[BOUND] A channel empties in one of three ways, two of which have a vocabulary of their own
 Chapters/46_Effects--Stateless.md	[BOUND] A dependency injection container often lets you register a fallback for a type that no other registration provides
 Chapters/46_Effects--Stateless.md	[BOUND] A failure leaves the error channel in one of two ways
-Chapters/46_Effects--Stateless.md	[BOUND] A structural check matches on method names alone, so two supplied objects that both define CODE are indistinguishable
+Chapters/46_Effects--Stateless.md	[BOUND] A structural check matches on method names alone, so it accepts every supplied object that defines CODE
 Chapters/46_Effects--Stateless.md	[BOUND] An Effect's type declares three things
 Chapters/46_Effects--Stateless.md	[BOUND] Because the one CODE runs in the driver, neither CODE nor anything that calls it needs CODE
-Chapters/46_Effects--Stateless.md	[BOUND] Both instances need CODE, since each is a CODE by structure alone
 Chapters/46_Effects--Stateless.md	[BOUND] CODE accepts an Effect whose yield channel has narrowed to those two, which is all that remains once you supply every other Ability
-Chapters/46_Effects--Stateless.md	[BOUND] CODE binds for one execution of one Effect, so two bindings for the same type can be live at once, as the screen and memory CODEs are in When Two Implementations Match
+Chapters/46_Effects--Stateless.md	[BOUND] CODE binds for one execution of one Effect, so two bindings for the same type can be live at once
 Chapters/46_Effects--Stateless.md	[BOUND] CODE defines its own CODE, rather than using the one Stateless provides, to show that a dependency is an ordinary class
 Chapters/46_Effects--Stateless.md	[BOUND] CODE in CODE stores its values as CODEs, so looking up a name is the only step and CODE is the only failure
 Chapters/46_Effects--Stateless.md	[BOUND] CODE in CODE, a clock whose one method is CODE
@@ -774,7 +773,7 @@ Chapters/46_Effects--Stateless.md	[BOUND] The class implements the generator pro
 Chapters/46_Effects--Stateless.md	[BOUND] The output above shows standard output alone, so it leaves out the warning
 Chapters/46_Effects--Stateless.md	[BOUND] The parameter version adds a CODE parameter to both, although CODE, one level further down, is the one function that uses it
 Chapters/46_Effects--Stateless.md	[BOUND] The parameter version then adds two parameters to every function on the path
-Chapters/46_Effects--Stateless.md	[BOUND] The two calls are identical, and no type records whether CODE has run, so the type checker accepts both
+Chapters/46_Effects--Stateless.md	[BOUND] The two calls are identical
 Chapters/46_Effects--Stateless.md	[BOUND] The two styles differ when a function three calls deep requests the dependency
 Chapters/46_Effects--Stateless.md	[BOUND] The type checker and CODE treat the two channels differently
 Chapters/46_Effects--Stateless.md	[BOUND] This version changes the table row alone
@@ -1366,9 +1365,10 @@ Solutions/45_Effects--Generators/README.md	[BOUND] you wrote the full sequence o
 Solutions/46_Effects--Stateless/README.md	[BOUND] A caller needing a bare CODE has one case left to handle
 Solutions/46_Effects--Stateless/README.md	[BOUND] CODE declares two requirements and leaves the instances to CODE, so every combination of instances is a valid environment for it
 Solutions/46_Effects--Stateless/README.md	[BOUND] Following the type checker until the program builds means one edit
-Solutions/46_Effects--Stateless/README.md	[BOUND] For a name with a positive score the program prints one line, for a name with a negative score CODE raises a CODE, and for a name missing from CODE it raises a CODE
+Solutions/46_Effects--Stateless/README.md	[BOUND] For a name with a positive score the program prints one line
 Solutions/46_Effects--Stateless/README.md	[BOUND] Now every caller has two options, the same two CODE's callers have
 Solutions/46_Effects--Stateless/README.md	[BOUND] One Effect, Many Environments shows CODE running CODE against a table of materials and nailers
+Solutions/46_Effects--Stateless/README.md	[BOUND] One rule predicts them all
 Solutions/46_Effects--Stateless/README.md	[BOUND] Pass its instance to CODE once for each protocol, in one call, run the Effect, and assert on the recorder's two lists
 Solutions/46_Effects--Stateless/README.md	[BOUND] The difference between the two cases is whether anything later uses the dropped value
 Solutions/46_Effects--Stateless/README.md	[BOUND] The discarded CODE is a complete statement, so the type checker checks that statement alone and accepts it
@@ -1378,7 +1378,6 @@ Solutions/46_Effects--Stateless/README.md	[BOUND] The requirement appears in the
 Solutions/46_Effects--Stateless/README.md	[BOUND] Then check whether the type checker can distinguish two classes that share one method name
 Solutions/46_Effects--Stateless/README.md	[BOUND] Those two are the only options, so the dependency stays visible
 Solutions/46_Effects--Stateless/README.md	[BOUND] Two CODEs that share one method name describe one structure under two names
-Solutions/46_Effects--Stateless/README.md	[BOUND] With a third implementation added to CODE, the three implementations have six orderings, and one rule predicts them all
 Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] **Leave the Effect alone
 Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] Add a source class with the same two methods and place it in the tuple that CODE receives
 Solutions/47_Effects--Stateless_in_Practice/README.md	[BOUND] CODE asks for an instance of CODE, so its request consists of the type alone
