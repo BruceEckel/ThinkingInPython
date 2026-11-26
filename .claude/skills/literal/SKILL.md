@@ -460,3 +460,21 @@ and it becomes part of every future pass.
   Grep the scope for
   `(standard|common|usual|accepted|typical) (practice|approach|way|solution|answer|fix)`.
   C102 in `bruce_edit_db.md`.
+- "A language with built-in Effects intercepts an Effect where it
+  runs." and "Scala cannot intercept an Effect at the point where it
+  runs, the way a native handler does." (2026-11-26, chapters 46 and
+  44, proposed on the Framing Proposals page and approved by Bruce.)
+  "Intercept" leaves the reader to work out who catches what, and an
+  Effect "runs" in the handler, after the thing the sentence is
+  describing.
+  Say what the language does with the call: "transfers execution from
+  the line that requests an Effect to a handler". For a library, say
+  what an ordinary call does: "a Scala call runs the function it
+  names, at the line where you wrote it. A library cannot send that
+  call to a handler".
+  Keep chapter 44's `except` analogy ("A handler intercepts an Effect
+  and decides what it means"), which has the transfer in the next
+  paragraph, and a special method that intercepts attribute access
+  or construction, the reference's own verb.
+  Grep the scope for `intercept`.
+  C112 in `bruce_edit_db.md`.

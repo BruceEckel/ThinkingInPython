@@ -561,6 +561,13 @@ already stated nearby, as in a summary sentence that closes a section.
   "The body writes to standard output, a side effect the signature
   leaves out." A verdict on code ("incomplete", "wrong", "broken") is
   tested by reading it as a plain statement about the code.
+- `44_Effects--Effect_Management` 2026-11-26, was Claude-written,
+  proposed on the Framing Proposals page and approved by Bruce: "The
+  hidden Effects make code hard to understand. A reader who sees only
+  the signature must ask:" -> "The hidden Effects make a function
+  unpredictable to a reader who sees only its signature. That reader
+  must ask:". "Hard to understand" was a verdict over four questions
+  that each ask whether a reader can say in advance what a call does.
 
 **Home.** literal (Accrued patterns and the "Vague descriptions"
 section), the pass that owns figures; deep-review (prose pass, "Vague").
@@ -3119,6 +3126,15 @@ the book-wide read that day (Opus agents, brief in
   chapter 45 and 115 in `Chapters/`; the other 8 in chapter 45 were
   framed ("If `outer()` wrote `yield one()`", "with `values.append(a)`
   in place of `yield a`", an exercise statement).
+- `44_Effects--Effect_Management` 2026-11-26, was Claude-written,
+  proposed on the Framing Proposals page and approved by Bruce:
+  "Instead of calling the built-in `input()` and `print()`, `greet()`
+  declares what it needs:" -> "If `greet()` calls the built-in
+  `input()` and `print()` in its body, `greet()` picks the console for
+  every caller, a test included. Here, `greet()` declares what it
+  needs:". The lead-in compared its listing with a `greet()` the
+  chapter does not show. The condition frames that version and says
+  what it decides.
 
 **Home.** alternative (its own pass, `.claude/skills/alternative/SKILL.md`)
 | ambiguity (catalog and Accrued shapes) |
@@ -7826,6 +7842,83 @@ the life of the thread").
 **Home.** `stutter` (Accrued shapes; the echo is what a pass can
 find) | this file. The one sighting is outside `Chapters/`, so a
 `Promotion` line waits for a sighting in a chapter.
+
+### C111. "Unpredictable from X" names no one who predicts: write the clause
+
+**Test.** An adjective for what cannot be known in advance
+("unpredictable", "unknown", "invisible") carries a bare "from"
+phrase for the evidence ("unpredictable from its arguments"). The
+phrase also reads as the cause, and the sentence names no one who
+predicts. Say what stays the same and what differs, in a clause the
+listing can confirm ("the same call returns different results"), or
+name the reader ("unpredictable to a reader who sees only its
+signature"). Check the phrase against the listing too: `roll()` in
+chapter 46 takes no arguments.
+
+**Keep when.** A "to" phrase names who cannot tell ("unpredictable to
+a reader who sees only its signature"), or the "from" phrase names a
+place and the adjective a relation to it ("reachable from the root",
+"indistinguishable from an empty program").
+
+**Sightings.** 1
+- `46_Effects--Stateless` 2026-11-26, a Claude-written proposal on
+  the Framing Proposals page, Bruce's note on its card:
+  "'unpredictable from its arguments' is unclear; fix that."
+  "A side cause makes a function unpredictable from its arguments." ->
+  "A side cause makes a function unpredictable: the same call returns
+  different results."
+- The grep that day (an "-able" word, then "from" or "to", then
+  "its", "the", or "a", then argument, signature, caller, or reader,
+  both trees) found one site, the kept form in chapter 44.
+
+**Home.** `ambiguity` (Accrued shapes) | this file.
+
+### C112. A language that "intercepts an Effect where it runs" transfers execution to a handler: say that
+
+**Test.** "Intercept" with an Effect as its object and a place for
+the Effect to "run" ("intercepts an Effect where it runs", "cannot
+intercept an Effect at the point where it runs"). The reader has to
+work out who intercepts what, and the handler performs the Effect
+after the event the sentence describes. Say what the language does
+with the call: it transfers execution from the line that requests the
+Effect to a handler. For a library, say what an ordinary call does:
+it runs the function it names, at the line where you wrote it.
+
+**Keep when.** The sentence sets up the `except` analogy and the
+transfer is stated beside it (chapter 44: "An `except` block
+intercepts exceptions ... A handler intercepts an Effect and decides
+what it means", with the transfer in the next paragraph). A special
+method that intercepts attribute access or construction keeps the
+reference's own verb (`__getattribute__()`, a metaclass's
+`__call__()`). Appendix A defines its "interception" where it uses
+the word.
+
+**Sightings.** 2, both Claude-written, proposed on the Framing
+Proposals page 2026-11-26 and approved by Bruce
+- `44_Effects--Effect_Management`: "The machinery exists because
+  Scala cannot intercept an Effect at the point where it runs, the
+  way a native handler does." -> "The machinery exists because a
+  Scala call runs the function it names, at the line where you wrote
+  it. A library cannot send that call to a handler, the way a native
+  language does."
+- `46_Effects--Stateless`: "A language with built-in Effects
+  intercepts an Effect where it runs." -> "A language with built-in
+  Effects transfers execution from the line that requests an Effect
+  to a handler."
+- Chapter 44 gained the transfer as a paragraph of its own in the
+  Handlers section the same day ("When `greet()` reaches `ask(...)`,
+  execution leaves `greet()` and enters the `with fun ask(prompt)`
+  handler in `main()`"), and "When an Effect runs, the handler
+  receives a *continuation*" became "When a function requests an
+  Effect, the function pauses, and the handler receives a
+  *continuation*".
+- The grep that day (`intercept`, both trees) found 19 lines: these
+  two, the keeps above, and one exercise statement in chapter 47 with
+  its solution.
+
+**Promotion.** Proposed: two chapters.
+
+**Home.** `literal` (Accrued patterns) | this file.
 
 ## Retired
 

@@ -108,6 +108,15 @@ each pass hands the next one less to do.
    the program", C102). Grep the scope for
    `(standard|common|usual|accepted|typical) (practice|approach|way|solution|answer|fix)`
    and keep a practice the field holds.
+   A language does not "intercept an Effect where it runs": say what
+   it does with the call ("A language with built-in Effects
+   intercepts an Effect where it runs" -> "transfers execution from
+   the line that requests an Effect to a handler"; "Scala cannot
+   intercept an Effect at the point where it runs" -> "a Scala call
+   runs the function it names, at the line where you wrote it",
+   C112). Grep the scope for `intercept`, and keep the `except`
+   analogy when the transfer is stated beside it, and a special
+   method that intercepts attribute access.
 2. `positive`: a negation that is an accident of phrasing turns around.
    A subject of "Nothing", "Nobody", or "No one" with a verb ("Nothing
    calls `throw()` on the first booking" -> "`list(book())` drives the
@@ -559,7 +568,15 @@ each pass hands the next one less to do.
    capability's word (`retry()` in chapters 46 and 47 runs the
    function again from its start and needs no continuation), then
    cut the capability that does not need the mechanism ("express a
-   backtracking search") or say how the two differ (C99).
+   backtracking search") or say how the two differ (C99). An
+   adjective for what cannot be known takes a clause, not a bare
+   "from" phrase ("A side cause makes a function unpredictable from
+   its arguments", Bruce: "'unpredictable from its arguments' is
+   unclear" -> "unpredictable: the same call returns different
+   results", C111). The "from" phrase reads as evidence or as cause,
+   and `roll()` takes no arguments. Grep the scope for
+   `predictable (from|by)` and read each "-able from" for who cannot
+   tell what.
 7. `activate`: passives with a natural actor, nominalizations,
    metadiscourse, empty frames, tense drift (a relative-clause past
    in a sentence about standing behavior included: "the value that

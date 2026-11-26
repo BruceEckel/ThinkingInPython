@@ -491,3 +491,20 @@ Shapes Bruce flags that the catalog above did not name, dated, with the sentence
   how the two differ.
   Both sentences now say "a backtracking search" alone.
   C99 in `bruce_edit_db.md`.
+- 2026-11-26, chapter 46 (a proposal on the Framing Proposals page):
+  an adjective for what cannot be known, with a bare "from" phrase.
+  "A side cause makes a function unpredictable from its arguments."
+  (Bruce: "'unpredictable from its arguments' is unclear; fix that.")
+  "From its arguments" reads as the evidence a reader predicts from
+  or as the cause of the unpredictability, the sentence names no one
+  who predicts, and `roll()`, the function under it, takes no
+  arguments.
+  Say what stays the same and what differs, in a clause the listing
+  can confirm: "A side cause makes a function unpredictable: the same
+  call returns different results."
+  Keep a "to" phrase that names who cannot tell ("unpredictable to a
+  reader who sees only its signature") and a spatial "from"
+  ("reachable from the root").
+  Grep the scope for `predictable (from|by)` and read each "-able
+  from".
+  C111 in `bruce_edit_db.md`.
