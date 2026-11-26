@@ -629,6 +629,14 @@ each pass hands the next one less to do.
     noun and a code variable of one spelling naming different things.
     It runs last because the ten passes above write new sentences,
     and a rewrite can put a word beside its code span.
+    A clause that names a noun again to give it one standing property
+    folds into a modifier ("the world outside your program, and that
+    world keeps changing" -> "the ever-changing world outside your
+    program", C110, Bruce's hand in `HighLevel.md`). Keep a clause
+    that chains a new fact onto the noun ("a value, and that value
+    becomes the result of the `yield` expression"). The scan's window
+    is three tokens, so grep the scope for `, and (that|this|the) `
+    and read each hit for a noun the sentence has used.
 
 ## Before the read
 

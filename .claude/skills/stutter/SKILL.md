@@ -229,3 +229,19 @@ sentence, the date, and the repair.
   evaluation* computes a value only when something needs it"), the
   book's usual way to open a section on a term.
   C106 in `bruce_edit_db.md`.
+- 2026-11-26, `HighLevel.md` (the repo-root overview): a noun named
+  again to carry one property.
+  "Others depend on the world outside your program, and that world
+  keeps changing." became, in Bruce's hand, "Others depend on the
+  ever-changing world outside your program."
+  The second clause held no event and no object, only a property the
+  world has all the time, so an adjective before the noun says it and
+  the noun appears once.
+  The two "world"s sit five tokens apart, outside the scan's window,
+  so grep the scope for `, and (that|this|the) ` and read each hit
+  for a noun the sentence has used.
+  Keep the clause when it chains a new fact onto the noun: an event,
+  an identity, or a contrast ("a value, and that value becomes the
+  result of the `yield` expression"). The book has 45 of those, and
+  they are the "topic noun named again" keep above.
+  C110 in `bruce_edit_db.md`.

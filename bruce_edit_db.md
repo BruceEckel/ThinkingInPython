@@ -7795,6 +7795,38 @@ Bruce's hand (`69911c79`):
 **Home.** `ambiguity` for (a), `cohesion` for (b) | this file. No
 skill entry until a second sighting.
 
+### C110. A clause that repeats a noun to give it one standing property becomes a modifier on the noun
+
+**Test.** A sentence introduces a noun and then adds ", and that N
+<verb>s", and the whole content of the second clause is a property N
+has all the time ("keeps changing"): no event, no object, and no
+claim the next sentence builds on. One adjective or participle before
+the noun says the same, so the sentence is one clause and N appears
+once. The repeated noun is the tell.
+
+**Keep when.** The second clause chains a new fact onto the noun, old
+before new: an event or an object ("a value, and that value becomes
+the result of the `yield` expression"), an identity ("and that buffer
+is `data`"), a contrast ("and that object stays as mutable as it
+was"), or a limit with a phrase of its own ("and that size holds for
+the life of the thread").
+
+**Sightings.** 1
+- `HighLevel.md` (the repo-root overview, not a chapter) 2026-11-26,
+  was Claude-written, Bruce's hand (`3a8aa557`):
+  "Others depend on the world outside your program, and that world
+  keeps changing." -> "Others depend on the ever-changing world
+  outside your program."
+- The grep that day (a noun, then ", and that|this|the" and the same
+  noun, in one sentence, both trees) found 46 sentences, and 45 of
+  them are the keeps above. One is close to the test and stands
+  unedited: Solutions 45, "a generator object, and that object sits
+  suspended before its first line".
+
+**Home.** `stutter` (Accrued shapes; the echo is what a pass can
+find) | this file. The one sighting is outside `Chapters/`, so a
+`Promotion` line waits for a sighting in a chapter.
+
 ## Retired
 
 Rejected by Bruce, or promoted and later withdrawn. Never propose these
