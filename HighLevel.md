@@ -1,7 +1,7 @@
 # Effect Management: A High-Level View
 
 Some functions do the same thing every time you call them.
-Others depend on the world outside your program, and that world keeps changing.
+Others depend on the ever-changing world outside your program.
 An *Effect Management System* tracks the second kind of function and gives you control over what each one does.
 
 ## Predictable and Unpredictable Functions
