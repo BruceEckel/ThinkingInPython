@@ -769,6 +769,31 @@ def stutter(v: Vars) -> None:
     py("tools.word_stutter", *prose_files(v), *v.words("ARGS"))
 
 
+@task("Survey reading level per file and per section (report-only)")
+def reading_level(v: Vars) -> None:
+    """Survey the reading level of the prose (tools/reading_level.py).
+    Each file and each `##` section gets a row with its words,
+    sentences, words per sentence, syllables per word, and three
+    scores: the Flesch-Kincaid grade, SMOG, and Coleman-Liau. Fenced
+    listings, headings, block quotes, tables, HTML, link definitions,
+    and `#:` lines are skipped; list items and footnotes are read, and
+    a link counts as its text. A code span counts as the identifiers in
+    it, one word each, with their syllables summed over the parts
+    (`StopIteration` is Stop and Iteration); ARGS="--code it" counts
+    every span as the one word "it" instead, the lower bound that treats
+    every name as known to the reader. Each file ends with its longest
+    sentences. CH=NN picks one chapter and its Solutions file;
+    DOCS=HighLevel.md picks any Markdown path; ARGS="--target 8" marks
+    each row above grade 8 and ends with the count of sections above
+    it; ARGS=--summary prints one table of every file, hardest first,
+    for a book-wide read; ARGS=--calibrate compares the syllable
+    counter with the CMU Pronouncing Dictionary and ARGS="--calibrate
+    --write" updates the table of corrections with the words of the
+    paths it reads. It keeps no baseline and is not part of `tip prose`.
+    """
+    py("tools.reading_level", *prose_files(v), *v.words("ARGS"))
+
+
 @task("Report public class names that only their class uses "
       "(report-only; accept with `tip internal-names-accept`)")
 def internal_names(v: Vars) -> None:

@@ -892,6 +892,29 @@ not. Its first survey read 177 and found five, each a verb beside a
 variable of that spelling ("`announce()` calls every responder ...
 `calls` shows that both assignments called"), so it is read in the
 same keep-biased frame; `MIXED_NOTES` in the tool has the list.
+`tip reading-level` (`tools/reading_level.py`, 2026-11-26) is a fourth
+survey tool outside `tip prose`, with no baseline and no parse. Per
+file and per `##` section it prints words, sentences, words per
+sentence, syllables per word, and three grades (Flesch-Kincaid, SMOG,
+Coleman-Liau), then the file's longest sentences. `DOCS=HighLevel.md`
+reads any Markdown path, `ARGS="--target 8"` marks each row above a
+grade, and `ARGS=--summary` prints one row per file, hardest first.
+It reads the prose `tip stutter` reads, with link text counted, and
+takes its sentences from `reflow_prose.split_sentences()`. A code span
+counts as its identifiers (`StopIteration` is one word of five
+syllables), and `ARGS="--code it"` counts each span as the word "it".
+The gap between the two runs is the part of a grade that comes from
+names: chapter 46 reads 8.3 with them and 6.9 without. Syllables come
+from `HAND` in the tool, then `tools/data/syllable_overrides.txt`,
+then a heuristic. The table holds the 453 book words where the
+heuristic and the CMU Pronouncing Dictionary disagree, and
+`ARGS="--calibrate --write"` updates it through
+`tools/syllable_dict.py`, which runs in a throwaway `uv run
+--no-project --with cmudict` environment, as the spaCy parser does.
+That day the book read Flesch-Kincaid 8.3 over 94 files, from 6.9
+(chapter 38) to 10.0 (chapters 25 and 33), and `HighLevel.md`, written
+for grade 8, read 5.4. The formulas count sentence length and word
+length, so a grade measures the sentences, not the ideas in them.
 `tip italics` (`tools/italics.py`, 2026-10-23) lists italics that break
 the introduce-once rule: `[EMPHASIS]` a span of function words ("*is*",
 "defers *how*"), `[REPEAT]` a term italicized again in the same file,

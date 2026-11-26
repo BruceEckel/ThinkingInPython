@@ -98,7 +98,7 @@ at about a third more candidates over the book.
 import argparse
 import keyword
 import re
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from pathlib import Path
 from typing import Final, NamedTuple
 from tools.config import ROOT
@@ -214,12 +214,16 @@ def clean(line: str) -> str:
     return ATTRS.sub("", line)
 
 
-def paragraphs(doc: Document) -> Iterator[list[tuple[int, str]]]:
+def paragraphs(
+    doc: Document, clean: Callable[[str], str] = clean,
+) -> Iterator[list[tuple[int, str]]]:
     """Each prose paragraph as (1-based line, cleaned text) pairs.
 
     The reader `tools/stranded_prepositions.py` uses, except that code
     spans stay in the text, since their identifiers are what the
-    `[CODE]` shape compares against.
+    `[CODE]` shape compares against. A caller passes its own `clean`
+    when it needs another reading of links, as `tools/reading_level.py`
+    does.
     """
     fenced = doc.in_fence()
     current: list[tuple[int, str]] = []

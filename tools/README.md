@@ -1848,6 +1848,57 @@ tip negatives ARGS="--top 20"          # the 20 densest paragraphs
 tip negatives ARGS=--calibrate         # edit pairs and the rule's examples
 ```
 
+## reading_level.py
+
+A survey of reading level per file and per `##` section, outside
+`tip prose`, with no baseline and no gate. Each row gives words,
+sentences, words per sentence, syllables per word, and three scores:
+the Flesch-Kincaid grade, SMOG, and Coleman-Liau. Each file ends with
+its longest sentences, and a run over several files ends with a summary
+table, hardest first, and the grade over all of them.
+
+It reads the prose that `word_stutter.py` reads (listings, headings,
+block quotes, tables, HTML, and `#:` lines are skipped; list items and
+footnotes are read) with one difference: a link counts as its text.
+Sentences come from `reflow_prose.split_sentences()`. A code span counts
+by mode. `--code words`, the default, reads each identifier as one word
+whose syllables are the sum over its parts (`StopIteration` is Stop and
+Iteration, `validate_output` is validate and output). `--code it` reads
+every span as the one word "it", the lower bound that treats every name
+as a word the reader knows. Comparing the two shows how much of a
+section's grade comes from names.
+
+A syllable count looks a word up in `HAND` (technical words no
+dictionary has, counted by ear), then in
+`tools/data/syllable_overrides.txt`, then in `heuristic()`, a
+vowel-group counter with a silent-e rule and a few suffix rules. The
+table holds each word of the book where the heuristic and the CMU
+Pronouncing Dictionary's first pronunciation disagree, with the
+dictionary's count, so a normal run needs no dictionary. `--calibrate`
+asks for one. The dictionary is `syllable_dict.py`, which runs under `uv
+run --no-project --python 3.12 --with cmudict` (`DICT_CMD`) and
+imports nothing from `tools/`, the way `spacy_parse.py` does, because
+the project adds no dependency for a survey. When it cannot start,
+`--calibrate` says so on stderr and exits 0.
+
+`--calibrate` prints the agreement with the dictionary before and after
+`HAND` and the table, the words the table lacks, its stale entries, and
+the words the dictionary lacks (candidates for `HAND`). `--calibrate
+--write` updates the table: the words of the paths join the words it
+holds, and an entry the heuristic now gets right is dropped, so a run
+over one chapter keeps the rest of the book's entries. Other flags:
+`--longest N` (default 10, 0 for none), `--summary` (only the summary
+table), `--target GRADE` (mark rows above it with ` >` and count the
+sections above it), and `--fail` (with `--target`, exit 1 when a whole
+file is above it).
+
+```
+tip reading-level DOCS=HighLevel.md                # one file
+tip reading-level CH=44 ARGS="--code it --target 8"
+tip reading-level ARGS=--summary                   # the whole book
+tip reading-level ARGS="--calibrate --write"       # update the syllable table
+```
+
 ## check_all.py
 
 The checks below each have their own script and their own `tip` target,
